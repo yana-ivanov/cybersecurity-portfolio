@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glassworm Detector — Invisible Unicode & Crypto C2 Scanner | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&family=IBM+Plex+Serif:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d5cfc4;--bg:#f0ede6;--paper:#ffffff;--card:#f7f5f0;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --serif:'IBM Plex Serif',serif;
+}
+html{scroll-behavior:smooth;font-size:19px}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.7;font-size:16px}
+
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--serif);font-size:clamp(2rem,5vw,3rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:#fff}
+.mast-desc{font-family:var(--sans);font-size:.95rem;color:#94a3b8;line-height:1.75;max-width:640px;margin-bottom:2rem}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:3rem 0}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--rule);margin-bottom:2rem}
+.tab-btn{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.75rem 1.5rem;background:none;border:none;cursor:pointer;color:#94a3b8;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ── NOTICES ── */
+.notice{border-radius:4px;padding:.85rem 1.1rem;margin-bottom:1rem;display:flex;gap:.75rem;align-items:flex-start;box-shadow:var(--shadow)}
+.notice.amber{background:#fffbeb;border:1px solid #fcd34d}
+.notice.red{background:#fef2f2;border:2px solid var(--red)}
+.notice-icon{font-size:1rem;flex-shrink:0;margin-top:.1rem}
+.notice-text{font-family:var(--mono);font-size:.65rem;letter-spacing:.03em;line-height:1.65}
+.notice.amber .notice-text{color:#78350f}
+.notice.red .notice-text{color:#7f1d1d}
+.notice-text strong{display:block;margin-bottom:.2rem;letter-spacing:.1em;text-transform:uppercase}
+.notice.red .notice-text strong{color:var(--red)}
+.notice.amber .notice-text strong{color:var(--amber)}
+
+/* ── DROP ZONE ── */
+.drop-zone{border:2px dashed #bfdbfe;border-radius:2px;background:#f0f7ff;padding:1.75rem 1.5rem;text-align:center;cursor:pointer;transition:background .15s,border-color .15s;position:relative}
+.drop-zone:hover,.drop-zone.dragover{background:#dbeafe;border-color:var(--blue)}
+.drop-zone.has-file{border-style:solid;border-color:var(--blue)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{font-size:1.3rem;color:var(--blue);margin-bottom:.4rem}
+.drop-title{font-family:var(--sans);font-size:.95rem;font-weight:600;color:var(--ink);margin-bottom:.25rem}
+.drop-sub{font-family:var(--mono);font-size:.68rem;color:#94a3b8;letter-spacing:.06em}
+.drop-filename{font-family:var(--mono);font-size:.68rem;color:var(--blue);margin-top:.4rem;display:none;word-break:break-all}
+.drop-zone.has-file .drop-sub{display:none}
+.drop-zone.has-file .drop-filename{display:block}
+
+/* ── ACTIONS ── */
+.action-row{display:flex;align-items:center;gap:1rem;margin-top:1.25rem;flex-wrap:wrap}
+.zbtn{font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;padding:.85rem 2.25rem;border-radius:2px;border:none;cursor:pointer;transition:background .2s;display:inline-flex;align-items:center;gap:.5rem}
+.zbtn-run{background:#a8c4f5;color:#fff;pointer-events:none}
+.zbtn-run.ready{background:var(--blue);color:#fff;pointer-events:auto}
+.zbtn-run.ready:hover{background:#153e80}
+.zbtn-run.running{background:var(--blue);pointer-events:none;opacity:.7}
+.zbtn-clear{background:transparent;color:#64748b;border:1px solid var(--rule);font-size:.72rem;padding:.7rem 1.75rem}
+.zbtn-clear:hover{border-color:var(--ink);color:var(--ink)}
+.zstatus{font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;color:#94a3b8}
+.zstatus.ok{color:var(--green)}.zstatus.warn{color:var(--amber)}.zstatus.running{color:var(--amber)}
+.spinner{display:none;width:10px;height:10px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.zbtn-run.running .spinner{display:block}
+.zbtn-run.running .run-icon{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── OUTPUT ── */
+.output-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:#94a3b8;margin:.85rem 0 .35rem}
+#uniOutput,#cryptoOutput{background:#0a0f1a;border-radius:2px;padding:1.1rem 1.4rem;font-family:var(--mono);font-size:.75rem;line-height:1.7;color:#e2e8f0;min-height:140px;max-height:520px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+#uniOutput .placeholder,#cryptoOutput .placeholder{color:#334155;font-style:italic}
+.zt-red{color:#ef4444}.zt-orange{color:#fb923c}.zt-green{color:#4ade80}
+.zt-blue{color:#60a5fa}.zt-dim{color:#475569}.zt-bold{font-weight:700}
+
+/* ── COMPAT GRID ── */
+.compat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem 2rem;font-family:var(--mono);font-size:.68rem;line-height:1.8;margin-bottom:1.25rem;background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:1.1rem 1.25rem;box-shadow:var(--shadow)}
+.compat-label{letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem;font-size:.6rem;font-weight:700}
+.compat-label.good{color:var(--green)}
+.compat-label.limited{color:var(--amber)}
+.compat-item{color:var(--ink3)}
+
+/* ── HOW IT WORKS ── */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0}
+.how-card{background:var(--paper);border:1px solid var(--rule);border-top:3px solid var(--blue);border-radius:4px;padding:1.1rem;box-shadow:var(--shadow)}
+.how-num{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;color:var(--blue);text-transform:uppercase;margin-bottom:.35rem}
+.how-title{font-family:var(--serif);font-size:.92rem;font-weight:700;color:var(--ink);margin-bottom:.35rem;line-height:1.3}
+.how-desc{font-size:.82rem;color:var(--ink3);line-height:1.6}
+
+/* ── RANGE TABLE ── */
+.range-table{width:100%;border-collapse:collapse;font-size:.82rem;margin:1.25rem 0;box-shadow:var(--shadow);border-radius:4px;overflow:hidden}
+.range-table thead tr{background:#0a0f1a;color:#fff}
+.range-table th{padding:.7rem 1rem;text-align:left;font-family:var(--mono);font-size:.65rem;letter-spacing:.1em}
+.range-table td{padding:.65rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+.range-table tr:last-child td{border-bottom:none}
+.range-table tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+.range-table td.code{font-family:var(--mono);font-size:.75rem;color:var(--red)}
+.range-table td strong{color:var(--ink)}
+
+.callout{padding:1rem 1.25rem;border-radius:4px;margin:1.5rem 0;border-left:4px solid;box-shadow:var(--shadow)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{font-size:.88rem;color:var(--ink3);line-height:1.7;margin:0}
+.callout strong{color:var(--ink)}
+
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer a{color:#4a9eff;text-decoration:none}
+
+@media(max-width:680px){
+  .mast-inner,.wrap{padding-left:1.5rem;padding-right:1.5rem}
+  .how-grid{grid-template-columns:1fr}
+  .compat-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Analyst Toolkit · Supply Chain Security</div>
+    <h1 class="title">Glassworm Detector</h1>
+    <p class="mast-desc">Scan source code files for invisible Unicode payloads and detect blockchain C2 connections. Built on the detection logic from the <a href="../analysis/glassworm_analysis.html" style="color:#4a9eff">Glassworm threat analysis</a> and the <a href="../labs/lab_log_006.html" style="color:#4a9eff">zeek_triage.py</a> methodology. Runs entirely in your browser — no files leave your machine.</p>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    BROWSER-BASED &nbsp;·&nbsp; NO SERVER &nbsp;·&nbsp; NO DATA UPLOAD &nbsp;·&nbsp; TRAINING USE ONLY
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+  <div class="notice amber">
+    <span class="notice-icon">⚠️</span>
+    <div class="notice-text">
+      <strong>Training &amp; Educational Use Only</strong>
+      This tool demonstrates Glassworm detection concepts for educational purposes. Do not use it to scan production codebases containing proprietary source code, trade secrets, or CUI. For regulated environments, deploy the <a href="#" style="color:var(--amber)">zeek_triage.py</a> script locally where code never leaves your system.
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('unicode',this)">Invisible Unicode Scanner</button>
+    <button class="tab-btn" onclick="switchTab('crypto',this)">Blockchain C2 Detector</button>
+    <button class="tab-btn" onclick="switchTab('about',this)">How It Works</button>
+  </div>
+
+  <!-- ── TAB 1: Unicode Scanner ── -->
+  <div class="tab-panel active" id="panel-unicode">
+
+    <div class="notice red">
+      <span class="notice-icon">🔴</span>
+      <div class="notice-text">
+        <strong>CMMC / Source Code Notice</strong>
+        Do not upload source files from DoD contractor codebases, proprietary systems, or any environment subject to CMMC, ITAR, or EAR controls. Use only with publicly available or synthetic test files.
+      </div>
+    </div>
+
+    <div class="compat-grid">
+      <div>
+        <div class="compat-label good">Detects</div>
+        <div class="compat-item">Glassworm PUA codepoints U+FE00–U+FE0F</div>
+        <div class="compat-item">Variation Selectors Supplement U+E0100–U+E01EF</div>
+        <div class="compat-item">Zero-width characters U+200B–U+200F</div>
+        <div class="compat-item">Soft hyphen and invisible BOM characters</div>
+      </div>
+      <div>
+        <div class="compat-label limited">File Types Supported</div>
+        <div class="compat-item">.js .ts .jsx .tsx .py .rb .php</div>
+        <div class="compat-item">.java .cs .go .rs .cpp .c .sh</div>
+        <div class="compat-item">.json .yaml .toml .env .html</div>
+        <div class="compat-item">Any plain text file (select manually)</div>
+      </div>
+    </div>
+
+    <div class="drop-zone" id="uniDrop">
+      <input type="file" id="uniFileInput" multiple>
+      <div class="drop-icon">🔍</div>
+      <div class="drop-title">Drop source code files here</div>
+      <div class="drop-sub">Multiple files supported · Click to browse · Training files only</div>
+      <div class="drop-filename" id="uniFileName"></div>
+    </div>
+
+    <div class="action-row">
+      <button class="zbtn zbtn-run" id="uniRunBtn">
+        <span class="run-icon">▶</span>
+        <span class="spinner"></span>
+        Scan for Invisible Unicode
+      </button>
+      <button class="zbtn zbtn-clear" onclick="uniClear()">Clear</button>
+      <span class="zstatus" id="uniStatus"></span>
+    </div>
+
+    <div class="output-label">Scan Output</div>
+    <div id="uniOutput"><span class="placeholder">Drop source code files above and click Scan to detect invisible Unicode payloads…</span></div>
+
+  </div>
+
+  <!-- ── TAB 2: Crypto C2 Detector ── -->
+  <div class="tab-panel" id="panel-crypto">
+
+    <p style="font-size:.9rem;color:var(--ink3);margin-bottom:1rem">Upload a plain-text export of your DNS query log, HTTP access log, or network connection log. The detector scans for connections to blockchain RPC nodes, cryptocurrency exchanges, IPFS infrastructure, and Web3 endpoints that indicate Glassworm or similar blockchain-C2 malware activity.</p>
+
+    <div class="compat-grid">
+      <div>
+        <div class="compat-label good">Flags</div>
+        <div class="compat-item">Solana RPC nodes (Glassworm primary C2)</div>
+        <div class="compat-item">Ethereum / Infura / Alchemy nodes</div>
+        <div class="compat-item">IPFS gateways used for payload hosting</div>
+        <div class="compat-item">Crypto exchange contacts from workstations</div>
+      </div>
+      <div>
+        <div class="compat-label limited">Accepts</div>
+        <div class="compat-item">Plain text DNS query logs (.txt .log)</div>
+        <div class="compat-item">HTTP access log exports</div>
+        <div class="compat-item">Zeek http.log / ssl.log / dns.log exports</div>
+        <div class="compat-item">Any newline-delimited domain list</div>
+      </div>
+    </div>
+
+    <div class="drop-zone" id="cryptoDrop">
+      <input type="file" id="cryptoFileInput" accept=".txt,.log,.csv">
+      <div class="drop-icon">⛓️</div>
+      <div class="drop-title">Drop a network log file here</div>
+      <div class="drop-sub">DNS log · HTTP log · Connection log · Training data only</div>
+      <div class="drop-filename" id="cryptoFileName"></div>
+    </div>
+
+    <div class="action-row">
+      <button class="zbtn zbtn-run" id="cryptoRunBtn">
+        <span class="run-icon">▶</span>
+        <span class="spinner"></span>
+        Scan for Blockchain C2
+      </button>
+      <button class="zbtn zbtn-clear" onclick="cryptoClear()">Clear</button>
+      <span class="zstatus" id="cryptoStatus"></span>
+    </div>
+
+    <div class="output-label">Scan Output</div>
+    <div id="cryptoOutput"><span class="placeholder">Drop a network log file above and click Scan to detect blockchain C2 connections…</span></div>
+
+  </div>
+
+  <!-- ── TAB 3: About ── -->
+  <div class="tab-panel" id="panel-about">
+
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">How Unicode Injection Works</div>
+        <div class="how-title">Invisible Characters Carry the Payload</div>
+        <div class="how-desc">Glassworm uses Unicode Private Use Area codepoints that render as zero-width whitespace in every editor and terminal. An entire executable payload hides inside what looks like an empty string. At runtime a decoder extracts and executes it.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">How Blockchain C2 Works</div>
+        <div class="how-title">Commands Come from the Blockchain</div>
+        <div class="how-desc">Instead of connecting to a traditional C2 server, Glassworm reads commands from Solana blockchain transactions. There is no IP to block — the traffic looks like HTTPS to a legitimate financial service. Blocking crypto domains severs the channel entirely.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">Why Human Review Fails</div>
+        <div class="how-title">You Cannot See What Isn't There</div>
+        <div class="how-desc">An experienced senior developer reviewing a pull request containing a Glassworm payload will approve it. The code looks identical to legitimate code. Automated scanning that checks codepoint values — not visual rendering — is the only reliable detection method.</div>
+      </div>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.15rem;font-weight:700;color:var(--ink);margin:2rem 0 .75rem">Unicode Ranges This Tool Checks</h3>
+    <table class="range-table">
+      <thead><tr><th>Range</th><th>Name</th><th>Legitimate Use</th><th>Threat</th></tr></thead>
+      <tbody>
+        <tr><td class="code">U+FE00–U+FE0F</td><td><strong>Variation Selectors 1–16</strong></td><td>None in source code</td><td>Primary Glassworm payload range</td></tr>
+        <tr><td class="code">U+E0100–U+E01EF</td><td><strong>Variation Selectors Supplement</strong></td><td>None in source code</td><td>Secondary Glassworm range</td></tr>
+        <tr><td class="code">U+200B–U+200F</td><td><strong>Zero-Width Characters</strong></td><td>Rare — text layout only</td><td>Text steganography, prompt injection</td></tr>
+        <tr><td class="code">U+FEFF</td><td><strong>Zero-Width No-Break Space</strong></td><td>BOM at file start only</td><td>Payload injection when mid-file</td></tr>
+        <tr><td class="code">U+00AD</td><td><strong>Soft Hyphen</strong></td><td>Typographic line-breaking</td><td>Invisible character injection</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-blue">
+      <p><strong>For production environments:</strong> This browser tool is for learning and demonstration. To scan your actual codebase, download <strong>zeek_triage.py</strong> and run it locally with <code style="font-family:var(--mono);font-size:.85em;background:#f1f5f9;padding:.1rem .3rem;border-radius:3px">python3 zeek_triage.py --scan-code /path/to/your/code</code>. Your source code never leaves your machine. For CI/CD integration, add the Unicode scanner as a pre-commit hook so every commit is checked automatically before merging.</p>
+    </div>
+
+  </div>
+
+</div></div>
+
+<!-- ── SAMPLE FILES ── -->
+<div style="background:var(--card);border-top:1px solid var(--rule);padding:3rem 0">
+  <div class="wrap">
+    <div style="font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:#94a3b8;margin-bottom:.5rem">Sample Test Files</div>
+    <h2 style="font-family:var(--serif);font-size:1.5rem;font-weight:600;color:var(--ink);margin-bottom:.5rem">Try the Tool Yourself</h2>
+    <p style="font-family:var(--sans);font-size:.9rem;color:var(--ink3);line-height:1.7;margin-bottom:1.75rem;max-width:680px">Both files are fully synthetic — created specifically for this demonstration. No real credentials, no real infrastructure, no real payloads. Open either file in VS Code before scanning — you will not see anything suspicious. Then drop it into the tool above and see what the scanner finds.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem">
+
+      <div style="background:var(--paper);border:1px solid var(--rule);border-top:3px solid var(--blue);padding:1.5rem">
+        <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;color:var(--blue);text-transform:uppercase;margin-bottom:.5rem">Tab 1 · Invisible Unicode Scanner</div>
+        <div style="font-family:var(--serif);font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:.5rem">sample_unicode_payload.js</div>
+        <p style="font-family:var(--sans);font-size:.82rem;color:var(--ink3);line-height:1.65;margin-bottom:1rem">A realistic JavaScript authentication module. Looks completely clean in any code editor. Contains 16 invisible PUA codepoints hidden across 4 lines inside variable names and comments. Scanner will report CRITICAL with exact line numbers and codepoints.</p>
+        <a href="sample_unicode_payload.js" download style="font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;background:var(--blue);color:#fff;padding:.6rem 1.25rem;border-radius:2px;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;transition:background .2s">↓ Download</a>
+      </div>
+
+      <div style="background:var(--paper);border:1px solid var(--rule);border-top:3px solid var(--amber);padding:1.5rem">
+        <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;color:var(--amber);text-transform:uppercase;margin-bottom:.5rem">Tab 2 · Blockchain C2 Detector</div>
+        <div style="font-family:var(--serif);font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:.5rem">sample_blockchain_dns_log.txt</div>
+        <p style="font-family:var(--sans);font-size:.82rem;color:var(--ink3);line-height:1.65;margin-bottom:1rem">A simulated DNS query log mixing normal Microsoft and Google traffic with blockchain infrastructure contacts. Contains Solana RPC, IPFS gateway, Ethereum, and other crypto domain hits as would appear in a Glassworm-infected workstation log.</p>
+        <a href="sample_blockchain_dns_log.txt" download style="font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;background:var(--amber);color:#fff;padding:.6rem 1.25rem;border-radius:2px;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;transition:background .2s">↓ Download</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>Glassworm Detector · Yana Ivanov · Educational Use Only</span>
+  <a href="index.html">← Portfolio</a>
+</footer>
+
+<script>
+// ── TAB SWITCHING ──────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+// ── UNICODE RANGES ─────────────────────────────────────
+const PUA_RANGES = [
+  [0xFE00,  0xFE0F,  'Variation Selectors (VS1-VS16)',         'Glassworm / Invisible Unicode Payload Injection'],
+  [0xE0100, 0xE01EF, 'Variation Selectors Supplement',         'Glassworm / Invisible Unicode Payload Injection'],
+  [0x200B,  0x200F,  'Zero-Width Characters',                  'Text Steganography / Prompt Injection'],
+  [0xFEFF,  0xFEFF,  'Zero-Width No-Break Space (mid-file)',   'Invisible Character Injection'],
+  [0x00AD,  0x00AD,  'Soft Hyphen',                            'Invisible Character Injection'],
+];
+
+// ── CRYPTO DOMAINS ─────────────────────────────────────
+const CRYPTO_DOMAINS = [
+  {domain:'solana.com',          cat:'Solana Blockchain',     attack:'Glassworm primary C2 channel'},
+  {domain:'helius-rpc.com',      cat:'Solana RPC Node',       attack:'Glassworm primary C2 channel'},
+  {domain:'mainnet-beta.solana', cat:'Solana Mainnet RPC',    attack:'Glassworm primary C2 channel'},
+  {domain:'projectserum.com',    cat:'Solana DeFi',           attack:'Blockchain C2'},
+  {domain:'infura.io',           cat:'Ethereum RPC',          attack:'Blockchain C2'},
+  {domain:'alchemyapi.io',       cat:'Ethereum RPC',          attack:'Blockchain C2'},
+  {domain:'alchemy.com',         cat:'Ethereum RPC',          attack:'Blockchain C2'},
+  {domain:'etherscan.io',        cat:'Ethereum Explorer',     attack:'Blockchain C2'},
+  {domain:'flashbots.net',       cat:'Ethereum MEV',          attack:'Blockchain C2'},
+  {domain:'cloudflare-eth.com',  cat:'Ethereum RPC',          attack:'Blockchain C2'},
+  {domain:'blockchain.com',      cat:'Bitcoin Infrastructure',attack:'Blockchain C2'},
+  {domain:'blockchain.info',     cat:'Bitcoin Infrastructure',attack:'Blockchain C2'},
+  {domain:'ipfs.io',             cat:'IPFS Gateway',          attack:'Decentralized Payload Hosting'},
+  {domain:'gateway.ipfs.io',     cat:'IPFS Gateway',          attack:'Decentralized Payload Hosting'},
+  {domain:'dweb.link',           cat:'IPFS Gateway',          attack:'Decentralized Payload Hosting'},
+  {domain:'web3.storage',        cat:'Web3 Storage',          attack:'Decentralized Payload Hosting'},
+  {domain:'pinata.cloud',        cat:'IPFS Pinning',          attack:'Decentralized Payload Hosting'},
+  {domain:'nftport.xyz',         cat:'NFT Infrastructure',    attack:'Web3 C2 Infrastructure'},
+  {domain:'opensea.io',          cat:'NFT Marketplace',       attack:'Web3 C2 Infrastructure'},
+  {domain:'binance.com',         cat:'Crypto Exchange',       attack:'Crypto Exfiltration Endpoint'},
+  {domain:'coinbase.com',        cat:'Crypto Exchange',       attack:'Crypto Exfiltration Endpoint'},
+  {domain:'kraken.com',          cat:'Crypto Exchange',       attack:'Crypto Exfiltration Endpoint'},
+  {domain:'rpc.ankr.com',        cat:'Multi-chain RPC',       attack:'Blockchain C2'},
+  {domain:'ethplorer.io',        cat:'Ethereum Explorer',     attack:'Blockchain C2'},
+];
+
+// ── H helper ──────────────────────────────────────────
+function H(cls, text) {
+  return cls ? `<span class="${cls}">${text}</span>` : text;
+}
+
+// ── UNICODE SCANNER ────────────────────────────────────
+let uniFiles = [];
+
+const uniDrop     = document.getElementById('uniDrop');
+const uniInput    = document.getElementById('uniFileInput');
+const uniFileName = document.getElementById('uniFileName');
+const uniRunBtn   = document.getElementById('uniRunBtn');
+const uniStatus   = document.getElementById('uniStatus');
+const uniOutput   = document.getElementById('uniOutput');
+
+function setUniFiles(files) {
+  uniFiles = Array.from(files);
+  uniFileName.textContent = uniFiles.map(f => f.name).join(', ');
+  uniDrop.classList.add('has-file');
+  uniRunBtn.classList.add('ready');
+  setUniStatus('');
+}
+
+uniInput.addEventListener('change', () => { if (uniInput.files.length) setUniFiles(uniInput.files); });
+uniDrop.addEventListener('dragover', e => { e.preventDefault(); uniDrop.classList.add('dragover'); });
+uniDrop.addEventListener('dragleave', e => { if (!uniDrop.contains(e.relatedTarget)) uniDrop.classList.remove('dragover'); });
+uniDrop.addEventListener('drop', e => { e.preventDefault(); uniDrop.classList.remove('dragover'); if (e.dataTransfer.files.length) setUniFiles(e.dataTransfer.files); });
+
+function setUniStatus(msg, cls) {
+  uniStatus.textContent = msg;
+  uniStatus.className = 'zstatus' + (cls ? ' ' + cls : '');
+}
+
+function uniClear() {
+  uniFiles = [];
+  uniDrop.classList.remove('has-file');
+  uniFileName.textContent = '';
+  uniInput.value = '';
+  uniRunBtn.classList.remove('ready');
+  uniOutput.innerHTML = '<span class="placeholder">Drop source code files above and click Scan to detect invisible Unicode payloads…</span>';
+  setUniStatus('');
+}
+
+uniRunBtn.addEventListener('click', async () => {
+  if (!uniFiles.length || !uniRunBtn.classList.contains('ready')) return;
+  uniRunBtn.classList.add('running'); uniRunBtn.classList.remove('ready');
+  setUniStatus('Scanning…', 'running');
+  uniOutput.innerHTML = '';
+
+  const allFindings = [];
+  let totalScanned = 0;
+
+  for (const file of uniFiles) {
+    totalScanned++;
+    const text = await readFileText(file);
+    const lines = text.split('\n');
+    for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+      const line = lines[lineIdx];
+      for (let charIdx = 0; charIdx < line.length; charIdx++) {
+        const cp = line.codePointAt(charIdx);
+        if (!cp) continue;
+        for (const [start, end, rangeName, attack] of PUA_RANGES) {
+          if (cp >= start && cp <= end) {
+            const context = line.replace(new RegExp(String.fromCodePoint(cp), 'g'), '·').trim().slice(0, 100);
+            allFindings.push({
+              file: file.name,
+              line: lineIdx + 1,
+              position: charIdx,
+              codepoint: `U+${cp.toString(16).toUpperCase().padStart(4, '0')}`,
+              range: rangeName,
+              attack,
+              context,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  const div = '─'.repeat(56);
+  const eq  = '═'.repeat(56);
+  let html = '';
+
+  html += H('zt-bold', eq) + '\n';
+  html += H('zt-bold', '  GLASSWORM INVISIBLE UNICODE SCAN REPORT') + '\n';
+  html += H('zt-dim', `  Files scanned: ${totalScanned}`) + '\n';
+  html += H('zt-bold', eq) + '\n\n';
+
+  if (allFindings.length === 0) {
+    html += H('zt-green', '[ CLEAN ]') + ' No invisible Unicode characters detected.\n';
+    html += H('zt-dim', 'No PUA codepoints found in any scanned file.') + '\n';
+  } else {
+    // Group by file
+    const byFile = {};
+    for (const f of allFindings) {
+      if (!byFile[f.file]) byFile[f.file] = [];
+      byFile[f.file].push(f);
+    }
+
+    html += H('zt-red', '[ INVISIBLE UNICODE DETECTED ]');
+    html += H('zt-dim', ' — ') + H('zt-red', allFindings.length + ' instance(s)');
+    html += H('zt-dim', ' in ') + H('zt-red', Object.keys(byFile).length + ' file(s)') + '\n';
+    html += H('zt-dim', div) + '\n\n';
+
+    for (const [filename, findings] of Object.entries(byFile)) {
+      html += H('zt-red', '!! FILE  ') + H('zt-bold', filename) + '\n';
+      html += H('zt-dim', `         ${findings.length} suspicious codepoint(s)`) + '\n\n';
+      for (const hit of findings) {
+        html += `  Line      : ${H('zt-bold', String(hit.line))}  Position: ${hit.position}\n`;
+        html += `  Codepoint : ${H('zt-red', hit.codepoint)}\n`;
+        html += `  Range     : ${H('zt-orange', hit.range)}\n`;
+        html += `  Attack    : ${H('zt-red', hit.attack)}\n`;
+        html += `  Signature : ${H('zt-dim', `PUA codepoint ${hit.codepoint} — no legitimate use in source code`)}\n`;
+        if (hit.context) html += `  Context   : ${H('zt-dim', hit.context)}\n`;
+        html += '\n';
+      }
+    }
+
+    // Severity
+    html += H('zt-bold', eq) + '\n';
+    html += H('zt-blue', '[ SEVERITY ]') + '\n' + H('zt-dim', div) + '\n';
+    html += `  Files with findings   : ${H('zt-red', String(Object.keys(byFile).length))}\n`;
+    html += `  Total codepoints      : ${H('zt-red', String(allFindings.length))}\n`;
+    html += `  Severity              : ${H('zt-red', H('zt-bold', 'CRITICAL'))}\n\n`;
+    html += H('zt-dim', 'Invisible Unicode in source code is an unambiguous indicator of') + '\n';
+    html += H('zt-dim', 'Glassworm payload injection. Quarantine affected files immediately.') + '\n';
+    html += H('zt-dim', 'Do not execute or deploy until cleaned and audited.') + '\n';
+  }
+
+  html += '\n' + H('zt-bold', eq) + '\n';
+  html += H('zt-dim', 'Glassworm Detector · Browser analysis · zeek_triage.py for CLI scanning') + '\n';
+
+  uniOutput.innerHTML = html;
+  uniOutput.scrollTop = 0;
+  uniRunBtn.classList.remove('running'); uniRunBtn.classList.add('ready');
+  setUniStatus(allFindings.length > 0 ? `${allFindings.length} finding(s) — CRITICAL` : 'Scan complete — Clean', allFindings.length > 0 ? 'warn' : 'ok');
+});
+
+// ── CRYPTO SCANNER ─────────────────────────────────────
+let cryptoFile = null;
+
+const cryptoDrop     = document.getElementById('cryptoDrop');
+const cryptoInput    = document.getElementById('cryptoFileInput');
+const cryptoFileName = document.getElementById('cryptoFileName');
+const cryptoRunBtn   = document.getElementById('cryptoRunBtn');
+const cryptoStatus   = document.getElementById('cryptoStatus');
+const cryptoOutput   = document.getElementById('cryptoOutput');
+
+function setCryptoFile(file) {
+  cryptoFile = file;
+  cryptoFileName.textContent = file.name;
+  cryptoDrop.classList.add('has-file');
+  cryptoRunBtn.classList.add('ready');
+  setCryptoStatus('');
+}
+
+cryptoInput.addEventListener('change', () => { if (cryptoInput.files[0]) setCryptoFile(cryptoInput.files[0]); });
+cryptoDrop.addEventListener('dragover', e => { e.preventDefault(); cryptoDrop.classList.add('dragover'); });
+cryptoDrop.addEventListener('dragleave', e => { if (!cryptoDrop.contains(e.relatedTarget)) cryptoDrop.classList.remove('dragover'); });
+cryptoDrop.addEventListener('drop', e => { e.preventDefault(); cryptoDrop.classList.remove('dragover'); if (e.dataTransfer.files[0]) setCryptoFile(e.dataTransfer.files[0]); });
+
+function setCryptoStatus(msg, cls) {
+  cryptoStatus.textContent = msg;
+  cryptoStatus.className = 'zstatus' + (cls ? ' ' + cls : '');
+}
+
+function cryptoClear() {
+  cryptoFile = null;
+  cryptoDrop.classList.remove('has-file');
+  cryptoFileName.textContent = '';
+  cryptoInput.value = '';
+  cryptoRunBtn.classList.remove('ready');
+  cryptoOutput.innerHTML = '<span class="placeholder">Drop a network log file above and click Scan to detect blockchain C2 connections…</span>';
+  setCryptoStatus('');
+}
+
+cryptoRunBtn.addEventListener('click', async () => {
+  if (!cryptoFile || !cryptoRunBtn.classList.contains('ready')) return;
+  cryptoRunBtn.classList.add('running'); cryptoRunBtn.classList.remove('ready');
+  setCryptoStatus('Scanning…', 'running');
+  cryptoOutput.innerHTML = '';
+
+  const text = await readFileText(cryptoFile);
+  const lines = text.split('\n');
+  const hits = [];
+  const seen = new Set();
+
+  for (const line of lines) {
+    const lower = line.toLowerCase();
+    for (const {domain, cat, attack} of CRYPTO_DOMAINS) {
+      if (lower.includes(domain) && !seen.has(domain)) {
+        seen.add(domain);
+        // Try to extract IP-like patterns from the line
+        const ipMatch = line.match(/\b(\d{1,3}(?:\.\d{1,3}){3})\b/g);
+        hits.push({
+          domain,
+          category: cat,
+          attack,
+          ips: ipMatch || [],
+          rawLine: line.trim().slice(0, 120),
+        });
+      }
+    }
+  }
+
+  const div = '─'.repeat(56);
+  const eq  = '═'.repeat(56);
+  let html = '';
+
+  html += H('zt-bold', eq) + '\n';
+  html += H('zt-bold', '  BLOCKCHAIN / CRYPTO C2 DETECTION REPORT') + '\n';
+  html += H('zt-dim', `  File: ${cryptoFile.name}  |  Lines scanned: ${lines.length}`) + '\n';
+  html += H('zt-bold', eq) + '\n\n';
+
+  if (hits.length === 0) {
+    html += H('zt-green', '[ CLEAN ]') + ' No blockchain or cryptocurrency connections detected.\n';
+    html += H('zt-dim', 'No crypto/blockchain domains found in this log file.') + '\n';
+    html += H('zt-dim', 'Note: If crypto domains are blocked at your firewall,') + '\n';
+    html += H('zt-dim', 'traffic will not appear in logs — which is the correct outcome.') + '\n';
+  } else {
+    html += H('zt-red', '[ BLOCKCHAIN / CRYPTO C2 DETECTED ]');
+    html += H('zt-dim', ' — ') + H('zt-red', hits.length + ' unique domain(s)') + '\n';
+    html += H('zt-dim', div) + '\n\n';
+
+    for (const hit of hits) {
+      const isSolana = hit.attack.toLowerCase().includes('glassworm');
+      html += H('zt-red', '!! CRYPTO  ') + H('zt-bold', hit.domain) + '\n';
+      html += `  Category  : ${H('zt-orange', hit.category)}\n`;
+      html += `  Attack    : ${H(isSolana ? 'zt-red' : 'zt-orange', hit.attack)}\n`;
+      if (hit.ips.length > 0) {
+        html += `  IP(s)     : ${H('zt-dim', hit.ips.join('  '))}\n`;
+      }
+      html += `  Log line  : ${H('zt-dim', hit.rawLine)}\n\n`;
+    }
+
+    html += H('zt-bold', eq) + '\n';
+    html += H('zt-blue', '[ SEVERITY ]') + '\n' + H('zt-dim', div) + '\n';
+    html += `  Blockchain domains found : ${H('zt-red', String(hits.length))}\n`;
+    const hasSolana = hits.some(h => h.attack.toLowerCase().includes('glassworm'));
+    const severity = hasSolana ? 'CRITICAL — Glassworm C2 channel detected' : 'HIGH — Blockchain C2 infrastructure contact';
+    html += `  Severity                 : ${H('zt-red', H('zt-bold', severity))}\n\n`;
+    html += H('zt-dim', 'Action: Block all crypto/blockchain domains at perimeter firewall.') + '\n';
+    html += H('zt-dim', 'There is no legitimate reason for contractor workstations') + '\n';
+    html += H('zt-dim', 'to communicate with blockchain infrastructure.') + '\n';
+  }
+
+  html += '\n' + H('zt-bold', eq) + '\n';
+  html += H('zt-dim', 'Glassworm Detector · Browser analysis · zeek_triage.py for full Zeek log scanning') + '\n';
+
+  cryptoOutput.innerHTML = html;
+  cryptoOutput.scrollTop = 0;
+  cryptoRunBtn.classList.remove('running'); cryptoRunBtn.classList.add('ready');
+  setCryptoStatus(hits.length > 0 ? `${hits.length} hit(s) detected` : 'Scan complete — Clean', hits.length > 0 ? 'warn' : 'ok');
+});
+
+// ── FILE READER HELPER ─────────────────────────────────
+function readFileText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsText(file, 'utf-8');
+  });
+}
+</script>
+</body>
+</html>

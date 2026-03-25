@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Hiring Trap — How Job Search Tools Became a National Security Exposure | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+.masthead{background:var(--ink);color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:.75rem;color:#fff}
+h1.title span{color:#ef4444}
+.mast-sub{font-family:var(--serif);font-size:1rem;color:#94a3b8;line-height:1.7;margin-bottom:2rem;max-width:660px;font-style:italic}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:1rem}
+.meta-item .label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#ef4444;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:var(--ink);color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.78rem;color:var(--blue);word-break:break-all}
+
+/* ── PERMISSION CARD ── */
+.perm-grid{display:grid;gap:.75rem;margin:1.75rem 0}
+.perm-card{background:var(--paper);border:1px solid var(--rule);border-radius:2px;padding:1.1rem 1.25rem;display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:start}
+.perm-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.perm-icon.critical{background:var(--red-dim);border:1px solid rgba(192,57,43,.2)}
+.perm-icon.critical .mdi{color:var(--red);font-size:1.1rem}
+.perm-icon.high{background:var(--amber-dim);border:1px solid rgba(180,83,9,.2)}
+.perm-icon.high .mdi{color:var(--amber);font-size:1.1rem}
+.perm-icon.low{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2)}
+.perm-icon.low .mdi{color:var(--blue);font-size:1.1rem}
+.perm-name{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--ink);margin-bottom:.25rem}
+.perm-desc{font-size:.85rem;color:var(--ink3);line-height:1.6;margin:0}
+.perm-badge{font-family:var(--mono);font-size:.65rem;font-weight:700;padding:.2rem .55rem;border-radius:2px;white-space:nowrap;align-self:start;margin-top:.1rem}
+.badge-critical{background:var(--red-dim);color:var(--red)}
+.badge-high{background:var(--amber-dim);color:var(--amber)}
+.badge-needed{background:var(--green-dim);color:var(--green)}
+
+/* ── MANIFEST BOX ── */
+.manifest-box{background:#0a0f1a;border-radius:2px;padding:1.5rem;margin:1.75rem 0;overflow-x:auto}
+.manifest-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.18em;color:#60a5fa;text-transform:uppercase;margin-bottom:.75rem}
+.manifest-code{font-family:var(--mono);font-size:.78rem;color:#e2e8f0;line-height:1.75;white-space:pre-wrap;word-break:break-word}
+.manifest-code .key{color:#60a5fa}
+.manifest-code .val{color:#4ade80}
+.manifest-code .warn{color:#ef4444;font-weight:700}
+.manifest-code .comment{color:#64748b}
+
+/* ── LAYER STACK ── */
+.layer-stack{margin:1.75rem 0;display:grid;gap:0}
+.layer{padding:1.1rem 1.5rem;border:1px solid var(--rule);border-bottom:none;display:grid;grid-template-columns:32px 1fr;gap:1rem;align-items:start;background:var(--paper)}
+.layer:last-child{border-bottom:1px solid var(--rule)}
+.layer-num{font-family:var(--mono);font-size:.7rem;font-weight:700;color:#94a3b8;padding-top:.15rem}
+.layer-title{font-family:var(--display-clean);font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.25rem}
+.layer-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+
+/* ── TOOL SECTION ── */
+.tool-wrap{background:var(--paper);border:1px solid var(--rule);border-radius:2px;margin:2rem 0;overflow:hidden}
+.tool-header{background:#0a0f1a;padding:1.1rem 1.5rem;display:flex;align-items:center;gap:.75rem}
+.tool-header-title{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;color:#fff;text-transform:uppercase}
+.tool-header-sub{font-family:var(--mono);font-size:.62rem;color:#64748b;margin-left:auto}
+.tool-body{padding:1.5rem}
+.tool-instructions{background:#f8fafc;border:1px solid var(--rule);border-radius:2px;padding:1.1rem 1.25rem;margin-bottom:1.25rem}
+.instr-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.6rem}
+.instr-steps{list-style:none;counter-reset:steps}
+.instr-steps li{counter-increment:steps;display:flex;gap:.75rem;font-family:var(--mono);font-size:.72rem;color:var(--ink3);line-height:1.6;margin-bottom:.4rem}
+.instr-steps li::before{content:counter(steps);width:18px;height:18px;border-radius:50%;background:var(--blue);color:#fff;font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem}
+.instr-steps li code{background:#e2e8f0;padding:.05rem .3rem;border-radius:2px;font-size:.7rem;color:var(--ink)}
+.drop-zone{border:2px dashed #bfdbfe;border-radius:2px;background:#f0f7ff;padding:1.75rem 1.5rem;text-align:center;cursor:pointer;transition:background .15s,border-color .15s;position:relative}
+.drop-zone:hover,.drop-zone.dragover{background:#dbeafe;border-color:var(--blue)}
+.drop-zone.has-file{border-style:solid;border-color:var(--blue)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon .mdi{font-size:1.6rem;color:var(--blue)}
+.drop-title{font-family:var(--serif);font-size:.95rem;font-weight:600;color:var(--ink);margin:.35rem 0 .25rem}
+.drop-sub{font-family:var(--mono);font-size:.65rem;color:#94a3b8;letter-spacing:.06em}
+.drop-filename{font-family:var(--mono);font-size:.68rem;color:var(--blue);margin-top:.4rem;display:none;word-break:break-all}
+.drop-zone.has-file .drop-sub{display:none}
+.drop-zone.has-file .drop-filename{display:block}
+.action-row{display:flex;align-items:center;gap:1rem;margin-top:1.25rem;flex-wrap:wrap}
+.zbtn{font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;padding:.85rem 2.25rem;border-radius:2px;border:none;cursor:pointer;transition:background .2s;display:inline-flex;align-items:center;gap:.5rem}
+.zbtn-run{background:#a8c4f5;color:#fff;pointer-events:none}
+.zbtn-run.ready{background:var(--blue);color:#fff;pointer-events:auto}
+.zbtn-run.ready:hover{background:#153e80}
+.zbtn-clear{background:transparent;color:#64748b;border:1px solid var(--rule);font-size:.72rem;padding:.7rem 1.75rem}
+.zbtn-clear:hover{border-color:var(--ink);color:var(--ink)}
+.zstatus{font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;color:#94a3b8}
+.zstatus.ok{color:var(--green)}.zstatus.warn{color:var(--amber)}
+.output-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:#94a3b8;margin:.85rem 0 .35rem}
+#scanOutput{background:#0a0f1a;border-radius:2px;padding:1.1rem 1.4rem;font-family:var(--mono);font-size:.75rem;line-height:1.7;color:#e2e8f0;min-height:120px;max-height:480px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+.zt-red{color:#ef4444}.zt-orange{color:#fb923c}.zt-green{color:#4ade80}.zt-blue{color:#60a5fa}.zt-dim{color:#475569}.zt-bold{font-weight:700}
+
+/* ── BIO ── */
+.bio{background:var(--ink);color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:4rem}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-role{font-family:var(--mono);font-size:.65rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+.bio-link{color:#4a9eff;text-decoration:none;font-family:var(--mono);font-size:.65rem;display:inline-flex;align-items:center;gap:.3rem;margin-top:.75rem}
+.bio-link::before{content:'←'}
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+@media(max-width:680px){
+  .wrap,.mast-inner{padding:0 1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .perm-card{grid-template-columns:auto 1fr}
+  .bio{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Threat Intelligence Analysis</div>
+    <h1 class="title">The Hiring Trap<br><span>How Job Search Tools Became a National Security Exposure</span></h1>
+    <p class="mast-sub">A first-person analysis of how a broken hiring process is pushing job seekers — including defense industry professionals — into installing browser extensions with surveillance-level access to their entire digital life.</p>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">March 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Extension Analyzed</div><div class="value">Jobright Autofill v1.3.1</div></div>
+      <div class="meta-item"><div class="label">Audience</div><div class="value">Defense Contractors · HR Teams · Job Seekers</div></div>
+      <div class="meta-item"><div class="label">Evidence</div><div class="value">Manifest.json · First-Person Experience</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    500K+ JOB SEEKERS INSTALLED THIS EXTENSION &nbsp;·&nbsp; MANIFEST GRANTS ACCESS TO EVERY WEBSITE YOU VISIT &nbsp;·&nbsp; THREE SCRIPTS RUN ON ALL URLs
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>The Job Market Nobody Warned You About</h2>
+
+  <p>I installed Jobright because I was applying to a lot of jobs and being asked for the same information over and over again. Name, address, phone number, work history, education — the same fields on every form, on every platform, for every company. Automating that process was not laziness. It was the only rational response to a hiring system that had become a second full-time job.</p>
+
+  <p>For those who haven't been in the job market recently, the change is significant. There was a time — not long ago — when looking for work was a human process on both sides. You had one resume. You sent it to a company. Someone read it, called you in, and you either got the job or you didn't. The process was imperfect but legible. You knew what was happening and why.</p>
+
+  <p>That world is gone. Today's job market is one of the most psychologically exhausting environments a professional can navigate. Hundreds of qualified candidates compete for a single position, with no acknowledgment, no feedback, and no human contact unless you clear an AI filter that most applicants never knew existed.</p>
+
+  <h3>The AI Layer Changed Everything</h3>
+  <p>Applicant Tracking Systems now screen resumes for keyword matches before a human ever reads them. A candidate with fifteen years of relevant experience gets automatically rejected because they used "led" instead of "managed," or because their resume format confused the parser. The response from job seekers was rational and predictable: maintain multiple versions of a resume tailored to different job description keywords, optimizing for machines rather than for humans. The resume stopped being a document that represented a person and became a keyword delivery mechanism.</p>
+
+  <p>The interviews that follow — when they happen — are often no more human than the initial filter. AI-conducted phone screens ask scripted questions with no room for dialogue. Pre-recorded video interviews require answering questions into a camera with no interviewer present, no ability to ask your own questions, and no feedback afterward. Some companies ask candidates to complete multi-hour technical projects, or to record themselves explaining their thought process through a complex problem — and then disappear entirely without response.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The AI training data concern:</strong> When a company asks you to record yourself explaining your thought process, consider carefully what they are collecting. Your voice. Your face. Your reasoning patterns. Your professional identity on camera. Before I understood the security implications, I declined these requests because I didn't want to help train AI to replace me. That instinct was correct — but the risk goes further than job replacement. A recording of your voice, face, and professional reasoning is a complete package for deepfake creation. Name, appearance, vocal patterns, behavioral cues — everything needed to impersonate you convincingly in a video call, a voice message, or a synthetic media attack. Most people who decline these requests do so for career reasons. Few think about what the recording could be used for once it leaves the interview platform.</p>
+  </div>
+
+  <p>The result is a workforce that has learned to treat the job search as a logistics problem to be optimized — and that optimization has created a security exposure that most organizations have not begun to account for. When applying for jobs feels like a full-time job, people stop scrutinizing the tools they use to manage it. That is the opening the threat operates through.</p>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>What the Extension Actually Requests</h2>
+
+  <p>Jobright Autofill is trusted by over 500,000 job seekers according to its own Chrome Web Store listing. Its stated purpose is simple: fill out job application forms automatically so you don't have to type the same information repeatedly. To do that, the extension needs to know what to fill — your name, your contact details, your work history. It needs to be able to interact with web forms. That is a narrow, well-defined technical requirement.</p>
+
+  <p>The manifest.json file — the document that declares what an extension is allowed to do — tells a different story. This is not speculation or inference. This is the actual file installed on the machines of half a million job seekers, read directly from the extension folder.</p>
+
+  <div class="manifest-box">
+    <div class="manifest-label">manifest.json — Jobright Autofill v1.3.1 — Actual Permissions</div>
+    <div class="manifest-code"><span class="key">"permissions"</span>: [
+  <span class="warn">"tabs"</span>,        <span class="comment">← See every tab you have open — URL, title, status — at all times</span>
+  <span class="warn">"cookies"</span>,     <span class="comment">← Read and write cookies for ANY website, including session tokens</span>
+  <span class="warn">"scripting"</span>,   <span class="comment">← Inject and execute JavaScript on any webpage you visit</span>
+  <span class="val">"declarativeNetRequest"</span>,  <span class="comment">← Intercept, block, or redirect network requests</span>
+  <span class="val">"storage"</span>,      <span class="comment">← Store data locally on your machine</span>
+  <span class="val">"activeTab"</span>     <span class="comment">← This is the only permission actually needed for autofill</span>
+],
+
+<span class="key">"host_permissions"</span>: [
+  <span class="warn">"http://*/*"</span>,   <span class="comment">← Every HTTP website on the internet</span>
+  <span class="warn">"https://*/*"</span>,  <span class="comment">← Every HTTPS website on the internet</span>
+  <span class="warn">"&lt;all_urls&gt;"</span>   <span class="comment">← All URLs, explicitly stated a third time</span>
+],
+
+<span class="key">"content_scripts"</span>: [
+  { <span class="warn">"matches": ["&lt;all_urls&gt;"]</span>, "js": ["constants.js"] },   <span class="comment">← Script 1: runs on every website</span>
+  { <span class="warn">"matches": ["&lt;all_urls&gt;"]</span>, "js": ["filler.js"] },      <span class="comment">← Script 2: runs on every website</span>
+  { <span class="warn">"matches": ["&lt;all_urls&gt;"]</span>, "js": ["contents.js"] }    <span class="comment">← Script 3: runs on every website</span>
+]</div>
+  </div>
+
+  <p>Three separate JavaScript files running on every single website you visit — not just job boards, not just application forms, but every website. The filler script has a plausible function. The other two have no stated purpose in the manifest. The extension's marketing says it helps you apply to jobs. The manifest says it runs code on your banking website, your email, your medical portal, and this page.</p>
+
+  <h3>The Minimum Necessary Comparison</h3>
+  <p>To autofill a name and email address into a job application form, an extension needs exactly one permission: <code style="font-family:var(--mono);font-size:.85em;background:#f1f5f9;padding:.1rem .35rem;border-radius:2px">activeTab</code> — access to the tab you are currently viewing, only while you are viewing it, only when you click the extension. That is the minimum necessary permission for the stated function.</p>
+
+  <p>Jobright requests <strong>tabs</strong> (all tabs, always), <strong>cookies</strong> (all websites), <strong>scripting</strong> (execute code anywhere), and three content scripts running persistently on all URLs. The gap between what is needed and what is requested is not a minor technical discrepancy. It is the difference between a key to one room and a master key to every room in the building.</p>
+
+  <div class="perm-grid">
+    <div class="perm-card">
+      <div class="perm-icon critical"><span class="mdi mdi-tab-search"></span></div>
+      <div>
+        <div class="perm-name">tabs — Read all browser tabs</div>
+        <p class="perm-desc">Grants access to the URL, title, and status of every tab you have open at any time. Not just during a job application — constantly. This means the extension can see that you have your bank open, your email open, your health portal open, and any other page you visit.</p>
+      </div>
+      <div class="perm-badge badge-critical">Not needed for autofill</div>
+    </div>
+    <div class="perm-card">
+      <div class="perm-icon critical"><span class="mdi mdi-cookie-alert-outline"></span></div>
+      <div>
+        <div class="perm-name">cookies — Read and write all site cookies</div>
+        <p class="perm-desc">Cookies include session tokens — the credential that keeps you logged into websites without re-entering your password. An extension with cookie access to all URLs can read the session token for your email, your LinkedIn account, your bank, or any other site you are logged into.</p>
+      </div>
+      <div class="perm-badge badge-critical">Not needed for autofill</div>
+    </div>
+    <div class="perm-card">
+      <div class="perm-icon critical"><span class="mdi mdi-code-braces"></span></div>
+      <div>
+        <div class="perm-name">content_scripts on &lt;all_urls&gt; × 3</div>
+        <p class="perm-desc">Three JavaScript files that execute on every website you visit, automatically, without any action on your part. One file can plausibly be the autofill mechanism. The purpose of the other two is not stated. Code running on every page you visit can read everything on that page.</p>
+      </div>
+      <div class="perm-badge badge-critical">One script maximum needed</div>
+    </div>
+    <div class="perm-card">
+      <div class="perm-icon low"><span class="mdi mdi-cursor-default-click-outline"></span></div>
+      <div>
+        <div class="perm-name">activeTab — Access the current tab on click</div>
+        <p class="perm-desc">The only permission that is genuinely necessary for autofill functionality. Grants access to the current tab only when the user clicks the extension icon. Scoped, intentional, and user-initiated.</p>
+      </div>
+      <div class="perm-badge badge-needed">Legitimate — needed</div>
+    </div>
+  </div>
+
+  <h3>The Settings That Exist But Nobody Finds</h3>
+  <p>Chrome does expose controls for extension permissions — buried under the extension's Details page in Developer mode. There, a user can find that Jobright is set to access all sites by default, and can theoretically restrict it. Chrome itself provides a warning on that same page: <em>"Google Chrome cannot prevent extensions from recording your browsing history."</em> The control exists. The disclosure exists. But it is several layers of navigation past where any ordinary user would look, the default is maximum access, and Chrome is admitting its own limitations in the same breath.</p>
+
+  <p>Disclosure that is technically present but practically invisible is not meaningful disclosure. The permissions are disclosed. Half a million people installed the extension without reading them — not because they are careless, but because the hiring process had made them desperate enough to click install without reading the fine print. That is the exploitation model.</p>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>The Data Flowing Through the Hiring Process</h2>
+
+  <p>The extension is one layer of a larger data collection ecosystem that activates the moment someone begins a job search. Every platform, every form, and every interaction in the modern hiring process generates data — and that data flows to more parties than the applicant ever intended.</p>
+
+  <div class="layer-stack">
+    <div class="layer">
+      <div class="layer-num">01</div>
+      <div>
+        <div class="layer-title">Job Platforms — LinkedIn, Indeed, and the Aggregators</div>
+        <p class="layer-desc">Every application submitted through a job platform is logged — by the platform, by the ATS that receives it, and often by analytics tools embedded in both. LinkedIn's business model is built in part on connecting recruiter demand with candidate supply. Your profile, your search behavior, your application history, and your inferred career trajectory are the product. The same data that makes LinkedIn useful to legitimate recruiters makes it equally useful to anyone else who can access it — through scraping, through data purchases, or through the platform's own advertising and partnership infrastructure.</p>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="layer-num">02</div>
+      <div>
+        <div class="layer-title">ATS Platforms — Third-Party Systems You Never Agreed To</div>
+        <p class="layer-desc">Most companies do not receive your application directly. It goes to a third-party Applicant Tracking System — Workday, Greenhouse, Lever, iCIMS, Ashby. You are agreeing to that platform's terms of service, whether you read them or not, when you submit an application. These platforms have had security incidents. The data you submitted to a company that never called you back is sitting in an ATS database you have no visibility into and no ability to delete from.</p>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="layer-num">03</div>
+      <div>
+        <div class="layer-title">Fake Job Postings — Data Harvesting at Scale</div>
+        <p class="layer-desc">The FBI has documented and warned against fake job postings specifically designed to collect applicant data. A posting on a legitimate job board costs little to place. Hundreds of qualified applicants respond with their full personal and professional profiles. The "company" collects the data, never contacts the applicants, and the information enters a market where it can be sold, used for targeted phishing, or provided to foreign intelligence collection operations. The job board profits from the posting fee regardless of whether the job is real. Their financial incentive to police fake listings is limited.</p>
+      </div>
+    </div>
+    <div class="layer">
+      <div class="layer-num">04</div>
+      <div>
+        <div class="layer-title">Autofill Extensions — Persistent Access After the Search Ends</div>
+        <p class="layer-desc">Unlike the other layers, which are activated only during specific interactions, a browser extension with content scripts running on all URLs does not stop when the job search ends. It continues running on every page you visit, every day, for as long as the extension remains installed. The job search was temporary. The access it granted is not.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-amber">
+    <p><strong>The spam as evidence:</strong> After an active job search period, I began receiving a significant increase in unsolicited contact — text messages offering implausible earnings, emails from individuals claiming to be HR representatives at companies I had applied to, calls from recruiters with no connection to any role I had pursued. This is consistent with personal data entering a secondary market. It does not confirm which specific platform or tool was the source. But the timing and volume were not coincidental, and the pattern — name, phone, email, professional context, all clearly derived from a resume — suggests data that was submitted as part of a job application found its way somewhere it was not intended to go.</p>
+  </div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>The Defense Contractor Exposure</h2>
+
+  <p>For most job seekers, the worst outcome from this data ecosystem is spam — unwanted calls, fraudulent recruiter outreach, targeted advertising. That is a real harm, but it is a personal one. For professionals working in or seeking to work in national security and defense, the exposure is categorically different.</p>
+
+  <p>A resume submitted through a job platform or autofill extension does not merely contain personal contact information. For a defense professional, it is an intelligence document. It identifies who is currently seeking access to sensitive programs. It reveals what clearance level the candidate likely holds based on their prior employment. It shows which programs and facilities they have worked within. It indicates when they are in career transition — which is when people are most vulnerable to approach. And it provides the full professional context needed to craft a highly targeted social engineering attempt that will be indistinguishable from a legitimate opportunity.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Army Intelligence Warning — November 2025:</strong> Lt. Gen. Anthony Hale, Army deputy chief of staff for intelligence, issued a memo to over one million soldiers and civilians warning that foreign intelligence entities are actively using employment sites and social media platforms to identify and approach individuals seeking new employment. The memo specifically noted that adversaries look for individuals "expressing dissatisfaction or describing financial insecurity" — the exact profile of someone in the middle of a difficult job search. This is not a theoretical future threat. It is documented current activity.</p>
+  </div>
+
+  <h3>The Attack Scenario</h3>
+  <p>Consider a software engineer at a defense contractor who spent six months job searching before accepting their current role. During that search they used a resume autofill extension, submitted applications to dozens of companies through LinkedIn and Indeed, and uploaded their resume to several platforms. Their data — name, email, phone, work history including the defense contractor, clearance indicators from program names, skills — now exists in multiple databases with varying security postures and unknown data sharing practices.</p>
+
+  <p>A foreign intelligence service with access to job seeker data — through purchase, through breach of an ATS platform, or through their own fake job posting operation — can now identify this individual as a current employee at a defense contractor with likely clearance. They know their career trajectory, their areas of expertise, and the fact that they were actively looking to leave a year ago — suggesting potential dissatisfaction. They have a phone number and personal email address that predates any corporate security monitoring.</p>
+
+  <p>The approach does not need to be a clumsy phishing email. It can be a LinkedIn message from a convincing profile at a company the target would genuinely want to work for. It can be a recruiter call to their personal cell. It can be a tailored job offer that references their exact skill set and career goals, because that information was collected through the job search they conducted a year ago. The target never connected their old job search behavior to the approach they are receiving today.</p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Data Type in Resume / Application</th><th>Intelligence Value</th><th>Attack Use</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Full legal name + personal email + phone</strong></td><td class="red">Critical</td><td>Direct contact channel outside corporate monitoring</td></tr>
+      <tr><td><strong>Current / recent employer name</strong></td><td class="red">Critical</td><td>Identifies cleared contractor — targeting priority established</td></tr>
+      <tr><td><strong>Program names and project descriptions</strong></td><td class="red">Critical</td><td>Reveals which classified or sensitive programs accessed</td></tr>
+      <tr><td><strong>Skills and technical specializations</strong></td><td class="amber">High</td><td>Identifies value of access — what knowledge to extract</td></tr>
+      <tr><td><strong>Career timeline and transition dates</strong></td><td class="amber">High</td><td>Identifies when vulnerability window opened — target when in transition</td></tr>
+      <tr><td><strong>Education and certifications</strong></td><td class="amber">High</td><td>Refines clearance level assessment and professional credibility</td></tr>
+      <tr><td><strong>References listed</strong></td><td class="amber">High</td><td>Maps professional network — identifies colleagues to also approach</td></tr>
+      <tr><td><strong>Salary expectations</strong></td><td>Medium</td><td>Calibrates financial offer to make it attractive without being suspicious</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- SECTION 05 — TOOL -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>Check Your Own Extensions</h2>
+
+  <p>The analysis above is based on reading the manifest.json file of an installed extension — a file that is sitting on your machine right now for every extension you have installed. You do not need special tools or technical training to read it. The information is there. Most people have never looked at it.</p>
+
+  <p>The scanner below reads a manifest.json file and tells you in plain language what each permission means and whether it is necessary for the extension's stated purpose. Extract the file from any Chrome extension on your machine and drop it in.</p>
+
+  <div class="tool-wrap">
+    <div class="tool-header">
+      <span class="mdi mdi-shield-search" style="color:#60a5fa;font-size:1.1rem"></span>
+      <span class="tool-header-title">Extension Permission Scanner</span>
+      <span class="tool-header-sub">Runs in browser · No file uploaded anywhere</span>
+    </div>
+    <div class="tool-body">
+
+      <div class="tool-instructions">
+        <div class="instr-label">How to extract your extension's manifest.json</div>
+        <ol class="instr-steps">
+          <li>Open Chrome and go to <code>chrome://extensions</code></li>
+          <li>Enable <code>Developer mode</code> using the toggle in the top-right corner</li>
+          <li>Find the extension you want to check — click <code>Details</code> — copy the Extension ID from the URL</li>
+          <li>Open Finder → Go menu → Go to Folder → paste: <code>~/Library/Application Support/Google/Chrome/Default/Extensions/[ID]</code></li>
+          <li>Open the highest version number folder — find <code>manifest.json</code> — drag it into the drop zone below</li>
+        </ol>
+      </div>
+
+      <div class="drop-zone" id="manifestDrop">
+        <input type="file" id="manifestInput" accept=".json">
+        <div class="drop-icon"><span class="mdi mdi-file-code-outline"></span></div>
+        <div class="drop-title">Drop manifest.json here</div>
+        <div class="drop-sub">From any Chrome extension folder · Click to browse</div>
+        <div class="drop-filename" id="manifestFileName"></div>
+      </div>
+
+      <div class="action-row">
+        <button class="zbtn zbtn-run" id="scanBtn">
+          <span class="mdi mdi-magnify"></span> Scan Permissions
+        </button>
+        <button class="zbtn zbtn-clear" onclick="scanClear()">Clear</button>
+        <span class="zstatus" id="scanStatus"></span>
+      </div>
+
+      <div class="output-label">Scan Output</div>
+      <div id="scanOutput"><span class="zt-dim" style="font-style:italic">Drop a manifest.json file above and click Scan to analyze extension permissions…</span></div>
+
+    </div>
+  </div>
+
+  <p style="font-size:.88rem;color:#94a3b8;margin-top:.5rem">This tool runs entirely in your browser. The manifest.json file is read locally and never transmitted anywhere. For a complete scan of an extension's JavaScript source code for invisible Unicode and suspicious patterns, use the <a href="glassworm_detector.html" style="color:var(--blue)">Glassworm Detector</a>.</p>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>What Should Change</h2>
+
+  <h3>For Individuals</h3>
+  <p>Before installing any browser extension, open the Chrome Web Store listing and click the privacy disclosure at the bottom. Look at what data the developer says they collect. Then open the extension's Details page after installing and check what permissions it actually has — the two should match. If an autofill tool says it collects only what is necessary but its manifest requests access to all tabs and all cookies, that inconsistency is information.</p>
+
+  <p>Extensions installed during a job search do not automatically become less risky after the search ends. If you no longer need an extension, remove it. The access it holds does not expire when your need for it does.</p>
+
+  <h3>For Defense Contractors and Security Teams</h3>
+  <p>The insider threat and foreign targeting problem does not begin when an employee joins the organization. It begins during the hiring process — and in some cases, years earlier, during a previous job search. Personnel security programs that focus exclusively on behavior after hire are missing the upstream exposure that the hiring process creates.</p>
+
+  <p>A policy that addresses which browser extensions employees may use on personal devices that also access corporate networks is not an overreach. It is the specific, technically grounded control that addresses a documented intelligence collection methodology. The Army issued that guidance to a million personnel. Defense contractors should not wait for a mandate to implement the same thinking.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>CMMC connection:</strong> NIST 800-171 control 3.1.19 requires organizations to protect CUI on mobile devices. Control 3.13.1 requires monitoring communications at system boundaries. Neither was written with browser extensions in mind — but both speak to the principle that data leaving an authorized perimeter through an unmonitored channel is a compliance gap. An employee whose personal browser extension is reading every page they visit, including internal web applications accessible through a VPN, is a boundary that is not being monitored.</p>
+  </div>
+
+  <h3>For the Hiring Industry</h3>
+  <p>The broken hiring process is not an accident. It is the product of optimizing for volume and efficiency at the expense of the human experience on both sides. AI filters, ghost interviews, pre-recorded video submissions, and disposable candidate data exist because they reduce cost for the company — and because job seekers in a difficult market have limited ability to refuse. The security consequences of this optimization are being paid by the people who could least afford to consider them: the job seekers themselves.</p>
+
+  <p>Meaningful disclosure of data practices — before the application form is opened, not buried in a terms of service agreement that nobody reads — is a minimum standard that the industry has not adopted voluntarily and that regulators have been slow to enforce. The data that job seekers generate in the course of looking for work deserves the same protection as any other sensitive personal information. It is, in many cases, far more sensitive.</p>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">The manifest.json analysis in this report is based on direct inspection of Jobright Autofill v1.3.1 installed on the author's machine. Extension permission descriptions are based on official Chrome extension API documentation. Army intelligence warning sourced from Nextgov/FCW reporting on Lt. Gen. Anthony Hale's November 2025 memo. FBI fake job posting warnings sourced from FBI El Paso field office public reporting. This report represents the author's independent analysis based on personal experience and publicly documented evidence. This report does not assert that Jobright.ai has engaged in malicious activity. It presents the extension's declared permissions as documented evidence and invites readers to evaluate whether those permissions are proportionate to the stated function.</p>
+</div>
+
+</div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-role">Security Analyst · CMMC Consultant · SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. This report is based on her own experience as a job seeker, her direct inspection of an extension she had installed on her own machine, and her subsequent decision to remove it. The security analysis came from understanding what the permissions actually meant — knowledge that most of the half million people who installed the same extension do not have, and should.</p>
+    <a href="index.html" class="bio-link">Portfolio</a>
+  </div>
+</div>
+
+</div>
+
+<footer>
+  <span>The Hiring Trap · Yana Ivanov · March 2026</span>
+  <span>First-person analysis · Based on direct evidence · Educational use</span>
+</footer>
+
+<script>
+// ── PERMISSION DEFINITIONS ──────────────────────────────
+const PERMISSION_DATA = {
+  tabs: {
+    label: 'tabs',
+    risk: 'critical',
+    plain: 'Can see every tab you have open — the URL, title, and status of every page in your browser at all times. Not just during a job application. Always.',
+    needed_for_autofill: false,
+    why_concerning: 'Gives the extension a complete picture of your browsing activity across every website.'
+  },
+  cookies: {
+    label: 'cookies',
+    risk: 'critical',
+    plain: 'Can read and write cookies for any website. Cookies include session tokens — the credentials that keep you logged into your bank, email, and other accounts without re-entering your password.',
+    needed_for_autofill: false,
+    why_concerning: 'Session token access is equivalent to account access on any site you are logged into.'
+  },
+  scripting: {
+    label: 'scripting',
+    risk: 'critical',
+    plain: 'Can inject JavaScript code into any webpage and execute it. Code injected this way can read everything on the page, interact with forms, and send data externally.',
+    needed_for_autofill: true,
+    why_concerning: 'Legitimate for autofill — but combined with all_urls host permissions, means code can run on every site you visit.'
+  },
+  webNavigation: {
+    label: 'webNavigation',
+    risk: 'high',
+    plain: 'Can monitor all browser navigation events — every page you visit, when you visit it, and how you navigate between pages.',
+    needed_for_autofill: false,
+    why_concerning: 'Builds a complete browsing history regardless of browser settings.'
+  },
+  history: {
+    label: 'history',
+    risk: 'critical',
+    plain: 'Can read your complete browser history — every site you have ever visited in Chrome.',
+    needed_for_autofill: false,
+    why_concerning: 'No autofill tool needs access to historical browsing data.'
+  },
+  bookmarks: {
+    label: 'bookmarks',
+    risk: 'high',
+    plain: 'Can read all your bookmarks — sites you have saved and consider important enough to bookmark.',
+    needed_for_autofill: false,
+    why_concerning: 'Bookmarks reveal personal and professional interests, frequently visited sites, and saved resources.'
+  },
+  storage: {
+    label: 'storage',
+    risk: 'low',
+    plain: 'Can store data locally in your browser. Used by most extensions to save settings and user data between sessions.',
+    needed_for_autofill: true,
+    why_concerning: 'Standard permission — needed to remember your profile data.'
+  },
+  activeTab: {
+    label: 'activeTab',
+    risk: 'needed',
+    plain: 'Grants access to the current tab only when you click the extension icon. Scoped, user-initiated, and time-limited — the minimum permission for autofill functionality.',
+    needed_for_autofill: true,
+    why_concerning: 'This is the correct permission for autofill. If this were the only tab permission, the concern would be significantly lower.'
+  },
+  identity: {
+    label: 'identity',
+    risk: 'critical',
+    plain: 'Can request your Google account identity and OAuth tokens — potentially accessing your Google account.',
+    needed_for_autofill: false,
+    why_concerning: 'Direct access to Google account credentials.'
+  },
+  nativeMessaging: {
+    label: 'nativeMessaging',
+    risk: 'critical',
+    plain: 'Can communicate with applications installed on your computer outside the browser. This is a bridge between your browser and your operating system.',
+    needed_for_autofill: false,
+    why_concerning: 'Enables the extension to interact with software on your machine — far beyond any browser-based functionality.'
+  },
+  declarativeNetRequest: {
+    label: 'declarativeNetRequest',
+    risk: 'high',
+    plain: 'Can intercept, block, or redirect network requests from your browser. An autofill tool has no stated need to intercept or redirect your network traffic.',
+    needed_for_autofill: false,
+    why_concerning: 'Could be used to redirect requests, block security updates, or intercept data in transit.'
+  },
+  declarativeNetRequestWithHostAccess: {
+    label: 'declarativeNetRequestWithHostAccess',
+    risk: 'critical',
+    plain: 'Same as declarativeNetRequest but with explicit access to modify requests to specific hosts — can intercept traffic to named websites.',
+    needed_for_autofill: false,
+    why_concerning: 'Targeted traffic interception capability.'
+  },
+  clipboardRead: {
+    label: 'clipboardRead',
+    risk: 'critical',
+    plain: 'Can read whatever is on your clipboard — including passwords, sensitive text, and anything you copy from any application on your computer.',
+    needed_for_autofill: false,
+    why_concerning: 'Clipboard often contains passwords and sensitive data copied from password managers.'
+  },
+  clipboardWrite: {
+    label: 'clipboardWrite',
+    risk: 'high',
+    plain: 'Can write to your clipboard — could replace what you copied with different content.',
+    needed_for_autofill: false,
+    why_concerning: 'Could silently replace copied content with attacker-controlled data.'
+  },
+  geolocation: {
+    label: 'geolocation',
+    risk: 'high',
+    plain: 'Can access your physical location. No autofill tool requires your geographic coordinates.',
+    needed_for_autofill: false,
+    why_concerning: 'Reveals physical location continuously.'
+  },
+  management: {
+    label: 'management',
+    risk: 'critical',
+    plain: 'Can view, enable, and disable other extensions installed in your browser.',
+    needed_for_autofill: false,
+    why_concerning: 'Could disable security extensions or expose your full extension list.'
+  },
+};
+
+const HOST_RISK_PATTERNS = [
+  { pattern: '<all_urls>', risk: 'critical', label: 'All URLs — complete browser access' },
+  { pattern: 'http://*/*', risk: 'critical', label: 'All HTTP websites' },
+  { pattern: 'https://*/*', risk: 'critical', label: 'All HTTPS websites' },
+  { pattern: '*://*/*', risk: 'critical', label: 'All websites (wildcard)' },
+];
+
+// ── FILE HANDLING ───────────────────────────────────────
+let manifestFile = null;
+const drop = document.getElementById('manifestDrop');
+const input = document.getElementById('manifestInput');
+const fileName = document.getElementById('manifestFileName');
+const scanBtn = document.getElementById('scanBtn');
+const scanStatus = document.getElementById('scanStatus');
+const scanOutput = document.getElementById('scanOutput');
+
+input.addEventListener('change', () => { if (input.files[0]) setFile(input.files[0]); });
+drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragover'); });
+drop.addEventListener('dragleave', e => { if (!drop.contains(e.relatedTarget)) drop.classList.remove('dragover'); });
+drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('dragover'); if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
+
+function setFile(file) {
+  manifestFile = file;
+  fileName.textContent = file.name;
+  drop.classList.add('has-file');
+  scanBtn.classList.add('ready');
+  setStatus('');
+}
+
+function setStatus(msg, cls) {
+  scanStatus.textContent = msg;
+  scanStatus.className = 'zstatus' + (cls ? ' ' + cls : '');
+}
+
+function scanClear() {
+  manifestFile = null;
+  drop.classList.remove('has-file');
+  fileName.textContent = '';
+  input.value = '';
+  scanBtn.classList.remove('ready');
+  scanOutput.innerHTML = '<span class="zt-dim" style="font-style:italic">Drop a manifest.json file above and click Scan to analyze extension permissions…</span>';
+  setStatus('');
+}
+
+function H(cls, text) { return `<span class="${cls}">${text}</span>`; }
+
+// ── SCANNER ─────────────────────────────────────────────
+scanBtn.addEventListener('click', async () => {
+  if (!manifestFile || !scanBtn.classList.contains('ready')) return;
+
+  let manifest;
+  try {
+    const text = await readText(manifestFile);
+    manifest = JSON.parse(text);
+  } catch(e) {
+    scanOutput.innerHTML = H('zt-red', '✗ Could not parse file — make sure you dropped a valid manifest.json');
+    setStatus('Parse error', 'warn');
+    return;
+  }
+
+  const eq = '═'.repeat(58);
+  const div = '─'.repeat(58);
+  let html = '';
+  let totalRisk = 0;
+  let criticalCount = 0;
+
+  html += H('zt-bold', eq) + '\n';
+  html += H('zt-bold', '  EXTENSION PERMISSION SCANNER') + '\n';
+  html += H('zt-dim', `  Extension: ${manifest.name || 'Unknown'}`) + '\n';
+  html += H('zt-dim', `  Version  : ${manifest.version || 'Unknown'}`) + '\n';
+  html += H('zt-dim', `  Author   : ${manifest.author || 'Not specified'}`) + '\n';
+  html += H('zt-dim', div) + '\n';
+  html += H('zt-orange', '  Scope: Optimized for job search autofill extensions.') + '\n';
+  html += H('zt-dim',    '  If scanning a different extension type — password manager,') + '\n';
+  html += H('zt-dim',    '  file launcher, cloud tool — some flagged permissions may be') + '\n';
+  html += H('zt-dim',    '  legitimate. See the context note in the analysis below.') + '\n';
+  html += H('zt-bold', eq) + '\n\n';
+
+  // ── Permissions
+  const perms = manifest.permissions || [];
+  html += H('zt-blue', '[ DECLARED PERMISSIONS ]') + '\n' + H('zt-dim', div) + '\n';
+
+  if (perms.length === 0) {
+    html += H('zt-green', '  No special permissions declared.') + '\n';
+  } else {
+    for (const perm of perms) {
+      const data = PERMISSION_DATA[perm];
+      if (data) {
+        const isRisk = data.risk === 'critical' || data.risk === 'high';
+        if (data.risk === 'critical') criticalCount++;
+        const badge = data.risk === 'critical' ? H('zt-red', '!! CRITICAL') :
+                      data.risk === 'high'     ? H('zt-orange', '▲ HIGH') :
+                      data.risk === 'needed'   ? H('zt-green', '✓ NEEDED') :
+                                                 H('zt-dim', '· LOW');
+        html += `\n  ${badge} ${H(isRisk ? 'zt-red' : 'zt-dim', perm)}\n`;
+        html += `  ${H('zt-dim', data.plain)}\n`;
+        if (isRisk) html += `  ${H('zt-orange', '→ ' + data.why_concerning)}\n`;
+        if (data.needed_for_autofill === false) totalRisk++;
+      } else {
+        html += `\n  ${H('zt-orange', '? UNKNOWN')} ${perm}\n`;
+        html += `  ${H('zt-dim', 'This permission is not in the reference database — research it manually.')}\n`;
+      }
+    }
+  }
+
+  // ── Host permissions
+  const hostPerms = manifest.host_permissions || [];
+  html += `\n${H('zt-blue', '[ HOST PERMISSIONS — WEBSITE ACCESS ]')}\n${H('zt-dim', div)}\n`;
+  if (hostPerms.length === 0) {
+    html += H('zt-green', '  No broad host permissions declared.') + '\n';
+  } else {
+    for (const host of hostPerms) {
+      const isWild = HOST_RISK_PATTERNS.some(p => host.includes(p.pattern.replace('*','').replace('/','').replace(':','')));
+      if (host.includes('*') && (host.includes('http') || host === '<all_urls>')) {
+        criticalCount++;
+        html += `\n  ${H('zt-red', '!! CRITICAL')} ${H('zt-red', host)}\n`;
+        html += `  ${H('zt-dim', 'Grants access to read and modify content on every matching website — not limited to job sites.')}\n`;
+      } else {
+        html += `\n  ${H('zt-dim', '· SCOPED')} ${host}\n`;
+        html += `  ${H('zt-dim', 'Limited to specific domain — lower risk.')}\n`;
+      }
+    }
+  }
+
+  // ── Content scripts
+  const contentScripts = manifest.content_scripts || [];
+  html += `\n${H('zt-blue', '[ CONTENT SCRIPTS — CODE RUNNING ON PAGES ]')}\n${H('zt-dim', div)}\n`;
+  if (contentScripts.length === 0) {
+    html += H('zt-green', '  No content scripts declared.') + '\n';
+  } else {
+    let allUrlsCount = 0;
+    for (const cs of contentScripts) {
+      const matches = cs.matches || [];
+      const isAllUrls = matches.some(m => m === '<all_urls>' || m === 'http://*/*' || m === 'https://*/*' || m === '*://*/*');
+      if (isAllUrls) allUrlsCount++;
+      const jsFiles = cs.js || [];
+      html += `\n  ${isAllUrls ? H('zt-red', '!! ALL SITES') : H('zt-dim', '· SCOPED')} `;
+      html += `${H('zt-dim', jsFiles.join(', ') || 'no JS files')}\n`;
+      html += `  ${H('zt-dim', 'Runs on: ' + matches.join(', '))}\n`;
+    }
+    if (allUrlsCount > 1) {
+      criticalCount++;
+      html += `\n  ${H('zt-red', H('zt-bold', `⚠ ${allUrlsCount} scripts run on ALL websites.`))} `;
+      html += H('zt-dim', 'For autofill, one script is sufficient.') + '\n';
+    }
+  }
+
+  // ── Background
+  const bg = manifest.background;
+  if (bg) {
+    html += `\n${H('zt-blue', '[ BACKGROUND SERVICE WORKER ]')}\n${H('zt-dim', div)}\n`;
+    html += `  ${H('zt-dim', 'Background script: ' + (bg.service_worker || bg.scripts?.join(', ') || 'present'))}\n`;
+    html += `  ${H('zt-dim', 'Runs persistently — not only when you interact with the extension.')}\n`;
+  }
+
+  // ── Minimum necessary check
+  html += `\n${H('zt-blue', '[ MINIMUM NECESSARY ANALYSIS ]')}\n${H('zt-dim', div)}\n`;
+  html += `  ${H('zt-dim', 'For a form autofill extension, the minimum necessary permissions are:')}\n`;
+  html += `  ${H('zt-green', '✓ activeTab')} — access current tab when clicked\n`;
+  html += `  ${H('zt-green', '✓ storage')} — save profile data locally\n`;
+  html += `  ${H('zt-green', '✓ scripting')} — inject autofill code into current tab\n`;
+  html += `  ${H('zt-dim', 'Any permissions beyond these warrant scrutiny.')}\n`;
+  html += `\n  ${H('zt-orange', '⚠ Important context:')}\n`;
+  html += `  ${H('zt-dim', 'This analysis uses autofill as the baseline because that is the')}\n`;
+  html += `  ${H('zt-dim', 'most common job-search extension type. If the extension you scanned')}\n`;
+  html += `  ${H('zt-dim', 'serves a different purpose — a file launcher, a password manager,')}\n`;
+  html += `  ${H('zt-dim', 'a cloud storage tool — some elevated permissions may be legitimate.')}\n`;
+  html += `  ${H('zt-dim', 'This scanner is a starting point for scrutiny, not a final verdict.')}\n`;
+  html += `  ${H('zt-dim', 'Always consider what the extension is supposed to do before')}\n`;
+  html += `  ${H('zt-dim', 'concluding that a permission is unnecessary.')}\n`;
+
+  // ── Summary
+  html += `\n${H('zt-bold', eq)}\n`;
+  html += `${H('zt-blue', '[ SUMMARY ]')}\n${H('zt-dim', div)}\n`;
+  html += `  Total permissions declared    : ${perms.length}\n`;
+  html += `  Critical risk permissions     : ${criticalCount > 0 ? H('zt-red', String(criticalCount)) : '0'}\n`;
+  html += `  Exceeds autofill minimum      : ${totalRisk > 0 ? H('zt-red', 'Yes — ' + totalRisk + ' permission(s) not needed for stated function') : H('zt-green', 'No')}\n`;
+
+  const severity = criticalCount >= 3 ? H('zt-red', H('zt-bold', 'HIGH RISK — Permissions significantly exceed stated function')) :
+                   criticalCount >= 1 ? H('zt-orange', H('zt-bold', 'ELEVATED RISK — Review carefully before use')) :
+                                        H('zt-green', H('zt-bold', 'LOW RISK — Permissions appear proportionate'));
+  html += `  Overall assessment            : ${severity}\n`;
+  html += '\n' + H('zt-bold', eq) + '\n';
+  html += H('zt-dim', 'Scanner · Yana Ivanov · Educational use · Does not replace a full code audit') + '\n';
+
+  scanOutput.innerHTML = html;
+  scanOutput.scrollTop = 0;
+  setStatus(criticalCount > 0 ? `${criticalCount} critical finding(s)` : 'Scan complete', criticalCount > 0 ? 'warn' : 'ok');
+});
+
+function readText(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = e => resolve(e.target.result);
+    r.onerror = () => reject(new Error('Read failed'));
+    r.readAsText(file);
+  });
+}
+</script>
+</body>
+</html>

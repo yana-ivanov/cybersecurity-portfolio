@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Log 007 — Confirmed IOC Matching & Severity Scoring Correction | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--display-clean);font-size:clamp(2rem,5vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#4a9eff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:#0a0f1a;line-height:1.2;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+.code-block{background:#0a0f1a;border-radius:3px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.co{color:#64748b}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem;table-layout:fixed}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;font-weight:600;overflow-wrap:break-word}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top;overflow-wrap:break-word;line-height:1.6}
+tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+td strong{color:var(--ink);font-weight:600}
+td.mono{font-family:var(--mono);font-size:.78rem;color:var(--blue);word-break:break-all}
+td.red{color:var(--red);font-weight:600}
+td.amber{color:var(--amber);font-weight:600}
+.terminal{background:#0a0f1a;border-radius:3px;padding:1.5rem;margin:1.75rem 0;border:1px solid rgba(255,255,255,.08)}
+.terminal-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{font-family:var(--mono);font-size:.6rem;color:#64748b;letter-spacing:.1em;text-transform:uppercase;margin-left:.5rem}
+.terminal pre{font-family:var(--mono);font-size:.76rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#e2e8f0}
+.t-red{color:#ef4444;font-weight:bold}
+.t-orange{color:#fb923c;font-weight:bold}
+.t-blue{color:#60a5fa;font-weight:bold}
+.t-dim{color:#475569}
+.t-bold{font-weight:bold}
+.finding{background:var(--paper);border:1px solid var(--rule);border-left:3px solid var(--red);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.finding.amber{border-left-color:var(--amber)}
+.finding.blue{border-left-color:var(--blue)}
+.finding-num{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:var(--red);text-transform:uppercase;margin-bottom:.3rem}
+.finding.amber .finding-num{color:var(--amber)}
+.finding.blue .finding-num{color:var(--blue)}
+.finding-title{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.6rem}
+.finding p{margin-bottom:.6rem;font-size:.88rem;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.before{border-top:3px solid var(--amber)}
+.compare-box.after{border-top:3px solid var(--green)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.before .compare-label{color:var(--amber)}
+.compare-box.after .compare-label{color:var(--green)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);border-radius:2px;padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:130px 1fr;gap:1rem;font-size:.92rem}
+.nist-desc{color:var(--ink3);font-size:.92rem;line-height:1.7}
+.ioc-table td.confirmed{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.78rem}
+.ioc-table td.dynamic{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.78rem}
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer a{color:#4a9eff;text-decoration:none}
+footer a:hover{color:#93c5fd}
+@media(max-width:680px){
+  .mast-inner,.wrap{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .compare-grid{grid-template-columns:1fr}
+  .nist-item{display:grid;grid-template-columns:130px 1fr;gap:1rem;font-size:.92rem}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Security Lab Log · Entry 007</div>
+    <h1 class="title">Confirmed IOC Matching & Severity Scoring Correction</h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Date</div><div class="value">March 19, 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational Use</div></div>
+      <div class="meta-item"><div class="label">Builds On</div><div class="value">Lab Log 006 — zeek_triage.py</div></div>
+      <div class="meta-item"><div class="label">New Function</div><div class="value">get_known_bad_hits()</div></div>
+      <div class="meta-item"><div class="label">Validated Against</div><div class="value">Lumma Stealer · Easy As 123 C2</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    IOC MATCHING · DYNAMIC DNS DETECTION · SEVERITY LOGIC CORRECTED · MARCH 19 2026
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>The Problem With Volume-Based Severity</h2>
+  <p>When Lab Log 006 validated the triage script against the Easy As 123 C2 pcap, it scored MEDIUM. The reasoning at the time: only 61.5KB of data had been sent to the C2 server, which fell below the CRITICAL threshold of 1MB. Low data volume, lower urgency.</p>
+  <p>That logic is wrong. Volume measures damage already done — it says nothing about the threat that is present right now. The Easy As 123 machine had a confirmed active C2 connection to 45.131.214.85, sending POST requests to <code style="font-family:var(--mono);font-size:.85rem;color:var(--red)">/fakeurl.htm</code> every 60 seconds for over four hours. The malware was installed, it had established contact with its operator, and it was waiting for a command payload. An attacker with access to that C2 server could have sent ransomware, a credential harvester, or a lateral movement tool at any moment.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The correct severity question is not "how much damage has occurred?" — it is "is a confirmed threat present?"</strong> A machine with an active C2 connection is CRITICAL regardless of byte count. The window is open. The severity logic needed to be corrected.</p>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-box before">
+      <div class="compare-label">Before — Volume-Based Scoring</div>
+      <p><strong>Easy As 123:</strong> 61.5KB sent → MEDIUM</p>
+      <p><strong>Lumma Stealer:</strong> 2.27MB sent → CRITICAL</p>
+      <p><strong>Flaw:</strong> Confuses "not much damage yet" with "not serious." A confirmed C2 beacon is always serious regardless of how many bytes have moved.</p>
+    </div>
+    <div class="compare-box after">
+      <div class="compare-label">After — IOC-Based Scoring</div>
+      <p><strong>Easy As 123:</strong> fakeurl.htm confirmed IOC → CRITICAL</p>
+      <p><strong>Lumma Stealer:</strong> 5 confirmed IOCs → CRITICAL</p>
+      <p><strong>Fix:</strong> Any match against KNOWN_BAD_DOMAINS immediately scores CRITICAL — threat confirmed regardless of data volume.</p>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>The KNOWN_BAD_DOMAINS List</h2>
+  <p>The fix required a third configuration list alongside <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">SUSPICIOUS_TLDS</code> and <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">SAFE_HOSTS</code>. Where SUSPICIOUS_TLDS scores domains probabilistically based on TLD abuse patterns, KNOWN_BAD_DOMAINS matches specific confirmed IOCs — either from malware previously analyzed in these labs, or from infrastructure categories that are essentially never used by legitimate organizations.</p>
+
+  <div class="tbl-wrap">
+    <table class="ioc-table">
+      <colgroup><col style="width:30%"><col style="width:15%"><col style="width:55%"></colgroup>
+      <thead><tr><th>IOC</th><th>Type</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td class="confirmed">fakeurl.htm</td><td>Confirmed IOC</td><td>Easy As 123 C2 URI — analyzed in Lab Log 003. CMD=POLL beaconing payload.</td></tr>
+        <tr><td class="confirmed">set_agent</td><td>Confirmed IOC</td><td>Lumma Stealer registration endpoint — analyzed in Lab Log 004. Browser fingerprint exfiltration.</td></tr>
+        <tr><td class="confirmed">whitepepper.su</td><td>Confirmed IOC</td><td>Lumma Stealer primary C2 domain. .su = Soviet Union TLD, criminal infrastructure.</td></tr>
+        <tr><td class="confirmed">communicationfirewall-security.cc</td><td>Confirmed IOC</td><td>Lumma Stealer secondary C2 domain. Deceptive name designed to appear legitimate.</td></tr>
+        <tr><td class="confirmed">holiday-forever.cc</td><td>Confirmed IOC</td><td>Lumma Stealer payload delivery domain. .cc = Cocos Islands, high abuse TLD.</td></tr>
+        <tr><td class="confirmed">whooptm.cyou</td><td>Confirmed IOC</td><td>Lumma Stealer C2 domain. .cyou = China You, extremely high abuse rate.</td></tr>
+        <tr><td class="confirmed">megafilehub</td><td>Confirmed IOC</td><td>Lumma Stealer payload hosting. Partial match catches all subdomains.</td></tr>
+        <tr><td class="dynamic">duckdns.org</td><td>Dynamic DNS</td><td>Free dynamic DNS. No identity verification. Widely abused by RATs and C2 infrastructure.</td></tr>
+        <tr><td class="dynamic">no-ip.com</td><td>Dynamic DNS</td><td>One of the most abused dynamic DNS providers globally. Rarely seen in legitimate enterprise traffic.</td></tr>
+        <tr><td class="dynamic">ddns.net</td><td>Dynamic DNS</td><td>Free subdomain service with no verification. Common in commodity malware C2.</td></tr>
+        <tr><td class="dynamic">hopto.org</td><td>Dynamic DNS</td><td>No-IP subdomain provider. Frequently flagged in threat intelligence feeds.</td></tr>
+        <tr><td class="dynamic">duckdns.org</td><td>Dynamic DNS</td><td>Popular with malware authors for fast infrastructure rotation.</td></tr>
+        <tr><td class="dynamic">zapto.org / sytes.net</td><td>Dynamic DNS</td><td>No-IP subdomain family. Near-zero legitimate enterprise usage.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>Why dynamic DNS providers belong on a bad list:</strong> Dynamic DNS lets anyone point a subdomain at any IP address and change it instantly — no registration, no identity verification. That flexibility is exactly what malware authors need: if a C2 IP gets blocked, they can redirect the domain to a new one within minutes. Legitimate enterprises with real infrastructure budgets and IT departments have no reason to use free dynamic DNS. Seeing any of these providers in enterprise network traffic is a strong indicator of malware or unauthorized software.</p>
+  </div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>The get_known_bad_hits() Function</h2>
+  <p>A new function was added to the script between the username lookup and the HTTP analysis steps. It checks both http.log and ssl.log against every entry in KNOWN_BAD_DOMAINS, deduplicates matches across both logs, and returns a list of confirmed hits with the matched IOC, the full host or domain, the destination IP, and the source log file.</p>
+
+  <div class="code-label">get_known_bad_hits() — New Function</div>
+  <div class="code-block"><pre><span class="ke">def</span> <span class="va">get_known_bad_hits</span>(log_dir):
+    <span class="co">"""Check http.log and ssl.log for confirmed malicious IOCs."""</span>
+    hits = []
+    seen = set()  <span class="co"># prevents same host appearing twice if in both logs</span>
+
+    <span class="co"># Check http.log — match against host AND URI path</span>
+    http_path = os.path.join(log_dir, <span class="hi">"http.log"</span>)
+    <span class="ke">if</span> os.path.exists(http_path):
+        <span class="ke">for</span> row <span class="ke">in</span> parse_zeek_log(http_path):
+            host     = row.get(<span class="hi">"host"</span>, <span class="hi">""</span>)
+            uri      = row.get(<span class="hi">"uri"</span>, <span class="hi">""</span>)
+            ip       = row.get(<span class="hi">"id.resp_h"</span>, <span class="hi">""</span>)
+            combined = host + uri  <span class="co"># fakeurl.htm is in the URI, not the host</span>
+            <span class="ke">for</span> ioc <span class="ke">in</span> KNOWN_BAD_DOMAINS:
+                <span class="ke">if</span> ioc <span class="ke">in</span> combined <span class="ke">and</span> host <span class="ke">not in</span> seen:
+                    seen.add(host)
+                    hits.append({
+                        <span class="hi">"indicator"</span>: ioc,
+                        <span class="hi">"host"</span>:      host,
+                        <span class="hi">"ip"</span>:        ip,
+                        <span class="hi">"source"</span>:    <span class="hi">"http.log"</span>
+                    })
+
+    <span class="co"># Check ssl.log — match against SNI server_name field</span>
+    ssl_path = os.path.join(log_dir, <span class="hi">"ssl.log"</span>)
+    <span class="ke">if</span> os.path.exists(ssl_path):
+        <span class="ke">for</span> row <span class="ke">in</span> parse_zeek_log(ssl_path):
+            server_name = row.get(<span class="hi">"server_name"</span>, <span class="hi">""</span>)
+            ip          = row.get(<span class="hi">"id.resp_h"</span>, <span class="hi">""</span>)
+            <span class="ke">for</span> ioc <span class="ke">in</span> KNOWN_BAD_DOMAINS:
+                <span class="ke">if</span> ioc <span class="ke">in</span> server_name <span class="ke">and</span> server_name <span class="ke">not in</span> seen:
+                    seen.add(server_name)
+                    hits.append({
+                        <span class="hi">"indicator"</span>: ioc,
+                        <span class="hi">"host"</span>:      server_name,
+                        <span class="hi">"ip"</span>:        ip,
+                        <span class="hi">"source"</span>:    <span class="hi">"ssl.log"</span>
+                    })
+
+    <span class="ke">return</span> hits</pre></div>
+
+  <h3>Key Design Decision — Matching Combined Host + URI</h3>
+  <p>The Easy As 123 C2 beacon posts to <code style="font-family:var(--mono);font-size:.85rem;color:var(--red)">45.131.214.85/fakeurl.htm</code>. The IOC <code style="font-family:var(--mono);font-size:.85rem;color:var(--red)">fakeurl.htm</code> is in the URI path, not the host field. If the function only checked <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">host</code>, it would never match. By concatenating <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">host + uri</code> into a single string before checking, the function catches IOCs in either field with one comparison.</p>
+
+  <h3>Severity Scoring Update</h3>
+  <p>The severity logic was updated to treat any confirmed IOC match as CRITICAL — regardless of data volume:</p>
+
+  <div class="code-block"><pre><span class="co"># Known bad hits always escalate to CRITICAL</span>
+<span class="ke">if</span> known_bad <span class="ke">or</span> total_sent > 1_000_000:
+    severity_display = red(bold(<span class="hi">"CRITICAL"</span>))
+<span class="ke">elif</span> total_sent > 100_000 <span class="ke">or</span> findings > 3:
+    severity_display = orange(bold(<span class="hi">"HIGH"</span>))
+<span class="ke">elif</span> findings > 0:
+    severity_display = orange(<span class="hi">"MEDIUM"</span>)
+<span class="ke">else</span>:
+    severity_display = <span class="hi">"LOW"</span></pre></div>
+
+  <p>The <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">known_bad or</code> condition means the script short-circuits to CRITICAL the moment any confirmed IOC is found — it does not wait to calculate data volumes first.</p>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>Validated Output — Both Pcaps</h2>
+
+  <h3>Lumma Stealer — 5 Confirmed IOC Matches</h3>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="terminal-dot" style="background:#ef4444"></div>
+      <div class="terminal-dot" style="background:#fbbf24;margin-left:4px"></div>
+      <div class="terminal-dot" style="background:#4ade80;margin-left:4px"></div>
+      <div class="terminal-title">python3 zeek_triage.py ~/Desktop/zeek-lumma</div>
+    </div>
+    <pre>Analyzing Zeek logs in: /Users/yanai/Desktop/zeek-lumma
+  [+] Host identity: done
+  [+] Username: done
+  [+] Known bad IOCs: done — <span class="t-red">5 matches</span>
+  [+] HTTP analysis: done — 1 hits
+  [+] TLS analysis: done — 5 hits
+
+<span class="t-bold">============================================================
+  ZEEK TRIAGE REPORT
+============================================================</span>
+
+<span class="t-blue">[ INFECTED HOST IDENTITY ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  IP Address : 10.1.21.58
+  MAC Address: 00:21:5d:c8:0e:f2
+  Hostname   : DESKTOP-ES9F3ML
+  Username   : <span class="t-red">gwyatt</span>
+
+<span class="t-red">[ CONFIRMED MALICIOUS IOCs ]</span> — <span class="t-red">5</span> matches
+<span class="t-dim">------------------------------------------------------------</span>
+  <span class="t-red">!! MATCH</span>  <span class="t-red">whitepepper.su</span>  <span class="t-dim">153.92.1.49</span>
+             IOC: <span class="t-bold">set_agent</span>  <span class="t-dim">[http.log]</span>
+  <span class="t-red">!! MATCH</span>  <span class="t-red">media.megafilehub4.lat</span>  <span class="t-dim">104.21.48.156</span>
+             IOC: <span class="t-bold">megafilehub</span>  <span class="t-dim">[ssl.log]</span>
+  <span class="t-red">!! MATCH</span>  <span class="t-red">whooptm.cyou</span>  <span class="t-dim">62.72.32.156</span>
+             IOC: <span class="t-bold">whooptm.cyou</span>  <span class="t-dim">[ssl.log]</span>
+  <span class="t-red">!! MATCH</span>  <span class="t-red">holiday-forever.cc</span>  <span class="t-dim">80.97.160.24</span>
+             IOC: <span class="t-bold">holiday-forever.cc</span>  <span class="t-dim">[ssl.log]</span>
+  <span class="t-red">!! MATCH</span>  <span class="t-red">communicationfirewall-security.cc</span>  <span class="t-dim">104.21.9.36</span>
+             IOC: <span class="t-bold">communicationfirewall-security.cc</span>  <span class="t-dim">[ssl.log]</span>
+
+<span class="t-blue">[ SEVERITY SUMMARY ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  Confirmed malicious IOCs : <span class="t-red">5</span>
+  Suspicious HTTP requests : <span class="t-red">1</span>
+  Suspicious TLS domains   : <span class="t-red">5</span>
+  Total data exfiltrated   : <span class="t-red">2.27 MB</span>
+  Overall severity         : <span class="t-red">CRITICAL</span></pre>
+  </div>
+
+  <h3>Easy As 123 — Severity Corrected From MEDIUM to CRITICAL</h3>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="terminal-dot" style="background:#ef4444"></div>
+      <div class="terminal-dot" style="background:#fbbf24;margin-left:4px"></div>
+      <div class="terminal-dot" style="background:#4ade80;margin-left:4px"></div>
+      <div class="terminal-title">python3 zeek_triage.py ~/Desktop/zeek-easy123</div>
+    </div>
+    <pre>Analyzing Zeek logs in: /Users/yanai/Desktop/zeek-easy123
+  [+] Host identity: done
+  [+] Username: done
+  [+] Known bad IOCs: done — <span class="t-red">1 matches</span>
+  [+] HTTP analysis: done — 1 hits
+  [+] TLS analysis: done — 0 hits
+
+<span class="t-bold">============================================================
+  ZEEK TRIAGE REPORT
+============================================================</span>
+
+<span class="t-blue">[ INFECTED HOST IDENTITY ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  IP Address : -
+  MAC Address: 00:e0:4c:68:08:00
+  Hostname   : brads-MBP
+  Username   : <span class="t-red">brolf</span>
+
+<span class="t-red">[ CONFIRMED MALICIOUS IOCs ]</span> — <span class="t-red">1</span> matches
+<span class="t-dim">------------------------------------------------------------</span>
+  <span class="t-red">!! MATCH</span>  <span class="t-red">45.131.214.85</span>  <span class="t-dim">45.131.214.85</span>
+             IOC: <span class="t-bold">fakeurl.htm</span>  <span class="t-dim">[http.log]</span>
+
+<span class="t-blue">[ SEVERITY SUMMARY ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  Confirmed malicious IOCs : <span class="t-red">1</span>
+  Suspicious HTTP requests : <span class="t-red">1</span>
+  Suspicious TLS domains   : 0
+  Total data exfiltrated   : 61.5 KB
+  Overall severity         : <span class="t-red">CRITICAL</span></pre>
+  </div>
+
+  <div class="callout callout-amber">
+    <p><strong>Why the Easy As 123 host field shows the IP twice:</strong> When malware connects directly to a raw IP address rather than a domain name, Zeek's http.log records the IP in both the host field and the id.resp_h field. There is no domain name to display because the malware never performed a DNS lookup — it hardcoded the C2 IP directly. This is itself a behavioral indicator: legitimate software almost always connects to domain names, not raw IPs.</p>
+  </div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>Script Evolution — Lab 006 vs Lab 007</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <colgroup><col style="width:30%"><col style="width:35%"><col style="width:35%"></colgroup>
+      <thead><tr><th>Capability</th><th>Lab 006</th><th>Lab 007</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Detection layers</strong></td>
+          <td>TLD matching + safe host filtering</td>
+          <td>IOC matching + TLD matching + safe host filtering</td>
+        </tr>
+        <tr>
+          <td><strong>Severity basis</strong></td>
+          <td>Data volume only</td>
+          <td>Confirmed IOC presence OR data volume</td>
+        </tr>
+        <tr>
+          <td><strong>Easy As 123 score</strong></td>
+          <td class="amber">MEDIUM — incorrect</td>
+          <td class="red">CRITICAL — correct</td>
+        </tr>
+        <tr>
+          <td><strong>Lumma Stealer score</strong></td>
+          <td class="red">CRITICAL — correct</td>
+          <td class="red">CRITICAL — correct</td>
+        </tr>
+        <tr>
+          <td><strong>Configuration lists</strong></td>
+          <td>2 — SUSPICIOUS_TLDS, SAFE_HOSTS</td>
+          <td>3 — adds KNOWN_BAD_DOMAINS</td>
+        </tr>
+        <tr>
+          <td><strong>Functions</strong></td>
+          <td>5 analysis functions</td>
+          <td>6 analysis functions — adds get_known_bad_hits()</td>
+        </tr>
+        <tr>
+          <td><strong>Report sections</strong></td>
+          <td>4 sections</td>
+          <td>5 sections — adds CONFIRMED MALICIOUS IOCs</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>NIST SP 800-171 Control Mapping</h2>
+  <div class="nist-box">
+    <div class="nist-box-title">Applicable Controls</div>
+    <div class="nist-items">
+      <div class="nist-item">
+        <div class="nist-control">3.14.6</div>
+        <div class="nist-desc"><strong>Monitor for malicious code.</strong> KNOWN_BAD_DOMAINS implements a signature-based detection layer equivalent in principle to antivirus IOC matching — any traffic to a confirmed malicious domain triggers an immediate CRITICAL alert, satisfying the requirement to monitor for and respond to malicious code at network connection points.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.14.7</div>
+        <div class="nist-desc"><strong>Identify unauthorized use.</strong> Direct C2 connections to raw IPs — as seen in Easy As 123 — are identified and flagged by IOC matching even when no domain name is present. The absence of DNS resolution is itself flagged as a behavioral indicator in the report output.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.3.1</div>
+        <div class="nist-desc"><strong>Audit logging.</strong> Each confirmed IOC match records the matched indicator, full host/domain, destination IP, and source log file — producing a structured audit record suitable for incident documentation and legal hold requirements.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 07 -->
+<div class="section">
+  <div class="section-num">Section 07</div>
+  <h2>Lessons Learned</h2>
+
+  <h3>Severity Logic Must Reflect Threat Reality, Not Just Damage Metrics</h3>
+  <p>The MEDIUM score for Easy As 123 was a design flaw, not an analysis error. The underlying data was correct — host identity, C2 IP, request count, data volumes were all accurately identified. The mistake was in what the scoring asked: how much data moved, rather than is a threat confirmed. Security tooling that scores low damage as low severity will systematically undertriage active C2 connections that haven't yet executed their payload — exactly the most important moment to catch them.</p>
+
+  <h3>IOC Lists Are Only Valuable If They Grow</h3>
+  <p>The current KNOWN_BAD_DOMAINS list contains IOCs from two malware families analyzed across four lab sessions. Every new pcap analyzed is an opportunity to add confirmed indicators. Dynamic DNS providers were added not from specific malware analysis but from threat intelligence knowledge — they represent a category of infrastructure that is empirically associated with malicious activity. Both types of entries belong on the list, and both should be documented with their source so future analysts understand why each entry is there.</p>
+
+  <h3>Next Lab</h3>
+  <p>Lab Log 008 will build the Mac application wrapper — a drag-and-drop GUI that runs zeek_triage.py without any terminal interaction. The goal is a self-contained tool that an analyst at any experience level can use on any Zeek log folder.</p>
+</div>
+
+</div></div>
+
+<footer>
+  <span>Lab Log 007 — KNOWN_BAD_DOMAINS · Yana Ivanov · March 19, 2026 · Educational use only</span>
+  <a href="index.html">← Portfolio</a>
+</footer>
+
+</body>
+</html>

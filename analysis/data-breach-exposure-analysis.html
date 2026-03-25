@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>38 Breaches, One Email Address | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ── DESIGN TOKENS ── */
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:rgba(192,57,43,0.06);border-color:var(--red)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:1.5rem 0}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--red)}
+
+/* ── STAT NUM GRID ── */
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper)}
+.stat-num-item:last-child{border-right:none}
+.stat-num{font-family:var(--display);font-size:2.4rem;font-weight:900;line-height:1;margin-bottom:.4rem}
+.stat-num-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;margin-bottom:.4rem;line-height:1.4}
+.stat-num-sub{font-size:.78rem;color:#94a3b8;line-height:1.5}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+
+/* ── ATTACK FLOW ── */
+.attack-flow{display:grid;grid-template-columns:repeat(5,1fr);gap:.75rem;margin:1rem 0}
+.flow-step{background:var(--bg);border:1px solid var(--rule);padding:1rem .75rem;text-align:center;position:relative}
+.flow-step::after{content:'→';position:absolute;right:-1.1rem;top:50%;transform:translateY(-50%);font-size:.9rem;color:#94a3b8;z-index:2;font-family:var(--mono)}
+.flow-step:last-child::after{display:none}
+.flow-step-num{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+.flow-step-icon{margin-bottom:.4rem;color:var(--ink3)}
+.flow-step-icon .material-icons{font-size:1.4rem}
+.flow-step-label{font-size:.75rem;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:.3rem;font-family:var(--mono)}
+.flow-step-desc{font-size:.68rem;color:var(--ink3);line-height:1.4}
+.flow-step.danger{background:var(--red-dim);border-color:rgba(192,57,43,.25)}
+.flow-step.danger .flow-step-num{color:var(--red)}
+.flow-step.danger .flow-step-icon{color:var(--red)}
+.flow-step.warning{background:var(--amber-dim);border-color:rgba(180,83,9,.25)}
+.flow-step.warning .flow-step-num{color:var(--amber)}
+.flow-step.warning .flow-step-icon{color:var(--amber)}
+
+/* ── SPLIT VISUAL ── */
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+
+/* ── TIMELINE ── */
+.timeline{margin:1.5rem 0;position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:.45rem;top:0;bottom:0;width:2px;background:var(--rule)}
+.tl-item{position:relative;margin-bottom:1.25rem;padding-left:1.25rem}
+.tl-item::before{content:'';position:absolute;left:-1.6rem;top:.4rem;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tl-date{font-family:var(--mono);font-size:.62rem;color:var(--red);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem}
+.tl-title{font-weight:700;color:var(--ink);font-size:.9rem;margin-bottom:.2rem;font-family:var(--display)}
+.tl-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── FINDINGS LIST ── */
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);border-radius:2px;background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--blue);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;border-radius:3px;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--blue-dim);color:var(--blue)}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+.cmmc-tag{display:inline-block;font-family:var(--mono);font-size:.58rem;padding:.15rem .45rem;background:var(--red-dim);color:var(--red);border:1px solid rgba(192,57,43,.2);text-transform:uppercase;letter-spacing:.06em;margin-left:.4rem;vertical-align:middle}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:4rem}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── RESPONSIVE ── */
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .split-visual{grid-template-columns:1fr}
+  .attack-flow{grid-template-columns:1fr}
+  .flow-step::after{display:none}
+  .bio{grid-template-columns:1fr;padding:2rem 1.5rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<header class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Threat Intelligence Analysis · Personal Exposure Case Study · MITRE ATT&CK v14</div>
+    <h1 class="title">38 Breaches, One Email Address —<br><em>Anatomy of a Credential Attack Surface</em></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">March 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Data Source</div><div class="value">HaveIBeenPwned</div></div>
+      <div class="meta-item"><div class="label">Framework</div><div class="value">MITRE ATT&CK v14</div></div>
+      <div class="meta-item"><div class="label">Severity</div><div class="value">High</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    Most recent breach: Under Armour / Everest Ransomware Group — data published January 2026 &nbsp;·&nbsp; Credential-stuffing list appearances: 4 active datasets including Synthient (2025, 2B records)
+  </div>
+</header>
+
+<!-- ══ CONTENT ══ -->
+<main>
+
+<!-- SECTION 01 — EXECUTIVE SUMMARY -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>Between 2012 and 2026, a single personal email address accumulated exposure across <strong>38 confirmed data breaches</strong> and 2 paste records — a span that covers four distinct phases of the modern threat landscape: the era of weak password hashing (2012–2015), the rise of large-scale credential aggregation (2016–2019), the industrialization of infostealer malware (2020–2023), and the current ransomware data-extortion era (2024–present).</p>
+
+  <p>This report treats that exposure history as a live threat intelligence dataset. Rather than cataloguing breaches in isolation, it maps the cumulative attack surface they create — including a key structural finding about authentication architecture: accounts created in the pre-SSO era (pre-2012) may exist as dormant native password accounts alongside more recent Google SSO logins, creating a hidden attack surface the account holder may not be aware of.</p>
+
+  <div class="stat-num-grid">
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">38</div>
+      <div class="stat-num-label">Confirmed Breaches</div>
+      <div class="stat-num-sub">2012–2026, single email address</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">5</div>
+      <div class="stat-num-label">Plain Text / Weak Hash</div>
+      <div class="stat-num-sub">Passwords assumed fully compromised</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">4</div>
+      <div class="stat-num-label">Active Stuffing Lists</div>
+      <div class="stat-num-sub">Including Synthient 2025 (2B records)</div>
+    </div>
+    <div class="stat-num-item stat-blue">
+      <div class="stat-num">2026</div>
+      <div class="stat-num-label">Most Recent Breach</div>
+      <div class="stat-num-sub">Under Armour, published Jan 2026</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 02 — BREACH TIMELINE -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>Breach Timeline: Four Eras of Exposure</h2>
+
+  <p>The 38 breaches in this profile do not represent isolated incidents — they map to four distinct phases in the evolution of the threat landscape, each with different attacker capabilities and different risks to the exposed individual.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Analyst note:</strong> The 2012 LinkedIn breach went undiscovered until 2016, meaning 164 million cracked SHA-1 credentials circulated for four years before any user notification. Early breach data ages poorly for defenders but never expires for attackers — once cracked, a password hash is permanently a plaintext credential.</p>
+  </div>
+
+  <div class="figure">
+    <div class="figure-title">Figure 1 — Breach History Timeline by Phase</div>
+    <div class="figure-body">
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-date">2012–2015 — Era of Weak Hashing</div>
+          <div class="tl-title">LinkedIn, Dropbox, Adobe, CafeMom, Kickstarter</div>
+          <div class="tl-desc">Industry-wide failure to implement proper password hashing. LinkedIn used unsalted SHA-1; Adobe used 3DES encryption with plaintext hints; CafeMom stored passwords in plaintext. These credentials were cracked en masse and remain in permanent circulation. Dropbox used a mixed SHA-1/bcrypt scheme — SHA-1 accounts fully cracked.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">2016–2019 — Era of Aggregation</div>
+          <div class="tl-title">Collection #1, Apollo, PDL, Canva, Zynga, EatStreet, Houzz, ShareThis</div>
+          <div class="tl-desc">Individual breach datasets begin merging into mega-aggregations. Collection #1 (773M records, Jan 2019) consolidated years of prior breaches into a single credential-stuffing tool. Apollo and PDL exposed professional identity data at scale, enabling targeted spear-phishing against business contacts.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">2020–2023 — Era of Infostealer Industrialization</div>
+          <div class="tl-title">Cit0day, Gravatar, Twitter 200M, LinkedIn Scrape, Gemini, CoinTracker, ParkMobile</div>
+          <div class="tl-desc">Malware-as-a-Service platforms (Lumma, RedLine, Raccoon) industrialize credential harvesting. Infostealer output feeds Telegram-based distribution networks. Unlike breach aggregations, infostealer credentials are current — harvested from live browser sessions, bypassing password change history entirely.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">2024–2026 — Era of Ransomware Data Extortion</div>
+          <div class="tl-title">Neiman Marcus, French Citizens, Post Millennial, Telegram Combolists, Synthient, Under Armour</div>
+          <div class="tl-desc">Ransomware groups shift to double-extortion: exfiltrate data before encrypting, then publish publicly when ransom is not paid. Everest ransomware group's Under Armour incident (343GB, published January 2026) is the most recent breach in this profile — data is actively circulating in criminal ecosystems now.</div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Timeline sourced from HaveIBeenPwned.com breach database and vendor security notifications. Dates reflect breach discovery where known; original incident dates may precede notification by months or years.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 03 — CREDENTIAL STUFFING ATTACK CHAIN -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>Credential Stuffing: The Full Attack Chain</h2>
+
+  <p>Credential stuffing is the primary active threat arising from this exposure profile. It exploits the gap between how frequently users change passwords and how long cracked credentials remain in circulation. The following chain traces how a 2012 LinkedIn breach becomes a 2026 account takeover attempt — a 14-year attack lifecycle.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 2 — Credential Stuffing Attack Chain (T1078)</div>
+    <div class="figure-body">
+      <div class="attack-flow">
+        <div class="flow-step">
+          <div class="flow-step-num">Step 01</div>
+          <div class="flow-step-icon"><span class="material-icons">storage</span></div>
+          <div class="flow-step-label">DB Breach</div>
+          <div class="flow-step-desc">Attacker exfiltrates password database from target platform</div>
+        </div>
+        <div class="flow-step warning">
+          <div class="flow-step-num">Step 02</div>
+          <div class="flow-step-icon"><span class="material-icons">build</span></div>
+          <div class="flow-step-label">Hash Cracking</div>
+          <div class="flow-step-desc">Unsalted or weak hashes cracked using rainbow tables or GPU rigs</div>
+        </div>
+        <div class="flow-step warning">
+          <div class="flow-step-num">Step 03</div>
+          <div class="flow-step-icon"><span class="material-icons">merge_type</span></div>
+          <div class="flow-step-label">Aggregation</div>
+          <div class="flow-step-desc">Plaintext credentials compiled into email:password combo lists, traded on dark web</div>
+        </div>
+        <div class="flow-step danger">
+          <div class="flow-step-num">Step 04</div>
+          <div class="flow-step-icon"><span class="material-icons">smart_toy</span></div>
+          <div class="flow-step-label">Automated Testing</div>
+          <div class="flow-step-desc">Tools (OpenBullet, Sentry MBA) test millions of pairs/day against banking, email, cloud portals</div>
+        </div>
+        <div class="flow-step danger">
+          <div class="flow-step-num">Step 05</div>
+          <div class="flow-step-icon"><span class="material-icons">lock_open</span></div>
+          <div class="flow-step-label">Account Takeover</div>
+          <div class="flow-step-desc">Successful logins monetized: accounts drained, reset chains exploited for lateral movement</div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">This email address appears in 4 active credential-stuffing aggregations (Collection #1, Cit0day, Synthient 2025, Telegram Combolists 2024). Any password historically shared across accounts should be treated as permanently compromised.</div>
+  </div>
+
+  <h3>The Password Reuse Multiplier</h3>
+  <p>Credential stuffing success scales directly with password reuse. A single compromised credential reused across five platforms creates five simultaneous attack vectors from one breach event. The Synthient dataset (2025, 2 billion records) and Telegram combolists (361 million records sourced partly from infostealer malware) represent the current state of the art — these lists are actively tested against targets continuously.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 3 — Infostealer vs. Breach Aggregation: Key Difference</div>
+    <div class="figure-body">
+      <div class="split-visual">
+        <div class="split-panel left">
+          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">history</span> Breach Aggregation Lists</div>
+          <p><strong>Source:</strong> Compiled from historical breach databases, traded on dark web forums.</p>
+          <p><strong>Credential age:</strong> Reflects passwords at time of breach — may be years old.</p>
+          <p><strong>Defense:</strong> Changing passwords after a breach notification removes the risk. Regular rotation limits exposure window.</p>
+          <p><strong>Examples in this profile:</strong> Collection #1, Cit0day, Pemiblanc, Exploit.In</p>
+        </div>
+        <div class="split-panel right">
+          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">bug_report</span> Infostealer-Sourced Credentials</div>
+          <p><strong>Source:</strong> Malware (Lumma, RedLine, Raccoon) deployed via malvertising, trojanized downloads, phishing attachments.</p>
+          <p><strong>Credential age:</strong> Current — harvested from active browser sessions. Session cookies captured alongside passwords.</p>
+          <p><strong>Defense:</strong> Password changes alone are insufficient if session cookie was captured. Requires full session invalidation + malware remediation.</p>
+          <p><strong>Examples in this profile:</strong> Telegram Combolists 2024 (partially infostealer-sourced)</p>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">The 2024 Telegram combolist dataset is notable because it combines both sources — historical breach data and live infostealer output — making it a qualitatively more dangerous attack tool than purely historical aggregations.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 04 — THREAT ACTOR PROFILES -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>Threat Actor Profiles</h2>
+
+  <p>Two categories of threat actor are directly implicated in the highest-severity breaches in this profile: the Everest ransomware group (Under Armour, January 2026) and the infostealer-as-a-service operators whose malware output fed the Telegram combolist distribution network.</p>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">Everest Ransomware Group — Under Armour Breach (Jan 2026)</div>
+        <div class="finding-desc">Russian-speaking ransomware-as-a-service group active since 2020. Operates a double-extortion model: exfiltrate data before encryption, then publish when ransom is refused. In November 2025, Everest claimed Under Armour as a victim, alleging 343GB of data exfiltrated. When ransom was not paid, 72 million customer records — including names, emails, dates of birth, geographic locations, and purchase history — were published publicly in January 2026. This data is now freshly circulating in criminal ecosystems and enables highly targeted spear-phishing. TTPs: initial access via phishing and stolen credentials; T1486 (Data Encrypted for Impact); T1567 (Exfiltration Over Web Service).</div>
+        <span class="finding-tag">CRITICAL — Data published Jan 2026</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">Infostealer-as-a-Service Operators — Telegram Combolist Distribution</div>
+        <div class="finding-desc">Malware-as-a-service ecosystem operating Lumma Stealer, RedLine, Raccoon, and Vidar — sold as subscription services on Russian-language cybercrime forums. Malware distributed via malvertising campaigns, trojanized software packages, and phishing attachments. Once executed, harvests browser-stored credentials, session cookies, autofill data, and cryptocurrency wallets. Stolen logs are packaged and sold via private Telegram channels, eventually feeding into mega-aggregations like the 2024 Telegram combolist (361 million records). The infostealer component is what makes the Telegram dataset qualitatively more dangerous than historical breach aggregations — these credentials were current at time of harvest.</div>
+        <span class="finding-tag">HIGH — Active threat, session-level credential exposure</span>
+      </div>
+    </div>
+    <div class="finding fn-medium">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">Credential Aggregators — Synthient, Collection #1, Cit0day</div>
+        <div class="finding-desc">Semi-automated actors who compile, deduplicate, and repackage existing breach data into standardized combo lists for sale or distribution. Synthient (2025) represents the current state of aggregation: 2 billion unique email addresses with 1.3 billion associated passwords, compiled across hundreds of prior breaches and made searchable through a threat intelligence partnership with HaveIBeenPwned. These datasets are the fuel for credential-stuffing botnets — their value lies in scale, not novelty.</div>
+        <span class="finding-tag">MEDIUM — Amplifies prior breach exposure</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 05 — MITRE ATT&CK MAPPING -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>MITRE ATT&CK Technique Mapping</h2>
+
+  <p>MITRE ATT&CK is a publicly maintained knowledge base of adversary tactics and techniques based on real-world observations. In SOC environments, ATT&CK technique IDs provide standardized vocabulary for classifying threat activity across teams and tooling — SIEMs, EDR platforms, and threat intelligence feeds all use ATT&CK as a common language. Each technique below is directly observed in or enabled by the breach exposure documented in this report.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Technique ID</th>
+        <th>Tactic</th>
+        <th>Technique Name</th>
+        <th>Observed in this profile</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="code">T1589.001</td>
+        <td><strong>Reconnaissance</strong></td>
+        <td>Gather Victim Identity Info: Credentials</td>
+        <td>Email + credentials harvested across 38 sources, compiled into active stuffing lists</td>
+      </tr>
+      <tr>
+        <td class="code">T1078</td>
+        <td><strong>Initial Access</strong></td>
+        <td>Valid Accounts</td>
+        <td>Stolen credentials used to authenticate as legitimate user — core mechanism of credential stuffing</td>
+      </tr>
+      <tr>
+        <td class="code">T1078.004</td>
+        <td class="red">Persistence</td>
+        <td>Valid Accounts: Cloud Accounts</td>
+        <td>Where Google SSO is active: one token compromise = access to all linked platforms. Where pre-SSO native accounts persist alongside SSO accounts, both attack surfaces exist simultaneously</td>
+      </tr>
+      <tr>
+        <td class="code">T1555.003</td>
+        <td><strong>Collection</strong></td>
+        <td>Credentials from Web Browsers</td>
+        <td>Infostealer malware targeting browser-stored credentials — source of Telegram combolist infostealer component</td>
+      </tr>
+      <tr>
+        <td class="code">T1486</td>
+        <td class="red">Impact</td>
+        <td>Data Encrypted for Impact</td>
+        <td>Everest ransomware group's Under Armour attack — encryption after exfiltration as double-extortion leverage</td>
+      </tr>
+      <tr>
+        <td class="code">T1530</td>
+        <td><strong>Collection</strong></td>
+        <td>Data from Cloud Storage</td>
+        <td>Post-compromise Dropbox access enabled via Google SSO token without separate authentication</td>
+      </tr>
+      <tr>
+        <td class="code">T1114.003</td>
+        <td class="amber">Collection</td>
+        <td>Email Collection: Email Forwarding Rule</td>
+        <td>Post-Gmail-compromise path: attacker sets forwarding rules to persist access and intercept password resets to all linked accounts</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-amber">
+    <p><strong>SOC relevance — T1078.004 (Cloud Accounts):</strong> This technique is a tier-one detection priority in Azure SOC environments. Compromised Entra ID (Azure AD) accounts exhibit the same cascading access pattern as the Google SSO structure in this profile — one identity provider controlling access to dozens of SaaS applications simultaneously. Detection focuses on anomalous sign-in patterns: impossible travel, unfamiliar device fingerprints, token replay from unexpected geographic locations.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 06 — CLOUD IDENTITY RISK -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>Cloud Identity Risk: SSO, the Pre-SSO Era, and the Duplicate Account Problem</h2>
+
+  <p>A key structural finding in this analysis concerns authentication architecture — and it is more complex than it first appears. While LinkedIn, Dropbox, and Canva currently support Google SSO login, the accounts in this profile were likely created before "Sign in with Google" was widely available. Google OAuth for third-party sites launched around 2009–2012 and was not broadly adopted until 2013–2015. LinkedIn was founded in 2003; Dropbox in 2008. Accounts created in that early period would have required native email and password registration.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Analyst note — SSO adoption timeline:</strong> "Sign in with Google" did not exist in the early 2000s. Any account created on a platform before approximately 2012 was registered with a native email and password, not OAuth. This means the breach exposure from LinkedIn (2012) and Dropbox (2012) may reflect real native password accounts — not accounts protected by Google SSO — for users who created those accounts in the early days of those platforms.</p>
+  </div>
+
+  <h3>The Duplicate Account Problem</h3>
+  <p>A common and underappreciated risk arises when users later adopt SSO on platforms where they already had native accounts. The typical sequence: a user creates an account with email + password in 2008. Years later, they click "Sign in with Google" on the same site. If the platform fails to recognize and merge the Google identity with the existing email account — which happens frequently — it silently creates a second account. The user is now logged into the new SSO account while the original native password account continues to exist, unmonitored, in the background.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 4 — The Duplicate Account Creation Vulnerability</div>
+    <div class="figure-body">
+      <div class="split-visual">
+        <div class="split-panel left">
+          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">check_circle</span> What the User Believes</div>
+          <p>User creates account in 2008 with email + password. Later switches to "Sign in with Google" and assumes this replaced or secured the original account.</p>
+          <p>User believes there is one account, protected by Google SSO and Google's 2FA.</p>
+          <p>User stops maintaining the original password — stops rotating it, forgets what it was, loses the ability to recover it if needed.</p>
+        </div>
+        <div class="split-panel right">
+          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">cancel</span> What Actually Exists</div>
+          <p>Two accounts exist: the original native account (email + old password, possibly from a breached era) and the new SSO account. Platform may not have merged them.</p>
+          <p>The original account sits dormant — with whatever password was set at creation, potentially one that appears in breach lists, with no active monitoring or rotation.</p>
+          <p>Password reset emails for the dormant account may not arrive due to spam filtering, delivery failures, or platform changes — creating an unrecoverable account that still holds personal data and represents an active credential-stuffing target.</p>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">This scenario is difficult to detect from the outside and is rarely flagged by platforms. The dormant native account is invisible to the user who believes they are using SSO, but fully visible — and targetable — to an attacker running credential-stuffing tools against breached email/password pairs.</div>
+  </div>
+
+  <h3>The Unrecoverable Account: A Compounded Risk</h3>
+  <p>A further complication emerges when attempting to investigate or close these dormant accounts: standard recovery mechanisms fail. The "Forgot password" flow sends a reset email that never arrives — caught by spam filters, routed to a defunct address variant, or simply undeliverable due to platform mail infrastructure issues. The account cannot be accessed, cannot be secured, and cannot be deleted through normal channels.</p>
+
+  <p>From a security standpoint, this is a Catch-22: the account exists and is targetable, but the legitimate owner has no path to secure or remove it through standard means. The only recourse is direct contact with the platform's support or privacy team — bypassing the automated recovery flow entirely — which is the approach taken with ParkMobile and Houzz in this analysis.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Critical finding:</strong> For accounts created before 2012 on platforms now supporting Google SSO, both a dormant native password account and a current SSO account may coexist without the user's awareness. The dormant account carries the credential risk from the original breach era; the SSO account carries the Google identity risk. Both attack surfaces must be addressed — and the dormant account may only be closeable via direct support or privacy deletion request, not through standard recovery flows.</p>
+  </div>
+
+  <h3>The SSO and Azure Entra ID Parallel</h3>
+  <p>Where SSO is confirmed and fully adopted, the risk architecture is directly analogous to Azure Entra ID in enterprise environments. A single identity provider controlling authentication for multiple downstream applications means one compromised token cascades through every integrated platform simultaneously. In Azure SOC contexts this is a tier-one detection priority — anomalous Entra ID sign-in patterns (impossible travel, unfamiliar device, token replay) trigger immediate investigation precisely because the blast radius of a single compromised identity is so large. The consumer equivalent deserves the same priority treatment.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 5 — Consumer SSO vs. Enterprise Entra ID: Structural Parallel</div>
+    <div class="figure-body">
+      <div class="split-visual">
+        <div class="split-panel left">
+          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">person</span> Consumer — Google SSO (where confirmed)</div>
+          <p><strong>Root of trust:</strong> Google account controls OAuth authentication for linked platforms.</p>
+          <p><strong>Blast radius:</strong> One stolen session token = simultaneous access to all SSO-linked platforms.</p>
+          <p><strong>Email-as-master-key:</strong> Gmail also functions as the password reset address for every email-linked account — SSO or not. Compromising Gmail gives reset authority over all downstream accounts.</p>
+          <p><strong>Detection gap:</strong> No centralized audit log across platforms for consumer SSO sessions.</p>
+        </div>
+        <div class="split-panel right">
+          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">business</span> Enterprise — Azure Entra ID</div>
+          <p><strong>Root of trust:</strong> Entra ID controls authentication for all integrated SaaS applications — SharePoint, Teams, Salesforce, ServiceNow, and more.</p>
+          <p><strong>Blast radius:</strong> One compromised Entra ID account cascades through every integrated application via OAuth token delegation — functionally identical risk profile at enterprise scale.</p>
+          <p><strong>Detection advantage:</strong> Entra ID Sign-in Logs + Microsoft Defender for Identity provide centralized visibility. Anomalous sign-ins trigger automated risk scoring and conditional access policies.</p>
+          <p><strong>SOC priority:</strong> Entra ID compromise is the single highest-leverage attack path in most Azure environments — tier-one detection, tier-one response.</p>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Whether the identity provider is a consumer Google account or an enterprise Azure Entra ID tenant, the architectural risk is identical: one compromised identity, cascading access to everything it controls. The difference is visibility and detection tooling — not the underlying vulnerability.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 07 — PRIORITIZED REMEDIATION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 07</div>
+  <h2>Prioritized Remediation</h2>
+
+  <p>Remediation is ordered by attack path proximity — actions that close the highest-impact vectors first. Each action is mapped to the MITRE ATT&CK technique it mitigates.</p>
+
+  <table>
+    <thead>
+      <tr><th>Priority</th><th>Action</th><th>ATT&CK Mitigation</th><th>Effort</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="red">P1 — Critical</td>
+        <td><strong>Harden Google account</strong> — upgrade 2FA to authenticator app, audit sessions and third-party app permissions, confirm unique high-entropy password in manager</td>
+        <td>T1078.004, T1078</td>
+        <td class="green">Hours</td>
+      </tr>
+      <tr>
+        <td class="red">P2 — Critical</td>
+        <td><strong>Password manager security audit</strong> — run Watchtower/Breach Report, rotate any reused or flagged credential. Priority: financial, email, professional accounts</td>
+        <td>T1078</td>
+        <td class="green">Hours</td>
+      </tr>
+      <tr>
+        <td class="amber">P3 — High</td>
+        <td><strong>Dropbox file audit</strong> — review stored files for sensitive documents, remove active shared links, check for legacy native password in Account Settings → Security</td>
+        <td>T1530</td>
+        <td class="green">Hours</td>
+      </tr>
+      <tr>
+        <td class="amber">P4 — High</td>
+        <td><strong>Dormant account deletion</strong> — ParkMobile (support portal submitted), Houzz (<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ccbcbea5baadafb58ca4a3b9b6b6e2afa3a1">[email&#160;protected]</a> submitted), EatStreet (deleted). Reduces active attack surface</td>
+        <td>T1078 — attack surface reduction</td>
+        <td class="amber">Days</td>
+      </tr>
+      <tr>
+        <td class="amber">P5 — High</td>
+        <td><strong>Enable continuous breach monitoring</strong> — HaveIBeenPwned email alerts + password manager breach monitoring. Converts reactive posture to proactive detection</td>
+        <td>T1589.001 — early warning</td>
+        <td class="green">Minutes</td>
+      </tr>
+      <tr>
+        <td class="green">P6 — Maintain</td>
+        <td><strong>Credit freeze — maintain existing</strong> — PII exposure across Neiman Marcus, Evite, EatStreet, French Citizens dataset (name, DOB, address, partial card). Freeze is stronger protection than fraud alert</td>
+        <td>Identity fraud mitigation</td>
+        <td class="green">Done</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Harden Google Account — the single point of failure <span class="cmmc-tag">T1078.004</span></div>
+        <div class="step-content-desc">Go to myaccount.google.com → Security. Upgrade 2FA from SMS to Google Authenticator or hardware key. Review active sessions (remove unrecognized devices). Review third-party app permissions (revoke unused access). Confirm password is unique and stored in password manager. This single action simultaneously hardens LinkedIn, Dropbox, Canva, and all email-linked accounts.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Run Password Manager Security Audit <span class="cmmc-tag">T1078</span></div>
+        <div class="step-content-desc">Open password manager → Watchtower or Security Dashboard → Breach Report. Any password used on LinkedIn pre-2016, Adobe pre-2014, or CafeMom should be considered permanently compromised regardless of when it was last changed — cracked versions of these databases are in perpetual circulation. Rotate all flagged credentials starting with financial accounts.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">Complete Dormant Account Deletion <span class="cmmc-tag">T1078</span></div>
+        <div class="step-content-desc">ParkMobile deletion request submitted via support portal. Houzz deletion email sent to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f282809b8493918bb29a9d878888dc919d9f">[email&#160;protected]</a> — watch inbox for confirmation link (Houzz requires email confirmation to complete deletion). EatStreet account deleted. Each dormant account removed eliminates one credential-stuffing entry point and one dataset containing personal data.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">Enable Continuous Breach Monitoring <span class="cmmc-tag">T1589.001</span></div>
+        <div class="step-content-desc">Configure HaveIBeenPwned.com email notification alerts (free, 2 minutes). Enable password manager breach monitoring feature. The Under Armour / Everest breach (January 2026) demonstrates that new high-severity exposures occur without warning — monitoring converts discovery from reactive (weeks/months after the fact) to near-real-time.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- INTERACTIVE TOOL -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Interactive Tool</div>
+  <h2>Check Your Exposure</h2>
+  <p>Two tools below. The first checks whether a specific password has appeared in any known data breach — using the HaveIBeenPwned Pwned Passwords API with k-Anonymity: only the first 5 characters of a SHA-1 hash are ever transmitted, never the password itself. The second links directly to HaveIBeenPwned's email breach search. Neither tool stores, logs, or transmits any personal data.</p>
+
+  <!-- PASSWORD CHECKER -->
+  <div style="background:var(--paper);border:1px solid var(--rule);margin:1.5rem 0;overflow:hidden">
+    <div style="background:#0a0f1a;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:#fff;display:flex;justify-content:space-between;align-items:center">
+      <span>Tool 1 — Pwned Password Checker</span>
+      <span style="color:#4ade80;font-size:.6rem">k-Anonymity · Password never transmitted</span>
+    </div>
+    <div style="padding:1.75rem">
+      <p style="font-size:.88rem;color:var(--ink3);margin-bottom:1.25rem">Enter a password to check if it has appeared in any known breach. The actual password is <strong>never sent</strong> — only a 5-character prefix of its SHA-1 hash is transmitted to the API. Your password stays in your browser.</p>
+
+      <div style="display:flex;gap:.75rem;align-items:flex-start;flex-wrap:wrap;margin-bottom:1rem">
+        <div style="flex:1;min-width:220px;position:relative">
+          <input id="pwdInput" type="password"
+            placeholder="Enter a password to check…"
+            style="width:100%;font-family:var(--mono);font-size:.88rem;padding:.7rem 2.8rem .7rem 1rem;border:1px solid var(--rule);border-radius:2px;background:#f8fafc;color:var(--ink);outline:none;transition:border-color .2s"
+            onfocus="this.style.borderColor='var(--blue)'"
+            onblur="this.style.borderColor='var(--rule)'"
+            onkeydown="if(event.key==='Enter')checkPassword()">
+          <button onclick="togglePwd()" title="Show/hide password"
+            style="position:absolute;right:.6rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#94a3b8;font-size:.85rem;padding:.2rem;line-height:1"
+            id="eyeBtn">👁</button>
+        </div>
+        <button onclick="checkPassword()"
+          style="font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.7rem 1.5rem;background:var(--red);color:#fff;border:none;border-radius:2px;cursor:pointer;white-space:nowrap;transition:background .2s"
+          onmouseover="this.style.background='#9b2e23'"
+          onmouseout="this.style.background='var(--red)'">Check Password</button>
+        <button onclick="document.getElementById('pwdInput').value='';document.getElementById('pwdResult').innerHTML=defaultMsg('pwd');document.getElementById('pwdInput').focus()"
+          style="font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.7rem 1.25rem;background:transparent;color:#64748b;border:1px solid var(--rule);border-radius:2px;cursor:pointer;transition:all .2s"
+          onmouseover="this.style.borderColor='var(--ink)';this.style.color='var(--ink)'"
+          onmouseout="this.style.borderColor='var(--rule)';this.style.color='#64748b'">Clear</button>
+      </div>
+
+      <div style="margin-bottom:.75rem;display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+        <span style="font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:#94a3b8;text-transform:uppercase">Try weak passwords:</span>
+        <button onclick="document.getElementById('pwdInput').value='password123';checkPassword()" style="font-family:var(--mono);font-size:.65rem;padding:.3rem .7rem;background:var(--red-dim);color:var(--red);border:1px solid rgba(192,57,43,.2);border-radius:2px;cursor:pointer">password123</button>
+        <button onclick="document.getElementById('pwdInput').value='qwerty';checkPassword()" style="font-family:var(--mono);font-size:.65rem;padding:.3rem .7rem;background:var(--red-dim);color:var(--red);border:1px solid rgba(192,57,43,.2);border-radius:2px;cursor:pointer">qwerty</button>
+        <button onclick="document.getElementById('pwdInput').value='Summer2024!';checkPassword()" style="font-family:var(--mono);font-size:.65rem;padding:.3rem .7rem;background:var(--amber-dim);color:var(--amber);border:1px solid rgba(180,83,9,.2);border-radius:2px;cursor:pointer">Summer2024!</button>
+      </div>
+
+      <div id="pwdResult" style="background:#0a0f1a;border-radius:3px;padding:1.1rem 1.4rem;font-family:var(--mono);font-size:.78rem;line-height:1.85;color:#e2e8f0;min-height:80px;white-space:pre-wrap;word-break:break-word">
+        <span style="color:#334155;font-style:italic">Enter a password above to check it against the HaveIBeenPwned breach database…</span>
+      </div>
+
+      <p style="font-size:.75rem;color:#94a3b8;margin-top:.75rem;font-family:var(--mono)">Privacy: Uses HIBP k-Anonymity model. SHA-1 hash computed in-browser. Only first 5 hex characters sent to api.pwnedpasswords.com. Full hash never leaves your device. <a href="https://haveibeenpwned.com/API/v3#SearchingPwnedPasswordsByRange" target="_blank" style="color:var(--blue)">API documentation ↗</a></p>
+    </div>
+  </div>
+
+  <!-- EMAIL CHECKER -->
+  <div style="background:var(--paper);border:1px solid var(--rule);margin:1.5rem 0;overflow:hidden">
+    <div style="background:#0a0f1a;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:#fff;display:flex;justify-content:space-between;align-items:center">
+      <span>Tool 2 — Email Breach Search</span>
+      <span style="color:#60a5fa;font-size:.6rem">Opens HaveIBeenPwned · No data stored here</span>
+    </div>
+    <div style="padding:1.75rem">
+      <p style="font-size:.88rem;color:var(--ink3);margin-bottom:1.25rem">Check whether your email address has appeared in any known data breach. Clicking the button opens <strong>haveibeenpwned.com</strong> directly — your email is pre-filled in the search. No email address is transmitted to or stored by this page.</p>
+
+      <div style="display:flex;gap:.75rem;align-items:flex-start;flex-wrap:wrap;margin-bottom:1rem">
+        <input id="emailInput" type="email"
+          placeholder="your@email.com"
+          style="flex:1;min-width:220px;font-family:var(--mono);font-size:.88rem;padding:.7rem 1rem;border:1px solid var(--rule);border-radius:2px;background:#f8fafc;color:var(--ink);outline:none;transition:border-color .2s"
+          onfocus="this.style.borderColor='var(--blue)'"
+          onblur="this.style.borderColor='var(--rule)'"
+          onkeydown="if(event.key==='Enter')openHIBP()">
+        <button onclick="openHIBP()"
+          style="font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.7rem 1.5rem;background:var(--blue);color:#fff;border:none;border-radius:2px;cursor:pointer;white-space:nowrap;transition:background .2s"
+          onmouseover="this.style.background='#153e80'"
+          onmouseout="this.style.background='var(--blue)'">Check on HIBP ↗</button>
+      </div>
+
+      <div style="background:#f8fafc;border:1px solid var(--rule);border-left:3px solid var(--blue);border-radius:0 2px 2px 0;padding:1rem 1.25rem">
+        <p style="font-size:.82rem;color:var(--ink3);margin:0;line-height:1.65"><strong>Why does this open a new tab?</strong> Email breach lookup requires an API key on HIBP's paid tier. Rather than requiring users to obtain or pay for an API key, this tool links directly to HIBP's own search — the most authoritative source — where the lookup is free and the results are always current.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- CONCLUSION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Conclusion</div>
+  <h2>Conclusions: What Thirteen Years of Breach Accumulation Teaches</h2>
+
+  <p>Thirteen years of breach accumulation across a single email address illustrates a fundamental asymmetry in digital security: defenders must secure every account continuously, while attackers need to exploit only one credential successfully. The 38 breaches in this profile are not independent incidents — they are 38 contributions to a compounding attack surface that grows more dangerous as aggregators combine them into increasingly comprehensive stuffing lists.</p>
+
+  <p>A key structural finding — refined during the investigation — concerns the assumed SSO architecture. Because LinkedIn, Dropbox, and Canva accounts were likely created before Google SSO was widely available (pre-2012), native email and password accounts almost certainly predate any SSO adoption. When users later adopt SSO on platforms where native accounts exist, platforms frequently create a second account rather than merging identities — leaving a dormant native password account in the background, unmonitored, carrying credentials from the original breach era. This duplicate account problem is invisible to the user but fully visible to credential-stuffing tools. In enterprise Azure environments, the equivalent risk is unmanaged legacy authentication protocols that persist alongside modern Entra ID SSO — the same ghost-account problem at organizational scale.</p>
+
+  <p>The emergence of the Synthient dataset (2025, 2 billion records) and the Telegram infostealer combolists (2024, 361 million records with browser-harvested credentials) signals a qualitative shift: credential stuffing is no longer limited to reusing historical breach data. Infostealer-sourced credentials are current, bypass password change history, and require behavioral detection — anomalous login patterns, impossible travel, unfamiliar device fingerprints — as a primary defense layer. This is precisely the detection logic that defines modern SOC operations in Azure environments.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Final assessment:</strong> The most underappreciated risk in this profile is not the 38 breaches themselves but what they revealed about account architecture: dormant native password accounts from the pre-SSO era likely coexist alongside current Google SSO logins on platforms including LinkedIn and Dropbox. These accounts are unmonitored, carry credentials from breach-era passwords, cannot be recovered through standard reset flows, and are only closeable via direct privacy deletion requests. The attack surface is larger — and harder to close — than a simple breach count suggests.</p>
+  </div>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">All findings in this report are based on publicly available breach data from HaveIBeenPwned.com, vendor security notifications, and open-source threat intelligence. MITRE ATT&CK techniques referenced are from ATT&CK v14. This analysis represents the author's independent research and does not reflect the views of any employer or client organization.</p>
+
+</div>
+</div>
+
+</main>
+
+<!-- ══ BIO ══ -->
+<div class="wrap">
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Consultant &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is an independent security analyst and CMMC consultant based in Connecticut, with 15+ years of enterprise technology experience and an MS in Information Systems and Management. Her security research focuses on credential-based attack vectors, cloud identity risk, and the intersection of personal exposure and enterprise threat modeling. She is pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a career focus on SOC analysis and cloud security engineering (Azure / Entra ID).</p>
+    <p class="bio-text" style="margin-top:.75rem">
+      <a href="index.html" class="back-nav-link">Portfolio</a>
+    </p>
+  </div>
+</div>
+</div>
+
+<footer>
+  <span>Data Breach Exposure Analysis · Yana Ivanov · March 2026</span>
+  <span>Based on public reporting · For educational use · Independent analysis</span>
+</footer>
+
+<script>
+function defaultMsg() {
+  return '<span style="color:#334155;font-style:italic">Enter a password above to check it against the HaveIBeenPwned breach database\u2026</span>';
+}
+
+function togglePwd() {
+  const inp = document.getElementById('pwdInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+async function sha1(str) {
+  const buf = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest('SHA-1', buf);
+  return Array.from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('').toUpperCase();
+}
+
+async function checkPassword() {
+  const pwd = document.getElementById('pwdInput').value;
+  const out = document.getElementById('pwdResult');
+  const eq  = '\u2550'.repeat(52);
+  const div = '\u2500'.repeat(52);
+
+  if (!pwd) {
+    out.innerHTML = '<span style="color:#94a3b8">Enter a password to check.</span>';
+    return;
+  }
+
+  out.innerHTML = '<span style="color:#60a5fa">Computing hash and querying API\u2026</span>';
+
+  try {
+    const hash   = await sha1(pwd);
+    const prefix = hash.slice(0, 5);
+    const suffix = hash.slice(5);
+
+    const resp = await fetch('https://api.pwnedpasswords.com/range/' + prefix, {
+      headers: { 'Add-Padding': 'true' }
+    });
+
+    if (!resp.ok) throw new Error('API returned ' + resp.status);
+
+    const text  = await resp.text();
+    const lines = text.split('\n');
+    let count   = 0;
+
+    for (const line of lines) {
+      const [s, c] = line.trim().split(':');
+      if (s === suffix) { count = parseInt(c, 10); break; }
+    }
+
+    let result = '<span style="color:#475569">' + eq + '</span>\n';
+    result += '  PWNED PASSWORD CHECK\n';
+    result += '  Hash prefix : <span style="color:#60a5fa">' + prefix + '</span>  <span style="color:#334155">(only this was transmitted)</span>\n';
+    result += '<span style="color:#475569">' + eq + '</span>\n\n';
+
+    if (count === 0) {
+      result += '<span style="color:#4ade80">[ CLEAN ]</span>  This password has not been seen in any known breach.\n\n';
+      result += '<span style="color:#475569">Not found in the HIBP database of 700M+ compromised passwords.\n';
+      result += 'This does not guarantee the password is strong \u2014 only that it\n';
+      result += 'has not appeared in a publicly known breach dataset.\n';
+      result += 'A unique, randomly generated password from your password\n';
+      result += 'manager remains the strongest option.</span>';
+    } else {
+      const severity = count > 100000 ? 'CRITICAL' : count > 1000 ? 'HIGH' : 'MEDIUM';
+      const sevColor = count > 100000 ? '#ef4444' : count > 1000 ? '#f59e0b' : '#60a5fa';
+      result += '<span style="color:#ef4444">[ PWNED ]</span>  This password has been seen in known breaches.\n\n';
+      result += '<span style="color:#475569">' + div + '</span>\n';
+      result += '   Times seen   : <span style="color:#ef4444">' + count.toLocaleString() + '</span>\n';
+      result += '   Severity     : <span style="color:' + sevColor + '">' + severity + '</span>\n\n';
+      result += '   This password exists in credential-stuffing lists and is\n';
+      result += '   actively tested against accounts by automated tools.\n\n';
+      result += '<span style="color:#475569">' + div + '</span>\n';
+      result += '   Action       : <span style="color:#ef4444">Change this password immediately on any account using it</span>\n';
+      result += '   Replace with : A randomly generated password from your manager\n';
+      result += '   Enable       : 2FA on any account where this password was used';
+    }
+
+    out.innerHTML = result;
+
+  } catch (err) {
+    out.innerHTML = '<span style="color:#f59e0b">[ ERROR ]  Could not reach the HIBP API.\n\nThis may be a network issue. Try visiting\nhaveibeenpwned.com/Passwords directly.\n\n' + err.message + '</span>';
+  }
+}
+
+function openHIBP() {
+  const email = document.getElementById('emailInput').value.trim();
+  window.open('https://haveibeenpwned.com/account/' + encodeURIComponent(email), '_blank', 'noopener,noreferrer');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('emailInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') openHIBP();
+  });
+  document.getElementById('pwdInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') checkPassword();
+  });
+});
+</script>
+</body>
+</html>

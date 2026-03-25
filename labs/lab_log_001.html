@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Log 001 — Network Reconnaissance | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+
+/* ── BACK NAV ── */
+.back-nav{
+  background:#0a0f1a;padding:.65rem 3rem;
+  display:flex;align-items:center;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  position:sticky;top:0;z-index:999;
+}
+.back-nav a{
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;
+  color:#4a9eff;text-decoration:none;text-transform:uppercase;
+  display:flex;align-items:center;gap:.5rem;transition:color .2s;
+}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;
+  text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--display-clean);font-size:clamp(2rem,5vw,3.2rem);font-weight:600;
+  line-height:1.15;margin-bottom:1.5rem;color:#fff}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;
+  padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;
+  color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;
+  display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#4a9eff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);
+  text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:#0a0f1a;
+  line-height:1.2;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── CODE BLOCKS ── */
+.code-block{
+  background:#0a0f1a;border-radius:3px;padding:1.25rem 1.5rem;
+  margin:1.5rem 0;overflow-x:auto;
+  border-left:3px solid #1a4fa0;
+}
+.code-block pre{
+  font-family:var(--mono);font-size:.8rem;color:#e2e8f0;
+  line-height:1.7;white-space:pre-wrap;word-break:break-word;
+}
+.code-block .prompt{color:#4a9eff}
+.code-block .comment{color:#64748b}
+.code-block .highlight{color:#4ade80}
+.code-block .warning{color:#ef4444}
+.code-label{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;
+  color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem;
+}
+
+/* ── FINDINGS TABLE ── */
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem;table-layout:fixed}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.68rem;
+  letter-spacing:.1em;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── LAB ENVIRONMENT BOX ── */
+.env-box{
+  background:var(--paper);border:1px solid var(--rule);
+  border-radius:2px;padding:1.5rem;margin:1.75rem 0;
+}
+.env-box-title{
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;
+  color:var(--blue);text-transform:uppercase;margin-bottom:1rem;
+  padding-bottom:.5rem;border-bottom:1px solid var(--rule);
+}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+
+/* ── NIST MAPPING ── */
+.nist-box{
+  background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);
+  border-radius:2px;padding:1.25rem 1.5rem;margin:1.75rem 0;
+}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:130px 1fr;gap:1rem;font-size:.92rem}
+.nist-desc{color:var(--ink3);font-size:.92rem;line-height:1.7}
+
+/* ── TIMELINE ── */
+.timeline{margin:1.75rem 0;display:grid;gap:0}
+.tl-item{display:grid;grid-template-columns:120px 1fr;gap:1.5rem;
+  padding:1rem 0;border-bottom:1px solid var(--rule)}
+.tl-item:last-child{border-bottom:none}
+.tl-time{font-family:var(--mono);font-size:.68rem;color:var(--blue);padding-top:.15rem}
+.tl-content{font-size:.9rem;color:var(--ink3);line-height:1.7}
+.tl-content strong{color:var(--ink)}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer a{color:#4a9eff;text-decoration:none}
+footer a:hover{color:#93c5fd}
+
+@media(max-width:680px){
+  .mast-inner,.wrap{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .env-grid{grid-template-columns:1fr}
+  .nist-item{display:grid;grid-template-columns:130px 1fr;gap:1rem;font-size:.92rem}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav">
+  <a href="index.html">Portfolio</a>
+</div>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Security Lab Log · Entry 001</div>
+    <h1 class="title">Network Reconnaissance —<br><span>What an Attacker Sees First</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item">
+        <div class="label">Analyst</div>
+        <div class="value">Yana Ivanov</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Date</div>
+        <div class="value">March 15, 2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Classification</div>
+        <div class="value">Public — Educational Use</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Lab Type</div>
+        <div class="value">Reconnaissance / Blue Team Analysis</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Tool</div>
+        <div class="value">Nmap 7.98</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Environment</div>
+        <div class="value">Isolated Docker / Kali Linux</div>
+      </div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    CONTROLLED LAB ENVIRONMENT &nbsp;·&nbsp; HOST-ONLY NETWORK &nbsp;·&nbsp; NO EXTERNAL SYSTEMS SCANNED &nbsp;·&nbsp; EDUCATIONAL PURPOSE ONLY
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="wrap">
+<div class="content">
+
+  <!-- ENVIRONMENT -->
+  <div class="section">
+    <div class="section-num">Section 01</div>
+    <h2>Lab Environment</h2>
+    <p>This lab was conducted entirely within a controlled, isolated environment. A Kali Linux Docker container was used as the scanning host, connected to a host-only Docker bridge network. No external internet-facing systems were scanned. The only target was the local Docker host (the analyst's own MacBook Pro).</p>
+
+    <div class="env-box">
+      <div class="env-box-title">Environment Configuration</div>
+      <div class="env-grid">
+        <div class="env-item">
+          <div class="env-label">Scanning Host</div>
+          <div class="env-value">Kali Linux (kali-rolling) · Docker Container</div>
+        </div>
+        <div class="env-item">
+          <div class="env-label">Target Host</div>
+          <div class="env-value">macOS Sequoia 15.7.4 · Apple M1 · Docker Host</div>
+        </div>
+        <div class="env-item">
+          <div class="env-label">Scanner IP</div>
+          <div class="env-value">172.17.0.2</div>
+        </div>
+        <div class="env-item">
+          <div class="env-label">Target IP</div>
+          <div class="env-value">172.17.0.1 (Docker bridge gateway)</div>
+        </div>
+        <div class="env-item">
+          <div class="env-label">Network Mode</div>
+          <div class="env-value">Host-only bridge — no internet exposure</div>
+        </div>
+        <div class="env-item">
+          <div class="env-label">Tool</div>
+          <div class="env-value">Nmap 7.98 · Platform: aarch64</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-blue">
+      <p><strong>Safety note:</strong> All scanning was performed against systems owned and controlled by the analyst. Running Nmap or any scanning tool against systems you do not own or have explicit permission to test is illegal under the Computer Fraud and Abuse Act (CFAA) and equivalent laws worldwide. This lab log documents authorized testing only.</p>
+    </div>
+  </div>
+
+  <!-- OBJECTIVE -->
+  <div class="section">
+    <div class="section-num">Section 02</div>
+    <h2>Objective</h2>
+    <p>The goal of this exercise was to understand what an attacker performing initial reconnaissance would see when scanning a target host — specifically, which ports are open, what services are running, and what those services reveal about the target's configuration and potential attack surface.</p>
+    <p>This is the first phase of any network intrusion: reconnaissance. Before an attacker exploits anything, they enumerate. Understanding this phase from the attacker's perspective is fundamental to building effective defenses.</p>
+    <p>Secondary objective: document the methodology and findings in a format that maps to real-world security assessment reporting.</p>
+  </div>
+
+  <!-- METHODOLOGY -->
+  <div class="section">
+    <div class="section-num">Section 03</div>
+    <h2>Methodology</h2>
+    <p>Two Nmap scans were conducted against the target in sequence, each building on the previous.</p>
+
+    <h3>Scan 1 — Service Version Detection (Top 1000 Ports)</h3>
+    <p>The initial scan used the <code>-sV</code> flag to perform service version detection against Nmap's default top 1000 most commonly used ports. This is the standard first scan in a reconnaissance sequence — fast, produces actionable results, and mirrors what an attacker would run.</p>
+
+    <div class="code-label">Command</div>
+    <div class="code-block"><pre><span class="prompt">┌──(root㉿kali)-[/]
+└─# </span>nmap -sV 172.17.0.1
+
+<span class="comment"># -sV : Probe open ports to determine service/version info
+# Target: 172.17.0.1 (Docker bridge gateway / host Mac)</span></pre></div>
+
+    <div class="code-label">Output</div>
+    <div class="code-block"><pre>Starting Nmap 7.98 ( https://nmap.org ) at 2026-03-15 22:49 +0000
+Nmap scan report for 172.17.0.1
+Host is up (0.0000080s latency).
+Not shown: 999 closed tcp ports (reset)
+PORT    STATE SERVICE VERSION
+<span class="highlight">111/tcp open  rpcbind 2-4 (RPC #100000)</span>
+MAC Address: 22:9B:39:9B:49:7B (Unknown)
+
+Service detection performed.
+Nmap done: 1 IP address (1 host up) scanned in 6.89 seconds</pre></div>
+
+    <h3>Scan 2 — Full Port Scan with Default Scripts</h3>
+    <p>The second scan expanded the scope to all 65,535 TCP ports (<code>-p-</code>) and added Nmap's default script engine (<code>-sC</code>). The script engine runs a curated set of safe enumeration scripts against each discovered service — exactly what a thorough attacker would do to extract maximum information about open services.</p>
+
+    <div class="code-label">Command</div>
+    <div class="code-block"><pre><span class="prompt">┌──(root㉿kali)-[/]
+└─# </span>nmap -sV -sC -p- 172.17.0.1
+
+<span class="comment"># -sV : Service version detection
+# -sC : Default NSE script scan
+# -p- : All 65,535 TCP ports (not just top 1000)</span></pre></div>
+
+    <div class="code-label">Output</div>
+    <div class="code-block"><pre>Starting Nmap 7.98 ( https://nmap.org ) at 2026-03-15 22:50 +0000
+Nmap scan report for 172.17.0.1
+Host is up (0.0000020s latency).
+Not shown: 65533 closed tcp ports (reset)
+PORT      STATE SERVICE VERSION
+<span class="highlight">111/tcp   open  rpcbind 2-4 (RPC #100000)</span>
+| rpcinfo:
+|   program version    port/proto  service
+|   100000  2,3,4        111/tcp   rpcbind
+|   100000  2,3,4        111/udp   rpcbind
+|   100000  3,4          111/tcp6  rpcbind
+|   100000  3,4          111/udp6  rpcbind
+|   100024  1          57699/tcp6  status
+|   100024  1          60774/udp   status
+|   100024  1          63708/udp6  status
+<span class="highlight">|_  100024  1          65471/tcp   status</span>
+<span class="highlight">65471/tcp open  status  1 (RPC #100024)</span>
+MAC Address: 22:9B:39:9B:49:7B (Unknown)
+
+Service detection performed.
+Nmap done: 1 IP address (1 host up) scanned in 7.22 seconds</pre></div>
+  </div>
+
+  <!-- FINDINGS -->
+  <div class="section">
+    <div class="section-num">Section 04</div>
+    <h2>Findings</h2>
+    <p>Two open TCP ports were identified across the full 65,535-port scan. The target presents a minimal attack surface — 65,533 ports were closed. The two open ports are both related to the RPC (Remote Procedure Call) service stack, which macOS exposes for network file sharing functionality.</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Port</th>
+            <th>Service</th>
+            <th>Version</th>
+            <th>Risk</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="code">111/tcp</td>
+            <td><strong>rpcbind</strong></td>
+            <td>v2-4 (RPC #100000)</td>
+            <td class="amber">Medium</td>
+            <td>Port mapper — acts as directory for all RPC services. Exposed on both IPv4 and IPv6.</td>
+          </tr>
+          <tr>
+            <td class="code">65471/tcp</td>
+            <td><strong>rpc.statd</strong></td>
+            <td>v1 (RPC #100024)</td>
+            <td class="amber">Medium</td>
+            <td>NFS lock monitor daemon. High-port assignment suggests dynamic allocation. Historical RCE vulnerabilities.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Finding 1 — rpcbind (Port 111)</h3>
+    <p>Port 111 is the RPC portmapper — a service that maintains a registry of which RPC programs are running and on which ports they can be reached. When the Nmap script engine queried rpcbind, it returned a full directory of registered RPC services including version numbers, port assignments, and protocol support (TCP/UDP, IPv4/IPv6).</p>
+    <p>From an attacker's perspective, rpcbind is valuable because it reveals the internal RPC service map without authentication. An attacker who can reach port 111 can enumerate every RPC service running on the target — including NFS mounts, which could expose file system access.</p>
+
+    <div class="callout callout-amber">
+      <p><strong>Attacker perspective:</strong> The rpcinfo output from the script scan would be used to enumerate NFS exports. The next step in a real attack would be: <code>showmount -e 172.17.0.1</code> to list any NFS shares. If shares exist without authentication, an attacker can mount them and browse the file system.</p>
+    </div>
+
+    <h3>Finding 2 — rpc.statd (Port 65471)</h3>
+    <p>rpc.statd is the NFS status monitor daemon, responsible for tracking file locks across NFS connections. It was assigned to port 65471 dynamically — the port number changes each time the service starts, which is why it wasn't found in the initial top-1000 scan but appeared in the full <code>-p-</code> scan.</p>
+    <p>rpc.statd has a documented history of serious vulnerabilities. CVE-2000-0800 (rpc.statd format string vulnerability) was used in real-world attacks against Linux systems. While the macOS implementation differs, the presence of this service on an externally-reachable interface warrants attention.</p>
+
+    <div class="callout callout-red">
+      <p><strong>Historical context:</strong> rpc.statd has been the target of remote code execution exploits. The <a href="stryker_threat_analysis.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Stryker wiper attack</a> documented in this portfolio demonstrates how a single exposed service without proper access controls can become a complete system compromise. The attack surface here is small but the service category is historically dangerous.</p>
+    </div>
+  </div>
+
+  <!-- ANALYSIS -->
+  <div class="section">
+    <div class="section-num">Section 05</div>
+    <h2>Security Analysis</h2>
+
+    <h3>What This Tells an Attacker</h3>
+    <p>A threat actor scanning this host gets a clear picture in under 10 seconds: the target is a macOS system (inferred from the RPC service stack and MAC address vendor), it has NFS-related services running suggesting file sharing is configured, and the attack surface is otherwise minimal with 65,533 closed ports.</p>
+    <p>The combination of rpcbind + rpc.statd is a fingerprint. It tells an experienced attacker this is likely a developer workstation or small office Mac with default file sharing settings — a lower-value target but potentially a pivot point into a larger network.</p>
+
+    <h3>Defender Perspective</h3>
+    <p>The minimal number of open ports (2 out of 65,535) reflects good default security hygiene. macOS Sequoia has strong firewall defaults and does not expose services unnecessarily. The rpcbind exposure is a consequence of having any network file sharing enabled — if NFS sharing is not actively being used, disabling it would eliminate both findings.</p>
+    <p>The dynamic port assignment of rpc.statd (65471) is actually a minor defense — an attacker cannot rely on a fixed port. However, because rpcbind on 111 advertises the current port, this obfuscation provides minimal real protection.</p>
+
+    <h3>If This Were a Defense Contractor Network</h3>
+    <p>In a CMMC-regulated environment, an open rpcbind port accessible from any host on the network would be a compliance finding. NIST SP 800-171 Control 3.13.6 requires organizations to deny network communications traffic by default and allow only by exception. An RPC service exposed to the network without a documented business justification would fail this control.</p>
+  </div>
+
+  <!-- NIST MAPPING -->
+  <div class="section">
+    <div class="section-num">Section 06</div>
+    <h2>NIST SP 800-171 Control Mapping</h2>
+    <p>The findings from this reconnaissance exercise map directly to CMMC Level 2 controls. A real assessment against a defense contractor environment would flag these findings against the following controls:</p>
+
+    <div class="nist-box">
+      <div class="nist-box-title">Applicable NIST SP 800-171 Controls</div>
+      <div class="nist-items">
+        <div class="nist-item">
+          <span class="nist-control">3.13.6</span>
+          <span class="nist-desc"><strong>Deny by default.</strong> Implement deny-by-default / allow-by-exception for network communications. An open rpcbind port not required for operations would fail this control.</span>
+        </div>
+        <div class="nist-item">
+          <span class="nist-control">3.4.6</span>
+          <span class="nist-desc"><strong>Least functionality.</strong> Configure systems to provide only essential capabilities. NFS services not required for operations should be disabled.</span>
+        </div>
+        <div class="nist-item">
+          <span class="nist-control">3.4.7</span>
+          <span class="nist-desc"><strong>Restrict software.</strong> Restrict use of software and components that cannot be adequately protected. Unpatched or legacy RPC services fall under this control.</span>
+        </div>
+        <div class="nist-item">
+          <span class="nist-control">3.13.1</span>
+          <span class="nist-desc"><strong>Monitor communications.</strong> Monitor, control, and protect communications at external boundaries and key internal boundaries. Network scanning capability is the defensive analog of what was performed here.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REMEDIATION -->
+  <div class="section">
+    <div class="section-num">Section 07</div>
+    <h2>Remediation Recommendations</h2>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Finding</th>
+            <th>Recommendation</th>
+            <th>Priority</th>
+            <th>Effort</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>rpcbind (111) exposed</strong></td>
+            <td>Disable NFS and RPC services if not actively used: System Settings → General → Sharing → disable File Sharing</td>
+            <td class="amber">Medium</td>
+            <td class="green">Low</td>
+          </tr>
+          <tr>
+            <td><strong>rpc.statd exposed</strong></td>
+            <td>Same as above — rpc.statd is a dependency of NFS and will be disabled along with it</td>
+            <td class="amber">Medium</td>
+            <td class="green">Low</td>
+          </tr>
+          <tr>
+            <td><strong>RPC service enumeration</strong></td>
+            <td>Enable macOS Application Firewall (System Settings → Network → Firewall) with stealth mode to prevent unauthenticated service enumeration</td>
+            <td class="amber">Medium</td>
+            <td class="green">Low</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-green">
+      <p><strong>Positive finding:</strong> 65,533 of 65,535 ports were closed — an extremely small attack surface. The macOS default security configuration is strong. The two open ports are functional services, not indicators of compromise. No evidence of malware, unauthorized access, or misconfiguration beyond the RPC exposure noted above.</p>
+    </div>
+  </div>
+
+  <!-- LESSONS LEARNED -->
+  <div class="section">
+    <div class="section-num">Section 08</div>
+    <h2>Lessons Learned</h2>
+
+    <h3>Technical</h3>
+    <p>The difference between the initial top-1000 scan and the full <code>-p-</code> scan was significant — rpc.statd on port 65471 was invisible to the first scan because it fell outside the default range. This demonstrates why thorough reconnaissance uses full port scans, and why defenders should not assume that high-numbered ports are invisible to attackers.</p>
+    <p>The <code>-sC</code> script engine extracted the full RPC service map from port 111 without any authentication — a single open port revealed the internal service registry. This is the information asymmetry that favors attackers: one open port, fully authenticated query, complete map returned.</p>
+
+    <h3>Process</h3>
+    <p>Setting up the Docker-based Kali lab environment required understanding Docker networking, container isolation, and the relationship between container IPs and host IPs. The Docker bridge network (172.17.0.0/16) is isolated from the host's physical network — scans run inside the container cannot reach external internet targets, which is the correct security posture for a lab environment.</p>
+
+    <h3>Connection to Portfolio Research</h3>
+    <p>The reconnaissance methodology documented here is the first step in every attack chain covered in this portfolio. The <a href="volt_typhoon_analysis.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Volt Typhoon campaign</a> began with reconnaissance of target infrastructure. The <a href="stryker_threat_analysis.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Stryker breach</a> required identifying the administrative credential endpoint. The F-35 breach exploited a service (default credentials on a network-facing interface) that would have been identified by exactly this kind of scan. Reconnaissance is not a technical exercise — it is the foundation of every security decision that follows.</p>
+  </div>
+
+  <!-- NEXT STEPS -->
+  <div class="section">
+    <div class="section-num">Section 09</div>
+    <h2>Next Lab</h2>
+    <p><a href="lab_log_002.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Lab Log 002</a> will cover <strong>network traffic capture and analysis</strong> using tcpdump and Wireshark inside the Kali container — capturing packets on the Docker bridge interface, identifying protocol patterns, and analyzing what network traffic reveals about host behavior. This is the defensive analog to this reconnaissance exercise: where Lab 001 asked "what can I see from outside," Lab 002 asks "what does traffic look like from inside."</p>
+
+    <div class="callout callout-blue">
+      <p><strong>CMMC relevance:</strong> NIST SP 800-171 Control 3.3.1 requires organizations to create and retain system audit logs to enable monitoring, analysis, investigation, and reporting. Network traffic analysis is the practical skill behind log-based detection — understanding what normal traffic looks like is prerequisite to identifying what abnormal looks like.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <span>Lab Log 001 — Network Reconnaissance &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; March 15, 2026 &nbsp;·&nbsp; Controlled lab environment &nbsp;·&nbsp; Educational use only</span>
+  <a href="index.html" style="color:#4a9eff;text-decoration:none;white-space:nowrap">← Portfolio</a>
+</footer>
+
+</body>
+</html>

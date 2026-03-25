@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Identical Lie — Unicode Homoglyph Attacks & Business Email Compromise | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+.masthead{background:var(--ink);color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#ef4444}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#ef4444;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:var(--ink);color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+.diagram{background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:2rem;margin:2rem 0;overflow-x:auto}
+.diagram-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin-bottom:1.5rem;padding-bottom:.75rem;border-bottom:1px solid var(--rule)}
+/* ── STAT GRID ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.25rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--display);font-size:2.2rem;font-weight:900;line-height:1;margin-bottom:.4rem}
+.stat-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.78rem;color:#94a3b8;line-height:1.5}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+/* ── HOMOGLYPH DEMO ── */
+.glyph-demo{background:#0a0f1a;border-radius:4px;padding:1.75rem 2rem;margin:2rem 0}
+.glyph-demo-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.25rem}
+.glyph-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.25rem}
+.glyph-row:last-child{margin-bottom:0}
+.glyph-pane{padding:1rem 1.25rem;border-radius:3px}
+.glyph-pane.real{background:rgba(20,90,50,.2);border:1px solid rgba(74,222,128,.2)}
+.glyph-pane.fake{background:rgba(192,57,43,.15);border:1px solid rgba(239,68,68,.2)}
+.glyph-pane-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem}
+.glyph-pane.real .glyph-pane-label{color:#4ade80}
+.glyph-pane.fake .glyph-pane-label{color:#ef4444}
+.glyph-domain{font-family:var(--mono);font-size:1.1rem;letter-spacing:.05em;margin-bottom:.4rem}
+.glyph-pane.real .glyph-domain{color:#e2e8f0}
+.glyph-pane.fake .glyph-domain{color:#fca5a5}
+.glyph-unicode{font-family:var(--mono);font-size:.65rem;color:#64748b;line-height:1.6}
+.glyph-pane.fake .glyph-unicode{color:#ef4444}
+/* ── ATTACK FLOW ── */
+.flow-list{margin:1.75rem 0;display:grid;gap:0}
+.flow-item{display:grid;grid-template-columns:48px 1fr;gap:1rem;padding:1.1rem 0;border-bottom:1px solid var(--rule);align-items:start}
+.flow-item:last-child{border-bottom:none}
+.flow-num{width:36px;height:36px;border-radius:50%;background:var(--red);color:#fff;font-family:var(--mono);font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.2rem}
+.flow-title{font-family:var(--display-clean);font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.25rem}
+.flow-body{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+/* ── FINDINGS ── */
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);border-radius:2px;background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--blue);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.35rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.65rem;padding:.15rem .5rem;border-radius:2px;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--blue-dim);color:var(--blue)}
+/* ── BIO ── */
+.bio{background:var(--ink);color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:4rem}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+footer{background:var(--ink2);color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+@media(max-width:680px){
+  .wrap,.mast-inner{padding:0 1.5rem}
+  .mast-meta,.stat-grid{grid-template-columns:1fr 1fr}
+  .glyph-row{grid-template-columns:1fr}
+  .bio{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Threat Intelligence Analysis</div>
+    <h1 class="title">The Identical Lie<br><span>Unicode Homoglyph Attacks &amp; Business Email Compromise</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">March 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Attack Type</div><div class="value">BEC · Domain Spoofing · Social Engineering</div></div>
+      <div class="meta-item"><div class="label">Financial Impact</div><div class="value">$55.5B Lost — FBI IC3</div></div>
+      <div class="meta-item"><div class="label">Trend</div><div class="value">+15% in 2025 · AI-Accelerated</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    $2.8 BILLION LOST IN 2024 ALONE &nbsp;·&nbsp; 21,442 COMPLAINTS TO FBI IC3 &nbsp;·&nbsp; 63% OF ORGANIZATIONS HIT IN 2025
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>Business Email Compromise is the second most financially damaging cybercrime reported to the FBI — not because it involves sophisticated technical exploits, but because it exploits something more fundamental: trust in a familiar name. An attacker doesn't need to break into a system. They simply need you to believe the email came from someone it didn't.</p>
+
+  <p>At the core of the most sophisticated BEC campaigns is a technique called a homoglyph attack — the substitution of legitimate letters with visually identical characters from other alphabets. The Cyrillic letter "а" and the Latin letter "a" are indistinguishable to the human eye. They are not the same character. A domain built with one looks identical to a domain built with the other, but leads somewhere entirely different. An email sent from that domain bypasses the mental checkpoint every employee uses when they decide whether to trust a message: does this look like it came from who it says it came from?</p>
+
+  <p>The answer, when homoglyphs are involved, is always yes — until the wire transfer is gone.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Scale of the threat:</strong> The FBI IC3 reports nearly $55.5 billion lost to BEC over the past decade, with $2.8 billion in 2024 alone. BEC attacks increased 15% in 2025, and by mid-2024 an estimated 40% of BEC phishing emails were AI-generated — making them nearly indistinguishable from genuine business correspondence. 63% of organizations experienced at least one BEC attempt in 2025.</p>
+  </div>
+
+  <div class="diagram">
+    <div class="diagram-title">Figure 1 — BEC by the Numbers</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-red">
+        <div class="stat-num">$55.5B</div>
+        <div class="stat-label">Total BEC Losses<br>Past Decade</div>
+        <div class="stat-sub">Source: FBI IC3 2024<br>Annual Report</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">$2.8B</div>
+        <div class="stat-label">Lost in 2024<br>Alone</div>
+        <div class="stat-sub">2nd most costly<br>cybercrime reported</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">+15%</div>
+        <div class="stat-label">BEC Attack<br>Increase in 2025</div>
+        <div class="stat-sub">3,000+ intercepted<br>per month on average</div>
+      </div>
+      <div class="stat-item stat-blue">
+        <div class="stat-num">63%</div>
+        <div class="stat-label">Organizations Hit<br>in 2025</div>
+        <div class="stat-sub">AFP 2025 Fraud<br>Survey</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>The Homoglyph — When Identical Means Different</h2>
+
+  <h3>What a Homoglyph Is</h3>
+  <p>Every character displayed on a screen has a unique numerical identifier assigned by the Unicode standard — the global system that allows computers to represent text in every language on earth. The Latin letter "a" is U+0061. The Cyrillic letter "а" — which looks identical — is U+0430. To every human who reads them, they are the same. To every computer system that processes them, they are completely different.</p>
+
+  <p>This gap between human perception and machine reality is the attack surface. An attacker who registers a domain using Cyrillic characters where Latin characters would normally appear creates a URL that looks genuine to any human who glances at it, passes basic visual inspection in email clients and browsers, and is technically a different domain that the attacker controls entirely.</p>
+
+  <div class="glyph-demo">
+    <div class="glyph-demo-label">Figure 2 — Can You Spot the Difference?</div>
+    <div class="glyph-row">
+      <div class="glyph-pane real">
+        <div class="glyph-pane-label">✓ Legitimate Domain</div>
+        <div class="glyph-domain">google.com</div>
+        <div class="glyph-unicode">All characters: Latin alphabet<br>Owned by Google LLC / Alphabet</div>
+      </div>
+      <div class="glyph-pane fake">
+        <div class="glyph-pane-label">✗ Homoglyph Attack Domain</div>
+        <div class="glyph-domain">gооglе.com</div>
+        <div class="glyph-unicode">o → Cyrillic о (U+043E) · e → Cyrillic е (U+0435)<br>Both o’s and final e replaced — looks pixel-perfect identical<br>Used in real credential harvesting campaigns</div>
+      </div>
+    </div>
+    <div class="glyph-row">
+      <div class="glyph-pane real">
+        <div class="glyph-pane-label">✓ Legitimate Domain</div>
+        <div class="glyph-domain">microsoft.com</div>
+        <div class="glyph-unicode">All characters: Latin alphabet<br>Owned by Microsoft Corporation</div>
+      </div>
+      <div class="glyph-pane fake">
+        <div class="glyph-pane-label">✗ Homoglyph Attack Domain</div>
+        <div class="glyph-domain">micrоsоft.com</div>
+        <div class="glyph-unicode">o → Cyrillic о (U+043E) · both o’s replaced<br>Documented in real BEC campaigns targeting Microsoft 365 users<br>Seized by Microsoft Digital Crimes Unit</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Why It Bypasses Security Filters</h3>
+  <p>Standard email security filters work by comparing domains against known malicious lists and checking for exact string matches. A filter looking for "google.com" will not flag "gооgglе.com" — because they are not the same string. The filter was never told to look for that domain. It has never been reported as malicious. It may have been registered hours ago specifically for this attack. It passes every rule-based check.</p>
+  <p>SPF, DKIM, and DMARC — the email authentication protocols that prevent spoofing of exact domains — provide no protection here. The attacker is not spoofing the legitimate domain. They are sending from their own domain, which they legitimately control, which legitimately passes authentication checks. The problem is not that the email is technically unauthorized. The problem is that it looks authorized to every human who reads it.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Palo Alto Networks Unit 42 documented this in the wild:</strong> In real homograph attacks observed by their threat detection team, emails bypassed natural language detection systems because the manipulated words — though appearing identical to legitimate ones — did not match the strings the filters were trained to flag. A filter looking for "Support Message Center" will not catch "Suррогt Меѕѕаgе Сеntеr" even though both look identical on screen.</p>
+  </div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>How a BEC Attack Unfolds</h2>
+
+  <p>A homoglyph-enabled BEC attack is not a random mass email campaign. It is a targeted, researched, patient operation. The attacker invests time before sending a single email. Understanding the full sequence reveals how many opportunities exist to detect and stop it — and how few organizations take advantage of them.</p>
+
+  <div class="diagram">
+    <div class="diagram-title">Figure 3 — The BEC Attack Sequence</div>
+    <div class="flow-list">
+      <div class="flow-item">
+        <div class="flow-num">1</div>
+        <div>
+          <div class="flow-title">Target Reconnaissance</div>
+          <div class="flow-body">The attacker researches the target organization publicly — LinkedIn for org structure and key personnel, company website for vendor relationships, press releases for active contracts and financial activity. They identify who handles payments, who has authority to authorize transfers, and what active business relationships exist. For a defense contractor, this might mean identifying the accounts payable contact, their direct manager, and a known vendor the company regularly pays.</div>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">2</div>
+        <div>
+          <div class="flow-title">Homoglyph Domain Registration</div>
+          <div class="flow-body">The attacker registers a domain that is visually identical to the target company's domain — or to a trusted vendor's domain. Domain registration costs less than $15. The domain passes WHOIS verification, has a legitimate registrar, and can have SPF and DKIM configured so emails from it pass authentication checks. From a technical standpoint it is a completely legitimate domain. The deception is purely visual.</div>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">3</div>
+        <div>
+          <div class="flow-title">Conversation Monitoring or Thread Hijacking</div>
+          <div class="flow-body">In more sophisticated attacks, the attacker first compromises a real email account — often a vendor — and reads ongoing conversations. They learn the payment schedule, the amounts involved, the names of the contacts, and the tone of the correspondence. When the timing is right they insert themselves into the thread from the homoglyph domain, impersonating a known party. The message is contextually accurate, uses familiar names, references real projects, and arrives exactly when a payment is expected.</div>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">4</div>
+        <div>
+          <div class="flow-title">The Fraudulent Request</div>
+          <div class="flow-body">The request is simple and plausible: updated banking details for an invoice, a request to redirect a payment to a new account, a wire transfer needed urgently for a contract requirement. The email comes from what appears to be a trusted address. The display name matches exactly. The signature block is copied from a real email. The writing style matches the impersonated person. The only difference — invisible to the recipient — is that the domain contains a Cyrillic letter where a Latin letter should be.</div>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">5</div>
+        <div>
+          <div class="flow-title">Transfer and Disappearance</div>
+          <div class="flow-body">The victim processes the payment. Funds are wired to an account controlled by the attacker. International transfers are typically routed through multiple countries — the FBI reports that the UK and Hong Kong are common intermediary stops, with funds ultimately moved to accounts in China, Mexico, or the UAE. By the time the fraud is discovered, the money has moved multiple times. Recovery is possible but statistically unlikely — the FBI's Financial Fraud Kill Chain has a limited window before funds become unrecoverable.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-red">
+    <p><strong>Microsoft seized 17 homoglyph domains:</strong> Microsoft's Digital Crimes Unit seized 17 domains used in BEC campaigns targeting Office 365 customers. In one documented case, attackers found a legitimate email thread about payment issues in a compromised account, then used a homoglyph domain nearly identical to the legitimate one to redirect funds. The attacker's domain passed visual inspection by every human who saw it. The fraud was only discovered after the transfer was complete.</p>
+  </div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>AI Has Changed the Equation</h2>
+
+  <p>BEC has always required social engineering skill — crafting a convincing email that sounds like a specific person, uses the right terminology, and triggers action without raising suspicion. That skill was once a limiting factor. Generating thousands of personalized, contextually accurate, grammatically perfect fraud emails required human effort and local language expertise.</p>
+
+  <p>Generative AI eliminated that constraint entirely.</p>
+
+  <p>By mid-2024, an estimated 40% of BEC phishing emails were AI-generated. The Microsoft MDDR 2025 report found that AI-generated phishing emails achieve an average click rate of 54% — compared to 12% for manually crafted campaigns. The improvement in click rates is not marginal. It is transformational. AI can analyze a target's email history, mimic their writing style, reference ongoing business relationships, and produce output that is indistinguishable from a genuine message.</p>
+
+  <p>The combination of AI-generated content with homoglyph domains is particularly dangerous. The domain provides the visual deception. The AI provides the textual authenticity. A recipient who knows to look for grammatical errors, unusual phrasing, or requests that feel slightly off — the traditional indicators of phishing — finds none of them. The email reads exactly like a message from the person it claims to be from, sent from a domain that looks exactly like the organization it claims to be from.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>New hire targeting:</strong> Research from LevelBlue SpiderLabs found a significant increase in BEC attacks targeting newly hired employees specifically. New hires are unfamiliar with their colleagues' roles, personalities, and communication styles — making them unable to recognize inconsistencies that an experienced employee might catch. A new accounts payable clerk receiving an urgent wire transfer request from what appears to be the CFO has no baseline to compare against. The homoglyph domain looks correct. The email sounds correct. They process the payment.</p>
+  </div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>Security Failures That Enable BEC Success</h2>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div class="finding-body">
+        <div class="finding-title">No Homoglyph Detection in Email Security Stack</div>
+        <div class="finding-desc">Standard email security filters perform exact string matching and reputation checking. They do not analyze the Unicode codepoint composition of domain names. A homoglyph domain registered 48 hours ago has no reputation — negative or positive. It passes every filter that relies on known-bad lists. Organizations need email security that performs Unicode normalization and mixed-script detection on every inbound domain.</div>
+        <span class="finding-tag">CRITICAL — Detection Gap</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div class="finding-body">
+        <div class="finding-title">No Out-of-Band Verification for Wire Transfers</div>
+        <div class="finding-desc">The single most effective defense against BEC — more effective than any technical control — is a policy requiring all wire transfers above a threshold to be verified through a second channel before processing. A phone call to a known number, a confirmation through a separate messaging system, or a callback to the requestor's verified number. An attacker who controls the email channel cannot control the phone. This is a process change, not a technology purchase, and it stops BEC regardless of how convincing the email is.</div>
+        <span class="finding-tag">CRITICAL — Process Gap</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">3</div>
+      <div class="finding-body">
+        <div class="finding-title">DMARC Not Enforced on Company Domain</div>
+        <div class="finding-desc">While DMARC does not protect against homoglyph domains, it prevents attackers from sending email that exactly spoofs the organization's own domain. A company without DMARC enforcement is vulnerable to both exact spoofing and homoglyph attacks. PCI DSS v4.0 now mandates DMARC enforcement for organizations processing payment cards as of March 2025. Organizations without DMARC are simultaneously non-compliant and more vulnerable.</div>
+        <span class="finding-tag">HIGH — Authentication Gap</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">4</div>
+      <div class="finding-body">
+        <div class="finding-title">Email Client Displays Friendly Name, Not Domain</div>
+        <div class="finding-desc">Most email clients — Outlook, Gmail, Apple Mail — display the sender's friendly name prominently and show the actual email address only on demand. A recipient sees "John Chen — Accounts Payable" not "billing@&#x0430;&#x0440;&#x0440;l&#x0435;.com". The homoglyph domain is hidden behind a display name that is trivially easy to set to anything. Configuring email clients to always display full email addresses, especially in payment-related contexts, removes this hiding place.</div>
+        <span class="finding-tag">HIGH — Visibility Gap</span>
+      </div>
+    </div>
+    <div class="finding fn-medium">
+      <div class="finding-num">5</div>
+      <div class="finding-body">
+        <div class="finding-title">No Proactive Homoglyph Domain Monitoring</div>
+        <div class="finding-desc">Organizations can monitor for homoglyph registrations of their own domain before an attack occurs. Tools like DNSTwist generate all possible lookalike domain variants and check whether they have been registered. A newly registered domain that looks visually identical to your company domain is a warning sign that a BEC campaign may be in preparation. This is proactive threat intelligence — acting before an email is sent rather than after funds are transferred.</div>
+        <span class="finding-tag">MEDIUM — Monitoring Gap</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>Detection &amp; Defense</h2>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Control</th><th>What It Does</th><th>Priority</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Out-of-band transfer verification</strong> — mandatory callback to verified number for all wires above threshold</td><td>Stops BEC regardless of how convincing the email — attacker cannot intercept a phone call to a known number</td><td class="red">Critical</td><td class="green">$0 — process change</td></tr>
+      <tr><td><strong>DMARC enforcement</strong> — p=reject policy on all company domains</td><td>Prevents exact domain spoofing; required by PCI DSS v4.0 as of March 2025</td><td class="red">Critical</td><td class="green">Low — configuration</td></tr>
+      <tr><td><strong>Unicode-aware email security</strong> — Proofpoint, Mimecast, or Microsoft Defender configured for homoglyph detection</td><td>Flags emails from domains containing mixed-script characters or confusable lookalikes</td><td class="red">Critical</td><td class="amber">Included in enterprise tiers</td></tr>
+      <tr><td><strong>Always display full email address</strong> — configure Outlook / email client to show domain alongside display name</td><td>Removes the hiding place behind friendly names; forces visual domain verification</td><td class="amber">High</td><td class="green">$0 — configuration</td></tr>
+      <tr><td><strong>Proactive homoglyph monitoring</strong> — DNSTwist or similar scanning for lookalike domain registrations</td><td>Early warning before an attack campaign launches; detects preparation phase</td><td class="amber">High</td><td class="green">Free tools available</td></tr>
+      <tr><td><strong>BEC-specific awareness training</strong> — scenario training on payment redirect requests, vendor banking change requests</td><td>The human layer; employees who know the pattern are the last defense when technology fails</td><td class="amber">High</td><td class="amber">Training investment</td></tr>
+      <tr><td><strong>Network-level homoglyph detection</strong> — DNS log and HTTP log analysis for punycode and mixed-script domains</td><td>Catches homoglyph domains that employees are communicating with in real time; feeds into SOC alerting</td><td class="amber">High</td><td class="green">Implemented in <a href="zeek_triage_tool.html" style="color:var(--green)">zeek_triage.py</a></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Network Detection — zeek_triage.py</h3>
+  <p>The homoglyph detection function added to <code style="font-family:var(--mono);font-size:.85em;background:#f1f5f9;padding:.1rem .3rem;border-radius:3px">zeek_triage.py</code> scans both HTTP and DNS logs for domains containing non-ASCII characters or Punycode encoding — the technical representation of internationalized domain names. A domain like <code style="font-family:var(--mono);font-size:.85em;background:#f1f5f9;padding:.1rem .3rem;border-radius:3px">xn--pple-43d.com</code> is the Punycode representation of a domain using Cyrillic characters that visually resembles "apple.com." Any occurrence in network logs is flagged with the decoded domain, the source and destination IPs, and the attack classification.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>NIST 800-171 mapping:</strong> BEC prevention maps to multiple CMMC controls. Control 3.14.2 (malicious code protection) covers email security gateway deployment. Control 3.2.2 (security awareness) covers BEC-specific training. Control 3.5.3 (multifactor authentication) reduces the impact of credential compromise that enables conversation hijacking. Control 3.6.1 (incident response) covers the immediate action required when a fraudulent transfer is discovered — time to contact the financial institution is measured in minutes, not hours.</p>
+  </div>
+</div>
+
+<!-- TOOL SECTION -->
+<div class="section">
+  <div class="section-num">Interactive Tool</div>
+  <h2>Homoglyph Domain Checker</h2>
+  <p>Type any domain below to check whether it contains Unicode homoglyphs — non-Latin characters substituted to impersonate a legitimate domain. Try typing a domain with Cyrillic or Greek characters, or paste a suspicious domain from an email you received.</p>
+
+  <div id="homoTool" style="background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:1.75rem;margin:1.5rem 0">
+
+    <div style="display:flex;gap:.75rem;align-items:flex-start;flex-wrap:wrap;margin-bottom:1.25rem">
+      <input id="homoInput" type="text"
+        placeholder="e.g. apple.com or paste a suspicious domain…"
+        style="flex:1;min-width:220px;font-family:var(--mono);font-size:.88rem;padding:.7rem 1rem;border:1px solid var(--rule);border-radius:2px;background:#f8fafc;color:var(--ink);outline:none;transition:border-color .2s"
+        oninput="checkHomoglyph()"
+        onfocus="this.style.borderColor='var(--blue)'"
+        onblur="this.style.borderColor='var(--rule)'">
+      <button onclick="checkHomoglyph()"
+        style="font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.7rem 1.5rem;background:var(--blue);color:#fff;border:none;border-radius:2px;cursor:pointer;white-space:nowrap;transition:background .2s"
+        onmouseover="this.style.background='#153e80'"
+        onmouseout="this.style.background='var(--blue)'">Check Domain</button>
+      <button onclick="document.getElementById('homoInput').value='';document.getElementById('homoResult').innerHTML='<span style=\'color:#94a3b8;font-family:var(--mono);font-size:.78rem\'>Enter a domain above to check it for homoglyph characters…</span>';document.getElementById('homoInput').focus()"
+        style="font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.7rem 1.25rem;background:transparent;color:#64748b;border:1px solid var(--rule);border-radius:2px;cursor:pointer;transition:all .2s"
+        onmouseover="this.style.borderColor='var(--ink)';this.style.color='var(--ink)'"
+        onmouseout="this.style.borderColor='var(--rule)';this.style.color='#64748b'">Clear</button>
+    </div>
+
+    <div style="margin-bottom:.75rem;display:flex;gap:.5rem;flex-wrap:wrap">
+      <span style="font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:#94a3b8;text-transform:uppercase;align-self:center">Try:</span>
+      <button onclick="document.getElementById('homoInput').value='g\u043e\u043eggl\u0435.com';checkHomoglyph()" style="font-family:var(--mono);font-size:.65rem;padding:.3rem .7rem;background:var(--red-dim);color:var(--red);border:1px solid rgba(192,57,43,.2);border-radius:2px;cursor:pointer">g&#x043E;&#x043E;gle.com</button>
+      <button onclick="document.getElementById('homoInput').value='micr\u043es\u043eft.com';checkHomoglyph()" style="font-family:var(--mono);font-size:.65rem;padding:.3rem .7rem;background:var(--red-dim);color:var(--red);border:1px solid rgba(192,57,43,.2);border-radius:2px;cursor:pointer">micr&#x043E;s&#x043E;ft.com</button>
+      <button onclick="document.getElementById('homoInput').value='google.com';checkHomoglyph()" style="font-family:var(--mono);font-size:.65rem;padding:.3rem .7rem;background:var(--green-dim);color:var(--green);border:1px solid rgba(20,90,50,.2);border-radius:2px;cursor:pointer">google.com</button>
+      <button onclick="document.getElementById('homoInput').value='xn--pple-43d.com';checkHomoglyph()" style="font-family:var(--mono);font-size:.65rem;padding:.3rem .7rem;background:var(--amber-dim);color:var(--amber);border:1px solid rgba(180,83,9,.2);border-radius:2px;cursor:pointer">xn--pple-43d.com</button>
+    </div>
+
+    <div id="homoResult" style="background:#0a0f1a;border-radius:3px;padding:1.1rem 1.4rem;font-family:var(--mono);font-size:.78rem;line-height:1.75;color:#e2e8f0;min-height:80px;white-space:pre-wrap;word-break:break-word">
+      <span style="color:#334155;font-style:italic">Enter a domain above to check it for homoglyph characters…</span>
+    </div>
+  </div>
+
+  <p style="font-size:.82rem;color:#94a3b8;margin-top:.5rem">This tool runs entirely in your browser. No domain is transmitted anywhere. For bulk scanning of DNS logs, the homoglyph detection function is implemented in <a href="zeek_triage_tool.html" style="color:var(--blue)">zeek_triage.py</a>.</p>
+</div>
+
+<!-- CONCLUSION -->
+<div class="section">
+  <div class="section-num">Conclusion</div>
+  <h2>The Attack That Costs Nothing to Launch</h2>
+
+  <p>What makes Business Email Compromise uniquely dangerous is the asymmetry. The attacker's cost is a domain registration — under $15 — and a few hours of research. The victim's cost, when the attack succeeds, averages $24,586 per wire transfer. For larger organizations, individual BEC incidents have exceeded $50 million. The FBI describes the cumulative ten-year loss of $55.5 billion as staggering. It is not the result of sophisticated nation-state hacking. It is the result of emails that looked like they came from someone they didn't.</p>
+
+  <p>The homoglyph technique is not new — it was first documented in 2001 — but it has become significantly more dangerous as AI removes the skill barrier from social engineering and as internationalized domain names expand the available character set for deception. The defenses exist. Out-of-band verification stops BEC unconditionally. Unicode-aware email security catches what rule-based filters miss. Proactive domain monitoring detects the preparation phase before a single email is sent.</p>
+
+  <p>The gap between available defense and actual deployment is not technical. Organizations know BEC exists. The FBI has issued repeated public warnings. The defenses are documented, inexpensive, and effective. The gap is organizational — the same gap that left Stryker's admin accounts without MFA, the same gap that left defense contractor development environments without Unicode scanners. Awareness without action is not security.</p>
+
+  <div class="callout callout-red">
+    <p><strong>If you receive a request to change banking details or initiate a wire transfer by email:</strong> Stop. Pick up the phone. Call the requestor at a number you already have — not a number provided in the email. Confirm the request verbally. This single step, applied consistently, makes BEC economically unviable regardless of how convincing the email appears. It costs nothing. It works every time.</p>
+  </div>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">All statistics in this report are sourced from publicly available data including the FBI IC3 2024 Annual Report and Internet Crime Complaint Center public service announcements, Palo Alto Networks Unit 42 threat research, LevelBlue SpiderLabs BEC trend analysis, AFP 2025 Fraud and Control Survey, and Microsoft Digital Crimes Unit reporting. This report represents the author's independent analysis for educational purposes.</p>
+</div>
+
+</div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Consultant &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- SAMPLE FILE -->
+<div style="background:#f7f5f0;border-top:1px solid var(--rule);padding:3rem 0">
+  <div class="wrap">
+    <div style="font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:#94a3b8;margin-bottom:.5rem">Sample Test File</div>
+    <h2 style="font-family:var(--display-clean);font-size:1.5rem;font-weight:600;color:var(--ink);margin-bottom:.5rem">Test the Detection</h2>
+    <p style="font-family:var(--serif);font-size:.9rem;color:var(--ink3);line-height:1.7;margin-bottom:1.75rem;max-width:680px">A synthetic network log simulating an accounts payable workstation at a defense subcontractor. Normal Microsoft and Google traffic is mixed with six Punycode-encoded homoglyph domains spoofing Pratt &amp; Whitney, Electric Boat, Sikorsky, General Dynamics, and RTX. Drop it into <a href="zeek_triage_tool.html" style="color:var(--blue)">zeek_triage.py</a> to see the homoglyph detection in action.</p>
+
+    <div style="background:var(--paper);border:1px solid var(--rule);border-top:3px solid var(--red);padding:1.5rem;max-width:520px">
+      <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem">DNS &amp; HTTP Log · Homoglyph Detection</div>
+      <div style="font-family:var(--display-clean);font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:.5rem">sample_homoglyph_log.txt</div>
+      <p style="font-family:var(--serif);font-size:.82rem;color:var(--ink3);line-height:1.65;margin-bottom:1rem">Simulated workstation log with 6 Punycode homoglyph domains embedded in normal traffic. Spoofed targets include CT defense contractors. All IPs and domains are synthetic — created for educational use only.</p>
+      <a href="sample_homoglyph_log.txt" download style="font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;background:var(--red);color:#fff;padding:.6rem 1.25rem;border-radius:2px;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;transition:background .2s">↓ Download</a>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<footer>
+  <span>Homoglyph &amp; BEC Analysis · Yana Ivanov · March 2026</span>
+  <span>Based entirely on public reporting · For educational use · Independent analysis</span>
+</footer>
+
+<script>
+const CYRILLIC_MAP = {
+  'а':['a','U+0430'],'е':['e','U+0435'],'о':['o','U+043E'],'р':['p','U+0440'],
+  'с':['c','U+0441'],'х':['x','U+0445'],'у':['y','U+0443'],'і':['i','U+0456'],
+  'ѕ':['s','U+0455'],'ј':['j','U+0458'],'А':['A','U+0410'],'В':['B','U+0412'],
+  'С':['C','U+0421'],'Е':['E','U+0415'],'Н':['H','U+041D'],'І':['I','U+0406'],
+  'К':['K','U+041A'],'М':['M','U+041C'],'О':['O','U+041E'],'Р':['P','U+0420'],
+  'Т':['T','U+0422'],'Х':['X','U+0425'],
+};
+const GREEK_MAP = {
+  'α':['a','U+03B1'],'ο':['o','U+03BF'],'Α':['A','U+0391'],'Β':['B','U+0392'],
+  'Ε':['E','U+0395'],'Ζ':['Z','U+0396'],'Η':['H','U+0397'],'Ι':['I','U+0399'],
+  'Κ':['K','U+039A'],'Μ':['M','U+039C'],'Ν':['N','U+039D'],'Ο':['O','U+039F'],
+  'Ρ':['P','U+03A1'],'Τ':['T','U+03A4'],'Υ':['Y','U+03A5'],'Χ':['X','U+03A7'],
+};
+
+function checkHomoglyph() {
+  const input  = document.getElementById('homoInput').value.trim();
+  const result = document.getElementById('homoResult');
+  if (!input) {
+    result.innerHTML = '<span style="color:#334155;font-style:italic">Enter a domain above to check it for homoglyph characters…</span>';
+    return;
+  }
+
+  const eq  = '═'.repeat(52);
+  const div = '─'.repeat(52);
+  let out = '';
+  let findings = [];
+  let isPuny = false;
+
+  // Check Punycode
+  if (input.toLowerCase().includes('xn--')) {
+    isPuny = true;
+    findings.push({type:'puny', msg:'Punycode prefix detected — domain contains non-ASCII characters encoded for DNS transport'});
+  }
+
+  // Check each character
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i];
+    if (CYRILLIC_MAP[ch]) {
+      const [latin, cp] = CYRILLIC_MAP[ch];
+      findings.push({type:'cyrillic', pos:i, ch, cp, latin, script:'Cyrillic'});
+    } else if (GREEK_MAP[ch]) {
+      const [latin, cp] = GREEK_MAP[ch];
+      findings.push({type:'greek', pos:i, ch, cp, latin, script:'Greek'});
+    } else if (ch.charCodeAt(0) > 127 && !isPuny) {
+      findings.push({type:'other', pos:i, ch, cp:`U+${ch.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')}`, script:'Non-ASCII'});
+    }
+  }
+
+  out += `\x1b[1m${eq}\x1b[0m\n`;
+  out += `  HOMOGLYPH DOMAIN CHECK\n`;
+  out += `  Domain: ${input}\n`;
+  out += `\x1b[1m${eq}\x1b[0m\n\n`;
+
+  if (findings.length === 0 && !isPuny) {
+    // Clean
+    out += `<span style="color:#4ade80">[ CLEAN ]</span> No homoglyph characters detected.\n\n`;
+    out += `<span style="color:#475569">All characters are standard ASCII — this domain appears legitimate.\n`;
+    out += `Note: This tool checks character encoding only. Always verify\n`;
+    out += `the full context of any email before acting on it.</span>`;
+  } else {
+    const charFindings = findings.filter(f => f.type !== 'puny');
+    if (isPuny) {
+      out += `<span style="color:#ef4444">!! PUNYCODE</span>  ${input}\n`;
+      out += `<span style="color:#475569">             Punycode (xn--) encodes non-ASCII characters for DNS.\n`;
+      out += `             This domain likely contains Unicode characters that look\n`;
+      out += `             identical to a legitimate domain when displayed.</span>\n\n`;
+    }
+
+    if (charFindings.length > 0) {
+      // Build decoded version
+      let decoded = '';
+      for (const ch of input) {
+        if (CYRILLIC_MAP[ch]) decoded += CYRILLIC_MAP[ch][0];
+        else if (GREEK_MAP[ch]) decoded += GREEK_MAP[ch][0];
+        else decoded += ch;
+      }
+
+      out += `<span style="color:#ef4444">!! HOMOGLYPH DETECTED</span>  ${input}\n`;
+      out += `<span style="color:#475569">${div}</span>\n`;
+      out += `   Decoded (what it looks like): <span style="color:#fbbf24">${decoded}</span>\n`;
+      out += `   Non-ASCII characters found : <span style="color:#ef4444">${charFindings.length}</span>\n\n`;
+
+      for (const f of charFindings) {
+        out += `   Position ${f.pos} : <span style="color:#ef4444">${f.ch}</span>  ${f.cp}  [${f.script}]\n`;
+        out += `<span style="color:#475569">               Looks like Latin '${f.latin}' — but is a different character\n`;
+        out += `               An attacker registered this domain to impersonate\n`;
+        out += `               a domain containing '${f.latin}' at this position</span>\n\n`;
+      }
+
+      out += `<span style="color:#475569">${div}</span>\n`;
+      out += `   Attack    : <span style="color:#ef4444">Homoglyph BEC Domain Spoofing</span>\n`;
+      out += `   Technique : Unicode character substitution (${[...new Set(charFindings.map(f=>f.script))].join(', ')})\n`;
+      out += `   Severity  : <span style="color:#ef4444">HIGH — do not trust emails from this domain</span>`;
+    }
+  }
+
+  result.innerHTML = out;
+}
+
+// Allow Enter key
+document.getElementById('homoInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkHomoglyph();
+});
+</script>
+</body>
+</html>

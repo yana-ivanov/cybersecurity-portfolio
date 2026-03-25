@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Encryption Illusion — Russia's Signal & WhatsApp Campaign | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* NAV */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* MASTHEAD */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* WRAP */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* CALLOUTS */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:rgba(192,57,43,0.06);border-color:var(--red)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:1.5rem 0}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--red)}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);margin:2rem 0;border:1px solid var(--rule)}
+.stat-box{background:var(--paper);padding:1.5rem 1.2rem;text-align:center}
+.stat-icon{font-size:1.6rem;color:var(--red);line-height:1;margin-bottom:.4rem}
+.stat-icon .material-icons{font-size:2rem}
+.stat-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;margin-bottom:.5rem}
+.stat-desc{font-size:.78rem;color:var(--ink3);line-height:1.5}
+
+/* FIGURE */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+
+/* ATTACK FLOW */
+.attack-flow{display:grid;grid-template-columns:repeat(5,1fr);gap:.75rem;margin:1rem 0}
+.flow-step{background:var(--bg);border:1px solid var(--rule);padding:1rem .75rem;text-align:center;position:relative}
+.flow-step::after{content:'→';position:absolute;right:-1.1rem;top:50%;transform:translateY(-50%);
+  font-size:.9rem;color:#94a3b8;z-index:2;font-family:var(--mono)}
+.flow-step:last-child::after{display:none}
+.flow-step-num{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+.flow-step-icon{margin-bottom:.4rem;color:var(--ink3)}
+.flow-step-icon .material-icons{font-size:1.4rem}
+.flow-step-label{font-size:.75rem;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:.3rem;font-family:var(--mono)}
+.flow-step-desc{font-size:.68rem;color:var(--ink3);line-height:1.4}
+.flow-step.danger{background:var(--red-dim);border-color:rgba(192,57,43,.25)}
+.flow-step.danger .flow-step-num{color:var(--red)}
+.flow-step.danger .flow-step-icon{color:var(--red)}
+.flow-step.warning{background:var(--amber-dim);border-color:rgba(180,83,9,.25)}
+.flow-step.warning .flow-step-num{color:var(--amber)}
+
+/* SPLIT VISUAL */
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+
+/* APP SPECTRUM */
+.spectrum-apps{display:grid;grid-template-columns:repeat(5,1fr);gap:.75rem;margin:1rem 0}
+.app-card{background:var(--paper);border:1px solid var(--rule);padding:.9rem .7rem;text-align:center;border-top:3px solid var(--rule)}
+.app-card.danger{border-top-color:var(--red)}
+.app-card.warning{border-top-color:var(--amber)}
+.app-card.good{border-top-color:var(--green)}
+.app-icon{margin-bottom:.35rem;color:var(--ink3)}
+.app-icon .material-icons{font-size:1.4rem}
+.app-card.danger .app-icon{color:var(--red)}
+.app-card.warning .app-icon{color:var(--amber)}
+.app-card.good .app-icon{color:var(--green)}
+.app-name{font-family:var(--mono);font-size:.65rem;font-weight:600;color:var(--ink);margin-bottom:.3rem}
+.app-status{font-size:.62rem;color:var(--ink3);line-height:1.4;margin-bottom:.4rem}
+.app-badge{font-family:var(--mono);font-size:.55rem;padding:.15rem .4rem;text-transform:uppercase;letter-spacing:.06em;display:inline-block}
+.badge-danger{background:var(--red-mid);color:var(--red)}
+.badge-warning{background:var(--amber-dim);color:var(--amber)}
+.badge-good{background:var(--green-dim);color:var(--green)}
+
+/* AWARENESS CYCLE — horizontal row */
+.cycle-row{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;align-items:center;gap:.5rem;margin:1.5rem 0}
+.cycle-node{text-align:center;padding:.75rem .5rem}
+.cycle-circle{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  margin:0 auto .6rem;border:2px solid}
+.cycle-circle .material-icons{font-size:1.5rem}
+.cycle-node.phase1 .cycle-circle{background:var(--red-dim);border-color:var(--red);color:var(--red)}
+.cycle-node.phase2 .cycle-circle{background:var(--amber-dim);border-color:var(--amber);color:var(--amber)}
+.cycle-node.phase3 .cycle-circle{background:var(--blue-dim);border-color:var(--blue);color:var(--blue)}
+.cycle-node.phase4 .cycle-circle{background:var(--green-dim);border-color:var(--green);color:var(--green)}
+.cycle-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin-bottom:.25rem}
+.cycle-node.phase1 .cycle-label{color:var(--red)}
+.cycle-node.phase2 .cycle-label{color:var(--amber)}
+.cycle-node.phase3 .cycle-label{color:var(--blue)}
+.cycle-node.phase4 .cycle-label{color:var(--green)}
+.cycle-desc{font-size:.68rem;color:var(--ink3);line-height:1.4}
+.cycle-arrow{font-family:var(--mono);font-size:1.1rem;color:#94a3b8;text-align:center;padding:0 .25rem}
+
+/* CMMC CONTROL LIST — replaces nested table */
+.control-list{margin:1.5rem 0}
+.control-item{display:grid;grid-template-columns:1fr auto;gap:1rem;padding:.85rem 1rem;border-bottom:1px solid var(--rule);align-items:start}
+.control-item:first-child{border-top:1px solid var(--rule)}
+.control-item:last-child{border-bottom:none}
+.control-left{}
+.control-vector{font-size:.88rem;color:var(--ink);font-weight:600;margin-bottom:.2rem;font-family:var(--serif)}
+.control-name{font-size:.78rem;color:var(--ink3);margin-bottom:.2rem}
+.control-id{font-family:var(--mono);font-size:.65rem;color:var(--red);letter-spacing:.06em}
+.control-right{text-align:right;flex-shrink:0}
+.control-gap{font-family:var(--mono);font-size:.65rem;padding:.2rem .5rem;border-radius:1px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.gap-critical{background:var(--red-dim);color:var(--red)}
+.gap-high{background:var(--amber-dim);color:var(--amber)}
+
+/* STEP LIST */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;
+  justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+.cmmc-tag{display:inline-block;font-family:var(--mono);font-size:.58rem;padding:.15rem .45rem;
+  background:var(--red-dim);color:var(--red);border:1px solid rgba(192,57,43,.2);
+  text-transform:uppercase;letter-spacing:.06em;margin-left:.4rem;vertical-align:middle}
+
+/* TIMELINE */
+.timeline{margin:1.5rem 0;position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:.45rem;top:0;bottom:0;width:2px;background:var(--rule)}
+.tl-item{position:relative;margin-bottom:1.25rem;padding-left:1.25rem}
+.tl-item::before{content:'';position:absolute;left:-1.6rem;top:.4rem;width:10px;height:10px;
+  border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tl-date{font-family:var(--mono);font-size:.62rem;color:var(--red);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem}
+.tl-title{font-weight:700;color:var(--ink);font-size:.9rem;margin-bottom:.2rem;font-family:var(--display)}
+.tl-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* BIO — exact match to Volt Typhoon */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:4rem}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;
+  display:flex;align-items:center;justify-content:center;font-family:var(--display);
+  font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* FOOTER */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .split-visual{grid-template-columns:1fr}
+  .spectrum-apps{grid-template-columns:repeat(2,1fr)}
+  .attack-flow{grid-template-columns:1fr}
+  .flow-step::after{display:none}
+  .cycle-row{grid-template-columns:1fr;grid-template-rows:auto}
+  .cycle-arrow{transform:rotate(90deg)}
+  .bio{grid-template-columns:1fr;padding:2rem 1.5rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<header class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Investigative Threat Analysis · Russia · Social Engineering</div>
+    <h1 class="title">The Encryption Illusion —<br><em>How Russia Bypassed Signal Without Breaking It</em></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">March 16, 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Threat Actor</div><div class="value">Russian State (FSB / GRU)</div></div>
+      <div class="meta-item"><div class="label">Active Since</div><div class="value">2024 — Escalating 2026</div></div>
+      <div class="meta-item"><div class="label">Severity</div><div class="value">High — Active Campaign</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    ACTIVE CAMPAIGN &nbsp;·&nbsp; DUTCH INTELLIGENCE CONFIRMED &nbsp;·&nbsp; GOVERNMENT EMPLOYEES COMPROMISED &nbsp;·&nbsp; DEFENSE CONTRACTORS AT RISK &nbsp;·&nbsp; MARCH 16 2026
+  </div>
+</header>
+
+<main>
+
+<!-- SECTION 01 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>Signal is considered one of the most cryptographically secure messaging applications on the planet. Its encryption protocol — the Signal Protocol — is the gold standard adopted by WhatsApp, Google Messages, and dozens of other platforms. Mathematically, it is effectively unbreakable with current technology. Russian intelligence agencies knew this. So they did not try to break it.</p>
+
+  <p>On March 9, 2026, the Netherlands' Military Intelligence and Security Service (MIVD) and General Intelligence and Security Service (AIVD) issued a joint public warning confirming a <strong>large-scale global campaign</strong> by Russian state hackers to seize Signal and WhatsApp accounts belonging to government officials, military personnel, defense employees, and journalists. Dutch government employees had already been confirmed as victims. The technique did not involve cracking encryption, exploiting zero-days, or deploying malware. It involved asking people to hand over their keys — and people did.</p>
+
+  <p><strong>Defining Assessment:</strong> This is not a story about a broken app. Signal's encryption held. It is a story about the only layer that cannot be patched — the human being using the tool. For defense contractors handling Controlled Unclassified Information under CMMC, this is a direct and present threat. When an employee uses a personal messaging app to share a project update or document link because it is faster than the company's approved system, they create a vulnerability that no amount of technical infrastructure can close.</p>
+
+  <div class="stat-grid">
+    <div class="stat-box">
+      <div class="stat-icon"><span class="material-icons">public</span></div>
+      <div class="stat-label">Scope</div>
+      <div class="stat-desc">Large-scale global campaign — confirmed victims across multiple NATO countries</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon"><span class="material-icons">remove_circle_outline</span></div>
+      <div class="stat-label">Vulnerabilities Exploited</div>
+      <div class="stat-desc">Zero technical flaws. No malware. No zero-days. Pure social engineering.</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon"><span class="material-icons">verified</span></div>
+      <div class="stat-label">Dutch Gov Confirmed</div>
+      <div class="stat-desc">MIVD and AIVD confirmed Dutch government employees already compromised</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon"><span class="material-icons">person_search</span></div>
+      <div class="stat-label">Primary Targets</div>
+      <div class="stat-desc">Military personnel · Government officials · Defense-adjacent journalists</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>The Attack — Exactly How Russia Got In</h2>
+
+  <p>The technique Russia used is elegant precisely because it exploits human trust in official-looking communications. The attack has two primary variants — both targeting the legitimate security features of the apps rather than any flaw in them.</p>
+
+  <h3>Variant A — The Fake Support Chatbot</h3>
+  <p>The attacker creates a Signal or WhatsApp account named <strong>"Signal Security Support"</strong>, <strong>"Signal Support Chatbot"</strong>, or similar. They contact the target directly inside the app with an urgent message: suspicious activity detected, a possible data leak, an attempt to access private messages. To "protect" the account, the target is asked to share their SMS verification code and PIN. The attacker has simultaneously requested re-registration of the target's account on a new device. Signal sends the real code to the target's phone. The target, believing they are helping support, types it back. The attacker owns the account.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 1 — Attack Flow: How Russia Walks In Through the Front Door</div>
+    <div class="figure-body">
+      <div class="attack-flow">
+        <div class="flow-step">
+          <div class="flow-step-num">Step 01</div>
+          <div class="flow-step-icon"><span class="material-icons">theater_comedy</span></div>
+          <div class="flow-step-label">Fake Account Created</div>
+          <div class="flow-step-desc">"Signal Security Support" — official-looking name inside the app</div>
+        </div>
+        <div class="flow-step warning">
+          <div class="flow-step-num">Step 02</div>
+          <div class="flow-step-icon"><span class="material-icons">mark_email_unread</span></div>
+          <div class="flow-step-label">Urgent Message Sent</div>
+          <div class="flow-step-desc">"Suspicious activity — share your code to protect your account"</div>
+        </div>
+        <div class="flow-step warning">
+          <div class="flow-step-num">Step 03</div>
+          <div class="flow-step-icon"><span class="material-icons">smartphone</span></div>
+          <div class="flow-step-label">Re-Registration Triggered</div>
+          <div class="flow-step-desc">Signal sends real SMS verification code to target's phone</div>
+        </div>
+        <div class="flow-step danger">
+          <div class="flow-step-num">Step 04</div>
+          <div class="flow-step-icon"><span class="material-icons">vpn_key</span></div>
+          <div class="flow-step-label">Target Hands Over Key</div>
+          <div class="flow-step-desc">Verification code + PIN sent to attacker — believed to be support</div>
+        </div>
+        <div class="flow-step danger">
+          <div class="flow-step-num">Step 05</div>
+          <div class="flow-step-icon"><span class="material-icons">visibility</span></div>
+          <div class="flow-step-label">Account Compromised</div>
+          <div class="flow-step-desc">Full access to message history, group chats, and ongoing conversations</div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">The encryption worked perfectly at every step. Russia did not attack the technology — they attacked the person using it.</div>
+  </div>
+
+  <h3>Variant B — The Malicious QR Code</h3>
+  <p>Signal supports a legitimate "Linked Devices" feature allowing access from multiple devices simultaneously. Russia weaponized this entirely legitimate feature. Attackers created phishing pages displaying QR codes disguised as Signal group invitations, security alerts, or official device-pairing instructions. When targets scanned the code, they were silently adding the attacker's device as a linked device — granting permanent read access to all messages without triggering any security alert. In one documented case, Russian military intelligence linked Signal accounts recovered from captured battlefield devices to their own servers, gaining access to Ukrainian military communications.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Critical insight:</strong> GRU unit APT44 (Sandworm) linked Signal accounts from captured battlefield devices to their own servers — gaining access to Ukrainian military communications from devices taken during combat. The same technique is now confirmed against NATO government targets globally.</p>
+  </div>
+
+  <h3>Campaign Timeline</h3>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-date">2024 — Initial Operations</div>
+      <div class="tl-title">Ukraine-Focused Phase</div>
+      <div class="tl-desc">Google Threat Intelligence identified Russian actors phishing Signal accounts of Ukrainian military personnel and warned the tactic would likely spread beyond Ukraine.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">Early 2026 — Expansion</div>
+      <div class="tl-title">NATO Government Targeting Begins</div>
+      <div class="tl-desc">Germany's domestic intelligence warns of Signal phishing targeting German military and political figures. Campaign expands beyond Ukraine to NATO member governments.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">March 9, 2026 — Confirmation</div>
+      <div class="tl-title">Dutch Intelligence Issues Global Warning</div>
+      <div class="tl-desc">MIVD and AIVD confirm large-scale global campaign. Dutch government employees confirmed compromised. WhatsApp added to target scope alongside Signal.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">March 2026 — Ongoing</div>
+      <div class="tl-title">Active and Unresolved</div>
+      <div class="tl-desc">Campaign continues with no confirmed end. Defense contractors using personal messaging apps for work communications remain exposed.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>The Encryption Illusion — Why "Secure" Apps Are Not Enough</h2>
+
+  <p>The most dangerous misconception in enterprise security today is the belief that end-to-end encryption makes a communication channel safe for sensitive work. It does not. Encryption protects data <em>in transit</em> between two points. It says nothing about the security of the endpoints, the behavior of the users, or what happens when one endpoint is silently handed to an adversary.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 2 — The Encryption Illusion: What Encryption Protected vs. What Russia Attacked</div>
+    <div class="figure-body">
+      <div class="split-visual">
+        <div class="split-panel left">
+          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">check_circle</span> What Encryption Protected</div>
+          <p><strong>The transit channel.</strong> Every message sent between the two devices was mathematically scrambled using the Signal Protocol. No one on the network — not ISPs, not government intercept, not even Signal itself — could read the content in transit.</p>
+          <p>The encryption worked. <strong>Russia never attacked it.</strong> Attempting to break Signal Protocol encryption with current technology would take longer than the age of the universe.</p>
+          <p>The math was perfect. The lock was unbreakable. The door it was protecting was left open by a human who did not know better.</p>
+        </div>
+        <div class="split-panel right">
+          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">cancel</span> What Encryption Cannot Protect</div>
+          <p><strong>The human endpoint.</strong> Once Russia convinced the target to hand over their verification code, they became a legitimate linked device. The encryption now protected Russia's access just as faithfully as the original user's.</p>
+          <p>The app worked exactly as designed — encrypting and delivering messages to all linked devices including the attacker's. <strong>Security features became the attack vector.</strong></p>
+          <p>No patch fixes this. No algorithm prevents a person from handing over their key when they believe they are talking to official support.</p>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Encryption is a technical control. Social engineering is a human problem. Technical controls cannot compensate for absent human training.</div>
+  </div>
+
+  <h3>The App Confusion Problem</h3>
+  <p>A significant reason this attack succeeds at scale is that users conflate "encrypted" with "secure for work." The differences between apps matter enormously in a defense contractor context — particularly the widely misunderstood Telegram encryption model.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 3 — Messaging App Trust Spectrum: Personal Use to CMMC-Compliant</div>
+    <div class="figure-body">
+      <div class="spectrum-apps">
+        <div class="app-card danger">
+          <div class="app-icon"><span class="material-icons">chat_bubble</span></div>
+          <div class="app-name">WhatsApp</div>
+          <div class="app-status">E2E encrypted but personal accounts — no corporate control, metadata to Meta servers</div>
+          <div class="app-badge badge-danger">Not for CUI</div>
+        </div>
+        <div class="app-card danger">
+          <div class="app-icon"><span class="material-icons">send</span></div>
+          <div class="app-name">Telegram</div>
+          <div class="app-status">Default chats NOT end-to-end encrypted. Only "Secret Chats" are. Widely misunderstood.</div>
+          <div class="app-badge badge-danger">Not for CUI</div>
+        </div>
+        <div class="app-card warning">
+          <div class="app-icon"><span class="material-icons">lock</span></div>
+          <div class="app-name">Signal</div>
+          <div class="app-status">Strong encryption but personal accounts — confirmed Russian target. No enterprise audit trail.</div>
+          <div class="app-badge badge-warning">Not for CUI</div>
+        </div>
+        <div class="app-card good">
+          <div class="app-icon"><span class="material-icons">work</span></div>
+          <div class="app-name">Slack Enterprise</div>
+          <div class="app-status">SSO + MFA enforced, corporate-controlled, audit logs, data stays within org boundary</div>
+          <div class="app-badge badge-good">Acceptable</div>
+        </div>
+        <div class="app-card good">
+          <div class="app-icon"><span class="material-icons">shield</span></div>
+          <div class="app-name">DoD-Approved</div>
+          <div class="app-status">DISA-approved platforms with FedRAMP authorization — designed for CUI handling</div>
+          <div class="app-badge badge-good">CUI Compliant</div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">The Telegram misconception is particularly dangerous — standard group chats are stored in plaintext on Telegram's servers. Only "Secret Chats" use E2E encryption, and they do not work in groups at all.</div>
+  </div>
+
+  <div class="callout callout-amber">
+    <p><strong>The Telegram misconception explained:</strong> Telegram uses client-server encryption for regular chats — Telegram's servers can read those messages. Only "Secret Chats" are end-to-end encrypted, and they do not work in group chats at all. An employee who believes Telegram is more secure than WhatsApp because they "heard it uses encryption" may actually be on a less secure platform than they realize.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>Why Defense Contractors Are Uniquely Exposed</h2>
+
+  <p>The Russian campaign targets government officials and military personnel — but the threat surface extends directly to every defense contractor whose employees communicate about work on personal devices. The defense industrial base operates in a hybrid environment: employees handle sensitive procurement details, technical specifications, contract information, and project communications that may touch CUI — often on devices and apps their employer does not control.</p>
+
+  <h3>The Familiarity Gap</h3>
+  <p>A consistent pattern emerges across organizations that handle sensitive data: employees default to familiar personal apps not because they intend to violate policy, but because the approved tool feels less convenient and they genuinely do not understand why the distinction matters. The Dutch intelligence report confirmed this explicitly — government officials used Signal for sensitive communications not because their approved secure systems failed, but because Signal was the app they already knew. Convenience overrode compliance.</p>
+
+  <p>This behavior is entirely predictable and entirely addressable — but only through training that explains the real risk in practical terms, not through policy documents that employees file and forget.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>Analyst observation:</strong> In real-world security awareness testing, phishing failure rates at companies with dedicated security teams — even those handling highly sensitive data — consistently run 20–40% on first exposure. Individuals who fail are not generally careless; they lack specific knowledge of what a particular attack looks like. The fake Signal support message exploits exactly this gap. A defense contractor employee who has never seen a credential-harvesting attempt inside an encrypted app has no frame of reference to recognize it.</p>
+  </div>
+
+  <h3>The CMMC Compliance Gap</h3>
+  <p>CMMC Level 2 contains explicit controls governing where and how Controlled Unclassified Information can be handled, transmitted, and stored. When an employee sends a work document via WhatsApp, discusses project details in a Signal group, or shares a contract update in a Telegram channel — they are almost certainly moving CUI outside the controlled information environment their organization is responsible for protecting. This is not a theoretical compliance concern. It is an active intelligence collection opportunity for Russian state actors who are confirmed to be operating against exactly these channels right now.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The supply chain dimension:</strong> CMMC requirements flow down from prime contractors to subcontractors under DFARS 252.204-7021. A small precision machining shop in Connecticut supplying components to Electric Boat, with employees sharing project photos via WhatsApp, is a valid intelligence target and a potential entry point into the broader submarine program. Russia does not need to compromise Electric Boat directly when it can read the communications of their supply chain.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>The Human Vulnerability Lifecycle — Why Training Is the Only Fix</h2>
+
+  <p>Technical controls can restrict unauthorized app usage. Policies can prohibit personal messaging for work. But neither addresses the root cause: people who have never been shown what a social engineering attack looks like inside an encrypted messaging app do not know to be suspicious. The attack succeeds because the target has no mental model for it.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 4 — Human Vulnerability Lifecycle: From No Awareness to Active Defense</div>
+    <div class="figure-body">
+      <div class="cycle-row">
+        <div class="cycle-node phase1">
+          <div class="cycle-circle"><span class="material-icons">gps_not_fixed</span></div>
+          <div class="cycle-label">No Awareness</div>
+          <div class="cycle-desc">Clicks the link. Shares the code. No frame of reference for the attack.</div>
+        </div>
+        <div class="cycle-arrow">→</div>
+        <div class="cycle-node phase2">
+          <div class="cycle-circle"><span class="material-icons">bolt</span></div>
+          <div class="cycle-label">Incident</div>
+          <div class="cycle-desc">Account compromised. Data exposed. Consequences real and immediate.</div>
+        </div>
+        <div class="cycle-arrow">→</div>
+        <div class="cycle-node phase3">
+          <div class="cycle-circle"><span class="material-icons">school</span></div>
+          <div class="cycle-label">Education</div>
+          <div class="cycle-desc">Training delivered. Attack patterns explained. Recognition begins.</div>
+        </div>
+        <div class="cycle-arrow">→</div>
+        <div class="cycle-node phase4">
+          <div class="cycle-circle"><span class="material-icons">security</span></div>
+          <div class="cycle-label">Active Defense</div>
+          <div class="cycle-desc">Catches phishing, smishing, and impersonation attempts instinctively.</div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">The critical insight: reactive training delivered after an incident is too late for a defense contractor handling CUI. The incident IS the breach. CMMC onboarding training must move employees to Active Defense before they ever touch a sensitive system.</div>
+  </div>
+
+  <p>Security awareness testing consistently shows that employees who experience a simulated phishing event and receive targeted training afterward become significantly better at identifying future attempts — not just the same attack type, but novel variations. The exposure creates a cognitive pattern that generalizes. For defense contractors, this means the question is not whether to train employees on social engineering. It is whether to train them before or after a Russian intelligence agency reads their Signal messages.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Policy perspective:</strong> CMMC security awareness training should not be positioned to employees as a compliance requirement — it should be positioned as a professional skill that protects them personally as well as the organization. Employees who understand <em>why</em> Signal is unsuitable for CUI communications — not just that it is forbidden — are dramatically more likely to comply consistently, including in edge cases the policy never explicitly anticipated.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>CMMC Controls — The Framework Already Has the Answer</h2>
+
+  <p>The Russian Signal campaign is not a new threat category that CMMC failed to anticipate. Every element of this attack — unauthorized communication channels, credential disclosure, absence of employee training, unapproved application usage — maps directly to existing CMMC Level 2 requirements. The gap is not in the framework. It is in implementation.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 5 — CMMC Controls Mapped to the Signal / WhatsApp Attack</div>
+    <div class="figure-body">
+      <div class="control-list">
+        <div class="control-item">
+          <div class="control-left">
+            <div class="control-vector">Employee uses personal Signal or WhatsApp for work communications</div>
+            <div class="control-name">Limit system access to authorized users and authorized types of transactions</div>
+            <div class="control-id">AC.L2-3.1.1</div>
+          </div>
+          <div class="control-right"><span class="control-gap gap-high">High Gap</span></div>
+        </div>
+        <div class="control-item">
+          <div class="control-left">
+            <div class="control-vector">CUI transmitted via unauthorized messaging app</div>
+            <div class="control-name">Control the flow of CUI in accordance with approved authorizations</div>
+            <div class="control-id">AC.L2-3.1.3</div>
+          </div>
+          <div class="control-right"><span class="control-gap gap-critical">Critical Gap</span></div>
+        </div>
+        <div class="control-item">
+          <div class="control-left">
+            <div class="control-vector">Connection to external personal messaging platform</div>
+            <div class="control-name">Limit connections to external systems to authorized connections only</div>
+            <div class="control-id">AC.L2-3.1.20</div>
+          </div>
+          <div class="control-right"><span class="control-gap gap-high">High Gap</span></div>
+        </div>
+        <div class="control-item">
+          <div class="control-left">
+            <div class="control-vector">No training on social engineering or messaging app credential phishing</div>
+            <div class="control-name">Ensure personnel are aware of security risks associated with their activities</div>
+            <div class="control-id">AT.L2-3.2.1</div>
+          </div>
+          <div class="control-right"><span class="control-gap gap-critical">Critical Gap</span></div>
+        </div>
+        <div class="control-item">
+          <div class="control-left">
+            <div class="control-vector">Generic training not covering messaging app impersonation attacks</div>
+            <div class="control-name">Ensure personnel are trained to carry out assigned security responsibilities</div>
+            <div class="control-id">AT.L2-3.2.2</div>
+          </div>
+          <div class="control-right"><span class="control-gap gap-high">High Gap</span></div>
+        </div>
+        <div class="control-item">
+          <div class="control-left">
+            <div class="control-vector">Unapproved apps on work-adjacent or BYOD devices</div>
+            <div class="control-name">Establish and enforce software usage and installation restrictions</div>
+            <div class="control-id">CM.L2-3.4.6 / 3.4.7</div>
+          </div>
+          <div class="control-right"><span class="control-gap gap-critical">Critical Gap</span></div>
+        </div>
+        <div class="control-item">
+          <div class="control-left">
+            <div class="control-vector">Communications not using FIPS-validated cryptographic implementations</div>
+            <div class="control-name">Implement cryptographic mechanisms to prevent unauthorized CUI disclosure</div>
+            <div class="control-id">SC.L2-3.13.10</div>
+          </div>
+          <div class="control-right"><span class="control-gap gap-critical">Critical Gap</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">None of these controls are new. All of them address the exact conditions Russia is exploiting. The gap is implementation — not framework coverage.</div>
+  </div>
+
+  <h3>What Good Looks Like — Practical Implementation</h3>
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Block unauthorized messaging apps at the network level <span class="cmmc-tag">CM.L2-3.4.6</span></div>
+        <div class="step-content-desc">DNS filtering and web proxy rules blocking WhatsApp Web, Telegram Web, and Signal Desktop from corporate network segments. MDM policy preventing installation of unapproved apps on devices used for work. The block must come with a clear explanation to employees — not just a policy document.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Provide and mandate approved alternatives <span class="cmmc-tag">CM.L2-3.4.7</span></div>
+        <div class="step-content-desc">Enterprise Slack with SSO and MFA enforced, or Microsoft Teams in a FedRAMP-authorized environment. Employees will use the most convenient tool — the goal is making the compliant tool the convenient one. A secure collaboration portal employees access with work credentials removes the incentive to reach for personal apps.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">Mandatory social engineering training at onboarding — not annual checkbox <span class="cmmc-tag">AT.L2-3.2.1</span></div>
+        <div class="step-content-desc">Training that specifically covers messaging app impersonation attacks, not just email phishing. Show employees what a fake Signal support message looks like before they encounter one. Conduct simulated messaging app social engineering tests and use failures as teaching moments, not punitive events.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">One inviolable rule — enforce it explicitly <span class="cmmc-tag">AT.L2-3.2.2</span></div>
+        <div class="step-content-desc">No legitimate security system or support team will ever request an SMS verification code or PIN through a chat message. Ever. This rule must be stated explicitly at onboarding, reinforced in training, and included in the acceptable use policy with clear visual examples of what the attack looks like.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-content-label">Monitor for CUI leaving controlled channels <span class="cmmc-tag">AC.L2-3.1.3</span></div>
+        <div class="step-content-desc">DLP tools configured to detect CUI keywords and document types being transmitted to unauthorized destinations. Alerts on large file transfers to personal cloud storage, external email, or messaging platforms. Employees should understand what is being monitored and why — this is a security measure, not surveillance.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 07 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 07</div>
+  <h2>Conclusion — The Lock Was Perfect. They Asked for the Key.</h2>
+
+  <p>Russia did not break Signal. They did not need to. The most sophisticated cryptographic protocol in consumer messaging is irrelevant when the person holding the keys can be convinced to hand them over by a message that looks like it comes from support. This is not a new insight — social engineering has been the dominant attack vector for decades — but it lands with particular force in the context of an app that has built its entire brand on being unbreakable.</p>
+
+  <p>The lesson for the defense industrial base is not that employees should stop using encrypted messaging apps. It is that encryption is a technical control that addresses a technical threat. Social engineering is a human threat that requires a human control — training, awareness, clear policy, and approved alternatives that make compliance the path of least resistance.</p>
+
+  <p>CMMC already requires all of this. The controls exist. The framework is in place. The gap is the distance between a policy document that says "use approved communication channels" and an employee who genuinely understands why that rule exists, what a violation looks like in practice, and what to do when they receive a message from an account called "Signal Security Support."</p>
+
+  <p><strong>Final Assessment:</strong> Russian intelligence agencies are actively reading the Signal and WhatsApp conversations of government officials, military personnel, and defense-adjacent professionals right now. The encryption is working. The humans are the vulnerability. For Connecticut defense contractors in CMMC Phase 1 compliance — many still treating security awareness training as a checkbox — this campaign is a direct and current threat. The cost of addressing it is a few hours of well-designed onboarding training and a clear policy on approved communication tools. The cost of not addressing it is a Russian intelligence analyst reading conversations about engine components, submarine delivery schedules, and helicopter maintenance contracts.</p>
+
+  <div class="callout callout-red">
+    <p><strong>One rule that stops this attack:</strong> Your SMS verification code and PIN will never be requested by any legitimate support service through a chat message — ever. If any account, regardless of how official it looks, asks for this code inside Signal, WhatsApp, or any other messaging app: close the conversation, do not share the code, and report it to your security team immediately.</p>
+  </div>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">All findings in this report are based on publicly available information including the joint advisory from the Netherlands MIVD and AIVD (March 9, 2026), Google Threat Intelligence reporting, TechCrunch, NBC News, Malwarebytes, SecurityAffairs, Recorded Future News, and Infosecurity Magazine. This represents the author's independent analysis and does not reflect the views of any employer or client organization.</p>
+
+</div>
+</div>
+
+</main>
+
+<!-- AUTHOR BIO — exact Volt Typhoon style -->
+<div class="wrap">
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Consultant &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base — Electric Boat, Pratt and Whitney, Sikorsky, and their supply chains. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis with a focus on the intersection of social engineering, CMMC compliance, and nation-state threat actors targeting the defense supply chain. She is pursuing CompTIA Security+ and CMMC Registered Practitioner certification. This analysis was produced independently as a contribution to the security community's understanding of persistent nation-state threats to US critical infrastructure.</p>
+    <p class="bio-text" style="margin-top:.75rem">
+      <a href="index.html" class="back-nav-link">Portfolio</a>
+    </p>
+  </div>
+</div>
+</div>
+
+<footer>
+  <span>Signal / WhatsApp Analysis · Yana Ivanov · March 2026</span>
+  <span>Based on public reporting · For educational use · Independent analysis</span>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Log 002 — Network Traffic Analysis | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+
+.back-nav{
+  background:#0a0f1a;padding:.65rem 3rem;
+  display:flex;align-items:center;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  position:sticky;top:0;z-index:999;
+}
+.back-nav a{
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;
+  color:#4a9eff;text-decoration:none;text-transform:uppercase;
+  display:flex;align-items:center;gap:.5rem;transition:color .2s;
+}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;
+  text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--display-clean);font-size:clamp(2rem,5vw,3.2rem);font-weight:600;
+  line-height:1.15;margin-bottom:1.5rem;color:#fff}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;
+  padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;
+  color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;
+  display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#4a9eff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);
+  text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:#0a0f1a;
+  line-height:1.2;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+.code-block{
+  background:#0a0f1a;border-radius:3px;padding:1.25rem 1.5rem;
+  margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0;
+}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap}
+.code-block .prompt{color:#4a9eff}
+.code-block .comment{color:#64748b}
+.code-block .highlight{color:#4ade80}
+.code-block .warning{color:#ef4444}
+.code-block .syn{color:#fbbf24}
+.code-block .rst{color:#f87171}
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;
+  color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem;table-layout:fixed}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+.env-box{background:var(--paper);border:1px solid var(--rule);border-radius:2px;padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);
+  text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);border-radius:2px;padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:130px 1fr;gap:1rem;font-size:.92rem}
+.nist-desc{color:var(--ink3);font-size:.92rem;line-height:1.7}
+
+/* Packet anatomy diagram */
+.packet-diagram{
+  background:#0a0f1a;border-radius:3px;padding:1.5rem;margin:1.75rem 0;
+  font-family:var(--mono);font-size:.75rem;
+}
+.packet-row{display:grid;grid-template-columns:180px minmax(160px,auto) 1fr;gap:1rem;
+  padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.06);align-items:baseline}
+.packet-row:last-child{border-bottom:none}
+.packet-field{color:#94a3b8;font-size:.65rem;letter-spacing:.06em}
+.packet-value{color:#4a9eff;font-weight:600}
+.packet-meaning{color:#e2e8f0;font-size:.72rem}
+.packet-row.syn .packet-value{color:#4ade80}
+.packet-row.rst .packet-value{color:#f87171}
+.packet-header{display:grid;grid-template-columns:180px minmax(160px,auto) 1fr;gap:1rem;
+  padding:.4rem 0 .6rem;margin-bottom:.25rem;
+  border-bottom:2px solid rgba(255,255,255,.15)}
+.packet-header span{font-size:.6rem;letter-spacing:.15em;color:#64748b;text-transform:uppercase}
+
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer a{color:#4a9eff;text-decoration:none}
+footer a:hover{color:#93c5fd}
+
+@media(max-width:680px){
+  .mast-inner,.wrap{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .env-grid{grid-template-columns:1fr}
+  .nist-item{display:grid;grid-template-columns:130px 1fr;gap:1rem;font-size:.92rem}
+  .packet-row,.packet-header{grid-template-columns:1fr;gap:.15rem}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav">
+  <a href="index.html">Portfolio</a>
+</div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Security Lab Log · Entry 002</div>
+    <h1 class="title">Network Traffic Analysis — Reading the Language of Packets</h1>
+    <div class="mast-meta">
+      <div class="meta-item">
+        <div class="label">Analyst</div>
+        <div class="value">Yana Ivanov</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Date</div>
+        <div class="value">March 15, 2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Classification</div>
+        <div class="value">Public — Educational Use</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Lab Type</div>
+        <div class="value">Traffic Analysis / Blue Team</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Tools</div>
+        <div class="value">tcpdump · Nmap 7.98</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Builds On</div>
+        <div class="value">Lab Log 001 — Reconnaissance</div>
+      </div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    CONTROLLED LAB ENVIRONMENT &nbsp;·&nbsp; DOCKER BRIDGE NETWORK &nbsp;·&nbsp; NO EXTERNAL SYSTEMS CAPTURED &nbsp;·&nbsp; EDUCATIONAL PURPOSE ONLY
+  </div>
+</div>
+
+<div class="wrap">
+<div class="content">
+
+  <!-- ENVIRONMENT -->
+  <div class="section">
+    <div class="section-num">Section 01</div>
+    <h2>Lab Environment</h2>
+    <p>This lab builds directly on Lab Log 001 where network reconnaissance was performed using Nmap. Here we capture the raw network packets generated by that same scan — shifting from the attacker's view (what ports are open) to the defender's view (what does that traffic actually look like at the packet level).</p>
+
+    <div class="env-box">
+      <div class="env-box-title">Environment Configuration</div>
+      <div class="env-grid">
+        <div class="env-item">
+          <div class="env-label">Capture Host</div>
+          <div class="env-value">Kali Linux (kali-rolling) · Docker Container</div>
+        </div>
+        <div class="env-item">
+          <div class="env-label">Scan Target</div>
+          <div class="env-value">172.17.0.1 · Docker Host (macOS)</div>
+        </div>
+        <div class="env-item">
+          <div class="env-label">Capture Interface</div>
+          <div class="env-value">eth0 · Docker bridge (EN10MB)</div>
+        </div>
+        <div class="env-item">
+          <div class="env-label">Packets Captured</div>
+          <div class="env-value">20 of 206 observed</div>
+        </div>
+        <div class="env-item">
+          <div class="env-label">Capture Tool</div>
+          <div class="env-value">tcpdump · snapshot length 262144 bytes</div>
+        </div>
+        <div class="env-item">
+          <div class="env-label">Traffic Generator</div>
+          <div class="env-value">Nmap -Pn -F (fast mode, top 100 ports)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OBJECTIVE -->
+  <div class="section">
+    <div class="section-num">Section 02</div>
+    <h2>Objective</h2>
+    <p>Lab Log 001 answered the question: <em>what can an attacker see from outside?</em> This lab answers the complementary question: <em>what does that attack traffic look like from inside?</em></p>
+    <p>Network traffic analysis is a foundational blue team skill. Intrusion Detection Systems (IDS), Security Information and Event Management platforms (SIEM), and network forensics all depend on the analyst's ability to read packet captures and identify what they represent. Before you can detect an attack in traffic, you need to know what an attack looks like in traffic.</p>
+    <p>This exercise captures a live Nmap port scan at the packet level — reading the raw TCP handshake attempts that an Nmap fast-mode scan generates — and interprets what each packet field reveals about the scanner's behavior and intent.</p>
+  </div>
+
+  <!-- METHODOLOGY -->
+  <div class="section">
+    <div class="section-num">Section 03</div>
+    <h2>Methodology</h2>
+    <p>tcpdump was run in the background on interface eth0 with a 20-packet capture limit. Simultaneously, Nmap was run in fast mode against the Docker host. The combination produced 206 packets on the wire — tcpdump captured the first 20 before stopping, providing a representative sample of the scan traffic.</p>
+
+    <div class="code-label">Command — Traffic Capture + Scan</div>
+    <div class="code-block"><pre><span class="prompt">┌──(root㉿kali)-[/]
+└─# </span>tcpdump -i eth0 -n -c 20 -v & sleep 2 && nmap -Pn -F 172.17.0.1
+
+<span class="comment"># tcpdump flags:
+# -i eth0    : capture on Docker bridge interface
+# -n         : no DNS resolution (show raw IPs)
+# -c 20      : stop after 20 packets
+# -v         : verbose output (show TTL, flags, checksums)
+#
+# nmap flags:
+# -Pn        : skip host discovery ping (treat host as up)
+# -F         : fast mode (top 100 ports only)</span></pre></div>
+
+    <div class="code-label">Raw Capture Output</div>
+    <div class="code-block"><pre>tcpdump: listening on eth0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+
+<span class="syn">23:43:05.156625 IP (tos 0x0, ttl 52, id 25479, offset 0, flags [none], proto TCP (6), length 44)
+    172.17.0.2.47648 > 172.17.0.1.143: Flags [S], cksum 0x62a7 (correct), seq 3780590930, win 1024, options [mss 1460], length 0</span>
+<span class="rst">23:43:05.157015 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    172.17.0.1.143 > 172.17.0.2.47648: Flags [R.], cksum 0x7e50 (correct), seq 0, ack 3780590931, win 0, length 0</span>
+
+<span class="syn">23:43:05.157076 IP (tos 0x0, ttl 47, id 32616, offset 0, flags [none], proto TCP (6), length 44)
+    172.17.0.2.47648 > 172.17.0.1.23: Flags [S], cksum 0x631f (correct), seq 3780590930, win 1024, options [mss 1460], length 0</span>
+<span class="rst">23:43:05.157177 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    172.17.0.1.23 > 172.17.0.2.47648: Flags [R.], cksum 0x7ec8 (correct), seq 0, ack 3780590931, win 0, length 0</span>
+
+<span class="syn">23:43:05.157209 IP (tos 0x0, ttl 59, id 12029, offset 0, flags [none], proto TCP (6), length 44)
+    172.17.0.2.47648 > 172.17.0.1.135: Flags [S], cksum 0x62af (correct), seq 3780590930, win 1024, options [mss 1460], length 0</span>
+<span class="rst">23:43:05.157292 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    172.17.0.1.135 > 172.17.0.2.47648: Flags [R.], cksum 0x7e58 (correct), seq 0, ack 3780590931, win 0, length 0</span>
+
+<span class="syn">23:43:05.157306 IP (tos 0x0, ttl 53, id 44193, offset 0, flags [none], proto TCP (6), length 44)
+    172.17.0.2.47648 > 172.17.0.1.22: Flags [S], cksum 0x6320 (correct), seq 3780590930, win 1024, options [mss 1460], length 0</span>
+<span class="rst">23:43:05.157371 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    172.17.0.1.22 > 172.17.0.2.47648: Flags [R.], cksum 0x7ec9 (correct), seq 0, ack 3780590931, win 0, length 0</span>
+
+<span class="syn">23:43:05.157384 IP (tos 0x0, ttl 54, id 31202, offset 0, flags [none], proto TCP (6), length 44)
+    172.17.0.2.47648 > 172.17.0.1.995: Flags [S], cksum 0x5f53 (correct), seq 3780590930, win 1024, options [mss 1460], length 0</span>
+<span class="rst">23:43:05.157450 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    172.17.0.1.995 > 172.17.0.2.47648: Flags [R.], cksum 0x7afc (correct), seq 0, ack 3780590931, win 0, length 0</span>
+
+<span class="syn">23:43:05.157477 IP (tos 0x0, ttl 37, id 55897, offset 0, flags [none], proto TCP (6), length 44)
+    172.17.0.2.47648 > 172.17.0.1.3306: Flags [S], cksum 0x564c (correct), seq 3780590930, win 1024, options [mss 1460], length 0</span>
+<span class="rst">23:43:05.157515 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    172.17.0.1.3306 > 172.17.0.2.47648: Flags [R.], cksum 0x71f5 (correct), seq 0, ack 3780590931, win 0, length 0</span>
+
+<span class="syn">23:43:05.157542 IP (tos 0x0, ttl 43, id 35746, offset 0, flags [none], proto TCP (6), length 44)
+    172.17.0.2.47648 > 172.17.0.1.1723: Flags [S], cksum 0x5c7b (correct), seq 3780590930, win 1024, options [mss 1460], length 0</span>
+<span class="rst">23:43:05.157626 IP (tos 0x0, ttl 64, id 0, offset 0, flags [DF], proto TCP (6), length 40)
+    172.17.0.1.1723 > 172.17.0.2.47648: Flags [R.], cksum 0x7824 (correct), seq 0, ack 3780590931, win 0, length 0</span>
+
+<span class="syn">23:43:05.157648 IP (tos 0x0, ttl 37, id 42359, offset 0, flags [none], proto TCP (6), length 44)
+    172.17.0.2.47648 > 172.17.0.1.443: Flags [S], cksum 0x617b (correct), seq 3780590930, win 1024, options [mss 1460], length 0</span>
+
+20 packets captured
+206 packets received by filter
+0 packets dropped by kernel</pre></div>
+  </div>
+
+  <!-- PACKET ANATOMY -->
+  <div class="section">
+    <div class="section-num">Section 04</div>
+    <h2>Reading the Packets — Anatomy of a TCP SYN</h2>
+    <p>Every line in a tcpdump capture is a packet. Each packet contains structured fields that tell a precise story about what is happening on the network. Understanding these fields is how analysts identify normal traffic, detect anomalies, and attribute behavior to specific tools or attackers.</p>
+    <p>Below is a detailed breakdown of a single SYN packet from the capture — the probe Nmap sent to port 22 (SSH):</p>
+
+    <div class="code-label">Packet Under Analysis</div>
+    <div class="code-block"><pre><span class="syn">23:43:05.157306 IP (tos 0x0, ttl 53, id 44193, offset 0, flags [none], proto TCP (6), length 44)
+    172.17.0.2.47648 > 172.17.0.1.22: Flags [S], cksum 0x6320 (correct), seq 3780590930, win 1024, options [mss 1460], length 0</span></pre></div>
+
+    <div class="packet-diagram">
+      <div class="packet-header">
+        <span>Field</span>
+        <span>Value</span>
+        <span>What it means</span>
+      </div>
+      <div class="packet-row">
+        <span class="packet-field">Timestamp</span>
+        <span class="packet-value">23:43:05.156</span>
+        <span class="packet-meaning">Time the packet was captured. Microsecond precision. Used to reconstruct event timelines.</span>
+      </div>
+      <div class="packet-row">
+        <span class="packet-field">Protocol</span>
+        <span class="packet-value">TCP (6)</span>
+        <span class="packet-meaning">Transmission Control Protocol. Connection-oriented — requires handshake before data transfer.</span>
+      </div>
+      <div class="packet-row">
+        <span class="packet-field">TTL</span>
+        <span class="packet-value">53</span>
+        <span class="packet-meaning">Time To Live — decrements at each router hop. Nmap randomizes TTL to evade fingerprinting. A consistent TTL of 64 would suggest a local host.</span>
+      </div>
+      <div class="packet-row syn">
+        <span class="packet-field">Source</span>
+        <span class="packet-value">172.17.0.2.47648</span>
+        <span class="packet-meaning">Kali container IP + ephemeral source port 47648. Same source port used for all probes — an Nmap signature.</span>
+      </div>
+      <div class="packet-row syn">
+        <span class="packet-field">Destination</span>
+        <span class="packet-value">172.17.0.1.22</span>
+        <span class="packet-meaning">Docker host (Mac) IP + port 22 (SSH). Nmap is probing to see if SSH is running.</span>
+      </div>
+      <div class="packet-row syn">
+        <span class="packet-field">Flags [S]</span>
+        <span class="packet-value">SYN</span>
+        <span class="packet-meaning">SYN flag set — this is a connection request. The first step of the TCP three-way handshake. Nmap sends SYN without completing the handshake (SYN scan).</span>
+      </div>
+      <div class="packet-row">
+        <span class="packet-field">Window size</span>
+        <span class="packet-value">win 1024</span>
+        <span class="packet-meaning">Buffer size advertised. Normal OS connections use much larger windows (65535+). win 1024 is an Nmap fingerprint — real connections don't use this value.</span>
+      </div>
+      <div class="packet-row">
+        <span class="packet-field">MSS option</span>
+        <span class="packet-value">mss 1460</span>
+        <span class="packet-meaning">Maximum Segment Size — largest TCP payload the sender will accept. Standard Ethernet value.</span>
+      </div>
+      <div class="packet-row">
+        <span class="packet-field">Sequence number</span>
+        <span class="packet-value">seq 3780590930</span>
+        <span class="packet-meaning">Same sequence number used across all Nmap probes in this scan — another Nmap fingerprint. Real connections randomize this per connection.</span>
+      </div>
+      <div class="packet-row rst">
+        <span class="packet-field">Response Flags [R.]</span>
+        <span class="packet-value">RST+ACK</span>
+        <span class="packet-meaning">Reset + Acknowledge — the host's response to a SYN on a closed port. Means: "nothing is listening here, connection refused."</span>
+      </div>
+    </div>
+
+    <div class="callout callout-amber">
+      <p><strong>Analyst insight:</strong> Three fields alone — window size 1024, randomized TTL per packet, and identical sequence numbers across probes — are sufficient to identify this traffic as an Nmap SYN scan with high confidence, even without seeing the source IP. Modern IDS signatures detect Nmap by exactly these behavioral fingerprints.</p>
+    </div>
+  </div>
+
+  <!-- FINDINGS -->
+  <div class="section">
+    <div class="section-num">Section 05</div>
+    <h2>Findings</h2>
+
+    <h3>Finding 1 — Nmap Behavioral Fingerprint Visible in Traffic</h3>
+    <p>The capture reveals multiple Nmap-specific behavioral signatures that would trigger alerts in a properly configured IDS. The consistent source port (47648) used across all probes, the non-standard window size of 1024, and the randomized but low TTL values are all characteristic of Nmap's default SYN scan behavior.</p>
+    <p>In a real network environment, a SIEM rule as simple as "more than 10 SYN packets from the same source to different destination ports within 1 second" would generate an alert. The captured traffic shows 10 port probes in 0.001 seconds (1 millisecond) — a rate that no legitimate application produces.</p>
+
+    <h3>Finding 2 — All Ports Returned RST — Confirmed Closed</h3>
+    <p>Every SYN in the capture received a RST+ACK response. This is packet-level confirmation of what the Nmap scan reported: these ports are closed. The RST response means the TCP stack is active and responding — the host is up — but no application is listening on these ports.</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Port Probed</th>
+            <th>Service</th>
+            <th>SYN Sent</th>
+            <th>Response</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="code">143</td>
+            <td>IMAP (email)</td>
+            <td>Flags [S]</td>
+            <td>Flags [R.]</td>
+            <td class="green">Closed</td>
+          </tr>
+          <tr>
+            <td class="code">23</td>
+            <td>Telnet</td>
+            <td>Flags [S]</td>
+            <td>Flags [R.]</td>
+            <td class="green">Closed</td>
+          </tr>
+          <tr>
+            <td class="code">135</td>
+            <td>RPC (Windows)</td>
+            <td>Flags [S]</td>
+            <td>Flags [R.]</td>
+            <td class="green">Closed</td>
+          </tr>
+          <tr>
+            <td class="code">22</td>
+            <td>SSH</td>
+            <td>Flags [S]</td>
+            <td>Flags [R.]</td>
+            <td class="green">Closed</td>
+          </tr>
+          <tr>
+            <td class="code">995</td>
+            <td>POP3S (email)</td>
+            <td>Flags [S]</td>
+            <td>Flags [R.]</td>
+            <td class="green">Closed</td>
+          </tr>
+          <tr>
+            <td class="code">3306</td>
+            <td>MySQL</td>
+            <td>Flags [S]</td>
+            <td>Flags [R.]</td>
+            <td class="green">Closed</td>
+          </tr>
+          <tr>
+            <td class="code">1723</td>
+            <td>PPTP VPN</td>
+            <td>Flags [S]</td>
+            <td>Flags [R.]</td>
+            <td class="green">Closed</td>
+          </tr>
+          <tr>
+            <td class="code">443</td>
+            <td>HTTPS</td>
+            <td>Flags [S]</td>
+            <td>— (capture ended)</td>
+            <td class="amber">Unknown</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Finding 3 — ICMP Blocked — Stealth Posture</h3>
+    <p>Before the Nmap scan, a ping test was run from the Mac host to the Kali container (172.17.0.2). All 10 packets resulted in 100% packet loss — the container did not respond to ICMP echo requests. This is the default Docker container behavior: ICMP is not forwarded through the bridge without explicit configuration.</p>
+    <p>From a security perspective, this is a positive finding. A host that does not respond to ping is harder to discover passively. Attackers who rely on ping sweeps to map live hosts would not detect this container. This is sometimes called a <strong>stealth posture</strong> — the host processes traffic but does not advertise its presence.</p>
+
+    <div class="callout callout-blue">
+      <p><strong>206 packets observed vs 20 captured:</strong> tcpdump reported 206 packets received by the filter but only 20 were captured before the limit was hit. The remaining 186 packets represent the rest of the Nmap fast-mode scan across all 100 ports. The 20 captured are a representative sample — the pattern (SYN → RST) was consistent throughout.</p>
+    </div>
+  </div>
+
+  <!-- ANALYSIS -->
+  <div class="section">
+    <div class="section-num">Section 06</div>
+    <h2>Security Analysis</h2>
+
+    <h3>What This Traffic Looks Like to a Defender</h3>
+    <p>A network analyst watching this traffic in real time would see an unmistakable pattern: a single source IP sending SYN packets to sequential destination ports at machine speed with no completed handshakes. This is the textbook signature of a port scan. No legitimate application behavior produces this pattern.</p>
+    <p>In a defense contractor environment with a properly configured SIEM, this traffic would generate an alert within seconds. The alert would include the source IP, the number of ports probed, the time window, and a confidence score indicating automated scanning behavior. The SOC analyst would then investigate whether the source is internal (authorized scanner) or external (threat actor).</p>
+
+    <h3>The Defender's Advantage — Traffic Never Lies</h3>
+    <p>Logs can be deleted. Malware can be hidden. But network traffic captured at the packet level cannot be retroactively altered. This is why network forensics is a critical discipline in incident response — even after a <a href="volt_typhoon_analysis.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Volt Typhoon-style campaign</a> deletes its logs, the network capture may still contain evidence of lateral movement, command-and-control communication, and data exfiltration.</p>
+    <p>The <a href="stryker_threat_analysis.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Stryker wiper attack</a> destroyed 200,000 devices — but the network traffic generated during that destruction was still visible to anyone capturing at the perimeter. Packet capture is often the last line of forensic evidence when everything else has been destroyed.</p>
+
+    <h3>CMMC Relevance — Continuous Monitoring</h3>
+    <p>CMMC Level 2 requires organizations to monitor their networks for anomalous activity. The practical implementation of that requirement is exactly what was demonstrated here: capture traffic, analyze it, identify deviations from normal behavior. A defense contractor that cannot read a packet capture cannot demonstrate compliance with the monitoring controls — and cannot detect an intrusion when it happens.</p>
+  </div>
+
+  <!-- NIST MAPPING -->
+  <div class="section">
+    <div class="section-num">Section 07</div>
+    <h2>NIST SP 800-171 Control Mapping</h2>
+
+    <div class="nist-box">
+      <div class="nist-box-title">Applicable NIST SP 800-171 Controls</div>
+      <div class="nist-items">
+        <div class="nist-item">
+          <span class="nist-control">3.3.1</span>
+          <span class="nist-desc"><strong>Audit logging.</strong> Create and retain system audit logs to enable monitoring, analysis, investigation, and reporting. Network packet capture is the network-layer implementation of this control.</span>
+        </div>
+        <div class="nist-item">
+          <span class="nist-control">3.3.2</span>
+          <span class="nist-desc"><strong>User activity review.</strong> Ensure the actions of individual users can be traced to those users so they can be held accountable. Traffic analysis enables attribution of network activity to specific hosts and users.</span>
+        </div>
+        <div class="nist-item">
+          <span class="nist-control">3.14.6</span>
+          <span class="nist-desc"><strong>Monitor for malicious code.</strong> Monitor organizational systems to detect attacks and indicators of potential attacks. Port scan detection is a baseline implementation of this control.</span>
+        </div>
+        <div class="nist-item">
+          <span class="nist-control">3.14.7</span>
+          <span class="nist-desc"><strong>Identify unauthorized use.</strong> Identify unauthorized use of organizational systems. A port scan from an unrecognized internal IP would be identified as unauthorized activity through traffic analysis.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LESSONS LEARNED -->
+  <div class="section">
+    <div class="section-num">Section 08</div>
+    <h2>Lessons Learned</h2>
+
+    <h3>The Attacker Leaves Evidence</h3>
+    <p>The most important takeaway from this lab is that scanning activity is visible. Every SYN packet Nmap sent was captured. The tool, the technique, the target ports, the timing — all of it is preserved in the packet capture. An attacker who scans a network with tcpdump running anywhere on that network has already left evidence of their reconnaissance.</p>
+    <p>This changes how defenders think about monitoring. You don't need to catch an attacker in the act of exploitation — reconnaissance alone is detectable, and detecting reconnaissance early is the highest-value intervention in the kill chain.</p>
+
+    <h3>Packet Analysis Is a Skill, Not a Tool</h3>
+    <p>tcpdump produced 20 lines of output. Reading those 20 lines and extracting meaningful security conclusions — Nmap fingerprint, scan rate, port response pattern, stealth posture implications — required understanding TCP fundamentals, Nmap behavior, and network forensics methodology. The tool is simple. The analysis requires knowledge.</p>
+    <p>This is why CMMC consulting firms value analysts who can do both: run the tools and interpret what the output means for a client's security posture.</p>
+
+    <h3>Lab Limitations</h3>
+    <p>This capture was limited to 20 packets on an isolated Docker bridge network. Real-world traffic analysis involves millions of packets per hour across complex multi-segment networks. The fundamentals demonstrated here — flag interpretation, timing analysis, behavioral fingerprinting — apply at any scale, but production environments use dedicated capture infrastructure (full packet capture appliances, NetFlow, PCAP at network taps) rather than tcpdump on a single host.</p>
+  </div>
+
+  <!-- NEXT LAB -->
+  <div class="section">
+    <div class="section-num">Section 09</div>
+    <h2>Next Lab</h2>
+    <p>Lab Log 003 will cover <strong>password cracking fundamentals</strong> using hashcat inside the Kali container — generating password hashes, running dictionary attacks with the rockyou wordlist, and understanding why password storage and complexity requirements are a core CMMC compliance requirement. This directly supports NIST SP 800-171 Control 3.5.7 (password complexity) and maps to the credential abuse vector seen in the Stryker and Volt Typhoon cases.</p>
+
+    <div class="callout callout-blue">
+      <p><strong>Connection to portfolio research:</strong> The <a href="stryker_threat_analysis.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Stryker wiper attack</a> began with a single compromised administrative credential. Lab 003 will demonstrate how quickly weak credentials can be compromised — and why the CMMC requirement for strong authentication is not bureaucratic overhead but operational necessity.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <span>Lab Log 002 — Network Traffic Analysis &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; March 15, 2026 &nbsp;·&nbsp; Controlled lab environment &nbsp;·&nbsp; Educational use only</span>
+  <a href="index.html" style="color:#4a9eff;text-decoration:none;white-space:nowrap">← Portfolio</a>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zeek Triage — pcap IOC Analyzer | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&family=IBM+Plex+Serif:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0b0f19;--ink2:#1e2a3a;--ink3:#4a5568;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.09);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#155a32;--green-dim:rgba(21,90,50,0.09);
+  --rule:#d5cfc4;--bg:#f0ede6;--paper:#ffffff;--card:#f7f5f0;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --serif:'IBM Plex Serif',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.7;font-size:16px}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--serif);font-size:clamp(2rem,5vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:#fff}
+.mast-desc{font-family:var(--sans);font-size:.95rem;color:#94a3b8;line-height:1.75;max-width:620px;margin-bottom:2rem}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#4a9eff}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:3rem 0}
+
+/* ── TOOL STYLES ── */
+.disclaimer{background:#fef2f2;border:1px solid var(--red);border-radius:2px;padding:.85rem 1.1rem;margin-bottom:1rem;display:flex;gap:.75rem;align-items:flex-start}
+.disc-icon{font-size:1rem;flex-shrink:0;margin-top:.1rem}
+.disc-text{font-family:var(--mono);font-size:.65rem;letter-spacing:.04em;line-height:1.65;color:#7f1d1d}
+.disc-text strong{display:block;margin-bottom:.25rem;letter-spacing:.1em;text-transform:uppercase;color:var(--red)}
+.cmmc-notice{background:#fef2f2;border:2px solid var(--red);border-radius:2px;padding:.75rem 1rem;margin-bottom:1.25rem}
+.cmmc-notice p{font-family:var(--mono);font-size:.65rem;letter-spacing:.05em;color:#7f1d1d;line-height:1.65}
+.cmmc-notice strong{letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
+
+.compat-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem 1.5rem;font-family:var(--mono);font-size:.65rem;line-height:1.7;margin-bottom:1.25rem}
+.compat-label{letter-spacing:.1em;text-transform:uppercase;margin-bottom:.25rem;font-size:.6rem}
+.compat-label.good{color:var(--green)}
+.compat-label.limited{color:var(--amber)}
+.compat-item{color:#374151}
+
+.drop-zone{border:2px dashed #bfdbfe;border-radius:2px;background:#f0f7ff;padding:1.75rem 1.5rem;text-align:center;cursor:pointer;transition:background .15s,border-color .15s;position:relative}
+.drop-zone:hover,.drop-zone.dragover{background:#dbeafe;border-color:var(--blue)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-zone-icon{font-size:1.3rem;color:var(--blue);margin-bottom:.4rem}
+.drop-zone-title{font-family:var(--sans);font-size:.9rem;font-weight:600;color:var(--ink);margin-bottom:.2rem}
+.drop-zone-sub{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.06em}
+.drop-zone-file{font-family:var(--mono);font-size:.68rem;color:var(--blue);margin-top:.4rem;display:none;word-break:break-all}
+.drop-zone.has-file .drop-zone-sub{display:none}
+.drop-zone.has-file .drop-zone-file{display:block}
+.drop-zone.has-file{border-style:solid;border-color:var(--blue)}
+
+.action-row{display:flex;align-items:center;gap:.75rem;margin-top:.85rem}
+.zbtn{font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;padding:.85rem 2.25rem;border-radius:2px;border:none;cursor:pointer;transition:background .2s;display:inline-flex;align-items:center;gap:.4rem}
+.zbtn-run{background:#374151;color:#fff;pointer-events:none;opacity:.5}
+.zbtn-run.ready{background:var(--blue);pointer-events:auto;opacity:1}
+.zbtn-run.ready:hover{background:#153e80}
+.zbtn-run.ready:active{background:#0f2d5e}
+.zbtn-run.running{background:var(--blue);pointer-events:none;opacity:.7}
+.zbtn-clear{background:transparent;color:#64748b;border:1px solid var(--rule);font-size:.72rem;padding:.7rem 1.75rem}
+.zbtn-clear:hover{border-color:var(--ink);color:var(--ink)}
+.zstatus{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;color:#94a3b8}
+.zstatus.ok{color:var(--green)}.zstatus.warn{color:var(--amber)}.zstatus.running{color:var(--amber)}
+.zspinner{display:none;width:10px;height:10px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:zspin .7s linear infinite}
+.zbtn-run.running .zspinner{display:block}
+.zbtn-run.running .zrun-icon{display:none}
+@keyframes zspin{to{transform:rotate(360deg)}}
+.output-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:#94a3b8;margin:.85rem 0 .35rem}
+#zeekOutput{background:#0a0f1a;border-radius:2px;padding:1.1rem 1.4rem;font-family:var(--mono);font-size:.75rem;line-height:1.7;color:#e2e8f0;min-height:120px;max-height:500px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+#zeekOutput .placeholder{color:#334155;font-style:italic}
+.zt-red{color:#ef4444}.zt-orange{color:#fb923c}.zt-green{color:#4ade80}
+.zt-yellow{color:#fbbf24}.zt-blue{color:#60a5fa}.zt-dim{color:#475569}.zt-bold{font-weight:600}
+
+.callout{padding:1rem 1.25rem;border-radius:2px;margin:1.5rem 0;border-left:3px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout p{font-size:.88rem;color:var(--ink3);line-height:1.7;margin:0}
+.callout strong{color:var(--ink)}
+
+footer{background:#0a0f1a;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;border-top:1px solid rgba(255,255,255,.08)}
+footer a{color:#4a9eff;text-decoration:none}
+footer a:hover{color:#93c5fd}
+@media(max-width:680px){
+  .mast-inner,.wrap{padding-left:1.5rem;padding-right:1.5rem}
+  .compat-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Analyst Toolkit · Interactive Tool</div>
+    <h1 class="title">Zeek Triage — pcap IOC Analyzer</h1>
+    <p class="mast-desc">Upload a .pcap file and get an automated IOC threat report — HTTP, TLS, DHCP, and data-volume analysis with severity scoring. Runs entirely in your browser. No data leaves your machine. Built on the zeek_triage.py workflow from <a href="../labs/lab_log_006.html" style="color:#4a9eff">Lab Log 006</a>.</p>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    BROWSER-BASED · NO SERVER · NO DATA UPLOAD · TRAINING DATASETS ONLY
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+  <div class="disclaimer">
+    <span class="disc-icon">⚠️</span>
+    <div class="disc-text">
+      <strong>Training &amp; Educational Use Only</strong>
+      Do not upload pcap files containing real operational traffic, classified data, CUI, or network captures from production environments. Use only with synthetic, lab-generated, or publicly available training datasets such as malware-traffic-analysis.net.
+    </div>
+  </div>
+
+  <div class="cmmc-notice">
+    <p><strong>CMMC / DFARS Compliance Notice —</strong> Uploading pcap files from DoD contractor networks, systems processing CUI, or any environment subject to CMMC, DFARS 252.204-7012, or ITAR/EAR controls may constitute a compliance violation. This tool has not been assessed or authorized for use with controlled information. Consult your ISSO before use in any regulated context.</p>
+  </div>
+
+  <div class="compat-grid">
+    <div>
+      <div class="compat-label good">Works well with</div>
+      <div class="compat-item">HTTP-based C2 beaconing</div>
+      <div class="compat-item">Suspicious TLD domains (.su .cc .cyou .lat)</div>
+      <div class="compat-item">Dynamic DNS providers</div>
+      <div class="compat-item">KNOWN_BAD IOC matches</div>
+    </div>
+    <div>
+      <div class="compat-label limited">Limited results with</div>
+      <div class="compat-item">Pure TLS with clean domain names</div>
+      <div class="compat-item">New malware with unknown domains</div>
+      <div class="compat-item">Kerberos username extraction</div>
+      <div class="compat-item">.pcapng format (use .pcap only)</div>
+    </div>
+  </div>
+
+  <div class="drop-zone" id="zeekDrop">
+    <input type="file" id="zeekFileInput" accept=".pcap">
+    <div class="drop-zone-icon">↑</div>
+    <div class="drop-zone-title">Drop a .pcap file here</div>
+    <div class="drop-zone-sub">Training datasets only · Click to browse</div>
+    <div class="drop-zone-file" id="zeekFileName"></div>
+  </div>
+
+  <div class="action-row">
+    <button class="zbtn zbtn-run" id="zeekRunBtn">
+      <span class="zrun-icon">▶</span>
+      <span class="zspinner"></span>
+      Run Triage
+    </button>
+    <button class="zbtn zbtn-clear" onclick="zeekClear()">Clear</button>
+    <span class="zstatus" id="zeekStatus"></span>
+  </div>
+
+  <div class="output-label">Output</div>
+  <div id="zeekOutput"><span class="placeholder">Results will appear here after running triage…</span></div>
+
+  <div class="callout callout-blue" style="margin-top:2rem">
+    <p><strong>Suggested test file:</strong> Download any exercise pcap from <a href="https://malware-traffic-analysis.net/2026/index.html" target="_blank" style="color:var(--blue)">malware-traffic-analysis.net</a> — free, publicly available malware captures intended for training. The January and February 2026 Lumma Stealer exercises work especially well with this tool.</p>
+  </div>
+
+</div></div>
+
+<footer>
+  <span>Zeek Triage Tool · Yana Ivanov · Educational Use Only</span>
+  <a href="index.html">← Portfolio</a>
+</footer>
+
+<script>
+let zeekFile = null;
+
+const SUSPICIOUS_TLDS=['.su','.ru','.cc','.xyz','.top','.pw','.cyou','.lat','.tk','.ml','.ga','.cf'];
+const SAFE_HOSTS=['microsoft','windowsupdate','msocsp','google','akamai','cloudflare','office','bing','gstatic','msftconnect','msn','live','skype','azure','adobe','digicert','ocsp','apple','icloud','amazonaws','akamaitechnologies','lencr.org','pki.goog'];
+const KNOWN_BAD=['fakeurl.htm','set_agent','whitepepper.su','communicationfirewall-security.cc','holiday-forever.cc','whooptm.cyou','megafilehub','tempuri.org','duckdns.org','no-ip.com','ddns.net','hopto.org','servebeer.com','serveftp.com','myftp.biz','redirectme.net','zapto.org','sytes.net','ignorelist.com','dynamic-dns.net','chickenkiller.com','strangled.net','otzo.com','zzux.com'];
+
+function ru32(b,o){return(b[o]|b[o+1]<<8|b[o+2]<<16|b[o+3]<<24)>>>0;}
+function ru16be(b,o){return(b[o]<<8|b[o+1])>>>0;}
+function ip4(b,o){return b[o]+'.'+b[o+1]+'.'+b[o+2]+'.'+b[o+3];}
+function macS(b,o){return Array.from(b.slice(o,o+6)).map(x=>x.toString(16).padStart(2,'0')).join(':');}
+function toS(bytes){try{return new TextDecoder('latin1').decode(bytes);}catch{return '';}}
+
+function parsePcap(buf){const b=new Uint8Array(buf);const magic=ru32(b,0);if(magic!==0xa1b2c3d4&&magic!==0xd4c3b2a1)return null;const linkType=ru32(b,20);const pkts=[];let off=24;while(off+16<=b.length){const capLen=ru32(b,off+8);const start=off+16;if(start+capLen>b.length)break;pkts.push(b.slice(start,start+capLen));off=start+capLen;}return{pkts,linkType};}
+function parseHTTP(payload){const raw=toS(payload).replace(/\r\n/g,'\n');const lines=raw.split('\n');if(!lines[0])return null;const m=lines[0].match(/^(GET|POST|PUT|DELETE|HEAD|OPTIONS|PATCH)\s+(\S+)\s+HTTP/i);if(!m)return null;const method=m[1].toUpperCase(),uri=m[2];let host='';for(const l of lines.slice(1)){const hm=l.match(/^Host:\s*(.+)/i);if(hm){host=hm[1].trim();break;}}if(!host&&uri.startsWith('http')){const um=uri.match(/^https?:\/\/([^/]+)/);if(um)host=um[1];}return{method,uri,host};}
+function extractSNI(payload){try{if(payload.length<6||payload[0]!==0x16||payload[5]!==0x01)return null;let off=9;off+=2+32;if(off>=payload.length)return null;const sLen=payload[off++];off+=sLen;if(off+2>=payload.length)return null;const cLen=ru16be(payload,off);off+=2+cLen;if(off>=payload.length)return null;const compLen=payload[off++];off+=compLen;if(off+2>=payload.length)return null;const extLen=ru16be(payload,off);off+=2;const extEnd=off+extLen;while(off+4<=extEnd&&off+4<=payload.length){const eType=ru16be(payload,off);off+=2;const eLen=ru16be(payload,off);off+=2;if(eType===0){off+=2;off+=1;const nLen=ru16be(payload,off);off+=2;return toS(payload.slice(off,off+nLen));}off+=eLen;}}catch{}return null;}
+function extractDHCP(payload){try{if(payload.length<240||payload[0]!==1)return null;const clientMac=macS(payload,28);let off=240,hostname=null,assignedIp=null;while(off<payload.length){const code=payload[off++];if(code===255)break;if(code===0)continue;const len=payload[off++];if(code===12)hostname=toS(payload.slice(off,off+len));if(code===50)assignedIp=ip4(payload,off);off+=len;}return{clientMac,hostname,assignedIp};}catch{}return null;}
+
+function analyzePcap({pkts,linkType}){const httpHosts={},tlsDomains={},connBytes={};let hostInfo=null;for(const pkt of pkts){const ethOff=linkType===1?14:0;if(pkt.length<ethOff+20)continue;const ethertype=linkType===1?ru16be(pkt,12):0x0800;if(ethertype!==0x0800)continue;const ihl=(pkt[ethOff]&0x0f)*4;if(ihl<20)continue;const proto=pkt[ethOff+9];const srcIp=ip4(pkt,ethOff+12);const dstIp=ip4(pkt,ethOff+16);const totalLen=ru16be(pkt,ethOff+2);const transpOff=ethOff+ihl;if(proto===6){if(pkt.length<transpOff+20)continue;const tcpDoff=((pkt[transpOff+12]>>4)&0xf)*4;const payOff=transpOff+tcpDoff;const payload=pkt.slice(payOff);const payLen=Math.max(0,totalLen-ihl-tcpDoff);if(payLen>0)connBytes[dstIp]=(connBytes[dstIp]||0)+payLen;if(payload.length>4){const http=parseHTTP(payload);if(http&&http.host){const isSafe=SAFE_HOSTS.some(s=>http.host.toLowerCase().includes(s));if(!isSafe){if(!httpHosts[http.host])httpHosts[http.host]={host:http.host,ip:dstIp,methods:new Set(),uris:new Set(),count:0};httpHosts[http.host].methods.add(http.method);httpHosts[http.host].uris.add(http.uri);httpHosts[http.host].count++;}}const sni=extractSNI(payload);if(sni&&sni.length>2){const isSafe=SAFE_HOSTS.some(s=>sni.includes(s));if(!isSafe){for(const tld of SUSPICIOUS_TLDS){if(sni.endsWith(tld)&&!tlsDomains[sni])tlsDomains[sni]={domain:sni,ip:dstIp,tld};}}}}}if(proto===17){if(pkt.length<transpOff+8)continue;const dstPort=ru16be(pkt,transpOff+2);const payload=pkt.slice(transpOff+8);if(dstPort===67&&!hostInfo){const dhcp=extractDHCP(payload);if(dhcp)hostInfo={mac:dhcp.clientMac,hostname:dhcp.hostname||'-',ip:dhcp.assignedIp||srcIp};}}}
+const knownBadHits=[],seen=new Set();for(const[host,info]of Object.entries(httpHosts)){for(const uri of info.uris){const combined=(host+uri).toLowerCase();for(const ioc of KNOWN_BAD){if(combined.includes(ioc.toLowerCase())&&!seen.has(host)){seen.add(host);knownBadHits.push({indicator:ioc,host,ip:info.ip,source:'http'});}}}}for(const[domain]of Object.entries(tlsDomains)){for(const ioc of KNOWN_BAD){if(domain.toLowerCase().includes(ioc.toLowerCase())&&!seen.has(domain)){seen.add(domain);knownBadHits.push({indicator:ioc,host:domain,ip:tlsDomains[domain].ip,source:'tls'});}}}
+const suspIPs=new Set([...knownBadHits.map(h=>h.ip),...Object.values(httpHosts).map(h=>h.ip),...Object.values(tlsDomains).map(h=>h.ip)]);const volumes={};for(const[ip,bytes]of Object.entries(connBytes)){if(suspIPs.has(ip))volumes[ip]=bytes;}const totalSent=Object.values(volumes).reduce((s,v)=>s+v,0);const httpList=Object.values(httpHosts);const tlsList=Object.values(tlsDomains);const findings=httpList.length+tlsList.length;let severity='LOW';if(knownBadHits.length>0||totalSent>1_000_000)severity='CRITICAL';else if(totalSent>100_000||findings>3)severity='HIGH';else if(findings>0)severity='MEDIUM';return{hostInfo,knownBadHits,httpList,tlsList,volumes,totalSent,severity};}
+
+function fmtBytes(n){if(n>=1_000_000)return(n/1_000_000).toFixed(2)+' MB';if(n>=1_000)return(n/1_000).toFixed(1)+' KB';return n+' bytes';}
+function H(cls,text){return cls?'<span class="'+cls+'">'+text+'</span>':text;}
+
+function renderReport(r,filename){const{hostInfo,knownBadHits,httpList,tlsList,volumes,totalSent,severity}=r;const div='─'.repeat(54),eq='═'.repeat(54);const sevCls=severity==='CRITICAL'?'zt-red':severity==='HIGH'||severity==='MEDIUM'?'zt-orange':'';let html='';html+=H('zt-bold',eq)+'\n';html+=H('zt-bold','  ZEEK TRIAGE REPORT')+H('zt-dim',' (browser · no server)')+'\n';html+=H('zt-dim','  '+filename)+'\n';html+=H('zt-bold',eq)+'\n\n';html+=H('zt-blue','[ INFECTED HOST IDENTITY ]')+'\n'+H('zt-dim',div)+'\n';if(hostInfo){html+='  IP Address : '+hostInfo.ip+'\n';html+='  MAC Address: '+hostInfo.mac+'\n';html+='  Hostname   : '+hostInfo.hostname+'\n';}else{html+=H('zt-dim','  DHCP not found in capture')+'\n';}html+=H('zt-dim','  Username   : not available (requires Kerberos)')+'\n\n';const badCls=knownBadHits.length>0?'zt-red':'zt-blue';const badCountCls=knownBadHits.length>0?'zt-red':'';html+=H(badCls,'[ CONFIRMED MALICIOUS IOCs ]')+H('zt-dim',' — ')+H(badCountCls,knownBadHits.length+' matches')+'\n'+H('zt-dim',div)+'\n';if(knownBadHits.length>0){for(const h of knownBadHits){html+=H('zt-red','  !! MATCH  ')+H('zt-red',h.host)+'  '+H('zt-dim',h.ip)+'\n';html+=H('zt-dim','             IOC: ')+H('zt-bold',h.indicator)+H('zt-dim','  ['+h.source+']')+'\n';}}else{html+=H('zt-dim','  None found')+'\n';}html+='\n'+H('zt-blue','[ SUSPICIOUS HTTP REQUESTS ]')+H('zt-dim',' — ')+H(httpList.length>0?'zt-red':'',httpList.length+' unique hosts')+'\n'+H('zt-dim',div)+'\n';if(httpList.length>0){for(const h of httpList){const methods=[...h.methods].join(', ');html+=H(methods.includes('POST')?'zt-red':'',methods)+'  '+H('zt-red',h.host)+H('zt-dim','  ('+h.count+' requests)')+'\n';for(const uri of[...h.uris].slice(0,2)){html+=H('zt-dim','             '+(uri.length>78?uri.slice(0,78)+'...':uri))+'\n';}}}else{html+=H('zt-dim','  None found')+'\n';}html+='\n'+H('zt-blue','[ SUSPICIOUS TLS DOMAINS ]')+H('zt-dim',' — ')+H(tlsList.length>0?'zt-red':'',tlsList.length+' found')+'\n'+H('zt-dim',div)+'\n';if(tlsList.length>0){for(const h of tlsList){html+=H('zt-red',h.domain.padEnd(36))+'  '+H('zt-dim',h.ip+'  ['+h.tld+']')+'\n';}}else{html+=H('zt-dim','  None found')+'\n';}html+='\n'+H('zt-blue','[ DATA VOLUMES TO SUSPICIOUS IPs ]')+'\n'+H('zt-dim',div)+'\n';const volEntries=Object.entries(volumes).sort((a,b)=>b[1]-a[1]);if(volEntries.length>0){for(const[ip,bytes]of volEntries){html+=H('zt-bold','  '+ip)+'\n';html+='    Sent: '+H(bytes>=1_000_000?'zt-red':bytes>=100_000?'zt-orange':'',fmtBytes(bytes))+'\n';}}else{html+=H('zt-dim','  No suspicious traffic found')+'\n';}html+='\n'+H('zt-blue','[ SEVERITY SUMMARY ]')+'\n'+H('zt-dim',div)+'\n';html+='  Confirmed malicious IOCs : '+H(knownBadHits.length>0?'zt-red':'',knownBadHits.length)+'\n';html+='  Suspicious HTTP requests : '+H(httpList.length>0?'zt-red':'',httpList.length)+'\n';html+='  Suspicious TLS domains   : '+H(tlsList.length>0?'zt-red':'',tlsList.length)+'\n';html+='  Total data to suspicious : '+H(totalSent>=1_000_000?'zt-red':'zt-orange',fmtBytes(totalSent))+'\n';html+='  Overall severity         : '+H(sevCls,severity)+'\n\n';html+=H('zt-bold',eq)+'\n';html+=H('zt-dim','Browser analysis · Kerberos username unavailable · Full methodology: <a href="../labs/lab_log_006.html" style="color:#60a5fa">Lab Log 006</a>')+'\n';return html;}
+
+const drop=document.getElementById('zeekDrop');
+const fileInput=document.getElementById('zeekFileInput');
+const fileName=document.getElementById('zeekFileName');
+const runBtn=document.getElementById('zeekRunBtn');
+const statusEl=document.getElementById('zeekStatus');
+const output=document.getElementById('zeekOutput');
+
+function setFile(file){zeekFile=file;fileName.textContent=file.name;drop.classList.add('has-file');runBtn.classList.add('ready');setStatus('');}
+fileInput.addEventListener('change',()=>{if(fileInput.files[0])setFile(fileInput.files[0]);});
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('dragover');});
+drop.addEventListener('dragleave',e=>{if(!drop.contains(e.relatedTarget))drop.classList.remove('dragover');});
+drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('dragover');if(e.dataTransfer.files[0])setFile(e.dataTransfer.files[0]);});
+function setStatus(msg,cls){statusEl.textContent=msg;statusEl.className='zstatus'+(cls?' '+cls:'');}
+function zeekClear(){output.innerHTML='<span class="placeholder">Results will appear here after running triage…</span>';setStatus('');}
+runBtn.addEventListener('click',()=>{if(!zeekFile||!runBtn.classList.contains('ready'))return;runBtn.classList.add('running');runBtn.classList.remove('ready');setStatus('Parsing packets…','running');output.innerHTML='';const reader=new FileReader();reader.onload=function(e){try{const parsed=parsePcap(e.target.result);if(!parsed){output.innerHTML=H('zt-red','Error: Invalid pcap file. Only .pcap format supported.\n');runBtn.classList.remove('running');runBtn.classList.add('ready');setStatus('Error','warn');return;}output.innerHTML=renderReport(analyzePcap(parsed),zeekFile.name);output.scrollTop=0;runBtn.classList.remove('running');runBtn.classList.add('ready');setStatus('Analysis complete','ok');}catch(err){output.innerHTML=H('zt-red','Parse error: '+err.message+'\n');runBtn.classList.remove('running');runBtn.classList.add('ready');setStatus('Error','warn');}};reader.readAsArrayBuffer(zeekFile);});
+</script>
+</body>
+</html>

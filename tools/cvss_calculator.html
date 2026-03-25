@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CVSS 3.1 Score Calculator — Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&family=IBM+Plex+Serif:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0b0f19;--ink2:#1e2a3a;--ink3:#4a5568;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.09);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#155a32;--green-dim:rgba(21,90,50,0.09);
+  --rule:#d5cfc4;--bg:#f0ede6;--paper:#ffffff;--card:#f7f5f0;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --serif:'IBM Plex Serif',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.7;font-size:16px}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:960px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--serif);font-size:clamp(2rem,5vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:#fff}
+.mast-desc{font-family:var(--sans);font-size:.95rem;color:#94a3b8;line-height:1.75;max-width:620px;margin-bottom:2rem}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#4a9eff}
+.wrap{max-width:960px;margin:0 auto;padding:0 3rem}
+.content{padding:3rem 0}
+
+/* ── SCORE DISPLAY ── */
+.score-display{background:#0a0f1a;border-radius:3px;padding:2rem;margin-bottom:2.5rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:center}
+.score-circle{width:120px;height:120px;border-radius:50%;border:4px solid #1e2d45;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;transition:all .4s}
+.score-num{font-family:var(--serif);font-size:3rem;font-weight:600;line-height:1;color:#fff;transition:color .4s}
+.score-label{font-family:var(--mono);font-size:.55rem;letter-spacing:.15em;color:#64748b;text-transform:uppercase;margin-top:.2rem}
+.score-details{display:grid;gap:.5rem}
+.score-severity{font-family:var(--serif);font-size:1.8rem;font-weight:600;color:#fff;transition:color .4s}
+.score-vector{font-family:var(--mono);font-size:.72rem;color:#64748b;letter-spacing:.04em;word-break:break-all;line-height:1.6}
+.score-explanation{font-family:var(--sans);font-size:.95rem;color:#94a3b8;line-height:1.65;margin-top:.25rem}
+
+/* severity colors */
+.sev-none .score-circle{border-color:#334155}.sev-none .score-num,.sev-none .score-severity{color:#94a3b8}
+.sev-low .score-circle{border-color:#15803d}.sev-low .score-num,.sev-low .score-severity{color:#4ade80}
+.sev-medium .score-circle{border-color:#b45309}.sev-medium .score-num,.sev-medium .score-severity{color:#fbbf24}
+.sev-high .score-circle{border-color:#c2410c}.sev-high .score-num,.sev-high .score-severity{color:#fb923c}
+.sev-critical .score-circle{border-color:#991b1b}.sev-critical .score-num,.sev-critical .score-severity{color:#ef4444}
+
+/* ── METRIC GROUPS ── */
+.metric-group{background:var(--paper);border:1px solid var(--rule);border-radius:2px;margin-bottom:1.5rem;overflow:hidden}
+.group-header{padding:1rem 1.5rem .75rem;border-bottom:1px solid var(--rule)}
+.group-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.18em;color:var(--red);text-transform:uppercase;font-weight:600}
+.group-subtitle{font-family:var(--sans);font-size:.88rem;color:var(--ink3);margin-top:.3rem;line-height:1.5}
+.group-body{padding:1.25rem 1.5rem;display:grid;gap:1.25rem}
+
+/* ── METRIC ROW ── */
+.metric{display:grid;gap:.4rem}
+.metric-label{font-family:var(--serif);font-size:1rem;font-weight:600;color:var(--ink)}
+.metric-desc{font-family:var(--sans);font-size:.88rem;color:#64748b;line-height:1.55;margin-bottom:.2rem}
+.metric-options{display:flex;gap:.5rem;flex-wrap:wrap}
+.opt-btn{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;padding:.4rem .9rem;border:1px solid var(--rule);border-radius:2px;cursor:pointer;background:var(--paper);color:#64748b;transition:all .15s;white-space:nowrap}
+.opt-btn:hover{border-color:var(--ink);color:var(--ink)}
+.opt-btn.selected{background:var(--ink);color:#fff;border-color:var(--ink)}
+.opt-btn.selected.c-low{background:#145a32;border-color:#145a32}
+.opt-btn.selected.c-medium{background:#b45309;border-color:#b45309}
+.opt-btn.selected.c-high{background:#c2410c;border-color:#c2410c}
+.opt-btn.selected.c-critical{background:#991b1b;border-color:#991b1b}
+
+/* ── LEARN BOX ── */
+.learn-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.15);border-radius:2px;padding:1rem 1.25rem;margin-top:.5rem;display:none}
+.learn-box.open{display:block}
+.learn-box p{font-family:var(--sans);font-size:.92rem;color:var(--ink3);line-height:1.65;margin:0}
+.learn-box strong{color:var(--ink)}
+.learn-toggle{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;color:var(--blue);cursor:pointer;text-transform:uppercase;background:none;border:none;padding:0;margin-top:.3rem;display:inline-block}
+
+/* ── RESET ── */
+.reset-row{display:flex;align-items:center;gap:1rem;margin-bottom:2rem}
+.btn-reset{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.7rem 1.75rem;border-radius:2px;border:1px solid var(--rule);background:transparent;color:#64748b;cursor:pointer;transition:all .2s}
+.btn-reset:hover{border-color:var(--red);color:var(--red)}
+.copy-vector{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;padding:.7rem 1.75rem;border-radius:2px;border:1px solid rgba(26,79,160,.4);background:transparent;color:var(--blue);cursor:pointer;transition:all .2s}
+.copy-vector:hover{background:var(--blue-dim)}
+.copy-vector:active{background:var(--blue);color:#fff}
+
+/* ── ABOUT ── */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin:1.5rem 0}
+.about-card{background:var(--paper);border:1px solid var(--rule);padding:1.1rem;border-top:2px solid var(--blue)}
+.about-card-title{font-family:var(--serif);font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:.4rem}
+.about-card-text{font-family:var(--sans);font-size:.9rem;color:var(--ink3);line-height:1.6}
+.callout{padding:1rem 1.25rem;border-radius:2px;margin:1.5rem 0;border-left:3px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout p{font-family:var(--sans);font-size:.95rem;color:var(--ink3);line-height:1.7;margin:0}
+.callout strong{color:var(--ink)}
+
+footer{background:#0a0f1a;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;border-top:1px solid rgba(255,255,255,.08)}
+footer a{color:#4a9eff;text-decoration:none}
+@media(max-width:680px){
+  .mast-inner,.wrap{padding-left:1.5rem;padding-right:1.5rem}
+  .score-display{grid-template-columns:1fr;text-align:center}
+  .about-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Interactive Security Tool</div>
+    <h1 class="title">CVSS 3.1 Score Calculator</h1>
+    <p class="mast-desc">Calculate the severity of any vulnerability using the industry-standard Common Vulnerability Scoring System. Used by every SOC analyst, penetration tester, and vulnerability management team worldwide.</p>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    CVSS 3.1 · NIST NVD STANDARD · USED FOR EVERY CVE SCORE · EDUCATIONAL TOOL
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+  <!-- GROUP 1: EXPLOITABILITY -->
+  <div class="metric-group">
+    <div class="group-header">
+      <div class="group-title">Exploitability Metrics</div>
+      <div class="group-subtitle">How easy is it to exploit this vulnerability?</div>
+    </div>
+    <div class="group-body">
+
+      <!-- Attack Vector -->
+      <div class="metric" id="m-AV">
+        <div class="metric-label">Attack Vector (AV)</div>
+        <div class="metric-desc">How does the attacker reach the vulnerable component?</div>
+        <div class="metric-options">
+          <button class="opt-btn c-critical" data-metric="AV" data-val="N" data-label="Network" onclick="select(this)">Network</button>
+          <button class="opt-btn c-high" data-metric="AV" data-val="A" data-label="Adjacent" onclick="select(this)">Adjacent</button>
+          <button class="opt-btn c-medium" data-metric="AV" data-val="L" data-label="Local" onclick="select(this)">Local</button>
+          <button class="opt-btn c-low" data-metric="AV" data-val="P" data-label="Physical" onclick="select(this)">Physical</button>
+        </div>
+        <button class="learn-toggle" onclick="toggleLearn('learn-AV')">What does this mean? ▾</button>
+        <div class="learn-box" id="learn-AV">
+          <p><strong>Network</strong> — exploitable remotely over the internet. Most dangerous. Example: a web server vulnerability anyone can hit from anywhere.<br><br>
+          <strong>Adjacent</strong> — requires the attacker to be on the same local network or Bluetooth range. Example: WiFi attacks.<br><br>
+          <strong>Local</strong> — attacker needs local access (logged in to the machine). Example: a privilege escalation bug.<br><br>
+          <strong>Physical</strong> — attacker needs physical access to the device. Example: a USB attack.</p>
+        </div>
+      </div>
+
+      <!-- Attack Complexity -->
+      <div class="metric" id="m-AC">
+        <div class="metric-label">Attack Complexity (AC)</div>
+        <div class="metric-desc">Beyond the attacker's control — are there conditions that must exist for the attack to succeed?</div>
+        <div class="metric-options">
+          <button class="opt-btn c-high" data-metric="AC" data-val="L" data-label="Low" onclick="select(this)">Low</button>
+          <button class="opt-btn c-medium" data-metric="AC" data-val="H" data-label="High" onclick="select(this)">High</button>
+        </div>
+        <button class="learn-toggle" onclick="toggleLearn('learn-AC')">What does this mean? ▾</button>
+        <div class="learn-box" id="learn-AC">
+          <p><strong>Low</strong> — no special conditions required. The attacker can exploit it repeatedly and reliably. Most vulnerabilities are Low complexity.<br><br>
+          <strong>High</strong> — specific conditions must exist that the attacker cannot guarantee. Example: a race condition that only works sometimes, or requires a specific configuration to be present.</p>
+        </div>
+      </div>
+
+      <!-- Privileges Required -->
+      <div class="metric" id="m-PR">
+        <div class="metric-label">Privileges Required (PR)</div>
+        <div class="metric-desc">What level of access does the attacker need before exploiting?</div>
+        <div class="metric-options">
+          <button class="opt-btn c-critical" data-metric="PR" data-val="N" data-label="None" onclick="select(this)">None</button>
+          <button class="opt-btn c-medium" data-metric="PR" data-val="L" data-label="Low" onclick="select(this)">Low</button>
+          <button class="opt-btn c-low" data-metric="PR" data-val="H" data-label="High" onclick="select(this)">High</button>
+        </div>
+        <button class="learn-toggle" onclick="toggleLearn('learn-PR')">What does this mean? ▾</button>
+        <div class="learn-box" id="learn-PR">
+          <p><strong>None</strong> — unauthenticated attacker. No account needed. Most dangerous.<br><br>
+          <strong>Low</strong> — attacker needs a basic user account. Example: any logged-in user can exploit it.<br><br>
+          <strong>High</strong> — attacker needs admin or root privileges. Less common but still dangerous — admins can be compromised.</p>
+        </div>
+      </div>
+
+      <!-- User Interaction -->
+      <div class="metric" id="m-UI">
+        <div class="metric-label">User Interaction (UI)</div>
+        <div class="metric-desc">Does exploitation require action from a legitimate user?</div>
+        <div class="metric-options">
+          <button class="opt-btn c-high" data-metric="UI" data-val="N" data-label="None" onclick="select(this)">None</button>
+          <button class="opt-btn c-medium" data-metric="UI" data-val="R" data-label="Required" onclick="select(this)">Required</button>
+        </div>
+        <button class="learn-toggle" onclick="toggleLearn('learn-UI')">What does this mean? ▾</button>
+        <div class="learn-box" id="learn-UI">
+          <p><strong>None</strong> — the attacker can exploit it alone, no victim interaction needed. Example: a server-side bug.<br><br>
+          <strong>Required</strong> — a user must do something. Example: click a link, open a file, visit a page. This is the category phishing exploits fall into.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- GROUP 2: SCOPE -->
+  <div class="metric-group">
+    <div class="group-header">
+      <div class="group-title">Scope</div>
+      <div class="group-subtitle">Can the impact spread beyond the vulnerable component?</div>
+    </div>
+    <div class="group-body">
+
+      <div class="metric" id="m-S">
+        <div class="metric-label">Scope (S)</div>
+        <div class="metric-desc">Can a successful exploit affect resources beyond the vulnerable component's authorization scope?</div>
+        <div class="metric-options">
+          <button class="opt-btn c-medium" data-metric="S" data-val="U" data-label="Unchanged" onclick="select(this)">Unchanged</button>
+          <button class="opt-btn c-critical" data-metric="S" data-val="C" data-label="Changed" onclick="select(this)">Changed</button>
+        </div>
+        <button class="learn-toggle" onclick="toggleLearn('learn-S')">What does this mean? ▾</button>
+        <div class="learn-box" id="learn-S">
+          <p><strong>Unchanged</strong> — the vulnerability only affects the component being attacked. Example: a database query injection that only affects that database.<br><br>
+          <strong>Changed</strong> — exploiting the vulnerability allows impact on other components. Example: a hypervisor escape that lets a VM attack the host OS. Or a browser sandbox escape. Scope Changed vulnerabilities are significantly more dangerous and score higher.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- GROUP 3: IMPACT -->
+  <div class="metric-group">
+    <div class="group-header">
+      <div class="group-title">Impact Metrics</div>
+      <div class="group-subtitle">What is the impact on the CIA triad if exploited?</div>
+    </div>
+    <div class="group-body">
+
+      <!-- Confidentiality -->
+      <div class="metric" id="m-C">
+        <div class="metric-label">Confidentiality Impact (C)</div>
+        <div class="metric-desc">Impact on confidentiality of information resources.</div>
+        <div class="metric-options">
+          <button class="opt-btn c-low" data-metric="C" data-val="N" data-label="None" onclick="select(this)">None</button>
+          <button class="opt-btn c-medium" data-metric="C" data-val="L" data-label="Low" onclick="select(this)">Low</button>
+          <button class="opt-btn c-high" data-metric="C" data-val="H" data-label="High" onclick="select(this)">High</button>
+        </div>
+        <button class="learn-toggle" onclick="toggleLearn('learn-C')">What does this mean? ▾</button>
+        <div class="learn-box" id="learn-C">
+          <p><strong>None</strong> — no confidentiality impact. The attacker gains no information.<br><br>
+          <strong>Low</strong> — limited information disclosure. Attacker gets some data but not everything. Example: can read certain files but not all.<br><br>
+          <strong>High</strong> — total loss of confidentiality. Attacker can read all data in the component. Example: full database dump, all credentials exposed.</p>
+        </div>
+      </div>
+
+      <!-- Integrity -->
+      <div class="metric" id="m-I">
+        <div class="metric-label">Integrity Impact (I)</div>
+        <div class="metric-desc">Impact on integrity — can data be modified?</div>
+        <div class="metric-options">
+          <button class="opt-btn c-low" data-metric="I" data-val="N" data-label="None" onclick="select(this)">None</button>
+          <button class="opt-btn c-medium" data-metric="I" data-val="L" data-label="Low" onclick="select(this)">Low</button>
+          <button class="opt-btn c-high" data-metric="I" data-val="H" data-label="High" onclick="select(this)">High</button>
+        </div>
+        <button class="learn-toggle" onclick="toggleLearn('learn-I')">What does this mean? ▾</button>
+        <div class="learn-box" id="learn-I">
+          <p><strong>None</strong> — attacker cannot modify any data.<br><br>
+          <strong>Low</strong> — attacker can modify some data but the scope is limited. Example: can change their own profile but not others.<br><br>
+          <strong>High</strong> — total loss of integrity. Attacker can modify anything. Example: arbitrary code execution, full database write access.</p>
+        </div>
+      </div>
+
+      <!-- Availability -->
+      <div class="metric" id="m-A">
+        <div class="metric-label">Availability Impact (A)</div>
+        <div class="metric-desc">Impact on availability — can the service be disrupted?</div>
+        <div class="metric-options">
+          <button class="opt-btn c-low" data-metric="A" data-val="N" data-label="None" onclick="select(this)">None</button>
+          <button class="opt-btn c-medium" data-metric="A" data-val="L" data-label="Low" onclick="select(this)">Low</button>
+          <button class="opt-btn c-high" data-metric="A" data-val="H" data-label="High" onclick="select(this)">High</button>
+        </div>
+        <button class="learn-toggle" onclick="toggleLearn('learn-A')">What does this mean? ▾</button>
+        <div class="learn-box" id="learn-A">
+          <p><strong>None</strong> — no availability impact. Service continues normally.<br><br>
+          <strong>Low</strong> — reduced performance or intermittent outages. Example: attacker can slow the service but not fully stop it.<br><br>
+          <strong>High</strong> — total loss of availability. Attacker can completely shut down the service. Example: a DoS vulnerability that crashes the server.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCORE DISPLAY -->
+  <div class="score-display sev-none" id="scoreDisplay" style="margin-bottom:1.5rem">
+    <div class="score-circle" id="scoreCircle">
+      <div class="score-num" id="scoreNum">—</div>
+      <div class="score-label">Score</div>
+    </div>
+    <div class="score-details">
+      <div class="score-severity" id="scoreSeverity">—</div>
+      <div class="score-vector" id="scoreVector"></div>
+      <div class="score-explanation" id="scoreExplanation">Select one option for each metric above to calculate your score.</div>
+    </div>
+  </div>
+
+  <div class="reset-row">
+    <button class="btn-reset" onclick="resetAll()">Reset All</button>
+    <button class="copy-vector" onclick="copyVector()">Copy Vector String</button>
+  </div>
+
+  <!-- ABOUT SECTION -->
+  <div style="margin-top:3rem;padding-top:2rem;border-top:1px solid var(--rule)">
+    <h2 style="font-family:var(--display);font-size:1.5rem;font-weight:700;margin-bottom:1rem">What is CVSS?</h2>
+    <p style="font-size:1rem;color:var(--ink3);margin-bottom:1rem">The Common Vulnerability Scoring System (CVSS) is the universal standard for rating the severity of security vulnerabilities. Every CVE (Common Vulnerability and Exposure) published by NIST's National Vulnerability Database has a CVSS score. When a SOC analyst triages an alert or a security team decides what to patch first, CVSS scores drive those priority decisions.</p>
+
+    <div class="about-grid">
+      <div class="about-card">
+        <div class="about-card-title">Score Ranges</div>
+        <div class="about-card-text" style="font-family:var(--mono);font-size:.85rem;line-height:2">
+          <span style="color:#94a3b8">0.0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> None<br>
+          <span style="color:#4ade80">0.1 – 3.9</span> Low<br>
+          <span style="color:#fbbf24">4.0 – 6.9</span> Medium<br>
+          <span style="color:#fb923c">7.0 – 8.9</span> High<br>
+          <span style="color:#ef4444">9.0 – 10.0</span> Critical
+        </div>
+      </div>
+      <div class="about-card">
+        <div class="about-card-title">The CIA Triad</div>
+        <div class="about-card-text">The three Impact metrics map directly to the CIA Triad — the foundational model of information security. <strong>Confidentiality</strong> (can it be read?), <strong>Integrity</strong> (can it be modified?), <strong>Availability</strong> (can it be disrupted?). Every security control in CMMC and NIST 800-171 exists to protect one or more of these three properties.</div>
+      </div>
+    </div>
+
+    <div class="callout callout-blue">
+      <p><strong>How SOC analysts use CVSS:</strong> When a new vulnerability is disclosed, analysts check its CVSS score to decide urgency. A CVSS 9.8 Critical with Network attack vector and no privileges required gets patched immediately. A CVSS 4.2 Medium requiring physical access gets scheduled for the next maintenance window. CVSS doesn't tell you everything — context matters — but it gives every team a common language for risk prioritization.</p>
+    </div>
+
+    <div class="callout callout-amber">
+      <p><strong>CVSS limitations:</strong> CVSS scores the worst-case technical severity in isolation. It doesn't account for whether your environment is actually exposed, whether compensating controls exist, or the business impact of the specific asset. A CVSS 9.8 on a server that's air-gapped from the internet is less urgent than a CVSS 7.0 on your public-facing web application. Always combine CVSS with context.</p>
+    </div>
+  </div>
+
+</div></div>
+
+<footer>
+  <span>CVSS 3.1 Calculator · Yana Ivanov · Educational Use Only</span>
+  <a href="index.html">← Portfolio</a>
+</footer>
+
+<script>
+// ── CVSS 3.1 WEIGHTS ─────────────────────────────────
+const WEIGHTS = {
+  AV: { N: 0.85, A: 0.62, L: 0.55, P: 0.20 },
+  AC: { L: 0.77, H: 0.44 },
+  PR: {
+    U: { N: 0.85, L: 0.62, H: 0.27 },
+    C: { N: 0.85, L: 0.68, H: 0.50 }
+  },
+  UI: { N: 0.85, R: 0.62 },
+  S:  { U: 'Unchanged', C: 'Changed' },
+  C:  { N: 0.00, L: 0.22, H: 0.56 },
+  I:  { N: 0.00, L: 0.22, H: 0.56 },
+  A:  { N: 0.00, L: 0.22, H: 0.56 },
+};
+
+const LABELS = {
+  AV: { N:'Network', A:'Adjacent', L:'Local', P:'Physical' },
+  AC: { L:'Low', H:'High' },
+  PR: { N:'None', L:'Low', H:'High' },
+  UI: { N:'None', R:'Required' },
+  S:  { U:'Unchanged', C:'Changed' },
+  C:  { N:'None', L:'Low', H:'High' },
+  I:  { N:'None', L:'Low', H:'High' },
+  A:  { N:'None', L:'Low', H:'High' },
+};
+
+const EXPLANATIONS = {
+  'None':     'No security impact. This vulnerability poses no real-world risk.',
+  'Low':      'Limited impact. Requires significant conditions or has minimal consequences. Schedule for routine patching.',
+  'Medium':   'Moderate impact. Warrants attention and should be patched in the near term. Review compensating controls.',
+  'High':     'Significant impact. Prioritize patching. Likely exploitable with meaningful consequences.',
+  'Critical': 'Maximum severity. Patch immediately. Likely remotely exploitable with full impact. Used in active attacks.',
+};
+
+let selected = { AV: null, AC: null, PR: null, UI: null, S: null, C: null, I: null, A: null };
+
+function select(btn) {
+  const metric = btn.dataset.metric;
+  const val    = btn.dataset.val;
+
+  // Deselect others in same metric
+  document.querySelectorAll(`[data-metric="${metric}"]`).forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selected[metric] = val;
+  calculate();
+}
+
+function calculate() {
+  const s = selected;
+  if (Object.values(s).some(v => v === null)) {
+    updateDisplay(null);
+    return;
+  }
+
+  const scope = s.S;
+  const ISS   = 1 - (1 - WEIGHTS.C[s.C]) * (1 - WEIGHTS.I[s.I]) * (1 - WEIGHTS.A[s.A]);
+  let ISC;
+  if (scope === 'U') {
+    ISC = 6.42 * ISS;
+  } else {
+    ISC = 7.52 * (ISS - 0.029) - 3.25 * Math.pow(ISS - 0.02, 15);
+  }
+
+  const prW   = WEIGHTS.PR[scope][s.PR];
+  const ExSc  = 8.22 * WEIGHTS.AV[s.AV] * WEIGHTS.AC[s.AC] * prW * WEIGHTS.UI[s.UI];
+
+  let score;
+  if (ISC <= 0) {
+    score = 0;
+  } else if (scope === 'U') {
+    score = Math.min(ISC + ExSc, 10);
+  } else {
+    score = Math.min(1.08 * (ISC + ExSc), 10);
+  }
+
+  // Round up to 1 decimal per CVSS spec
+  score = Math.ceil(score * 10) / 10;
+  updateDisplay(score, s);
+}
+
+function updateDisplay(score, s) {
+  const display   = document.getElementById('scoreDisplay');
+  const numEl     = document.getElementById('scoreNum');
+  const sevEl     = document.getElementById('scoreSeverity');
+  const vectorEl  = document.getElementById('scoreVector');
+  const explEl    = document.getElementById('scoreExplanation');
+
+  if (score === null) {
+    display.className = 'score-display sev-none';
+    numEl.textContent = '—';
+    sevEl.textContent = 'Select all metrics below';
+    vectorEl.textContent = 'CVSS:3.1/AV:_/AC:_/PR:_/UI:_/S:_/C:_/I:_/A:_';
+    explEl.textContent = 'Answer all eight questions to calculate the CVSS base score.';
+    return;
+  }
+
+  let sev, cls;
+  if (score === 0)        { sev = 'None';     cls = 'sev-none'; }
+  else if (score <= 3.9)  { sev = 'Low';      cls = 'sev-low'; }
+  else if (score <= 6.9)  { sev = 'Medium';   cls = 'sev-medium'; }
+  else if (score <= 8.9)  { sev = 'High';     cls = 'sev-high'; }
+  else                    { sev = 'Critical'; cls = 'sev-critical'; }
+
+  display.className = 'score-display ' + cls;
+  numEl.textContent = score.toFixed(1);
+  sevEl.textContent = sev;
+  vectorEl.textContent = buildVector(s);
+  explEl.textContent = EXPLANATIONS[sev];
+}
+
+function buildVector(s) {
+  if (!s) return 'CVSS:3.1/AV:_/AC:_/PR:_/UI:_/S:_/C:_/I:_/A:_';
+  return `CVSS:3.1/AV:${s.AV||'_'}/AC:${s.AC||'_'}/PR:${s.PR||'_'}/UI:${s.UI||'_'}/S:${s.S||'_'}/C:${s.C||'_'}/I:${s.I||'_'}/A:${s.A||'_'}`;
+}
+
+function resetAll() {
+  selected = { AV:null, AC:null, PR:null, UI:null, S:null, C:null, I:null, A:null };
+  document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+  updateDisplay(null);
+}
+
+function copyVector() {
+  const vec = document.getElementById('scoreVector').textContent;
+  navigator.clipboard.writeText(vec).then(() => {
+    const btn = document.querySelector('.copy-vector');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+function toggleLearn(id) {
+  const box = document.getElementById(id);
+  box.classList.toggle('open');
+  const btn = box.previousElementSibling;
+  btn.textContent = box.classList.contains('open')
+    ? btn.textContent.replace('▾','▴')
+    : btn.textContent.replace('▴','▾');
+}
+</script>
+</body>
+</html>

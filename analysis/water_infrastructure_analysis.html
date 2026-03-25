@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Open Tap — When Water Becomes a Weapon | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* NAV */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* MASTHEAD */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* WRAP */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* CALLOUTS */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* TABLES */
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:1.5rem 0}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--red)}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);margin:2rem 0;border:1px solid var(--rule)}
+.stat-box{background:var(--paper);padding:1.5rem 1.2rem;text-align:center}
+.stat-icon{font-size:1.6rem;color:var(--red);line-height:1;margin-bottom:.4rem}
+.stat-icon .material-icons{font-size:2rem}
+.stat-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;margin-bottom:.5rem}
+.stat-num{font-family:var(--display-clean);font-size:1.6rem;font-weight:700;color:var(--red);line-height:1;margin-bottom:.3rem}
+.stat-desc{font-size:.85rem;color:var(--ink3);line-height:1.5}
+
+/* FIGURE */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.88rem;color:var(--ink3);font-style:italic}
+
+/* ATTACK FLOW */
+.attack-flow{display:grid;grid-template-columns:repeat(5,1fr);gap:.75rem;margin:1rem 0}
+.flow-step{background:var(--bg);border:1px solid var(--rule);padding:1rem .75rem;text-align:center;position:relative}
+.flow-step::after{content:'→';position:absolute;right:-1.1rem;top:50%;transform:translateY(-50%);
+  font-size:.9rem;color:#94a3b8;z-index:2;font-family:var(--mono)}
+.flow-step:last-child::after{display:none}
+.flow-step-num{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+.flow-step-icon{margin-bottom:.4rem;color:var(--ink3)}
+.flow-step-icon .material-icons{font-size:1.4rem}
+.flow-step-label{font-size:.75rem;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:.3rem;font-family:var(--mono)}
+.flow-step-desc{font-size:.78rem;color:var(--ink3);line-height:1.5}
+.flow-step.danger{background:var(--red-dim);border-color:rgba(192,57,43,.25)}
+.flow-step.danger .flow-step-num{color:var(--red)}
+.flow-step.danger .flow-step-icon{color:var(--red)}
+.flow-step.warning{background:var(--amber-dim);border-color:rgba(180,83,9,.25)}
+.flow-step.warning .flow-step-num{color:var(--amber)}
+
+/* SPLIT VISUAL */
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;
+  margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel p{font-size:.92rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+
+/* CONTROL LIST */
+.control-list{margin:1.5rem 0}
+.control-item{display:grid;grid-template-columns:1fr auto;gap:1rem;padding:1rem 1rem;border-bottom:1px solid var(--rule);align-items:start}
+.control-item:first-child{border-top:1px solid var(--rule)}
+.control-item:last-child{border-bottom:none}
+.control-vector{font-size:1rem;color:var(--ink);font-weight:600;margin-bottom:.3rem;font-family:var(--serif)}
+.control-name{font-size:.95rem;color:var(--ink3);margin-bottom:.3rem;line-height:1.6}
+.control-id{font-family:var(--mono);font-size:.7rem;color:var(--red);letter-spacing:.06em}
+.control-right{text-align:right;flex-shrink:0}
+.control-gap{font-family:var(--mono);font-size:.7rem;padding:.25rem .6rem;border-radius:1px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.gap-critical{background:var(--red-dim);color:var(--red)}
+.gap-high{background:var(--amber-dim);color:var(--amber)}
+.gap-none{background:var(--green-dim);color:var(--green)}
+
+/* STEP LIST */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;
+  justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.92rem;color:var(--ink3);line-height:1.7}
+.cmmc-tag{display:inline-block;font-family:var(--mono);font-size:.58rem;padding:.15rem .45rem;
+  background:var(--red-dim);color:var(--red);border:1px solid rgba(192,57,43,.2);
+  text-transform:uppercase;letter-spacing:.06em;margin-left:.4rem;vertical-align:middle}
+
+/* TIMELINE */
+.timeline{margin:1.5rem 0;position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:.45rem;top:0;bottom:0;width:2px;background:var(--rule)}
+.tl-item{position:relative;margin-bottom:1.25rem;padding-left:1.25rem}
+.tl-item::before{content:'';position:absolute;left:-1.6rem;top:.4rem;width:10px;height:10px;
+  border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tl-item.amber::before{background:var(--amber)}
+.tl-item.green::before{background:var(--green)}
+.tl-date{font-family:var(--mono);font-size:.62rem;color:var(--red);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem}
+.tl-item.amber .tl-date{color:var(--amber)}
+.tl-item.green .tl-date{color:var(--green)}
+.tl-title{font-weight:700;color:var(--ink);font-size:.9rem;margin-bottom:.2rem;font-family:var(--display)}
+.tl-desc{font-size:.92rem;color:var(--ink3);line-height:1.7}
+
+/* SCENARIO CLOCK */
+.scenario-clock{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--rule);margin:2rem 0;border:1px solid var(--rule);align-items:stretch;overflow:hidden}
+.clock-box{background:var(--paper);padding:1.4rem 1rem;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
+.clock-time{font-family:var(--mono);font-size:1.1rem;font-weight:600;color:var(--red);margin-bottom:.3rem;white-space:nowrap}
+.clock-time.amber{color:var(--amber)}
+.clock-time.dark{color:var(--red)}
+.clock-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;margin-bottom:.4rem}
+.clock-icon{margin-bottom:.35rem}
+.clock-icon .material-icons{font-size:1.5rem;color:var(--red);display:block}
+.clock-icon.amber .material-icons{color:var(--amber)}
+.clock-desc{font-size:.85rem;color:var(--ink3);line-height:1.5;text-align:center}
+
+/* SCALE COMPARISON */
+.scale-compare{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:2rem 0}
+.scale-panel{background:var(--paper);border:1px solid var(--rule);padding:1.5rem}
+.scale-panel.small{border-top:3px solid var(--amber)}
+.scale-panel.large{border-top:3px solid var(--red)}
+.scale-header{display:flex;align-items:center;gap:.6rem;margin-bottom:.85rem}
+.scale-header .material-icons{font-size:1.4rem}
+.scale-panel.small .scale-header .material-icons{color:var(--amber)}
+.scale-panel.large .scale-header .material-icons{color:var(--red)}
+.scale-location{font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--ink);letter-spacing:.06em}
+.scale-sublabel{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.08em;text-transform:uppercase;margin-top:.1rem}
+.scale-stat{margin:.6rem 0}
+.scale-stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1}
+.scale-panel.small .scale-stat-num{color:var(--amber)}
+.scale-panel.large .scale-stat-num{color:var(--red)}
+.scale-stat-label{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.08em;text-transform:uppercase;margin-top:.1rem}
+.scale-divider{border:none;border-top:1px solid var(--rule);margin:.85rem 0}
+.scale-note{font-size:.88rem;color:var(--ink3);line-height:1.6}
+
+/* CONSEQUENCE GRID */
+.consequence-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.75rem 0}
+.consequence-box{background:var(--paper);border:1px solid var(--rule);padding:1.2rem;border-top:3px solid var(--red)}
+.consequence-box.amber{border-top-color:var(--amber)}
+.consequence-icon .material-icons{font-size:1.6rem;color:var(--red);display:block;margin-bottom:.5rem}
+.consequence-box.amber .consequence-icon .material-icons{color:var(--amber)}
+.consequence-label{font-family:var(--mono);font-size:.65rem;font-weight:600;color:var(--ink);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.4rem}
+.consequence-desc{font-size:.88rem;color:var(--ink3);line-height:1.6}
+
+/* POLICY GAP TABLE */
+.gap-table{margin:1.5rem 0}
+.gap-row{display:grid;grid-template-columns:320px 1fr auto;gap:0;padding:0;border-bottom:1px solid var(--rule);align-items:start;font-size:.9rem}
+.gap-row.header{background:#0a0f1a;color:#fff;font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;border-bottom:none;align-items:center}
+.gap-row.header span{color:#e2e8f0;text-align:left;display:block;padding:.75rem 1rem}
+.gap-row.header span:nth-child(2){padding-left:1rem}
+.gap-header-mid{padding-left:1rem !important}
+.gap-threat{color:var(--ink);font-weight:600;text-align:left;padding:.9rem 1rem}
+.gap-coverage{color:var(--ink3);font-size:.88rem;text-align:left;line-height:1.6;display:block;padding:.9rem 1rem}
+.gap-badge{font-family:var(--mono);font-size:.65rem;padding:.25rem .6rem;border-radius:1px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;margin:.9rem 1rem 0 0;display:block}
+.badge-none{background:var(--red-dim);color:var(--red)}
+.badge-partial{background:var(--amber-dim);color:var(--amber)}
+.badge-covered{background:var(--green-dim);color:var(--green)}
+
+/* BIO */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:4rem}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;
+  display:flex;align-items:center;justify-content:center;font-family:var(--display);
+  font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* FOOTER */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding:0 1.5rem}
+  .back-nav{padding-top:.9rem;padding-bottom:.9rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .split-visual{grid-template-columns:1fr}
+  .attack-flow{grid-template-columns:1fr}
+  .flow-step::after{display:none}
+  .scenario-clock{grid-template-columns:1fr 1fr}
+  .scale-compare{grid-template-columns:1fr}
+  .consequence-grid{grid-template-columns:1fr}
+  .gap-row{grid-template-columns:1fr;gap:.4rem}
+  .gap-row.header{display:none}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Critical Infrastructure Analysis · Water Security · Nation-State Threats</div>
+    <h1 class="title">The Open Tap —<br><em>When Water Becomes a Weapon</em></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">March 17, 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Threat Type</div><div class="value">ICS / SCADA / Water Supply</div></div>
+      <div class="meta-item"><div class="label">Confirmed Cases</div><div class="value">Ukraine 2015 · Florida 2021</div></div>
+      <div class="meta-item"><div class="label">Severity</div><div class="value">Critical — Structural Gap</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    <span>EPA HAS NO STATUTORY AUTHORITY TO MANDATE WATER CYBERSECURITY &nbsp;·&nbsp; 70% OF UTILITIES FAILED BASIC STANDARDS &nbsp;·&nbsp; 9 MILLION PEOPLE SERVED BY A SINGLE UNFILTERED SYSTEM &nbsp;·&nbsp; MARCH 2026</span>
+  </div>
+</header>
+
+<main>
+
+<!-- SECTION 01 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>On December 23, 2015, a Russian intelligence unit logged into a Ukrainian power company's control system and switched off 30 substations. 225,000 people lost electricity in the middle of winter. The lights came back on in six hours — but Russian hackers had already learned something important: critical infrastructure runs on the same software as any other organization, is often connected to the internet, and is operated by humans who can be deceived.</p>
+
+  <p>On February 5, 2021, a hacker accessed the water treatment system of Oldsmar, Florida — a city of 15,000 people — and raised the level of sodium hydroxide from 100 parts per million to 11,100 parts per million. The attack was caught by an alert operator who was watching his screen. An attacker targeting a system with no one watching would have had 24 to 36 hours before anyone noticed the water had been poisoned. For Oldsmar, the number of people at risk was 15,000. For New York City, using the same type of attack against the same type of system, the number is 9 million.</p>
+
+  <p><strong>Defining Assessment:</strong> This is not a hypothetical. The attack method has been demonstrated. The infrastructure is documented and publicly described. The regulatory gap is real and confirmed. What has not happened yet is a sophisticated nation-state actor targeting a major US water system with the intent to cause mass casualties. What is unclear is whether that is because the capability does not exist, or because no one has decided to use it yet.</p>
+
+  <div class="stat-grid">
+    <div class="stat-box">
+      <div class="stat-icon"><span class="material-icons">water_drop</span></div>
+      <div class="stat-label">NYC Daily Volume</div>
+      <div class="stat-num">1.1B</div>
+      <div class="stat-desc">Gallons per day — the largest unfiltered water supply in the United States</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon"><span class="material-icons">people</span></div>
+      <div class="stat-label">Population Served</div>
+      <div class="stat-num">9M+</div>
+      <div class="stat-desc">People — nearly half the population of all of New York State</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon"><span class="material-icons">filter_alt_off</span></div>
+      <div class="stat-label">Unfiltered Supply</div>
+      <div class="stat-num">90%</div>
+      <div class="stat-desc">Of NYC water is disinfected but not filtered — the largest such exemption in the US</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon"><span class="material-icons">gavel</span></div>
+      <div class="stat-label">Mandatory Cyber Rules</div>
+      <div class="stat-num">0</div>
+      <div class="stat-desc">EPA has no statutory authority to mandate cybersecurity for water utilities</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>Confirmed — What Russia Did in Ukraine</h2>
+
+  <p>Ukraine is the most documented case study in critical infrastructure attack. Beginning in 2015, Russian intelligence services used it as a live testing environment. The attacks were real, the effects were documented by US government investigators, and the techniques were published — because what works in Ukraine almost always translates elsewhere.</p>
+
+  <h3>The 2015 Power Grid Attack — First Confirmed Cyberattack on a Power Grid in History</h3>
+  <p>In the months before the attack, Russian hackers gained access to Ukrainian power company networks through spear-phishing emails containing malicious Microsoft Word attachments — the same technique used in countless corporate intrusions. They moved quietly through corporate networks until they reached the Industrial Control Systems. Then, on December 23, 2015, they acted.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 1 — The 2015 Ukraine Grid Attack: How It Unfolded</div>
+    <div class="figure-body">
+      <div class="attack-flow">
+        <div class="flow-step">
+          <div class="flow-step-num">Stage 01</div>
+          <div class="flow-step-icon"><span class="material-icons">email</span></div>
+          <div class="flow-step-label">Spear-Phish Entry</div>
+          <div class="flow-step-desc">Malicious Word docs delivered to corporate network — BlackEnergy 3 installed</div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-step-num">Stage 02</div>
+          <div class="flow-step-icon"><span class="material-icons">manage_search</span></div>
+          <div class="flow-step-label">Months of Recon</div>
+          <div class="flow-step-desc">Lateral movement — operators watched, credentials harvested, ICS mapped</div>
+        </div>
+        <div class="flow-step warning">
+          <div class="flow-step-num">Stage 03</div>
+          <div class="flow-step-icon"><span class="material-icons">toggle_off</span></div>
+          <div class="flow-step-label">30 Substations Off</div>
+          <div class="flow-step-desc">SCADA systems seized — breakers opened remotely across three companies simultaneously</div>
+        </div>
+        <div class="flow-step danger">
+          <div class="flow-step-num">Stage 04</div>
+          <div class="flow-step-icon"><span class="material-icons">phone_disabled</span></div>
+          <div class="flow-step-label">Cover &amp; Chaos</div>
+          <div class="flow-step-desc">KillDisk wipes servers; call center flooded with denial-of-service to block alerts</div>
+        </div>
+        <div class="flow-step danger">
+          <div class="flow-step-num">Stage 05</div>
+          <div class="flow-step-icon"><span class="material-icons">dark_mode</span></div>
+          <div class="flow-step-label">225,000 Without Power</div>
+          <div class="flow-step-desc">Mid-winter. 1–6 hours darkness. Manual restoration only — digital controls destroyed</div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">This was the first publicly confirmed successful cyberattack on a power grid in history. It has since been replicated and improved upon.</div>
+  </div>
+
+  <h3>The 2016 Escalation — Designed for Permanent Damage</h3>
+  <p>A year later, Russian hackers returned with Industroyer — a new malware built specifically for industrial control systems. The 2016 Kyiv attack cut one-fifth of the capital's power consumption. But investigators noted something more alarming than the outage itself: the attack was designed not just to turn the power off, but to physically destroy the equipment used to turn it back on. When operators attempted to restore power, the malware was configured to trigger conditions that would damage the station hardware — making the attack potentially weeks-long rather than hours-long. An operator caught the error in time.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The escalation pattern matters:</strong> 2015 was disruption — turn off the lights, restore them, send a message. 2016 was designed for permanent damage — destroy the hardware, make restoration impossible. A nation-state actor targeting US water infrastructure would not necessarily be interested in a short disruption. The intent could be to make restoration take weeks.</p>
+  </div>
+
+  <div class="split-visual">
+    <div class="split-panel left">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">check_circle</span>What Ukraine Had Working For It</div>
+      <p>Manual backup controls were still installed — operators could restore power physically when digital controls were destroyed.</p>
+      <p>Infrastructure was old Soviet equipment that Russian hackers knew intimately — but the age also meant analog fallbacks existed.</p>
+      <p>Western cybersecurity firms (ESET, Microsoft) helped Ukraine respond to the 2022 follow-on attacks before they succeeded.</p>
+      <p>Power came back within hours to days. No confirmed casualties directly attributed to the outages.</p>
+    </div>
+    <div class="split-panel right">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">cancel</span>What the US Does Not Have</div>
+      <p>Many US utilities have replaced analog backup controls with digital systems — in some cases, manual restoration is no longer possible without the control software.</p>
+      <p>Water contamination cannot be "switched back on" — once chemical levels are altered and the water reaches distribution, reversal requires flushing the entire network.</p>
+      <p>No mandatory cybersecurity standards for water utilities. Compliance is voluntary. The EPA cannot compel improvements.</p>
+      <p>An attack on NYC water at Oldsmar scale would not resolve in 6 hours. It would affect 9 million people over days.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>The Florida Proof of Concept — Oldsmar 2021</h2>
+
+  <p>In February 2021, an unknown attacker accessed the water treatment control system of Oldsmar, Florida using remote desktop software that was already installed and authorized on the system. The access did not trigger any alerts because the tool was a legitimate one. The operator whose computer was accessed noticed the intrusion because he was watching his screen at the moment a cursor began moving on its own.</p>
+
+  <p>Over three to five minutes, the attacker navigated the control interface — learned it in real time — and located the sodium hydroxide dosing controls. They changed the setting from 100 parts per million to 11,100 parts per million: 111 times the normal level. <strong>Sodium hydroxide is the primary ingredient in drain cleaner.</strong> At those concentrations, the water would cause chemical burns to the mouth, throat, esophagus, and stomach of anyone who drank it. The operator reversed the change immediately. But if he had not been watching — if this had happened at 3am, or if the operator had stepped away — the window before anyone noticed would have been 24 to 36 hours. By then, the water would already be in the distribution network.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Note on the Oldsmar investigation:</strong> Subsequent reporting raised questions about whether the intrusion was an external attack or an internal error. The FBI investigation was inconclusive, and a former city manager later described it as a possible employee mistake. What is not disputed: the control system was remotely accessible, the chemical change happened, and the only thing that caught it was an operator watching at the right moment. The vulnerability demonstrated is real regardless of the source.</p>
+  </div>
+
+  <h3>What the Chemistry Means in Plain Terms</h3>
+
+  <div class="consequence-grid">
+    <div class="consequence-box">
+      <div class="consequence-icon"><span class="material-icons">science</span></div>
+      <div class="consequence-label">Normal Level</div>
+      <div class="consequence-desc">Sodium hydroxide at 100 ppm is used to control water acidity and prevent pipe corrosion. At this level, it is safe and tasteless — necessary for water quality.</div>
+    </div>
+    <div class="consequence-box amber">
+      <div class="consequence-icon"><span class="material-icons">warning</span></div>
+      <div class="consequence-label">Attacked Level: 11,100 ppm</div>
+      <div class="consequence-desc">At 111× normal concentration, water becomes strongly alkaline. pH rises dangerously. The substance is functionally drain cleaner delivered through every tap in the service area.</div>
+    </div>
+    <div class="consequence-box">
+      <div class="consequence-icon"><span class="material-icons">local_hospital</span></div>
+      <div class="consequence-label">Human Effects</div>
+      <div class="consequence-desc">Symptoms of sodium hydroxide poisoning: chemical burns to mouth and throat, severe abdominal pain, vomiting, breathing difficulty, lung inflammation, and potential vision loss.</div>
+    </div>
+    <div class="consequence-box">
+      <div class="consequence-icon"><span class="material-icons">water</span></div>
+      <div class="consequence-label">Tasteless Until Too Late</div>
+      <div class="consequence-desc">At moderately elevated pH, water is not obviously different in taste or appearance. A person drinking from the tap would have no immediate indication something was wrong.</div>
+    </div>
+    <div class="consequence-box amber">
+      <div class="consequence-icon"><span class="material-icons">timer</span></div>
+      <div class="consequence-label">Detection Window</div>
+      <div class="consequence-desc">24–36 hours for water to reach the distribution network. Once distributed, contaminated water is in pipes, storage tanks, and buildings — flushing the entire system takes days.</div>
+    </div>
+    <div class="consequence-box">
+      <div class="consequence-icon"><span class="material-icons">people</span></div>
+      <div class="consequence-label">Oldsmar vs NYC Scale</div>
+      <div class="consequence-desc">Oldsmar serves 15,000 people. NYC's Catskill/Delaware system serves 9 million people with 90% unfiltered water. Same attack method — 600× the impact.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>New York City — Why This System, Why These Numbers</h2>
+
+  <p>New York City's water supply is not Niagara Falls — but it is one of the largest and most consequential pieces of infrastructure in the United States. The system delivers 1.1 billion gallons of drinking water per day to 8.5 million city residents and approximately 1 million people in surrounding counties — a total of over 9 million people. This represents nearly half the population of all of New York State.</p>
+
+  <p>The source is the Catskill and Delaware watershed system — 19 reservoirs and three controlled lakes spanning 2,000 square miles of upstate New York, connected to the city by gravity-fed aqueducts running up to 125 miles. The Catskill/Delaware system alone provides 88–90% of the city's daily water. And here is the detail that matters for a threat scenario: <strong>90% of that water is not filtered.</strong> It is treated only with chlorine and ultraviolet disinfection. The system received a federal waiver from filtration requirements based on the quality of its protected watershed. That waiver has been in place since 1997.</p>
+
+  <div class="scale-compare">
+    <div class="scale-panel small">
+      <div class="scale-header">
+        <span class="material-icons">location_city</span>
+        <div>
+          <div class="scale-location">OLDSMAR, FLORIDA — 2021</div>
+          <div class="scale-sublabel">Confirmed attack target</div>
+        </div>
+      </div>
+      <div class="scale-stat">
+        <div class="scale-stat-num">15,000</div>
+        <div class="scale-stat-label">Population served</div>
+      </div>
+      <div class="scale-stat">
+        <div class="scale-stat-num">~1M gal</div>
+        <div class="scale-stat-label">Estimated daily volume</div>
+      </div>
+      <hr class="scale-divider">
+      <div class="scale-note">Attacker gained access via TeamViewer remote desktop. Caught by an operator watching his screen. Investigation inconclusive on whether external or internal. Chemical change reversed in under 5 minutes.</div>
+    </div>
+    <div class="scale-panel large">
+      <div class="scale-header">
+        <span class="material-icons">location_city</span>
+        <div>
+          <div class="scale-location">NEW YORK CITY — CATSKILL / DELAWARE</div>
+          <div class="scale-sublabel">Largest unfiltered supply in the US</div>
+        </div>
+      </div>
+      <div class="scale-stat">
+        <div class="scale-stat-num">9,000,000+</div>
+        <div class="scale-stat-label">Population served</div>
+      </div>
+      <div class="scale-stat">
+        <div class="scale-stat-num">1.1 billion gal</div>
+        <div class="scale-stat-label">Daily volume — 90% unfiltered</div>
+      </div>
+      <hr class="scale-divider">
+      <div class="scale-note">90% of daily supply passes through disinfection only — no filtration. Water is tested at 50 monitoring stations daily. A chemical manipulation at the treatment stage would need to register before the water is distributed — within the same 24–36 hour window.</div>
+    </div>
+  </div>
+
+  <h3>The Unfiltered Supply — Understanding the Exemption</h3>
+  <p>Most cities filter their drinking water through physical filtration systems that remove pathogens, chemicals, and contaminants that survive disinfection. New York City received a federal waiver allowing it to skip this step because its watershed is unusually well-protected — largely forested, with strict development restrictions and extensive monitoring. The city invested approximately $1 billion in watershed protection programs to maintain this exemption.</p>
+
+  <p>What this means for a threat scenario: the Catskill/Delaware water passes through ultraviolet disinfection and chlorination, then travels directly into the distribution network. A chemical intervention at the treatment stage — increasing a dosing chemical to dangerous levels, as demonstrated in Florida — would not be caught by a filtration barrier because no filtration barrier exists for 90% of the supply. Detection depends on water quality sensors and human monitoring.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The monitoring reality:</strong> NYC DEP tests water at 50 monitoring stations daily. But daily testing means the interval between checks can be up to 24 hours — precisely the same window an attacker would have to work in. Real-time chemical sensors exist at treatment facilities, but a sophisticated attacker with SCADA access could potentially manipulate sensor readings alongside dosing controls — as Russia demonstrated was possible in Ukraine's power systems.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>The Scenario — Hour by Hour</h2>
+
+  <p>This is not speculation. Every step of the following scenario is drawn from documented events: the Oldsmar attack method, the Sandworm reconnaissance model from Ukraine, and the confirmed characteristics of the NYC water system. What follows is what a plausible attack looks like if a sophisticated nation-state actor decided to execute it.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 2 — Scenario Timeline: A Nation-State Attack on NYC Water</div>
+    <div class="figure-body">
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-date">Months Before — Reconnaissance Phase</div>
+          <div class="tl-title">Initial Access — Corporate Network</div>
+          <div class="tl-desc">Spear-phishing email targets an IT administrator at the NYC Department of Environmental Protection. Malware is installed on a corporate workstation. Attackers spend weeks or months mapping the network — identical to the Ukraine power grid playbook. They identify the OT (Operational Technology) network segments that control treatment systems.</div>
+        </div>
+        <div class="tl-item amber">
+          <div class="tl-date">Weeks Before — Staging Phase</div>
+          <div class="tl-title">SCADA Credentials Harvested</div>
+          <div class="tl-desc">Operators' credentials are captured through keyloggers or credential-harvesting tools. Attackers study the Human-Machine Interface — learn the layout, the controls, the dosing systems — without triggering any alerts. Remote access tools are staged. They know exactly where the sodium hydroxide or chlorine controls are before they act.</div>
+        </div>
+        <div class="tl-item amber">
+          <div class="tl-date">Day 0 — 3:00 AM</div>
+          <div class="tl-title">Attack Initiated at Night Shift Minimum</div>
+          <div class="tl-desc">Skeleton crew on shift. Attack begins during the lowest-attention window. Chemical dosing controls are accessed. Concentrations are raised to dangerous levels across multiple treatment points simultaneously — not just one facility. Sensor data is optionally manipulated to show normal readings.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Day 0 — 3:00 AM to 6:00 AM</div>
+          <div class="tl-title">Contaminated Water Enters Distribution</div>
+          <div class="tl-desc">The altered water begins moving through the aqueduct and distribution network. At this stage, the contamination is already in transit. Even if the attack is discovered now, water already in the pipeline cannot be recalled — it must be flushed through. The 1.1 billion gallon daily volume means hundreds of millions of gallons are already compromised.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Day 0 — 6:00 AM to Noon</div>
+          <div class="tl-title">Morning Demand Spike — Maximum Distribution</div>
+          <div class="tl-desc">Morning peak demand. Millions of people brush their teeth, make coffee, fill glasses of water. Symptoms of mild sodium hydroxide exposure — throat irritation, stomach discomfort — may initially be attributed to illness. There is no visible indicator in the water. Emergency services begin receiving calls, but the pattern is not yet recognized as an attack.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Day 0 — Noon onwards</div>
+          <div class="tl-title">Discovery and Cascade Begins</div>
+          <div class="tl-desc">A monitor or physical inspection detects the chemical anomaly. Emergency orders are issued to stop using tap water. But the water is already in millions of building storage tanks, restaurant kitchens, hospital systems, and dialysis centers — which require ultra-pure water continuously. Boil-water notices are useless for a chemical contaminant — boiling concentrates alkaline chemicals, it does not remove them.</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="figure-caption">Each stage is documented in real-world precedents. Nothing in this scenario requires a capability that has not already been demonstrated.</div>
+  </div>
+
+  <h3>The 24-36 Hour Window Is the Threat</h3>
+  <p>In Oldsmar, the attack was caught because an operator was watching his screen at the exact moment it happened. That is the only control that worked. In a sophisticated attack with credential access, sensor manipulation, and nighttime execution, that control does not exist. The 24-36 hour window before water reaches taps is not a safety margin — it is the attack window. By the time the contamination is confirmed and traceable, the distribution is already complete.</p>
+
+  <div class="scenario-clock">
+    <div class="clock-box">
+      <div class="clock-label">Contamination Initiated</div>
+      <div class="clock-icon"><span class="material-icons">bedtime</span></div>
+      <div class="clock-time">T+0</div>
+      <div class="clock-desc">3:00 AM. Night shift. No alert. Chemical levels altered at treatment stage.</div>
+    </div>
+    <div class="clock-box">
+      <div class="clock-label">Water in Distribution</div>
+      <div class="clock-icon amber"><span class="material-icons">water</span></div>
+      <div class="clock-time amber">T+6h</div>
+      <div class="clock-desc">Water enters distribution network. Hundreds of millions of gallons in transit. No recall possible.</div>
+    </div>
+    <div class="clock-box">
+      <div class="clock-label">Peak Exposure</div>
+      <div class="clock-icon"><span class="material-icons">people</span></div>
+      <div class="clock-time">T+9h</div>
+      <div class="clock-desc">Morning demand spike. Maximum population exposure. Symptoms begin — attributed to stomach illness.</div>
+    </div>
+    <div class="clock-box">
+      <div class="clock-label">System Flush</div>
+      <div class="clock-icon"><span class="material-icons">refresh</span></div>
+      <div class="clock-time dark">T+72h+</div>
+      <div class="clock-desc">System flush requires days. 1.1 billion gallons daily. Safe water confirmed only after full distribution purge.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>The Cascade — What Else Stops Working</h2>
+
+  <p>A water supply disruption is not just a water problem. Modern cities run on safe water in ways that are invisible until it is gone. A multi-day water security incident in New York City would not stay in the water system — it would cascade into every dependent system simultaneously.</p>
+
+  <div class="consequence-grid">
+    <div class="consequence-box">
+      <div class="consequence-icon"><span class="material-icons">local_hospital</span></div>
+      <div class="consequence-label">Hospitals and Dialysis</div>
+      <div class="consequence-desc">Dialysis patients require ultra-pure water — even elevated pH is lethal for dialysis. NYC has dozens of dialysis centers. Hospitals need continuous safe water for surgery, sterilization, medication preparation, and patient care. A water emergency immediately creates a medical emergency for the most vulnerable patients.</div>
+    </div>
+    <div class="consequence-box">
+      <div class="consequence-icon"><span class="material-icons">local_fire_department</span></div>
+      <div class="consequence-label">Fire Suppression</div>
+      <div class="consequence-desc">Fire suppression systems in buildings and hydrants depend on water pressure and availability. In a city of high-rise buildings, fire response relies entirely on the municipal water supply. A system-wide shutdown degrades fire response across all of New York City simultaneously.</div>
+    </div>
+    <div class="consequence-box amber">
+      <div class="consequence-icon"><span class="material-icons">restaurant</span></div>
+      <div class="consequence-label">Food Service and Industry</div>
+      <div class="consequence-desc">Restaurants, food processing, beverage production — all halted immediately. NYC's food supply chain for 9 million people depends on tap water for washing, cooking, and sanitation. A boil-water advisory is useless for chemical contamination; a full do-not-use order shuts down the food economy.</div>
+    </div>
+    <div class="consequence-box">
+      <div class="consequence-icon"><span class="material-icons">school</span></div>
+      <div class="consequence-label">Schools and Public Buildings</div>
+      <div class="consequence-desc">Thousands of schools, government buildings, and public facilities close immediately on a do-not-use water order. The cascading social and economic disruption ripples across the region — with knock-on effects on working parents, emergency services, and public health infrastructure.</div>
+    </div>
+    <div class="consequence-box amber">
+      <div class="consequence-icon"><span class="material-icons">local_grocery_store</span></div>
+      <div class="consequence-label">Bottled Water Collapse</div>
+      <div class="consequence-desc">A do-not-use order for 9 million people would exhaust available bottled water supplies within hours. Supply chains for emergency water distribution — tanker trucks, National Guard resources — are not scaled for a multi-day event affecting half the population of New York State.</div>
+    </div>
+    <div class="consequence-box">
+      <div class="consequence-icon"><span class="material-icons">psychology</span></div>
+      <div class="consequence-label">Public Confidence</div>
+      <div class="consequence-desc">After a confirmed deliberate attack on municipal water, public confidence in tap water takes years to rebuild — regardless of remediation. The psychological and economic costs of a population that no longer trusts its water supply are incalculable and persistent.</div>
+    </div>
+  </div>
+
+  <div class="callout callout-amber">
+    <p><strong>The Ukraine lesson applied:</strong> When Russia cut power to Kyiv for one hour in 2016, the attack was contained and the city recovered quickly. But Dragos Security confirmed the malware was designed to cause permanent physical damage — it was only an operator error in the attack code that prevented it. A water attack with the same intent — not disruption, but permanent damage — would not be over when the water is flushed. It would mean destroying the treatment infrastructure itself, making restoration take weeks, not hours.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 07 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 07</div>
+  <h2>The Regulatory Gap — Why Nobody Is Required to Do Anything</h2>
+
+  <p>In 2024, the EPA inspected water utilities across the United States and found that 70% failed to meet basic cybersecurity standards — including facilities using default passwords on internet-connected systems. This is not a secret finding. It has been reported publicly. Congress has heard testimony about it. And the EPA still cannot legally require water utilities to fix it.</p>
+
+  <p>The fundamental problem is statutory authority. Unlike power grids, aviation, financial systems, and now healthcare — which have mandatory federal cybersecurity requirements — water utilities operate under frameworks where cybersecurity guidance is voluntary. The EPA can publish best practices. It can offer grants. It cannot compel compliance.</p>
+
+  <div class="gap-table">
+    <div class="gap-row header">
+      <span>Infrastructure Sector</span>
+      <span class="gap-header-mid">Cybersecurity Mandate</span>
+      <span>Status</span>
+    </div>
+    <div class="gap-row">
+      <div class="gap-threat"><strong>Power Grid</strong> — NERC CIP standards</div>
+      <div class="gap-coverage">Mandatory federal cybersecurity requirements enforced by FERC. Utilities face fines for non-compliance.</div>
+      <div><span class="gap-badge badge-covered">Mandatory</span></div>
+    </div>
+    <div class="gap-row">
+      <div class="gap-threat"><strong>Aviation</strong> — TSA cybersecurity requirements</div>
+      <div class="gap-coverage">Mandatory security directives issued post-Colonial Pipeline. Critical systems must meet defined standards.</div>
+      <div><span class="gap-badge badge-covered">Mandatory</span></div>
+    </div>
+    <div class="gap-row">
+      <div class="gap-threat"><strong>Pipelines</strong> — TSA Pipeline Security Directives</div>
+      <div class="gap-coverage">Mandatory directives after Colonial Pipeline ransomware — incident reporting, access controls, patching required.</div>
+      <div><span class="gap-badge badge-covered">Mandatory</span></div>
+    </div>
+    <div class="gap-row">
+      <div class="gap-threat"><strong>Healthcare</strong> — HIPAA and HHS cyber rules</div>
+      <div class="gap-coverage">Mandatory security standards under HIPAA. New HHS rules (2024) expanding cybersecurity requirements.</div>
+      <div><span class="gap-badge badge-partial">Partial</span></div>
+    </div>
+    <div class="gap-row">
+      <div class="gap-threat"><strong>Water Utilities</strong> — EPA jurisdiction</div>
+      <div class="gap-coverage">EPA has no statutory authority to mandate cybersecurity requirements. All guidance is voluntary. 70% of inspected utilities failed basic standards in 2024.</div>
+      <div><span class="gap-badge badge-none">None</span></div>
+    </div>
+    <div class="gap-row">
+      <div class="gap-threat"><strong>Wastewater Systems</strong> — EPA jurisdiction</div>
+      <div class="gap-coverage">Same gap as water utilities. No mandatory federal cybersecurity standards. Compliance entirely voluntary.</div>
+      <div><span class="gap-badge badge-none">None</span></div>
+    </div>
+  </div>
+
+  <h3>What NIST and CISA Provide — and What It Cannot Do</h3>
+  <p>NIST published the Cybersecurity Framework. CISA maintains sector-specific guidance for water and wastewater systems. Both are excellent resources. Both are completely voluntary. A water utility that reads every document, attends every webinar, and implements zero recommendations faces no legal consequence. There is no audit, no penalty, no enforcement mechanism.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The 70% figure in context:</strong> The EPA found that 70% of inspected water utilities had cybersecurity deficiencies serious enough to merit concern — including default passwords on internet-facing control systems. Default passwords. On systems controlling the chemical treatment of water for millions of people. This is not a sophisticated advanced persistent threat problem. This is a patch-your-router problem that was never addressed because nobody was required to address it.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 08 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 08</div>
+  <h2>What Good Security Looks Like — The CISO Checklist</h2>
+
+  <p>The controls that would prevent or limit a water infrastructure attack are not exotic. They are the same foundational security practices required everywhere else. The gap is not capability — it is mandate and funding. For utilities that want to get ahead of eventual requirements, or for security professionals advising them, this is where the effort should be concentrated.</p>
+
+  <div class="control-list">
+    <div class="control-item">
+      <div class="control-left">
+        <div class="control-vector">Internet-exposed ICS / SCADA systems with default or weak credentials</div>
+        <div class="control-name">Require strong unique credentials, MFA where supported, and remove all default passwords before internet connection</div>
+        <div class="control-id">NIST CSF 2.0: PR.AA-01 / CISA WaterISAC Baseline</div>
+      </div>
+      <div class="control-right"><span class="control-gap gap-critical">Critical Gap</span></div>
+    </div>
+    <div class="control-item">
+      <div class="control-left">
+        <div class="control-vector">No network segmentation between corporate IT and OT / ICS environments</div>
+        <div class="control-name">Air-gap or strictly zone-segment OT networks from corporate IT — no lateral movement path from phishing target to SCADA system</div>
+        <div class="control-id">NIST SP 800-82 Rev.3: OT/ICS Network Architecture</div>
+      </div>
+      <div class="control-right"><span class="control-gap gap-critical">Critical Gap</span></div>
+    </div>
+    <div class="control-item">
+      <div class="control-left">
+        <div class="control-vector">Remote access to control systems via consumer tools (TeamViewer, AnyDesk, VNC)</div>
+        <div class="control-name">Replace consumer remote access with VPN + MFA enforced access to a hardened jump server; log and alert on all remote sessions</div>
+        <div class="control-id">CISA ICS-CERT Advisory / NIST CSF 2.0: PR.AA-05</div>
+      </div>
+      <div class="control-right"><span class="control-gap gap-critical">Critical Gap</span></div>
+    </div>
+    <div class="control-item">
+      <div class="control-left">
+        <div class="control-vector">No independent physical safety systems on chemical dosing controls</div>
+        <div class="control-name">Deploy hardware-enforced limits on chemical dosing — physical interlocks that cannot be overridden by software alone, regardless of SCADA compromise</div>
+        <div class="control-id">CISA Advisory AA21-042A / ICS Independent Safety Layer</div>
+      </div>
+      <div class="control-right"><span class="control-gap gap-high">High Gap</span></div>
+    </div>
+    <div class="control-item">
+      <div class="control-left">
+        <div class="control-vector">No continuous monitoring or anomaly detection on OT network traffic</div>
+        <div class="control-name">Deploy OT-specific monitoring (Dragos, Claroty, or equivalent) to baseline normal ICS behavior and alert on anomalous commands</div>
+        <div class="control-id">NIST CSF 2.0: DE.CM-01 / CISA WaterISAC</div>
+      </div>
+      <div class="control-right"><span class="control-gap gap-high">High Gap</span></div>
+    </div>
+    <div class="control-item">
+      <div class="control-left">
+        <div class="control-vector">No incident response plan specific to water treatment compromise</div>
+        <div class="control-name">Maintain and exercise a water-specific IR plan: who calls who, what systems get isolated, how public notification happens, and when EPA/CISA are notified</div>
+        <div class="control-id">America's Water Infrastructure Act (AWIA) — Risk and Resilience Assessment</div>
+      </div>
+      <div class="control-right"><span class="control-gap gap-high">High Gap</span></div>
+    </div>
+    <div class="control-item">
+      <div class="control-left">
+        <div class="control-vector">No offline backups of ICS configurations and no tested manual override capability</div>
+        <div class="control-name">Maintain offline, air-gapped backups of all SCADA configurations; preserve and test manual control capability so restoration does not depend on compromised software</div>
+        <div class="control-id">CISA Critical Infrastructure Resilience / Ukraine Lessons Applied</div>
+      </div>
+      <div class="control-right"><span class="control-gap gap-high">High Gap</span></div>
+    </div>
+  </div>
+
+  <h3>The One Control That Stopped Oldsmar</h3>
+  <p>A trained operator watching his screen at the exact right moment. That was the entire defense. Water utility security cannot depend on that. The controls above — network segmentation, hardware interlocks, continuous monitoring, credential hygiene — are what makes a sophisticated nation-state attack difficult rather than trivial. None of them require exotic technology. Most of them are already mandatory for power utilities, pipelines, and aviation. For water, they remain voluntary suggestions.</p>
+
+</div>
+</div>
+
+<!-- SECTION 09 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 09</div>
+  <h2>Conclusion — The Tap Is Open</h2>
+
+  <p>Russia demonstrated in Ukraine that critical infrastructure control systems can be accessed, studied, and manipulated by nation-state actors who are patient, skilled, and have years to prepare. They demonstrated it with power grids in 2015 and 2016. An unknown attacker demonstrated it with a water treatment plant in Florida in 2021. The only reason the Florida attack did not cause harm was an operator watching his screen. The only reason a Ukraine-scale attack has not happened to US water infrastructure is — as far as anyone can publicly confirm — that no nation-state actor has decided to execute one yet.</p>
+
+  <p>The Catskill/Delaware system serves 9 million people with 1.1 billion gallons per day of water that is disinfected but not filtered. It is the largest unfiltered water supply in the United States. The EPA cannot legally require the utilities in this system — or any water utility — to implement mandatory cybersecurity controls. 70% of utilities inspected in 2024 had basic deficiencies. Some were still using default passwords on internet-connected systems controlling the water that nearly half of New York State drinks every morning.</p>
+
+  <p>This is not a failure of technology. The tools that would harden these systems exist and are deployed in other sectors. It is a failure of regulatory priority. Water has been left off the mandatory compliance list while power, pipelines, and aviation were addressed. The argument for continuing to leave it off that list is difficult to make when the precedent — a working proof of concept against a US water treatment plant in 2021 — is already documented and publicly acknowledged by federal law enforcement.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The number that should end the policy debate:</strong> 9 million people. Nearly half the population of New York State. Served by a single gravity-fed system that reaches their taps with no filtration barrier. The only thing standing between a sophisticated attacker and mass chemical exposure to 9 million people is a set of voluntary guidelines that 70% of water utilities are not following — and no law that requires them to.</p>
+  </div>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">All findings in this report are based on publicly available information including CISA ICS-CERT advisories, Congressional Research Service reports, the National Academies Review of the NYC Watershed Protection Program (2020), Wikipedia documentation of the 2015 and 2016 Ukraine power grid attacks attributed to GRU/Sandworm, CNN, NPR, and CyberScoop reporting on the Oldsmar Florida incident, and EPA inspection reporting. Ukraine power grid casualty figures reflect the known disruption scope; no confirmed direct deaths from the grid attacks were established in public reporting. This represents the author's independent analysis and does not reflect the views of any employer or client organization.</p>
+
+</div>
+</div>
+
+</main>
+
+<!-- AUTHOR BIO -->
+<div class="wrap">
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Consultant &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base — Electric Boat, Pratt and Whitney, Sikorsky, and their supply chains. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis with a focus on ICS/SCADA vulnerabilities, nation-state threats to critical infrastructure, and the intersection of operational technology security and regulatory frameworks. She is pursuing CompTIA Security+ and CMMC Registered Practitioner certification. This analysis was produced independently as a contribution to the security community's understanding of persistent threats to US critical infrastructure.</p>
+    <p class="bio-text" style="margin-top:.75rem">
+      <a href="index.html" class="back-nav-link">Portfolio</a>
+    </p>
+  </div>
+</div>
+</div>
+
+<footer>
+  <span>Water Infrastructure Analysis · Yana Ivanov · March 2026</span>
+  <span>Based on public reporting · For educational use · Independent analysis</span>
+</footer>
+
+</body>
+</html>

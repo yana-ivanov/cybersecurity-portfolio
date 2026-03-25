@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Log 004 — Custom Wireshark Profile & Lumma Stealer Analysis | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--display-clean);font-size:clamp(2rem,5vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#4a9eff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:#0a0f1a;line-height:1.2;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+.code-block{background:#0a0f1a;border-radius:3px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-all}
+.co{color:#64748b}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+
+/* TABLES — fixed layout with proper wrapping */
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem;table-layout:fixed}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;font-weight:600;overflow-wrap:break-word;word-wrap:break-word}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top;overflow-wrap:break-word;word-wrap:break-word;line-height:1.6}
+tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+td strong{color:var(--ink);font-weight:600}
+td.mono{font-family:var(--mono);font-size:.78rem;color:var(--blue);word-break:break-all}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600}
+td.green{color:var(--green);font-weight:600}
+
+/* Color swatch for profile table */
+.swatch{display:inline-block;width:14px;height:14px;border-radius:2px;vertical-align:middle;margin-right:.4rem;border:1px solid rgba(0,0,0,.1)}
+
+.env-box{background:var(--paper);border:1px solid var(--rule);border-radius:2px;padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+
+.host-card{background:#0a0f1a;border-radius:3px;padding:1.5rem;margin:1.75rem 0;display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.hf-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:#64748b;text-transform:uppercase;margin-bottom:.3rem}
+.hf-value{font-family:var(--mono);font-size:.9rem;color:#4a9eff;font-weight:600}
+.hf-value.red{color:#ef4444}
+
+.finding{background:var(--paper);border:1px solid var(--rule);border-left:3px solid var(--red);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.finding.amber{border-left-color:var(--amber)}
+.finding.green{border-left-color:var(--green)}
+.finding-num{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:var(--red);text-transform:uppercase;margin-bottom:.3rem}
+.finding.amber .finding-num{color:var(--amber)}
+.finding.green .finding-num{color:var(--green)}
+.finding-title{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.6rem}
+.finding p{margin-bottom:.6rem;font-size:.88rem;grid-template-columns:2rem 1fr;gap:1rem;margin-bottom:1.5rem;align-items:start}
+.step-num{width:2rem;height:2rem;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.2rem}
+.step-title{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem}
+.step-desc{font-size:.9rem;color:var(--ink3);line-height:1.65}
+
+/* Comparison boxes */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.easy{border-top:3px solid var(--amber)}
+.compare-box.lumma{border-top:3px solid var(--red)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.easy .compare-label{color:var(--amber)}
+.compare-box.lumma .compare-label{color:var(--red)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);border-radius:2px;padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:130px 1fr;gap:1rem;font-size:.92rem}
+.nist-desc{color:var(--ink3);font-size:.92rem;line-height:1.7}
+
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer a{color:#4a9eff;text-decoration:none}
+footer a:hover{color:#93c5fd}
+
+@media(max-width:680px){
+  .mast-inner,.wrap{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .env-grid,.host-card,.compare-grid{grid-template-columns:1fr}
+  .nist-item{display:grid;grid-template-columns:130px 1fr;gap:1rem;font-size:.92rem}
+  .step-item{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Security Lab Log · Entry 004</div>
+    <h1 class="title">Custom Wireshark Profile & Lumma Stealer Independent Analysis</h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Date</div><div class="value">March 18, 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational Use</div></div>
+      <div class="meta-item"><div class="label">Lab Type</div><div class="value">Tool Configuration / Malware Analysis</div></div>
+      <div class="meta-item"><div class="label">Tools</div><div class="value">Wireshark 4.x · macOS</div></div>
+      <div class="meta-item"><div class="label">Source</div><div class="value">malware-traffic-analysis.net · 2026-01-31</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    SOC ANALYST PROFILE BUILT &nbsp;·&nbsp; LUMMA STEALER ANALYSIS &nbsp;·&nbsp; INDEPENDENT EXERCISE &nbsp;·&nbsp; WIN11OFFICE DOMAIN &nbsp;·&nbsp; MARCH 18 2026
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>Overview</h2>
+  <p>This lab has two parts. The first documents the build of a custom Wireshark analyst profile — a purpose-built configuration that makes the triage workflow from Lab Log 003 executable in one click rather than by memory. The second is an independent malware analysis: a fresh pcap from <a href="https://malware-traffic-analysis.net/2026/01/31/index.html" style="color:var(--blue)">malware-traffic-analysis.net (2026-01-31)</a>, analyzed independently using the profile and workflow built across the previous labs.</p>
+  <p>The exercise — "Lumma in the Room-ah" — introduced a different malware family than Lab Log 003. Where Easy As 123 used simple unencrypted HTTP beaconing, Lumma Stealer used a more sophisticated pattern: HTTP for reconnaissance and registration, TLS for actual credential exfiltration. Recognizing that difference without being told what to look for is the skill this lab validates.</p>
+  <div class="env-box">
+    <div class="env-box-title">Lab Configuration</div>
+    <div class="env-grid">
+      <div class="env-item"><div class="env-label">Profile Name</div><div class="env-value">SOC Analyst</div></div>
+      <div class="env-item"><div class="env-label">Pcap Source</div><div class="env-value">malware-traffic-analysis.net · 2026-01-31</div></div>
+      <div class="env-item"><div class="env-label">Exercise Name</div><div class="env-value">Lumma in the Room-ah</div></div>
+      <div class="env-item"><div class="env-label">Total Packets</div><div class="env-value">51,181</div></div>
+      <div class="env-item"><div class="env-label">Malware Family</div><div class="env-value">Lumma Stealer</div></div>
+      <div class="env-item"><div class="env-label">AD Domain</div><div class="env-value">WIN11OFFICE.COM</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>Part 1 — Building the SOC Analyst Profile</h2>
+  <p>Wireshark's default configuration is designed for general network troubleshooting, not security triage. The default columns show information useful for engineers debugging connectivity — not analysts hunting malware. The SOC Analyst profile reconfigures Wireshark from the ground up: optimized columns, color-coded protocol identification, and one-click filter buttons that execute the full triage workflow without typing.</p>
+
+  <h3>Profile Creation</h3>
+  <p>A named profile in Wireshark stores all display settings, color rules, columns, and filter buttons independently from the default configuration. Switching profiles with one click gives a completely different view of the same pcap — the same traffic, different lens.</p>
+  <div class="code-label">Profile Setup Path</div>
+  <div class="code-block"><pre><span class="co">Edit → Configuration Profiles → + (new profile)</span>
+Name: <span class="hi">SOC Analyst</span>
+<span class="co">
+All color rules, columns, and filter buttons configured
+below are saved to this profile only — default is untouched.</span></pre></div>
+
+  <h3>Column Layout</h3>
+  <p>The default Wireshark columns include Length — rarely useful for security triage. The SOC Analyst layout replaces it with source and destination port columns, making protocol identification instant. The critical addition is the Delta column — the single most useful column for detecting beaconing behavior.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <colgroup>
+        <col style="width:22%">
+        <col style="width:30%">
+        <col style="width:48%">
+      </colgroup>
+      <thead>
+        <tr><th>Column Title</th><th>Type</th><th>Why It Matters</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>No.</strong></td><td class="mono">Number</td><td>Packet reference number for cross-referencing findings</td></tr>
+        <tr><td><strong>Time</strong></td><td class="mono">Relative time</td><td>Seconds since capture start — consistent across all pcaps</td></tr>
+        <tr><td><strong>Src IP</strong></td><td class="mono">Source address</td><td>Where the packet came from</td></tr>
+        <tr><td><strong>Dst IP</strong></td><td class="mono">Dest address</td><td>Where the packet is going — external IPs stand out immediately</td></tr>
+        <tr><td><strong>Src Port</strong></td><td class="mono">Src port (unresolved)</td><td>Raw number faster to scan than service name</td></tr>
+        <tr><td><strong>Dst Port</strong></td><td class="mono">Dest port (unresolved)</td><td>Port 80=HTTP, 443=TLS, 445=SMB, 88=Kerberos — instant protocol ID</td></tr>
+        <tr><td><strong>Protocol</strong></td><td class="mono">Protocol</td><td>Wireshark's protocol identification</td></tr>
+        <tr><td><strong>Delta</strong></td><td class="mono">Delta time displayed</td><td>Time since previous displayed packet — repeating values = beaconing</td></tr>
+        <tr><td><strong>Info</strong></td><td class="mono">Information</td><td>Packet summary — GET/POST paths, flags, domain names</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Color Rules</h3>
+  <p>Color rules apply top to bottom — the first matching rule wins. Order is critical. C2 Beacon and HTTP External must sit above the generic HTTP rule or all HTTP matches the generic rule first and the specific ones never fire.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <colgroup>
+        <col style="width:22%">
+        <col style="width:43%">
+        <col style="width:35%">
+      </colgroup>
+      <thead>
+        <tr><th>Rule Name</th><th>Filter</th><th>Color / Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>C2 Beacon</strong></td>
+          <td class="mono">http.request.method == "POST" and !(http.host contains "microsoft")</td>
+          <td><span class="swatch" style="background:#ff0000"></span><strong>Red</strong> — highest priority. POST to non-Microsoft = investigate immediately</td>
+        </tr>
+        <tr>
+          <td><strong>HTTP External</strong></td>
+          <td class="mono">http.request and !(http.host contains "microsoft") and !(http.host contains "windowsupdate") and !(http.host contains "msocsp")</td>
+          <td><span class="swatch" style="background:#e67e22"></span><strong>Dark orange</strong> — non-Microsoft HTTP requests</td>
+        </tr>
+        <tr>
+          <td><strong>HTTP Unencrypted</strong></td>
+          <td class="mono">http</td>
+          <td><span class="swatch" style="background:#ff8c00"></span><strong>Orange</strong> — all HTTP including Windows noise</td>
+        </tr>
+        <tr>
+          <td><strong>DNS Query</strong></td>
+          <td class="mono">dns</td>
+          <td><span class="swatch" style="background:#aeccd4"></span><strong>Light blue</strong> — domain lookups</td>
+        </tr>
+        <tr>
+          <td><strong>Kerberos</strong></td>
+          <td class="mono">kerberos</td>
+          <td><span class="swatch" style="background:#9b59b6"></span><strong>Purple</strong> — authentication packets containing usernames</td>
+        </tr>
+        <tr>
+          <td><strong>DHCP</strong></td>
+          <td class="mono">dhcp</td>
+          <td><span class="swatch" style="background:#27ae60"></span><strong>Green</strong> — machine identity packets</td>
+        </tr>
+        <tr>
+          <td><strong>SMB</strong></td>
+          <td class="mono">smb or smb2</td>
+          <td><span class="swatch" style="background:#f1c40f"></span><strong>Yellow</strong> — Windows file sharing, confirms domain environment</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Filter Buttons — One-Click Triage Workflow</h3>
+  <p>Filter buttons are saved to the profile and appear as a persistent toolbar below the filter bar. Each button includes a comment — visible on hover as a tooltip — explaining what the filter finds and what to look for in the results. The buttons are ordered to match the triage sequence: machine identity → user identity → DNS → HTTP → exfiltration detection.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <colgroup>
+        <col style="width:20%">
+        <col style="width:42%">
+        <col style="width:38%">
+      </colgroup>
+      <thead>
+        <tr><th>Button Label</th><th>Filter Expression</th><th>Tooltip Comment</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>DHCP</strong></td>
+          <td class="mono">dhcp</td>
+          <td>Step 1 — Find MAC address, hostname, and IP. Click Request packet (source 0.0.0.0)</td>
+        </tr>
+        <tr>
+          <td><strong>Kerberos</strong></td>
+          <td class="mono">kerberos</td>
+          <td>Step 2 — Find username. Look for AS-REQ, expand req-body → cname → CNameString</td>
+        </tr>
+        <tr>
+          <td><strong>NBNS</strong></td>
+          <td class="mono">nbns</td>
+          <td>Windows NetBIOS hostname. Alternative to DHCP on older or unmanaged Windows machines</td>
+        </tr>
+        <tr>
+          <td><strong>mDNS</strong></td>
+          <td class="mono">mdns</td>
+          <td>Mac and Linux hostname discovery. Use instead of Kerberos on non-domain machines</td>
+        </tr>
+        <tr>
+          <td><strong>DNS</strong></td>
+          <td class="mono">dns</td>
+          <td>Works on any OS. What domains is this machine resolving? Unusual domains = red flag</td>
+        </tr>
+        <tr>
+          <td><strong>HTTP — All</strong></td>
+          <td class="mono">http</td>
+          <td>All unencrypted HTTP. Rare in 2026 — any plain HTTP to external hosts warrants investigation</td>
+        </tr>
+        <tr>
+          <td><strong>HTTP — External</strong></td>
+          <td class="mono">http.request and !(http.host contains "microsoft") and !(http.host contains "windowsupdate") and !(http.host contains "msocsp")</td>
+          <td>HTTP with Windows noise removed. What remains has no automatic legitimate explanation</td>
+        </tr>
+        <tr>
+          <td><strong>C2 POST</strong></td>
+          <td class="mono">http.request.method == "POST" and !(http.host contains "microsoft")</td>
+          <td>POST to non-Microsoft hosts. Data being sent outbound — exfiltration or C2 beacon check-in</td>
+        </tr>
+        <tr>
+          <td><strong>TLS</strong></td>
+          <td class="mono">tls</td>
+          <td>Encrypted traffic. Check SNI in Client Hello for destination domain — visible even in TLS</td>
+        </tr>
+        <tr>
+          <td><strong>Beaconing</strong></td>
+          <td class="mono">ip.dst == 0.0.0.0</td>
+          <td>Replace 0.0.0.0 with suspicious IP. Check Delta column for repeating intervals. Use I/O Graph to visualize</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>On dynamic IP filtering:</strong> Wireshark filter buttons are static — they cannot accept variable input. The Beaconing button uses <code style="font-family:var(--mono);font-size:.85rem">ip.dst == 0.0.0.0</code> as a placeholder. In practice, after finding a suspicious IP via HTTP External, the analyst edits the IP directly in the filter bar. Tools like Zeek, Suricata, and SIEM platforms handle automated dynamic detection — Wireshark is the right tool for manual forensic investigation of a specific pcap.</p>
+  </div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>Part 2 — Independent Analysis: Lumma Stealer</h2>
+  <p>With the SOC Analyst profile configured, the January 31, 2026 exercise pcap was analyzed independently — no guided steps, no hints. The workflow from Lab Log 003 was applied in sequence using the filter buttons. What follows is the complete analysis as it unfolded.</p>
+
+  <h3>Step 1 — Host Identification via DHCP</h3>
+  <p>The DHCP button returned 4 packets. The Request packet (source 0.0.0.0) contained all three machine identifiers in the options fields. The green color rule made the DHCP packets immediately visible in the full packet list before any filter was applied.</p>
+
+  <div class="code-label">DHCP Request — Packet Detail</div>
+  <div class="code-block"><pre><span class="co">DHCP Request (source: 0.0.0.0 → 255.255.255.255)</span>
+
+Client MAC address: <span class="hi">00:21:5d:c8:0e:f2</span>
+Option (50) Requested IP Address: <span class="hi">10.1.21.58</span>
+Option (12) Host Name: <span class="hi">DESKTOP-ES9F3ML</span></pre></div>
+
+  <h3>Step 2 — User Identification via Kerberos</h3>
+  <p>The Kerberos button returned 16 packets. The purple color rule made them visible in the list. Expanding an AS-REQ packet and navigating to req-body → cname → CNameString returned the username. The realm field confirmed the Active Directory domain.</p>
+
+  <div class="code-label">Kerberos AS-REQ — Packet Detail</div>
+  <div class="code-block"><pre><span class="co">AS-REQ — note: KRB5KDC_ERR_PREAUTH_REQUIRED also present
+This error is normal — Windows always requests pre-auth
+before issuing a ticket. Not a red flag.</span>
+
+CNameString: <span class="hi">gwyatt</span>
+realm: <span class="ke">WIN11OFFICE.COM</span></pre></div>
+
+  <h3>Confirmed Host Identity</h3>
+  <div class="host-card">
+    <div class="host-field"><div class="hf-label">IP Address</div><div class="hf-value">10.1.21.58</div></div>
+    <div class="host-field"><div class="hf-label">MAC Address</div><div class="hf-value">00:21:5d:c8:0e:f2</div></div>
+    <div class="host-field"><div class="hf-label">Hostname</div><div class="hf-value">DESKTOP-ES9F3ML</div></div>
+    <div class="host-field"><div class="hf-label">Username</div><div class="hf-value red">gwyatt</div></div>
+    <div class="host-field"><div class="hf-label">Domain</div><div class="hf-value">WIN11OFFICE.COM</div></div>
+    <div class="host-field"><div class="hf-label">NIC Vendor</div><div class="hf-value">00:21:5d prefix</div></div>
+  </div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>Malware Behavior — Lumma Stealer</h2>
+
+  <h3>Initial Detection — TLS Spike in I/O Graph</h3>
+  <p>Before applying any filters, the TLS color rule flagged a large volume of encrypted traffic in the packet list. Opening Statistics → I/O Graph and filtering to TLS traffic revealed a pronounced spike — a burst of encrypted connections concentrated in a short window. This was the first indicator that something beyond normal background activity was present.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>How the profile helped:</strong> The TLS color rule turned the suspicious packets visible in the raw packet list before any filter was applied. Without the color rule, TLS packets are indistinguishable from normal background traffic at a glance. The color rule made the spike obvious — the analyst's eye was drawn to it immediately.</p>
+  </div>
+
+  <h3>HTTP External — C2 Registration</h3>
+  <p>The HTTP External button returned 6 packets — 4 GET requests and 2 POST requests, all to the same external IP: <strong>153.92.1.49</strong> over port 80. This IP was referenced in the exercise scenario as the suspicious destination, confirming the infected host was identified correctly.</p>
+
+  <div class="code-label">C2 Traffic — HTTP External Results</div>
+  <div class="code-block"><pre><span class="co">All 6 requests → 153.92.1.49:80</span>
+
+<span class="hi">GET</span>  /api/set_agent?id=3BF67EC05320C5729578BE4C0ADF174C&amp;token=842e...&amp;<span class="ke">agent=Chrome</span>
+<span class="hi">GET</span>  /favicon.ico                        <span class="co">← connectivity check</span>
+<span class="hi">GET</span>  /api/set_agent?id=3BF67EC05320C5729578BE4C0ADF174C&amp;token=842e...&amp;<span class="ke">agent=Edge</span>
+<span class="hi">GET</span>  /favicon.ico                        <span class="co">← connectivity check</span>
+<span class="wa">POST</span> /api/set_agent?id=3BF67EC05320C5729578BE4C0ADF174C&amp;token=842e...&amp;act=log
+<span class="wa">POST</span> /api/set_agent?id=3BF67EC05320C5729578BE4C0ADF174C&amp;token=842e...&amp;act=log
+
+<span class="co">Key observation: two separate set_agent registrations
+→ agent=Chrome  (first browser profile)
+→ agent=Edge    (second browser profile)
+Lumma infected both browsers independently.</span></pre></div>
+
+  <h3>POST Payload — Browser Fingerprint Exfiltration</h3>
+  <p>Both POST packets contained identical structure: a comprehensive browser fingerprint sent to the C2 server. This was reconnaissance, not credential theft. Lumma profiled gwyatt's machine before proceeding to the exfiltration phase.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <colgroup>
+        <col style="width:22%">
+        <col style="width:35%">
+        <col style="width:43%">
+      </colgroup>
+      <thead>
+        <tr><th>Field Exfiltrated</th><th>Value Observed</th><th>Intelligence Value to Attacker</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Platform / OS</strong></td>
+          <td class="mono">Win32 · Windows NT 10.0</td>
+          <td>Confirms Windows target, rules out VM detection evasion</td>
+        </tr>
+        <tr>
+          <td><strong>Browser (POST 1)</strong></td>
+          <td class="mono">Chrome 144.0.0.0</td>
+          <td>Identifies which credential store to target</td>
+        </tr>
+        <tr>
+          <td><strong>Browser (POST 2)</strong></td>
+          <td class="mono">Edge 144.0.0.0</td>
+          <td>Second credential store — separate cookie and password database</td>
+        </tr>
+        <tr>
+          <td><strong>GPU / WebGL</strong></td>
+          <td class="mono">AMD Radeon R9 200 (Chrome) · Microsoft Basic Render (Edge)</td>
+          <td>Hardware fingerprint — uniquely identifies this machine even if IP changes</td>
+        </tr>
+        <tr>
+          <td><strong>Canvas fingerprint</strong></td>
+          <td class="mono">Base64 PNG rendering</td>
+          <td>GPU-specific rendering signature — machine re-identification across sessions</td>
+        </tr>
+        <tr>
+          <td><strong>Screen</strong></td>
+          <td class="mono">1920×1080 · 24-bit color</td>
+          <td>Additional fingerprint layer</td>
+        </tr>
+        <tr>
+          <td><strong>Hardware</strong></td>
+          <td class="mono">12-core CPU</td>
+          <td>Confirms real machine — sandbox environments typically show 1-2 cores</td>
+        </tr>
+        <tr>
+          <td><strong>webdriver</strong></td>
+          <td class="mono">false</td>
+          <td>Sandbox check — confirms this is a real user machine, not automated analysis. Triggers exfiltration phase.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-red">
+    <p><strong>The webdriver check is the trigger:</strong> <code style="font-family:var(--mono);font-size:.85rem">"webdriver":false</code> confirms the browser is not being controlled by automated testing software. Malware analysis sandboxes often use Selenium or similar tools which set webdriver=true. Lumma checked for this before proceeding — <code style="font-family:var(--mono);font-size:.85rem">false</code> means real user, real credentials worth stealing. This check passing is what activated the TLS exfiltration phase.</p>
+  </div>
+
+  <h3>TLS Exfiltration — Credential Theft Over Encrypted Channel</h3>
+  <p>Following the HTTP fingerprinting phase, Lumma switched to TLS for the actual credential exfiltration. Filtering to <code style="font-family:var(--mono);font-size:.85rem">ip.dst == 153.92.1.49</code> showed TLS connections to the same C2 IP on port 443, with multiple Application Data packets — the encrypted stolen data being transmitted.</p>
+  <p>The TLS Client Hello packets revealed an additional C2 domain via the SNI field: <strong>whitepepper.su</strong>. The SNI field in a TLS handshake is not encrypted — it must be sent in plaintext so the server knows which certificate to present. This means even TLS traffic reveals the destination domain to any analyst capturing at the network level.</p>
+
+  <div class="code-label">TLS Client Hello — SNI Field</div>
+  <div class="code-block"><pre><span class="co">Packet 25410 — TLS Client Hello</span>
+Transport Layer Security → Handshake Protocol →
+  Extension: server_name →
+    Server Name: <span class="wa">whitepepper.su</span>
+
+<span class="co">Why .su is a red flag:
+.su = Soviet Union ccTLD — a country that ceased to exist in 1991.
+The domain extension remains active and is almost exclusively
+used by Russian cybercriminal infrastructure because .su domains
+are difficult to take down through normal legal channels.
+Legitimate businesses do not use .su domains.</span></pre></div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>Easy As 123 vs Lumma Stealer — Comparing Attack Patterns</h2>
+  <p>Having now analyzed two different malware families, the contrast in technique is instructive. The same triage workflow identified both infections — but the behavior patterns, and what they reveal to the defender, are meaningfully different.</p>
+
+  <div class="compare-grid">
+    <div class="compare-box easy">
+      <div class="compare-label"><a href="lab_log_003.html" style="color:var(--amber);text-decoration:none">Easy As 123 — Lab Log 003</a></div>
+      <p><strong>C2 channel:</strong> Plain HTTP — fully readable</p>
+      <p><strong>Pattern:</strong> 264 POST requests at 60-second intervals — classic beaconing</p>
+      <p><strong>Payload:</strong> CMD=POLL check-ins — waiting for commands</p>
+      <p><strong>Detection:</strong> Immediately obvious in I/O Graph — regular spikes across 4.3 hours</p>
+      <p><strong>Sophistication:</strong> Low — no encryption, no sandbox detection, no fingerprinting</p>
+      <p><strong>Stage:</strong> Post-infection persistence — malware is installed and waiting</p>
+    </div>
+    <div class="compare-box lumma">
+      <div class="compare-label">Lumma Stealer — Lab Log 004</div>
+      <p><strong>C2 channel:</strong> HTTP for recon, TLS for exfiltration — partially hidden</p>
+      <p><strong>Pattern:</strong> 6 HTTP requests then TLS burst — act fast, get out</p>
+      <p><strong>Payload:</strong> Full browser fingerprint + encrypted credential exfiltration</p>
+      <p><strong>Detection:</strong> TLS spike visible in I/O Graph, SNI reveals domain in Client Hello</p>
+      <p><strong>Sophistication:</strong> Medium — sandbox detection, dual-browser targeting, canvas fingerprinting</p>
+      <p><strong>Stage:</strong> Active theft — by the time pcap is captured, credentials are already gone</p>
+    </div>
+  </div>
+
+  <div class="callout callout-red">
+    <p><strong>Critical difference in response urgency:</strong> Easy As 123 was a persistent beacon waiting for instructions — isolating the machine stops the threat. Lumma Stealer had already acted. By the time this pcap was analyzed, gwyatt's Chrome and Edge credentials, cookies, and saved passwords were in the attacker's hands. The correct response is not just machine isolation — it is immediate credential rotation for every service gwyatt was logged into on both browsers.</p>
+  </div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>Findings</h2>
+
+  <div class="finding">
+    <div class="finding-num">Finding 01 — Critical</div>
+    <div class="finding-title">Lumma Stealer Active — Credentials from Chrome and Edge Exfiltrated</div>
+    <p>Host <strong>DESKTOP-ES9F3ML</strong> (10.1.21.58, user: gwyatt) was infected with Lumma Stealer. The malware registered gwyatt's machine as a new agent with C2 server <strong>153.92.1.49</strong>, profiled both Chrome and Edge browser environments, confirmed the machine was not a sandbox, and proceeded to exfiltrate credentials over encrypted TLS connections.</p>
+    <p><strong>Immediate action required:</strong> Isolate the machine. Rotate all credentials for every service gwyatt accessed through Chrome or Edge — email, VPN, corporate systems, banking, any saved passwords. Assume all session cookies are compromised — active sessions on every logged-in service should be terminated.</p>
+  </div>
+
+  <div class="finding amber">
+    <div class="finding-num">Finding 02 — High</div>
+    <div class="finding-title">Dual Browser Infection — Both Chrome and Edge Credential Stores Compromised</div>
+    <p>Lumma registered as both a Chrome agent and an Edge agent independently. Chrome and Edge maintain separate credential databases, cookie stores, and saved password vaults. Both are compromised. Any credentials stored exclusively in Edge and not Chrome — or vice versa — are still stolen. The scope of compromised credentials is the union of both browser stores, not just one.</p>
+  </div>
+
+  <div class="finding amber">
+    <div class="finding-num">Finding 03 — High</div>
+    <div class="finding-title">C2 Infrastructure Includes .su Domain — Russian Cybercriminal Nexus</div>
+    <p>TLS Client Hello packets revealed connections to <strong>whitepepper.su</strong> — a Soviet Union ccTLD domain. The .su namespace is associated almost exclusively with Russian cybercriminal infrastructure. This attribution is not definitive but provides threat intelligence context: Lumma Stealer is a known commodity malware sold on Russian-language cybercriminal forums. The C2 infrastructure is consistent with that attribution.</p>
+  </div>
+</div>
+
+<!-- SECTION 07 -->
+<div class="section">
+  <div class="section-num">Section 07</div>
+  <h2>NIST SP 800-171 Control Mapping</h2>
+  <div class="nist-box">
+    <div class="nist-box-title">Applicable Controls</div>
+    <div class="nist-items">
+      <div class="nist-item">
+        <div class="nist-control">3.5.3</div>
+        <div class="nist-desc"><strong>Multi-factor authentication.</strong> Lumma stole saved passwords and session cookies. MFA means stolen passwords alone cannot grant access — the attacker also needs the second factor. This is the single most effective mitigation against credential stealer malware.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.13.1</div>
+        <div class="nist-desc"><strong>Boundary protection.</strong> An egress filter blocking outbound connections to .su domains or unknown external IPs on port 80 would have disrupted Lumma's HTTP registration phase — potentially before fingerprinting completed.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.14.6</div>
+        <div class="nist-desc"><strong>Monitor for malicious code.</strong> The TLS spike and HTTP External traffic to 153.92.1.49 are detectable anomalies. A SIEM rule alerting on HTTP POST to unknown external IPs would have fired on the registration packets.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.4.6</div>
+        <div class="nist-desc"><strong>Least functionality.</strong> Restricting browser credential storage on corporate machines — preventing Chrome and Edge from saving passwords — removes the credential store Lumma targets. Password managers with MFA protection replace the risk.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.3.1</div>
+        <div class="nist-desc"><strong>Audit logging.</strong> Network packet capture was the only forensic evidence available to reconstruct Lumma's behavior. Endpoint logs may have been unavailable or insufficient. The pcap is the record of what happened.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 08 -->
+<div class="section">
+  <div class="section-num">Section 08</div>
+  <h2>Lessons Learned</h2>
+
+  <h3>The Profile Works — Color Rules Are the Analyst's First Line of Detection</h3>
+  <p>In the Lumma exercise, the TLS color rule drew attention to the suspicious traffic before any filter was applied. The color rules are not decoration — they are an active detection layer. Opening a new pcap with the SOC Analyst profile active means the first visual scan of the packet list already highlights anomalies. The profile turns passive observation into active detection.</p>
+
+  <h3>SNI Is the Key to Reading TLS Traffic</h3>
+  <p>TLS encrypts the content of traffic but not the destination hostname. The SNI field in every TLS Client Hello reveals exactly which domain is being contacted — visible to any analyst with network capture access. <code style="font-family:var(--mono);font-size:.85rem">whitepepper.su</code> was immediately identifiable as suspicious because of the domain extension alone. Learning to read SNI fields in TLS packets is what makes encrypted C2 traffic partially transparent to the defender.</p>
+
+  <h3>Malware Families Have Recognizable Signatures</h3>
+  <p>After two exercises, patterns are already visible. Beaconing malware sends regular POST intervals — visible in I/O Graph as equally spaced spikes. Stealers act fast — small number of HTTP requests followed by TLS burst. The <code style="font-family:var(--mono);font-size:.85rem">/api/set_agent</code> path and the browser fingerprint payload are Lumma-specific signatures that, once seen, are immediately recognizable in any future pcap. Pattern recognition builds with each exercise.</p>
+
+  <h3>Next Lab</h3>
+  <p>Lab Log 005 will introduce <strong>Zeek (formerly Bro)</strong> — the network analysis framework that automates what Wireshark does manually. Where Wireshark requires an analyst to apply filters and read packets, Zeek generates structured logs automatically: conn.log, http.log, dns.log, ssl.log. The same Lumma traffic analyzed manually in this lab would be identified by Zeek in seconds. Understanding both tools — manual forensics and automated detection — is the complete picture of network security analysis.</p>
+</div>
+
+</div></div>
+
+<footer>
+  <span>Lab Log 004 — Custom Wireshark Profile & Lumma Stealer Analysis &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; March 18, 2026 &nbsp;·&nbsp; Educational use only</span>
+  <a href="index.html">← Portfolio</a>
+</footer>
+
+</body>
+</html>

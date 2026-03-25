@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Log 005 — Zeek Network Analysis Framework | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--display-clean);font-size:clamp(2rem,5vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#4a9eff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:#0a0f1a;line-height:1.2;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+.code-block{background:#0a0f1a;border-radius:3px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.co{color:#64748b}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem;table-layout:fixed}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;font-weight:600;overflow-wrap:break-word;word-wrap:break-word}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top;overflow-wrap:break-word;word-wrap:break-word;line-height:1.6}
+tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+td strong{color:var(--ink);font-weight:600}
+td.mono{font-family:var(--mono);font-size:.78rem;color:var(--blue);word-break:break-all}
+td.red{color:var(--red);font-weight:600}
+td.amber{color:var(--amber);font-weight:600}
+td.green{color:var(--green);font-weight:600}
+.env-box{background:var(--paper);border:1px solid var(--rule);border-radius:2px;padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+.host-card{background:#0a0f1a;border-radius:3px;padding:1.5rem;margin:1.75rem 0;display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.hf-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:#64748b;text-transform:uppercase;margin-bottom:.3rem}
+.hf-value{font-family:var(--mono);font-size:.9rem;color:#4a9eff;font-weight:600}
+.hf-value.red{color:#ef4444}
+.finding{background:var(--paper);border:1px solid var(--rule);border-left:3px solid var(--red);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.finding.amber{border-left-color:var(--amber)}
+.finding.green{border-left-color:var(--green)}
+.finding-num{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:var(--red);text-transform:uppercase;margin-bottom:.3rem}
+.finding.amber .finding-num{color:var(--amber)}
+.finding.green .finding-num{color:var(--green)}
+.finding-title{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.6rem}
+.finding p{margin-bottom:.6rem;font-size:.88rem;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);margin:1.75rem 0}
+.log-box{background:var(--paper);padding:1.1rem 1rem}
+.log-name{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--blue);margin-bottom:.25rem}
+.log-size{font-family:var(--mono);font-size:.65rem;color:#94a3b8;margin-bottom:.4rem}
+.log-desc{font-size:.8rem;color:var(--ink3);line-height:1.5}
+/* C2 summary table */
+.c2-table{margin:1.75rem 0;border:1px solid var(--rule);overflow:hidden}
+.c2-header{background:#0a0f1a;color:#fff;display:grid;grid-template-columns:2fr 1fr 1fr 1fr 2fr;gap:0;padding:0}
+.c2-header span{padding:.65rem 1rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;border-right:1px solid rgba(255,255,255,.08)}
+.c2-header span:last-child{border-right:none}
+.c2-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 2fr;gap:0;border-top:1px solid var(--rule)}
+.c2-row.danger{background:var(--red-dim)}
+.c2-row.warning{background:var(--amber-dim)}
+.c2-cell{padding:.7rem 1rem;font-size:.84rem;color:var(--ink3);border-right:1px solid var(--rule);overflow-wrap:break-word;word-wrap:break-word;line-height:1.5}
+.c2-cell:last-child{border-right:none}
+.c2-cell.domain{font-family:var(--mono);font-size:.78rem;color:var(--red);font-weight:600;word-break:break-all}
+.c2-cell.domain.amber{color:var(--amber)}
+.c2-cell strong{color:var(--ink)}
+/* Zeek workflow */
+.workflow{margin:1.75rem 0}
+.wf-item{display:grid;grid-template-columns:3rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.wf-num{width:2.5rem;height:2.5rem;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.78rem;font-weight:600;flex-shrink:0}
+.wf-title{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.25rem}
+.wf-desc{font-size:.9rem;color:var(--ink3);line-height:1.6}
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);border-radius:2px;padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:130px 1fr;gap:1rem;font-size:.92rem}
+.nist-desc{color:var(--ink3);font-size:.92rem;line-height:1.7}
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer a{color:#4a9eff;text-decoration:none}
+footer a:hover{color:#93c5fd}
+@media(max-width:680px){
+  .mast-inner,.wrap{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .env-grid,.host-card{grid-template-columns:1fr}
+  .log-grid{grid-template-columns:1fr 1fr}
+  .nist-item{display:grid;grid-template-columns:130px 1fr;gap:1rem;font-size:.92rem}
+  .wf-item{grid-template-columns:1fr}
+  .c2-header,.c2-row{grid-template-columns:1fr;gap:0}
+  .c2-header span,.c2-cell{border-right:none;border-bottom:1px solid rgba(255,255,255,.08)}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Security Lab Log · Entry 005</div>
+    <h1 class="title">Zeek Network Analysis — Automated Log Generation & Threat Discovery</h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Date</div><div class="value">March 18, 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational Use</div></div>
+      <div class="meta-item"><div class="label">Lab Type</div><div class="value">Network Forensics / Log Analysis</div></div>
+      <div class="meta-item"><div class="label">Tools</div><div class="value">Zeek 8.1.1 · Kali Linux · Docker</div></div>
+      <div class="meta-item"><div class="label">Source</div><div class="value">malware-traffic-analysis.net · 2026-01-31</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    ZEEK 8.1.1 · KALI LINUX · LUMMA STEALER PCAP · 5 SUSPICIOUS DOMAINS IDENTIFIED · FULL C2 SCOPE MAPPED · MARCH 18 2026
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>Overview — What Zeek Is and Why It Matters</h2>
+  <p>Wireshark is a forensic investigation tool — an analyst opens a pcap, applies filters, and reads individual packets manually. It is the right tool for understanding exactly what happened at the byte level. But it does not scale. A SOC analyst cannot manually review 51,000 packets for every alert that fires.</p>
+  <p>Zeek (formerly Bro) is the layer between raw packet capture and human analysis. It reads the same pcap — or live network traffic — and automatically produces structured log files organized by protocol. Instead of navigating packets one at a time, the analyst reads purpose-built logs: every HTTP request in http.log, every DNS query in dns.log, every TLS connection with its destination domain in ssl.log. What Wireshark takes an hour to surface, Zeek produces in seconds.</p>
+  <p>This lab runs Zeek against the same Lumma Stealer pcap analyzed in Lab Log 004 — the same infection, the same traffic, different tool. The comparison reveals what each approach sees, what each misses, and why professional SOC environments use both.</p>
+
+  <div class="env-box">
+    <div class="env-box-title">Lab Configuration</div>
+    <div class="env-grid">
+      <div class="env-item"><div class="env-label">Tool</div><div class="env-value">Zeek 8.1.1</div></div>
+      <div class="env-item"><div class="env-label">Environment</div><div class="env-value">Kali Linux · Docker · macOS M1 host</div></div>
+      <div class="env-item"><div class="env-label">Pcap</div><div class="env-value">malware-traffic-analysis.net · 2026-01-31</div></div>
+      <div class="env-item"><div class="env-label">Malware Family</div><div class="env-value">Lumma Stealer</div></div>
+      <div class="env-item"><div class="env-label">Total Packets</div><div class="env-value">51,181</div></div>
+      <div class="env-item"><div class="env-label">Logs Generated</div><div class="env-value">17 log files</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>Installation & Setup</h2>
+  <p>Zeek is not available in the standard Kali repository at a compatible version for the current ARM64 container environment. Installation requires the official Zeek OpenSUSE repository, which provides ARM64-compatible builds.</p>
+
+  <div class="code-label">Installation — Zeek 8.1.1 on Kali Linux ARM64</div>
+  <div class="code-block"><pre><span class="co"># Add official Zeek repository</span>
+echo <span class="hi">'deb http://download.opensuse.org/repositories/security:/zeek/Debian_12/ /'</span> \
+  | tee /etc/apt/sources.list.d/zeek.list
+
+<span class="co"># Add GPG key</span>
+curl -fsSL https://download.opensuse.org/repositories/security:/zeek/Debian_12/Release.key \
+  | gpg --dearmor | tee /etc/apt/trusted.gpg.d/zeek.gpg > /dev/null
+
+<span class="co"># Install</span>
+apt-get update && apt-get install -y zeek
+
+<span class="co"># Add to PATH</span>
+echo <span class="hi">'export PATH=/opt/zeek/bin:$PATH'</span> >> ~/.bashrc && source ~/.bashrc
+
+<span class="co"># Verify</span>
+zeek --version
+<span class="hi">zeek version 8.1.1</span></pre></div>
+
+  <h3>Running Zeek Against a pcap</h3>
+  <p>Zeek reads a pcap file with the <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">-r</code> flag and writes all log files to the current directory. The entire 51,181-packet capture was processed in under 5 seconds.</p>
+
+  <div class="code-label">Zeek pcap Analysis Command</div>
+  <div class="code-block"><pre>mkdir /tmp/zeek-lumma && cd /tmp/zeek-lumma
+zeek -r /tmp/lumma.pcap
+
+<span class="co"># Output — 17 log files generated automatically:</span>
+<span class="hi">conn.log      dhcp.log      dns.log       dce_rpc.log
+files.log     http.log      kerberos.log  ldap.log
+ldap_search.log  ocsp.log  quic.log      smb_files.log
+smb_mapping.log  ssl.log   weird.log     x509.log
+packet_filter.log</span></pre></div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>Log File Structure — Understanding What Zeek Produces</h2>
+  <p>Every Zeek log file follows the same format. The first several lines begin with <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">#</code> and contain metadata — the separator character, field names, and field types. The data lines follow. Understanding this structure is essential for reading any Zeek log correctly.</p>
+
+  <div class="code-label">Reading Column Names — Universal Command</div>
+  <div class="code-block"><pre><span class="co"># For any Zeek log file:</span>
+grep "^#fields" <span class="ke">logname.log</span> | tr '\t' '\n' | cat -n
+
+<span class="co"># Example output for http.log:
+#  1  #fields
+#  2  ts          ← timestamp
+#  3  uid         ← unique connection ID
+#  4  id.orig_h   ← source IP
+#  5  id.orig_p   ← source port
+#  6  id.resp_h   ← destination IP
+#  7  id.resp_p   ← destination port
+#  8  method      ← GET / POST
+#  9  host        ← destination hostname
+# 10  uri         ← URL path
+#    ... and more</span>
+
+<span class="co"># Then read selected columns with awk:
+# Note: awk column number = field line number - 1
+# (because #fields header line counts as line 1)</span>
+grep -v "^#" <span class="ke">logname.log</span> | awk -F'\t' '{print $8, $9, $10}' | column -t</pre></div>
+
+  <p>The <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">cat -n</code> command numbers each line including the <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">#fields</code> header line itself. Because that header line is counted as line 1, the actual awk column number for any field is its line number minus 1. This offset applies to every Zeek log file.</p>
+
+  <h3>The 17 Log Files — What Each Contains</h3>
+
+  <div class="log-grid">
+    <div class="log-box">
+      <div class="log-name">http.log</div>
+      <div class="log-size">4.3 KB · 8 entries</div>
+      <div class="log-desc">Every HTTP request — method, host, URI, response code, bytes. The most actionable log for C2 detection.</div>
+    </div>
+    <div class="log-box">
+      <div class="log-name">ssl.log</div>
+      <div class="log-size">20.4 KB · 54 entries</div>
+      <div class="log-desc">Every TLS connection with SNI domain name. Reveals C2 infrastructure even in encrypted traffic.</div>
+    </div>
+    <div class="log-box">
+      <div class="log-name">conn.log</div>
+      <div class="log-size">42.1 KB · all connections</div>
+      <div class="log-desc">Every network connection — source, destination, duration, bytes transferred in both directions.</div>
+    </div>
+    <div class="log-box">
+      <div class="log-name">dns.log</div>
+      <div class="log-size">56.8 KB · all queries</div>
+      <div class="log-desc">Every DNS lookup with resolved IPs. Connects domain names to IP addresses seen in other logs.</div>
+    </div>
+    <div class="log-box">
+      <div class="log-name">kerberos.log</div>
+      <div class="log-size">2.9 KB · 15 entries</div>
+      <div class="log-desc">Windows authentication — usernames, domain, ticket types, success/failure status.</div>
+    </div>
+    <div class="log-box">
+      <div class="log-name">dhcp.log</div>
+      <div class="log-size">644 bytes · 1 entry</div>
+      <div class="log-desc">Machine identity — MAC address, hostname, and assigned IP in a single record.</div>
+    </div>
+    <div class="log-box">
+      <div class="log-name">files.log</div>
+      <div class="log-size">3.9 KB</div>
+      <div class="log-desc">Every file transferred — MIME type, size, MD5/SHA1 hash. Use for malware hash lookups.</div>
+    </div>
+    <div class="log-box">
+      <div class="log-name">dce_rpc.log</div>
+      <div class="log-size">408 KB · Windows RPC</div>
+      <div class="log-desc">Windows remote procedure calls — normal domain activity, useful for lateral movement detection.</div>
+    </div>
+    <div class="log-box">
+      <div class="log-name">x509.log</div>
+      <div class="log-size">9.5 KB · certificates</div>
+      <div class="log-desc">TLS certificate details — issuer, subject, validity dates. Self-signed certs are a red flag.</div>
+    </div>
+    <div class="log-box">
+      <div class="log-name">weird.log</div>
+      <div class="log-size">801 bytes</div>
+      <div class="log-desc">Traffic Zeek could not parse normally. Unusual protocol behavior worth examining.</div>
+    </div>
+    <div class="log-box">
+      <div class="log-name">smb_files.log</div>
+      <div class="log-size">592 bytes · SMB</div>
+      <div class="log-desc">Files accessed or transferred over SMB. Useful for detecting lateral movement and data theft.</div>
+    </div>
+    <div class="log-box">
+      <div class="log-name">ldap.log</div>
+      <div class="log-size">1.7 KB · AD queries</div>
+      <div class="log-desc">Active Directory LDAP queries — normal domain activity, useful for reconnaissance detection.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>Triage Workflow — Five Commands, Full Picture</h2>
+  <p>The Zeek triage workflow mirrors the Wireshark sequence from Lab Log 003 and Lab Log 004 — machine identity, user identity, then behavior. The difference is speed and depth. Each command produces a clean, readable result without manual packet navigation.</p>
+
+  <div class="workflow">
+    <div class="wf-item">
+      <div class="wf-num">1</div>
+      <div>
+        <div class="wf-title">dhcp.log — Machine Identity</div>
+        <div class="wf-desc">MAC address, hostname, and assigned IP in a single record. The Zeek equivalent of filtering DHCP in Wireshark and clicking the Request packet.</div>
+      </div>
+    </div>
+    <div class="wf-item">
+      <div class="wf-num">2</div>
+      <div>
+        <div class="wf-title">kerberos.log — User Identity</div>
+        <div class="wf-desc">Username, domain, authentication type, and success/failure for every login. The Zeek equivalent of filtering Kerberos and reading CNameString.</div>
+      </div>
+    </div>
+    <div class="wf-item">
+      <div class="wf-num">3</div>
+      <div>
+        <div class="wf-title">http.log — Visible C2 Activity</div>
+        <div class="wf-desc">Every HTTP request showing method, host, and URI. Unencrypted C2 traffic is fully readable. One command surfaces the entire attack sequence.</div>
+      </div>
+    </div>
+    <div class="wf-item">
+      <div class="wf-num">4</div>
+      <div>
+        <div class="wf-title">ssl.log — Encrypted C2 Discovery</div>
+        <div class="wf-desc">Every TLS destination domain via SNI, sorted by connection count. Suspicious domains appear at the top. Reveals C2 infrastructure invisible to HTTP analysis alone.</div>
+      </div>
+    </div>
+    <div class="wf-item">
+      <div class="wf-num">5</div>
+      <div>
+        <div class="wf-title">conn.log — Data Volume Analysis</div>
+        <div class="wf-desc">Bytes sent and received per connection to suspicious IPs. Large outbound transfers confirm exfiltration. Quantifies the scope of the breach.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Command Reference — Exact Syntax Used</h3>
+
+  <div class="code-label">Step 1 — dhcp.log: MAC, Hostname, IP</div>
+  <div class="code-block"><pre>grep -v "^#" dhcp.log | awk -F'\t' '{print $5, $6, $10}' | column -t
+
+<span class="hi">00:21:5d:c8:0e:f2  DESKTOP-ES9F3ML  10.1.21.58</span></pre></div>
+
+  <div class="code-label">Step 2 — kerberos.log: Source IP, Request Type, Username, Success</div>
+  <div class="code-block"><pre>grep -v "^#" kerberos.log | awk -F'\t' '{print $3, $7, $8, $10}' | column -t
+
+<span class="hi">10.1.21.58  AS   gwyatt/WIN11OFFICE      F</span>   <span class="co">← pre-auth required (normal)</span>
+<span class="hi">10.1.21.58  AS   gwyatt/WIN11OFFICE      T</span>   <span class="co">← login successful</span>
+<span class="hi">10.1.21.58  TGS  gwyatt/WIN11OFFICE.COM  T</span>   <span class="co">← service ticket (×5)</span></pre></div>
+
+  <div class="code-label">Step 3 — http.log: Method, Host, URI</div>
+  <div class="code-block"><pre>grep -v "^#" http.log | awk -F'\t' '{print $8, $9, $10}' | column -t
+
+<span class="co">GET   www.msftconnecttest.com  /connecttest.txt          ← normal</span>
+<span class="co">GET   clients2.google.com      /time/1/current?...       ← normal</span>
+<span class="wa">GET   whitepepper.su           /api/set_agent?...agent=Chrome</span>
+<span class="wa">POST  whitepepper.su           /api/set_agent?...act=log</span>
+<span class="co">GET   whitepepper.su           /favicon.ico              ← connectivity check</span>
+<span class="wa">GET   whitepepper.su           /api/set_agent?...agent=Edge</span>
+<span class="wa">POST  whitepepper.su           /api/set_agent?...act=log</span>
+<span class="co">GET   whitepepper.su           /favicon.ico              ← connectivity check</span></pre></div>
+
+  <div class="code-label">Step 4 — ssl.log: Connection Count, Destination IP, SNI Domain</div>
+  <div class="code-block"><pre>grep -v "^#" ssl.log | awk -F'\t' '{print $5, $10}' | sort | uniq -c | sort -rn | column -t
+
+<span class="wa">16  153.92.1.49      whitepepper.su</span>               <span class="co">← primary C2 — highest count</span>
+<span class="co">13  142.251.116.95   oauthaccountmanager.googleapis.com</span>
+<span class="co"> 5  52.109.0.142     odc.officeapps.live.com</span>
+<span class="co"> 5  150.171.28.11    edge.microsoft.com</span>
+<span class="wa"> 2  104.21.9.36      communicationfirewall-security.cc</span>  <span class="co">← suspicious</span>
+<span class="co"> 2  23.222.241.141   www.bing.com</span>
+<span class="wa"> 1  80.97.160.24     holiday-forever.cc</span>               <span class="co">← suspicious</span>
+<span class="wa"> 1  62.72.32.156     whooptm.cyou</span>                     <span class="co">← suspicious</span>
+<span class="co">   ... [Microsoft / Google / Akamai / Cloudflare — all legitimate]</span>
+<span class="wa"> 1  104.21.48.156    media.megafilehub4.lat</span>           <span class="co">← suspicious</span></pre></div>
+
+  <div class="code-label">Step 5 — conn.log: Bytes Sent/Received to Suspicious IPs</div>
+  <div class="code-block"><pre>grep -v "^#" conn.log | awk -F'\t' \
+  '$5 ~ /153.92.1.49|104.21.9.36|80.97.160.24|62.72.32.156|104.21.48.156/ \
+  {print $5, $9, $10, $11}' | column -t
+
+<span class="co"># Key findings (duration · bytes_sent · bytes_received):</span>
+<span class="wa">153.92.1.49   2.809s   1,419,610  2,245</span>   <span class="co">← 1.4MB exfiltrated</span>
+<span class="wa">153.92.1.49   2.155s     253,261  2,245</span>   <span class="co">← 247KB exfiltrated</span>
+<span class="wa">104.21.48.156  24.76s    158,274  43,022</span>  <span class="co">← payload download (megafilehub4.lat)</span>
+<span class="wa">80.97.160.24   3.68s        849  114,938</span>  <span class="co">← 112KB downloaded (holiday-forever.cc)</span>
+<span class="wa">104.21.9.36    5.54s        899   97,009</span>  <span class="co">← 95KB downloaded (communicationfirewall-security.cc)</span>
+<span class="wa">104.21.9.36    4.38s     10,710   31,451</span>  <span class="co">← 31KB downloaded</span>
+<span class="wa">62.72.32.156  32.18s      3,692    6,143</span>  <span class="co">← 32s session (whooptm.cyou)</span></pre></div>
+
+  <div class="callout callout-amber">
+    <p><strong>The ssl.log discovery that Wireshark missed:</strong> Lab Log 004 identified whitepepper.su as the C2 domain. The Zeek ssl.log analysis surfaced four additional suspicious domains — communicationfirewall-security.cc, holiday-forever.cc, whooptm.cyou, and media.megafilehub4.lat — none of which appeared in the HTTP log. All four were conducting encrypted communications with the infected machine. The full scope of this infection was only visible through Zeek's ssl.log.</p>
+  </div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>Complete C2 Infrastructure Map</h2>
+  <p>Combining the http.log and ssl.log findings, the full picture of Lumma Stealer's command and control infrastructure is as follows. None of this required opening a single packet.</p>
+
+  <div class="c2-table">
+    <div class="c2-header">
+      <span>Domain</span>
+      <span>IP</span>
+      <span>Protocol</span>
+      <span>Data Volume</span>
+      <span>Role</span>
+    </div>
+    <div class="c2-row danger">
+      <div class="c2-cell domain">whitepepper.su</div>
+      <div class="c2-cell mono">153.92.1.49</div>
+      <div class="c2-cell">HTTP + TLS</div>
+      <div class="c2-cell red">1.67MB out</div>
+      <div class="c2-cell">Primary C2 — agent registration, browser fingerprint, credential exfiltration</div>
+    </div>
+    <div class="c2-row warning">
+      <div class="c2-cell domain amber">communicationfirewall-security.cc</div>
+      <div class="c2-cell mono">104.21.9.36</div>
+      <div class="c2-cell">TLS</div>
+      <div class="c2-cell amber">128KB in</div>
+      <div class="c2-cell">Secondary payload delivery — disguised as security infrastructure by domain name</div>
+    </div>
+    <div class="c2-row warning">
+      <div class="c2-cell domain amber">holiday-forever.cc</div>
+      <div class="c2-cell mono">80.97.160.24</div>
+      <div class="c2-cell">TLS</div>
+      <div class="c2-cell amber">115KB in</div>
+      <div class="c2-cell">Payload or configuration download — .cc TLD associated with criminal infrastructure</div>
+    </div>
+    <div class="c2-row warning">
+      <div class="c2-cell domain amber">whooptm.cyou</div>
+      <div class="c2-cell mono">62.72.32.156</div>
+      <div class="c2-cell">TLS</div>
+      <div class="c2-cell amber">32s session</div>
+      <div class="c2-cell">Possible command channel — longest single connection duration of all suspicious hosts</div>
+    </div>
+    <div class="c2-row warning">
+      <div class="c2-cell domain amber">media.megafilehub4.lat</div>
+      <div class="c2-cell mono">104.21.48.156</div>
+      <div class="c2-cell">TLS</div>
+      <div class="c2-cell amber">43KB in</div>
+      <div class="c2-cell">File hosting — likely additional malware module or payload download</div>
+    </div>
+  </div>
+
+  <div class="callout callout-red">
+    <p><strong>Total estimated data exfiltrated to primary C2:</strong> approximately <strong>1.67MB</strong> sent from 10.1.21.58 to 153.92.1.49 — representing the contents of gwyatt's Chrome and Edge credential stores, browser cookies, and saved passwords. Total additional payload downloaded from secondary infrastructure: approximately <strong>299KB</strong> across four domains.</p>
+  </div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>Confirmed Host Identity</h2>
+  <p>The dhcp.log and kerberos.log confirmed the infected host identity in two commands, matching the findings from the manual Wireshark analysis in Lab Log 004.</p>
+
+  <div class="host-card">
+    <div class="host-field"><div class="hf-label">IP Address</div><div class="hf-value">10.1.21.58</div></div>
+    <div class="host-field"><div class="hf-label">MAC Address</div><div class="hf-value">00:21:5d:c8:0e:f2</div></div>
+    <div class="host-field"><div class="hf-label">Hostname</div><div class="hf-value">DESKTOP-ES9F3ML</div></div>
+    <div class="host-field"><div class="hf-label">Username</div><div class="hf-value red">gwyatt</div></div>
+    <div class="host-field"><div class="hf-label">Domain</div><div class="hf-value">WIN11OFFICE.COM</div></div>
+    <div class="host-field"><div class="hf-label">Auth Status</div><div class="hf-value">Confirmed — AS success</div></div>
+  </div>
+</div>
+
+<!-- SECTION 07 -->
+<div class="section">
+  <div class="section-num">Section 07</div>
+  <h2>Findings</h2>
+
+  <div class="finding">
+    <div class="finding-num">Finding 01 — Critical</div>
+    <div class="finding-title">Full C2 Infrastructure Mapped — Five Domains, 1.67MB Exfiltrated</div>
+    <p>Zeek ssl.log analysis identified five suspicious domains communicating with DESKTOP-ES9F3ML (10.1.21.58, user: gwyatt). The primary C2 server at <strong>whitepepper.su</strong> (153.92.1.49) received approximately 1.67MB of outbound data — gwyatt's Chrome and Edge browser credentials, cookies, and saved passwords. Four additional domains delivered a combined 299KB of payload to the infected machine over encrypted TLS connections.</p>
+    <p>The <a href="lab_log_004.html" style="color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink)">Wireshark analysis in Lab Log 004</a> identified only whitepepper.su. Zeek's ssl.log revealed the complete infrastructure scope, including four additional C2 and payload delivery domains operating exclusively over TLS.</p>
+  </div>
+
+  <div class="finding amber">
+    <div class="finding-num">Finding 02 — High</div>
+    <div class="finding-title">Suspicious TLD Pattern Across All Five Domains</div>
+    <p>All five malicious domains use high-abuse TLDs: <strong>.su</strong> (Soviet Union — criminal infrastructure), <strong>.cc</strong> (Cocos Islands — heavily abused), <strong>.cyou</strong> (cheap TLD, high abuse rate), <strong>.lat</strong> (cheap TLD with file hosting abuse). None of these TLDs appear in any legitimate business infrastructure in this capture. A TLD-based detection rule would have flagged all five domains automatically.</p>
+  </div>
+
+  <div class="finding amber">
+    <div class="finding-num">Finding 03 — High</div>
+    <div class="finding-title">Domain Masquerading — communicationfirewall-security.cc</div>
+    <p>The domain <strong>communicationfirewall-security.cc</strong> is constructed to resemble legitimate security infrastructure. An analyst scanning domain names quickly might dismiss it as an internal security tool or vendor service. The <strong>.cc</strong> TLD and the absence of this domain from any legitimate vendor list are the tells. This masquerading technique is deliberate — designed to survive a superficial log review.</p>
+  </div>
+</div>
+
+<!-- SECTION 08 -->
+<div class="section">
+  <div class="section-num">Section 08</div>
+  <h2>Wireshark vs Zeek — When to Use Each</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <colgroup>
+        <col style="width:25%">
+        <col style="width:37%">
+        <col style="width:38%">
+      </colgroup>
+      <thead>
+        <tr><th>Task</th><th>Wireshark</th><th>Zeek</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Initial triage</strong></td>
+          <td>Manual — apply filters, read packets one at a time</td>
+          <td class="green">Faster — structured logs ready in seconds</td>
+        </tr>
+        <tr>
+          <td><strong>Host identification</strong></td>
+          <td>DHCP filter → click Request packet → read options</td>
+          <td class="green">One command → MAC, hostname, IP in one line</td>
+        </tr>
+        <tr>
+          <td><strong>C2 domain discovery</strong></td>
+          <td>TLS filter → find Client Hello packets → read SNI manually</td>
+          <td class="green">ssl.log sorted by count → suspicious domains at top</td>
+        </tr>
+        <tr>
+          <td><strong>Packet payload inspection</strong></td>
+          <td class="green">Full packet contents readable — POST body, HTTP headers, raw bytes</td>
+          <td>Log summaries only — cannot read packet contents</td>
+        </tr>
+        <tr>
+          <td><strong>Evidence documentation</strong></td>
+          <td class="green">Packet-level screenshots, exact byte sequences</td>
+          <td>Log output — less granular but structured and automatable</td>
+        </tr>
+        <tr>
+          <td><strong>Scale</strong></td>
+          <td>Practical up to ~100K packets manually</td>
+          <td class="green">Handles millions of packets, runs on live traffic 24/7</td>
+        </tr>
+        <tr>
+          <td><strong>Automation</strong></td>
+          <td>Manual only</td>
+          <td class="green">Output feeds SIEM, RITA, Python scripts, alerting systems</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>The professional workflow:</strong> Zeek runs continuously on live traffic or is applied to a pcap first for rapid triage. When Zeek identifies something suspicious — an unusual domain, a large outbound transfer, a known malicious TLD — the analyst opens Wireshark and drills into the specific packets to read the actual content, gather evidence, and document findings at the byte level. Zeek finds it. Wireshark proves it.</p>
+  </div>
+</div>
+
+<!-- SECTION 09 -->
+<div class="section">
+  <div class="section-num">Section 09</div>
+  <h2>NIST SP 800-171 Control Mapping</h2>
+  <div class="nist-box">
+    <div class="nist-box-title">Applicable Controls</div>
+    <div class="nist-items">
+      <div class="nist-item">
+        <div class="nist-control">3.3.1</div>
+        <div class="nist-desc"><strong>Audit logging.</strong> Zeek produces structured, searchable audit logs from raw network traffic automatically. Running Zeek on network captures at the perimeter satisfies the network-layer component of this control.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.14.6</div>
+        <div class="nist-desc"><strong>Monitor for malicious code.</strong> The ssl.log TLD analysis would detect all five malicious domains automatically with a simple script. A detection rule flagging .su, .cc, .cyou, and .lat domains would have alerted on this infection before the credential exfiltration completed.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.13.1</div>
+        <div class="nist-desc"><strong>Boundary protection.</strong> Zeek running at the network perimeter provides continuous visibility into all outbound connections. A Zeek-based alert on large outbound TLS transfers to unknown destinations would have flagged the 1.67MB exfiltration in real time.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.3.2</div>
+        <div class="nist-desc"><strong>User activity traceability.</strong> The kerberos.log attributed all suspicious network activity to user gwyatt on DESKTOP-ES9F3ML — a complete chain of attribution from packet to person, produced automatically without manual analysis.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 10 -->
+<div class="section">
+  <div class="section-num">Section 10</div>
+  <h2>Lessons Learned</h2>
+
+  <h3>Always Read the Column Map Before Writing Any Command</h3>
+  <p>Zeek log files have many columns and the awk column number equals the field line number minus one — because the <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">#fields</code> header line counts as line 1. Running <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">grep "^#fields" logname.log | tr '\t' '\n' | cat -n</code> before every new log file takes ten seconds and prevents every column mismatch error. This is the first command in any Zeek analysis session.</p>
+
+  <h3>ssl.log Is the Most Valuable Log for Modern Malware</h3>
+  <p>Modern malware uses TLS for almost everything. http.log shows the unencrypted reconnaissance phase — valuable but incomplete. ssl.log shows the full encrypted C2 infrastructure via SNI. Sorting ssl.log by connection count with <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">sort | uniq -c | sort -rn</code> puts the most-contacted suspicious hosts at the top automatically. In this analysis, ssl.log revealed four C2 domains completely invisible to HTTP analysis.</p>
+
+  <h3>Domain Name Pattern Recognition Is a Core Analyst Skill</h3>
+  <p>Five suspicious domains were identified in this analysis. None required threat intelligence lookups or reputation databases — they were identified by reading the domain names and TLDs. <strong>.su</strong> has not been a legitimate country TLD since 1991. <strong>communicationfirewall-security.cc</strong> combines security-sounding words with a high-abuse TLD. <strong>megafilehub4</strong> in a domain name means file hosting, not legitimate software. Learning to read domain names is fast, free, and requires no tools.</p>
+
+  <h3>Next Lab</h3>
+  <p>Lab Log 006 builds a Python automation script — <strong>zeek_triage.py</strong> — that reads a Zeek log folder and produces a complete color-coded threat report automatically. The same Lumma Stealer logs generated in this lab are the input, showing how the manual five-command workflow translates directly into automated detection code.</p>
+</div>
+
+</div></div>
+
+<footer>
+  <span>Lab Log 005 — Zeek Network Analysis &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; March 18, 2026 &nbsp;·&nbsp; Educational use only</span>
+  <a href="index.html">← Portfolio</a>
+</footer>
+
+</body>
+</html>

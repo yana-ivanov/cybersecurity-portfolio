@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Log 006 — Zeek_triage.py: Automated Threat Detection | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--display-clean);font-size:clamp(2rem,5vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#4a9eff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:#0a0f1a;line-height:1.2;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+.code-block{background:#0a0f1a;border-radius:3px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.co{color:#64748b}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem;table-layout:fixed}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;font-weight:600;overflow-wrap:break-word;word-wrap:break-word}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top;overflow-wrap:break-word;word-wrap:break-word;line-height:1.6}
+tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+td strong{color:var(--ink);font-weight:600}
+td.mono{font-family:var(--mono);font-size:.78rem;color:var(--blue);word-break:break-all}
+td.red{color:var(--red);font-weight:600}
+td.amber{color:var(--amber);font-weight:600}
+td.green{color:var(--green);font-weight:600}
+.env-box{background:var(--paper);border:1px solid var(--rule);border-radius:2px;padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+.host-card{background:#0a0f1a;border-radius:3px;padding:1.5rem;margin:1.75rem 0;display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.hf-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:#64748b;text-transform:uppercase;margin-bottom:.3rem}
+.hf-value{font-family:var(--mono);font-size:.9rem;color:#4a9eff;font-weight:600}
+.hf-value.red{color:#ef4444}
+.finding{background:var(--paper);border:1px solid var(--rule);border-left:3px solid var(--red);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.finding.amber{border-left-color:var(--amber)}
+.finding.green{border-left-color:var(--green)}
+.finding.blue{border-left-color:var(--blue)}
+.finding-num{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:var(--red);text-transform:uppercase;margin-bottom:.3rem}
+.finding.amber .finding-num{color:var(--amber)}
+.finding.green .finding-num{color:var(--green)}
+.finding.blue .finding-num{color:var(--blue)}
+.finding-title{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.6rem}
+.finding p{margin-bottom:.6rem;font-size:.88rem;border-radius:3px;padding:1.5rem;margin:1.75rem 0;border:1px solid rgba(255,255,255,.08)}
+.terminal-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{font-family:var(--mono);font-size:.6rem;color:#64748b;letter-spacing:.1em;text-transform:uppercase;margin-left:.5rem}
+.terminal pre{font-family:var(--mono);font-size:.76rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#e2e8f0}
+.t-red{color:#ef4444;font-weight:bold}
+.t-orange{color:#fb923c;font-weight:bold}
+.t-blue{color:#60a5fa;font-weight:bold}
+.t-dim{color:#475569}
+.t-bold{font-weight:bold}
+/* compare grid */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.easy{border-top:3px solid var(--amber)}
+.compare-box.lumma{border-top:3px solid var(--red)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.easy .compare-label{color:var(--amber)}
+.compare-box.lumma .compare-label{color:var(--red)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+/* function cards */
+.fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.75rem 0}
+.fn-card{background:var(--paper);border:1px solid var(--rule);padding:1rem 1.1rem;border-top:2px solid var(--blue)}
+.fn-name{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--blue);margin-bottom:.3rem}
+.fn-desc{font-size:.82rem;color:var(--ink3);line-height:1.55}
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);border-radius:2px;padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:130px 1fr;gap:1rem;font-size:.92rem}
+.nist-desc{color:var(--ink3);font-size:.92rem;line-height:1.7}
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer a{color:#4a9eff;text-decoration:none}
+footer a:hover{color:#93c5fd}
+@media(max-width:680px){
+  .mast-inner,.wrap{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .env-grid,.host-card,.compare-grid,.fn-grid{grid-template-columns:1fr}
+  .nist-item{display:grid;grid-template-columns:130px 1fr;gap:1rem;font-size:.92rem}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Security Lab Log · Entry 006</div>
+    <h1 class="title">Zeek_triage.py — Automated Threat Detection with Python</h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Date</div><div class="value">March 18, 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational Use</div></div>
+      <div class="meta-item"><div class="label">Lab Type</div><div class="value">Security Automation / Python</div></div>
+      <div class="meta-item"><div class="label">Language</div><div class="value">Python 3.14 · No external libraries</div></div>
+      <div class="meta-item"><div class="label">Validated Against</div><div class="value">Lumma Stealer · Easy As 123 C2</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    AI-ASSISTED DEVELOPMENT &nbsp;·&nbsp; ZERO EXTERNAL DEPENDENCIES &nbsp;·&nbsp; VALIDATED ON REAL MALWARE PCAPS &nbsp;·&nbsp; MARCH 18 2026
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>Overview</h2>
+  <p>Labs 003 through 005 established a manual triage workflow: DHCP for machine identity, Kerberos for username, HTTP and TLS logs for suspicious activity, conn.log for data volumes. Each step required applying the right filter or command, reading the output, and making a judgment call. The workflow is effective but depends entirely on the analyst remembering the sequence and executing it correctly under time pressure.</p>
+  <p>This lab automates that workflow into a single Python script — <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">zeek_triage.py</code> — that reads a Zeek log folder and produces a complete color-coded threat report in under one second. The script was developed using AI-assisted development: the problem was defined, the logic was directed, and every function was reviewed and validated against confirmed findings from the previous labs. The output was verified against two known malware families before being considered reliable.</p>
+
+  <div class="env-box">
+    <div class="env-box-title">Script Configuration</div>
+    <div class="env-grid">
+      <div class="env-item"><div class="env-label">Language</div><div class="env-value">Python 3.14</div></div>
+      <div class="env-item"><div class="env-label">Dependencies</div><div class="env-value">None — stdlib only (os, sys, collections)</div></div>
+      <div class="env-item"><div class="env-label">Input</div><div class="env-value">Any Zeek log directory</div></div>
+      <div class="env-item"><div class="env-label">Output</div><div class="env-value">Color-coded terminal threat report</div></div>
+      <div class="env-item"><div class="env-label">Runtime</div><div class="env-value">Under 1 second on 51,000-packet captures</div></div>
+      <div class="env-item"><div class="env-label">Platform</div><div class="env-value">macOS · Linux · Any Python 3.x system</div></div>
+    </div>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>On AI-assisted development:</strong> Every security professional uses AI tooling to accelerate scripting work. The skill is not typing code from memory — it is understanding what to build, directing the logic, reviewing the output for correctness, and validating against real data. This script was built that way. Every function can be explained line by line because the logic was understood before it was written, not after.</p>
+  </div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>Script Architecture</h2>
+  <p>The script is organized into six functions plus a main entry point. Each function maps directly to one step of the manual triage workflow from Lab Log 003 and Lab Log 005.</p>
+
+  <div class="fn-grid">
+    <div class="fn-card">
+      <div class="fn-name">parse_zeek_log(filepath)</div>
+      <div class="fn-desc">Core parser — reads any Zeek log file and returns a list of dictionaries, one per row, keyed by column name. Used by every other function. Skips all # header lines automatically.</div>
+    </div>
+    <div class="fn-card">
+      <div class="fn-name">get_host_identity(log_dir)</div>
+      <div class="fn-desc">Reads dhcp.log — extracts MAC address, hostname, and assigned IP from the first DHCP record. Returns None safely if the file doesn't exist.</div>
+    </div>
+    <div class="fn-card">
+      <div class="fn-name">get_username(log_dir)</div>
+      <div class="fn-desc">Reads kerberos.log — finds the first successful AS-REQ and extracts the CNameString username by splitting on the domain separator.</div>
+    </div>
+    <div class="fn-card">
+      <div class="fn-name">get_suspicious_http(log_dir)</div>
+      <div class="fn-desc">Reads http.log — deduplicates requests by host, filters out known-safe vendors, returns unique suspicious hosts with request counts and methods.</div>
+    </div>
+    <div class="fn-card">
+      <div class="fn-name">get_suspicious_tls(log_dir)</div>
+      <div class="fn-desc">Reads ssl.log — matches server_name SNI field against a list of high-abuse TLDs. Returns unique suspicious domains with IP and TLD classification.</div>
+    </div>
+    <div class="fn-card">
+      <div class="fn-name">get_data_volumes(log_dir, ips)</div>
+      <div class="fn-desc">Reads conn.log — sums bytes sent and received for each suspicious IP across all connections. Quantifies the scope of exfiltration in human-readable format.</div>
+    </div>
+  </div>
+
+  <h3>Key Python Concepts Applied</h3>
+
+  <div class="tbl-wrap">
+    <table>
+      <colgroup>
+        <col style="width:25%">
+        <col style="width:35%">
+        <col style="width:40%">
+      </colgroup>
+      <thead>
+        <tr><th>Concept</th><th>Where Used</th><th>Why It Matters</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>with open()</strong></td>
+          <td class="mono">parse_zeek_log</td>
+          <td>Guarantees file closes even if an error occurs — prevents resource leaks when processing many log files</td>
+        </tr>
+        <tr>
+          <td><strong>dict(zip())</strong></td>
+          <td class="mono">parse_zeek_log</td>
+          <td>Pairs column names with row values to create named dictionaries — enables row["hostname"] instead of row[6]</td>
+        </tr>
+        <tr>
+          <td><strong>row.get(key, default)</strong></td>
+          <td>All functions</td>
+          <td>Safe dictionary lookup — returns default value instead of crashing if a field is missing from a log row</td>
+        </tr>
+        <tr>
+          <td><strong>any() + generator</strong></td>
+          <td class="mono">get_suspicious_http</td>
+          <td>Checks if any safe vendor keyword appears in the hostname — concise one-line replacement for a nested loop</td>
+        </tr>
+        <tr>
+          <td><strong>set()</strong></td>
+          <td class="mono">get_suspicious_tls</td>
+          <td>Stores only unique values — prevents the same suspicious domain appearing multiple times in the report</td>
+        </tr>
+        <tr>
+          <td><strong>defaultdict</strong></td>
+          <td class="mono">get_data_volumes</td>
+          <td>Automatically creates a new entry for any unseen IP key — eliminates KeyError without manual initialization</td>
+        </tr>
+        <tr>
+          <td><strong>str.split()</strong></td>
+          <td class="mono">get_username</td>
+          <td>Splits "gwyatt/WIN11OFFICE.COM" on the slash to extract just the username — opposite of join()</td>
+        </tr>
+        <tr>
+          <td><strong>ANSI escape codes</strong></td>
+          <td class="mono">print_report</td>
+          <td>Terminal color output with no external libraries — red for confirmed threats, orange for caution, blue for structure</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>Color System — Meaning Over Decoration</h2>
+  <p>Terminal output colors are only useful if they mean something consistent. A color system that uses red for some things and not others, or that changes meaning between sections, forces the analyst to read carefully rather than scan quickly. The script uses three colors with strict single meanings:</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <colgroup>
+        <col style="width:15%">
+        <col style="width:30%">
+        <col style="width:55%">
+      </colgroup>
+      <thead>
+        <tr><th>Color</th><th>Meaning</th><th>Applied To</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong style="color:var(--red)">Red</strong></td>
+          <td>Confirmed threat — act immediately</td>
+          <td>POST requests, suspicious domain names, compromised username, data exfiltration over 1MB, CRITICAL severity</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--amber)">Orange</strong></td>
+          <td>Caution — investigate further</td>
+          <td>Data volumes between 100KB and 1MB, HIGH and MEDIUM severity ratings</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--blue)">Blue</strong></td>
+          <td>Structure only — not a threat indicator</td>
+          <td>Section headers exclusively</td>
+        </tr>
+        <tr>
+          <td><strong style="color:#64748b">Dim</strong></td>
+          <td>Secondary context</td>
+          <td>URIs, IP addresses, dividers — supporting information that doesn't require immediate attention</td>
+        </tr>
+        <tr>
+          <td>No color</td>
+          <td>Neutral facts</td>
+          <td>Host IP, MAC address, hostname, GET requests, connection counts</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>Design principle:</strong> An analyst under pressure should be able to open the terminal report and know in under five seconds whether the severity is CRITICAL or LOW based on color alone — without reading a single word. Red anywhere in the output means stop and investigate. No red means continue normal operations. The color system was designed to support that scan-first behavior.</p>
+  </div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>Validation — Two Malware Families, Two Different Signatures</h2>
+  <p>The script was validated against both pcaps analyzed in previous labs. The outputs were compared against findings from manual Wireshark analysis (Lab Log 004) and Zeek log analysis (Lab Log 005) to confirm accuracy.</p>
+
+  <h3>Lumma Stealer — malware-traffic-analysis.net 2026-01-31</h3>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="terminal-dot" style="background:#ef4444"></div>
+      <div class="terminal-dot" style="background:#fbbf24;margin-left:4px"></div>
+      <div class="terminal-dot" style="background:#4ade80;margin-left:4px"></div>
+      <div class="terminal-title">python3 zeek_triage.py ~/Desktop/zeek-lumma</div>
+    </div>
+    <pre><span class="t-bold">============================================================
+  ZEEK TRIAGE REPORT
+============================================================</span>
+
+<span class="t-blue">[ INFECTED HOST IDENTITY ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  IP Address : 10.1.21.58
+  MAC Address: 00:21:5d:c8:0e:f2
+  Hostname   : DESKTOP-ES9F3ML
+  Username   : <span class="t-red">gwyatt</span>
+
+<span class="t-blue">[ SUSPICIOUS HTTP REQUESTS ]</span> — <span class="t-red">1</span> unique hosts
+<span class="t-dim">------------------------------------------------------------</span>
+  <span class="t-red">GET, POST</span>  <span class="t-red">whitepepper.su</span>  <span class="t-dim">(6 requests)</span>
+             <span class="t-dim">/api/set_agent?id=3BF67EC05320C5729578BE4C0ADF174C&token=...</span>
+
+<span class="t-blue">[ SUSPICIOUS TLS DOMAINS ]</span> — <span class="t-red">5</span> found
+<span class="t-dim">------------------------------------------------------------</span>
+  <span class="t-red">media.megafilehub4.lat          </span> <span class="t-dim">104.21.48.156  [.lat]</span>
+  <span class="t-red">whooptm.cyou                    </span> <span class="t-dim">62.72.32.156   [.cyou]</span>
+  <span class="t-red">whitepepper.su                  </span> <span class="t-dim">153.92.1.49    [.su]</span>
+  <span class="t-red">holiday-forever.cc              </span> <span class="t-dim">80.97.160.24   [.cc]</span>
+  <span class="t-red">communicationfirewall-security.cc</span> <span class="t-dim">104.21.9.36   [.cc]</span>
+
+<span class="t-blue">[ DATA VOLUMES TO SUSPICIOUS IPs ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  <span class="t-bold">153.92.1.49</span>
+    Sent       : <span class="t-red">2.10 MB</span>
+    Received   : 76.9 KB
+    Connections: 24
+  <span class="t-bold">104.21.48.156</span>
+    Sent       : <span class="t-orange">158.3 KB</span>
+    Received   : 43.0 KB
+    Connections: 1
+
+<span class="t-blue">[ SEVERITY SUMMARY ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  Suspicious HTTP requests : <span class="t-red">1</span>
+  Suspicious TLS domains   : <span class="t-red">5</span>
+  Total data exfiltrated   : <span class="t-red">2.27 MB</span>
+  Overall severity         : <span class="t-red">CRITICAL</span></pre>
+  </div>
+
+  <h3>Easy As 123 C2 Beaconing — malware-traffic-analysis.net 2026-02-28</h3>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="terminal-dot" style="background:#ef4444"></div>
+      <div class="terminal-dot" style="background:#fbbf24;margin-left:4px"></div>
+      <div class="terminal-dot" style="background:#4ade80;margin-left:4px"></div>
+      <div class="terminal-title">python3 zeek_triage.py ~/Desktop/zeek-easy123</div>
+    </div>
+    <pre><span class="t-bold">============================================================
+  ZEEK TRIAGE REPORT
+============================================================</span>
+
+<span class="t-blue">[ INFECTED HOST IDENTITY ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  IP Address : -
+  MAC Address: 00:e0:4c:68:08:00
+  Hostname   : brads-MBP
+  Username   : <span class="t-red">brolf</span>
+
+<span class="t-blue">[ SUSPICIOUS HTTP REQUESTS ]</span> — <span class="t-red">1</span> unique hosts
+<span class="t-dim">------------------------------------------------------------</span>
+  <span class="t-red">POST</span>  <span class="t-red">45.131.214.85</span>  <span class="t-dim">(264 requests)</span>
+        <span class="t-dim">http://45.131.214.85/fakeurl.htm</span>
+
+<span class="t-blue">[ SUSPICIOUS TLS DOMAINS ]</span> — 0 found
+<span class="t-dim">------------------------------------------------------------</span>
+  None found
+
+<span class="t-blue">[ DATA VOLUMES TO SUSPICIOUS IPs ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  <span class="t-bold">45.131.214.85</span>
+    Sent       : 61.5 KB
+    Received   : 532 bytes
+    Connections: 1
+
+<span class="t-blue">[ SEVERITY SUMMARY ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  Suspicious HTTP requests : <span class="t-red">1</span>
+  Suspicious TLS domains   : 0
+  Total data exfiltrated   : 62.4 KB
+  Overall severity         : <span class="t-orange">MEDIUM</span></pre>
+  </div>
+
+  <div class="callout callout-amber">
+    <p><strong>Scoring limitation identified:</strong> At this stage the script scored Easy As 123 as MEDIUM based on low data volume — 61.5KB sent. This was later identified as a flaw in the severity logic. A confirmed active C2 connection is CRITICAL regardless of how much data has moved yet. The malware is installed, beaconing, and waiting for commands — an attacker could send a payload at any moment. Lab Log 007 corrects this by introducing KNOWN_BAD_DOMAINS matching, which escalates any confirmed IOC hit to CRITICAL automatically.</p>
+  </div>
+
+  <p>Both outputs matched the manually confirmed findings from previous labs. The data volumes, host identity, and domain detections were all accurate. The severity scoring for Easy As 123 was later corrected in Lab Log 007 — a confirmed C2 beacon should always score CRITICAL regardless of exfiltration volume.</p>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>Comparing the Two Malware Signatures</h2>
+  <p>Running the script against both pcaps in sequence makes the behavioral contrast between malware families immediately visible — not through packet-level analysis but through the summary output alone.</p>
+
+  <div class="compare-grid">
+    <div class="compare-box lumma">
+      <div class="compare-label">Lumma Stealer — CRITICAL</div>
+      <p><strong>HTTP hits:</strong> 1 host, 6 requests — acted fast, minimal footprint</p>
+      <p><strong>TLS hits:</strong> 5 suspicious domains — moved to encrypted channels immediately</p>
+      <p><strong>Exfiltrated:</strong> 2.27MB — active credential theft, damage already done</p>
+      <p><strong>Signature:</strong> Fast HTTP recon → encrypted exfiltration → gone</p>
+      <p><strong>Response:</strong> Isolate machine, rotate all credentials immediately</p>
+    </div>
+    <div class="compare-box easy">
+      <div class="compare-label">Easy As 123 C2 — CRITICAL (corrected in Lab 007)</div>
+      <p><strong>HTTP hits:</strong> 1 host, 264 requests — persistent beaconing over 4+ hours</p>
+      <p><strong>TLS hits:</strong> 0 — never bothered encrypting</p>
+      <p><strong>Exfiltrated:</strong> 61.5KB — check-ins only, waiting for commands</p>
+      <p><strong>Signature:</strong> Regular POST interval → POLL payload → C2 waiting</p>
+      <p><strong>Response:</strong> Isolate machine, block C2 IP, investigate initial infection vector</p>
+    </div>
+  </div>
+
+  <div class="callout callout-amber">
+    <p><strong>Severity scoring flaw:</strong> The initial script scored Easy As 123 as MEDIUM because data volume was low. This was wrong. Severity is not about how much damage has occurred — it is about whether a confirmed threat is present. A machine with an active C2 connection is CRITICAL regardless of exfiltration volume. The attacker is in. Lab Log 007 corrects this by adding KNOWN_BAD_DOMAINS detection, which scores any confirmed IOC match as CRITICAL automatically — separating "damage done" from "threat confirmed."</p>
+  </div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>Usage</h2>
+  <p>The script requires Python 3 and no external libraries. It runs on any system where Zeek logs are available — analyst workstation, jump server, or directly on the capture host.</p>
+
+  <div class="code-label">Running the Script</div>
+  <div class="code-block"><pre><span class="co"># Step 1 — Generate Zeek logs from a pcap</span>
+mkdir zeek-output && cd zeek-output
+zeek -r /path/to/capture.pcap
+
+<span class="co"># Step 2 — Run triage script against the log folder</span>
+python3 zeek_triage.py /path/to/zeek-output
+
+<span class="co"># Example against Lumma Stealer logs</span>
+python3 zeek_triage.py ~/Desktop/zeek-lumma
+
+<span class="co"># Example against Easy As 123 logs</span>
+python3 zeek_triage.py ~/Desktop/zeek-easy123</pre></div>
+
+  <h3>Configuration — Customizing Detection</h3>
+  <p>Two lists at the top of the script control detection behavior and can be edited without touching any function logic:</p>
+
+  <div class="code-block"><pre><span class="co"># High-abuse TLDs — connections to these domains are flagged</span>
+<span class="va">SUSPICIOUS_TLDS</span> = [<span class="hi">".su"</span>, <span class="hi">".ru"</span>, <span class="hi">".cc"</span>, <span class="hi">".xyz"</span>, <span class="hi">".top"</span>,
+                   <span class="hi">".pw"</span>, <span class="hi">".cyou"</span>, <span class="hi">".lat"</span>]
+
+<span class="co"># Known-safe vendors — connections to these hosts are filtered out</span>
+<span class="va">SAFE_HOSTS</span> = [<span class="hi">"microsoft"</span>, <span class="hi">"google"</span>, <span class="hi">"akamai"</span>, <span class="hi">"cloudflare"</span>,
+              <span class="hi">"adobe"</span>, <span class="hi">"digicert"</span>, <span class="hi">"windowsupdate"</span>, <span class="hi">"msftconnect"</span>,
+              <span class="hi">"office"</span>, <span class="hi">"bing"</span>, <span class="hi">"gstatic"</span>, <span class="hi">"msn"</span>, <span class="hi">"azure"</span>]</pre></div>
+
+  <p>Adding a new TLD to <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">SUSPICIOUS_TLDS</code> immediately flags all matching domains in any future analysis. Adding a vendor to <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">SAFE_HOSTS</code> removes false positives without touching any function logic.</p>
+</div>
+
+<!-- SECTION 07 -->
+<div class="section">
+  <div class="section-num">Section 07</div>
+  <h2>Planned Enhancements</h2>
+  <p>The current script covers the core triage workflow. Two enhancements are planned for Lab Log 007:</p>
+
+  <div class="finding blue">
+    <div class="finding-num">Enhancement 01</div>
+    <div class="finding-title">KNOWN_BAD_DOMAINS List + Dynamic DNS Detection</div>
+    <p>A third configuration list — <code style="font-family:var(--mono);font-size:.85rem">KNOWN_BAD_DOMAINS</code> — will flag specific IOCs from previously analyzed malware alongside dynamic DNS providers (no-ip.com, duckdns.org, ddns.net, and others) that are almost exclusively used by malware infrastructure. Known-bad matches will be scored higher than TLD-based matches and marked distinctly in the report output.</p>
+  </div>
+
+  <div class="finding blue">
+    <div class="finding-num">Enhancement 02</div>
+    <div class="finding-title">Mac Application Wrapper — GUI Drag-and-Drop Interface</div>
+    <p>The script will be wrapped in a lightweight GUI using Python's built-in tkinter library, allowing a Zeek log folder to be dragged and dropped into a window rather than typed as a command line argument. The goal is a self-contained Mac application that an analyst can use without any terminal knowledge — making the triage workflow accessible as a tool rather than a script.</p>
+  </div>
+</div>
+
+<!-- SECTION 08 -->
+<div class="section">
+  <div class="section-num">Section 08</div>
+  <h2>NIST SP 800-171 Control Mapping</h2>
+  <div class="nist-box">
+    <div class="nist-box-title">Applicable Controls</div>
+    <div class="nist-items">
+      <div class="nist-item">
+        <div class="nist-control">3.3.1</div>
+        <div class="nist-desc"><strong>Audit logging.</strong> The script automates the extraction and analysis of network-layer audit logs generated by Zeek. Running it produces a structured finding record that can be retained as part of an incident audit trail.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.14.6</div>
+        <div class="nist-desc"><strong>Monitor for malicious code.</strong> TLD-based domain detection and safe-host filtering implement an automated monitoring layer that would fire on both malware families tested — without requiring the analyst to know what to look for in advance.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.13.1</div>
+        <div class="nist-desc"><strong>Boundary protection.</strong> Data volume analysis quantifies outbound transfers to suspicious IPs — providing evidence for egress filtering decisions and confirming whether exfiltration has occurred before incident escalation.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.3.2</div>
+        <div class="nist-desc"><strong>User activity traceability.</strong> Automated Kerberos extraction attributes all suspicious network activity to a specific user and machine in every report — producing the accountability chain required by this control without manual analysis steps.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 09 -->
+<div class="section">
+  <div class="section-num">Section 09</div>
+  <h2>Lessons Learned</h2>
+
+  <h3>Automation Does Not Replace Understanding — It Requires It</h3>
+  <p>The script works correctly because the underlying workflow was understood first. The DHCP → Kerberos → HTTP → TLS → conn.log sequence, the column offset in Zeek logs, the meaning of AS-REQ vs TGS, why SNI is visible in encrypted traffic — all of that knowledge from <a href="lab_log_003.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Lab Logs 003</a> through <a href="lab_log_005.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">005</a> went directly into the script logic. An analyst who skipped those labs and ran this script would not know whether to trust the output or how to investigate a finding it surfaced.</p>
+
+  <h3>Deduplication Changes What the Report Means</h3>
+  <p>The first version of <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">get_suspicious_http</code> printed every individual HTTP request — 264 identical POST lines for Easy As 123. That output is technically accurate but operationally useless. The revised version deduplicates by host and shows a count instead. The report went from 264 lines that required scrolling to 1 line that conveyed the same information instantly. Good security tooling presents findings at the right level of abstraction for the decision that needs to be made.</p>
+
+  <h3>Severity Scoring Must Be Tied to Behavior, Not Just Counts</h3>
+  <p>Easy As 123 produced 264 suspicious HTTP requests. Lumma Stealer produced 6. A count-based severity score would rate Easy As 123 higher — but Lumma caused dramatically more damage. The script scores severity on data volume rather than request count because exfiltration volume is what determines response urgency. A machine that POSTed 2MB to a Russian domain needs immediate credential rotation regardless of how few requests it took.</p>
+
+  <h3>Next Lab</h3>
+  <p>Lab Log 007 will add KNOWN_BAD_DOMAINS detection with dynamic DNS flagging and build the Mac application wrapper — a drag-and-drop GUI that runs the triage script without any terminal interaction. The goal is a self-contained tool that an analyst at any skill level can use on any Zeek log folder.</p>
+</div>
+
+</div></div>
+
+<footer>
+  <span>Lab Log 006 — Python Triage Script &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; March 18, 2026 &nbsp;·&nbsp; Educational use only</span>
+  <a href="index.html">← Portfolio</a>
+</footer>
+
+</body>
+</html>

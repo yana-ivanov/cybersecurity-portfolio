@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Log 008 — Seven Days of Scans, Probes & Web Traffic | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#4a9eff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:.82rem;color:var(--blue)}
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+.code-block{background:#0a0f1a;border-radius:3px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.75;white-space:pre;word-break:break-word}
+.co{color:#64748b}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem;table-layout:fixed}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.85rem 1rem;text-align:left;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;font-weight:600;word-wrap:break-word}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top;word-wrap:break-word;overflow-wrap:break-word}
+tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue);word-break:break-all}
+.env-box{background:var(--paper);border:1px solid var(--rule);border-radius:2px;padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+.proto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);margin:1.75rem 0}
+.proto-box{background:var(--paper);padding:1.25rem 1rem}
+.proto-name{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--ink);margin-bottom:.3rem}
+.proto-pct{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--blue);margin-bottom:.4rem}
+.proto-pct.red{color:var(--red)}
+.proto-pct.amber{color:var(--amber)}
+.proto-desc{font-size:.78rem;color:var(--ink3);line-height:1.6}
+.finding{background:var(--paper);border:1px solid var(--rule);border-left:3px solid var(--blue);padding:1.5rem 1.75rem;margin:1.75rem 0}
+.finding.amber{border-left-color:var(--amber)}
+.finding.green{border-left-color:var(--green)}
+.finding-num{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.4rem}
+.finding.amber .finding-num{color:var(--amber)}
+.finding.green .finding-num{color:var(--green)}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding p{margin-bottom:.6rem;font-size:.88rem;color:var(--ink3);line-height:1.65}
+.finding p:last-child{margin-bottom:0}
+.verdict-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);margin:1.75rem 0}
+.verdict-box{background:var(--paper);padding:1.75rem 1rem;text-align:center}
+.verdict-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem;color:var(--ink3)}
+.verdict-label.red{color:var(--red)}
+.verdict-label.green{color:var(--green)}
+.verdict-label.amber{color:var(--amber)}
+.verdict-val{font-family:var(--display);font-size:2.4rem;font-weight:900;line-height:1;margin-bottom:.4rem}
+.verdict-val.red{color:var(--red)}
+.verdict-val.green{color:var(--green)}
+.verdict-val.amber{color:var(--amber)}
+.verdict-sub{font-size:.78rem;color:#94a3b8;line-height:1.5}
+.filter-list{margin:1.75rem 0}
+.filter-item{display:grid;grid-template-columns:280px 1fr;gap:1.5rem;padding:1.1rem 0;border-bottom:1px solid var(--rule);align-items:start}
+.filter-item:first-child{border-top:1px solid var(--rule)}
+.filter-item:last-child{border-bottom:none}
+.filter-syntax{font-family:var(--mono);font-size:.8rem;color:var(--blue);font-weight:600;word-break:break-all;line-height:1.7}
+.filter-desc{font-size:.88rem;color:var(--ink3);line-height:1.7}
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);border-radius:2px;padding:1.5rem 1.75rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:130px 1fr;gap:1rem;font-size:.88rem}
+.nist-control{font-family:var(--mono);font-size:.72rem;color:var(--blue);font-weight:700}
+.nist-desc{color:var(--ink3);line-height:1.7}
+.diff-badge{display:inline-block;font-family:var(--mono);font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;padding:.25rem .65rem;background:var(--blue-dim);color:var(--blue);border:1px solid rgba(26,79,160,.2);margin-left:.75rem;vertical-align:middle}
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer a{color:#4a9eff;text-decoration:none}
+footer a:hover{color:#93c5fd}
+@media(max-width:680px){
+  .mast-inner,.wrap{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .env-grid{grid-template-columns:1fr}
+  .proto-grid,.verdict-grid{grid-template-columns:1fr 1fr}
+  .nist-item,.filter-item{grid-template-columns:1fr;gap:.25rem}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Security Lab Log · Entry 008 <span style="font-size:.7rem;letter-spacing:.2em;color:#4a9eff;margin-left:1rem">· Advanced</span></div>
+    <h1 class="title">Seven Days Under Attack —<br>Analyzing a Live Web Server's Traffic</h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Date</div><div class="value">March 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational Use</div></div>
+      <div class="meta-item"><div class="label">Lab Type</div><div class="value">Internet-Facing Server Analysis</div></div>
+      <div class="meta-item"><div class="label">Tools</div><div class="value">Wireshark 4.x · CyberChef</div></div>
+      <div class="meta-item"><div class="label">Source</div><div class="value">malware-traffic-analysis.net · 2026-03-17</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    313,968 PACKETS · 7-DAY CAPTURE · APACHE 2.4.58 UBUNTU · 108,506 SYN PROBES · ALL ATTACKS BLOCKED · 4 VECTORS ANALYZED
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 — CONTEXT -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>Why This Lab Is Different <span class="diff-badge">Step Up from Lab 003</span></h2>
+
+  <p><a href="lab_log_003.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Lab 003</a> analyzed a compromised machine <em>inside</em> a network — an infected Windows workstation beaconing outward to a C2 server on a predictable 60-second interval. The scenario was relatively contained: one infected host, one C2 address, one malware family, clean beaconing signature.</p>
+
+  <p>This lab inverts that perspective entirely. Instead of watching malware phone home, we are analyzing a <strong>public-facing web server being attacked from the internet</strong> over seven consecutive days. The pcap file name tells the story: <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">seven-days-of-scans-and-probes-and-web-traffic</code>. What looks like noise at first glance is actually multiple distinct attackers, multiple attack vectors, and a server that — as this analysis will show — defended itself on every front while unknowingly advertising its own vulnerabilities in every response it sent.</p>
+
+  <p>This is harder than Lab 003 for three reasons. There is no single infected host to pivot from. There is no clean beaconing pattern to anchor the analysis. And not everything that looks suspicious is malicious — distinguishing normal internet background noise from genuine attack traffic is a core SOC analyst skill that this lab exercises directly.</p>
+
+  <div class="env-box">
+    <div class="env-box-title">Capture Configuration</div>
+    <div class="env-grid">
+      <div class="env-item"><div class="env-label">Source</div><div class="env-value">malware-traffic-analysis.net · 2026-03-17</div></div>
+      <div class="env-item"><div class="env-label">Total Packets</div><div class="env-value">313,968</div></div>
+      <div class="env-item"><div class="env-label">Capture Size</div><div class="env-value">~4 MB</div></div>
+      <div class="env-item"><div class="env-label">Duration</div><div class="env-value">~600,000 seconds (~7 days)</div></div>
+      <div class="env-item"><div class="env-label">Analysis Tool</div><div class="env-value">Wireshark 4.x · macOS</div></div>
+      <div class="env-item"><div class="env-label">Auxiliary Tool</div><div class="env-value">CyberChef (hex decode)</div></div>
+      <div class="env-item"><div class="env-label">Victim Server</div><div class="env-value">203.161.44.208</div></div>
+      <div class="env-item"><div class="env-label">Server Stack</div><div class="env-value">Apache 2.4.58 · Ubuntu · HTTP port 80</div></div>
+    </div>
+  </div>
+
+  <div class="callout callout-amber">
+    <p><strong>Key insight before starting:</strong> 313,968 packets generating only 4MB of data means an average of roughly 13 bytes per packet. Real file transfers produce much larger packets. Small average packet size is the first indicator that this capture is dominated by scanning and probing — not data movement.</p>
+  </div>
+</div>
+
+<!-- SECTION 02 — IDENTIFYING THE SERVER -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>Identifying the Victim Server</h2>
+
+  <p>Unlike Lab 003, there is no DHCP or Kerberos traffic to pivot from — this is a public internet server, not a domain-joined Windows workstation. The identification methodology changes completely. Instead of asking "whose machine is this?", the question becomes "what is this machine, and what is it running?"</p>
+
+  <p>The answer came from the server itself. Apache — like most web servers — includes a <strong>Server</strong> header in every HTTP response, including error responses. Filtering to any HTTP response and examining the headers revealed the server's identity immediately.</p>
+
+  <div class="code-label">HTTP Response — Server Banner Disclosure (Frame 67786)</div>
+  <div class="code-block"><pre><span class="co">HTTP/1.1 400 Bad Request</span>
+Date: <span class="va">Thu, 12 Mar 2026 14:25:08 GMT</span>
+<span class="wa">Server: Apache/2.4.58 (Ubuntu)</span>     <span class="co">← exact version disclosed</span>
+Content-Length: 324
+Connection: close
+Content-Type: text/html; charset=iso-8859-1
+
+<span class="co">Same header appeared in 200 OK, 404 Not Found, and 400 Bad Request responses.
+Every response the server sent — including error pages — disclosed its
+exact software version and operating system to every requestor.</span></pre></div>
+
+  <p>The MAC address <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">Rebox_cb:72:42</code> (OUI prefix <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">00:16:3c</code>) confirmed the server is running on <strong>Xen hypervisor</strong> — the virtualization platform used by many cloud hosting providers. This is a cloud-hosted Virtual Private Server (VPS), sitting directly on the public internet with no firewall or reverse proxy in front of it.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Why version disclosure matters:</strong> <code style="font-family:var(--mono);font-size:.85rem">Apache/2.4.58 (Ubuntu)</code> is a precise attack surface fingerprint. An attacker receiving this response can immediately query the CVE database for vulnerabilities specific to Apache 2.4.58. The server is telling every scanner exactly what to target. This is not a vulnerability by itself — but it makes every other vulnerability easier to exploit. The fix is a single configuration line: <code style="font-family:var(--mono);font-size:.85rem">ServerTokens Prod</code> in <code style="font-family:var(--mono);font-size:.85rem">apache2.conf</code>, which reduces all responses to just <code style="font-family:var(--mono);font-size:.85rem">Server: Apache</code> with no version.</p>
+  </div>
+</div>
+
+<!-- SECTION 03 — PROTOCOL HIERARCHY -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>Protocol Hierarchy — Reading 7 Days at a Glance</h2>
+
+  <p><strong>Statistics → Protocol Hierarchy</strong> gives the first map of what seven days of internet-facing traffic looks like. The distribution tells a clear story before a single filter is applied.</p>
+
+  <div class="proto-grid">
+    <div class="proto-box">
+      <div class="proto-name">TCP</div>
+      <div class="proto-pct red">dominant</div>
+      <div class="proto-desc">Expected. All web, scan, and probe traffic travels over TCP. The high volume of TCP errors (RST, retransmit) visible in the I/O graph is the signature of mass port scanning.</div>
+    </div>
+    <div class="proto-box">
+      <div class="proto-name">HTTP</div>
+      <div class="proto-pct amber">port 80 only</div>
+      <div class="proto-desc">All web traffic is unencrypted. No HTTPS in the capture — the server has no TLS configured. Every request and response is fully readable in Wireshark.</div>
+    </div>
+    <div class="proto-box">
+      <div class="proto-name">ICMP</div>
+      <div class="proto-pct">error responses</div>
+      <div class="proto-desc">Destination unreachable messages from the server — evidence of probes hitting ports with nothing listening. ICMP Type 3 Code 3 = Port Unreachable.</div>
+    </div>
+    <div class="proto-box">
+      <div class="proto-name">UDP</div>
+      <div class="proto-pct">probe traffic</div>
+      <div class="proto-desc">UDP probes on non-standard ports including RADIUS (1812). Attackers scanning for authentication services that could be brute-forced.</div>
+    </div>
+    <div class="proto-box">
+      <div class="proto-name">TLS/HTTPS</div>
+      <div class="proto-pct">absent</div>
+      <div class="proto-desc">No HTTPS traffic. Port 443 probes returned TCP errors — nothing was listening. This server offered no encrypted communication path to legitimate users.</div>
+    </div>
+    <div class="proto-box">
+      <div class="proto-name">HTTP 200 OK</div>
+      <div class="proto-pct amber">1,187 responses</div>
+      <div class="proto-desc">The server served content successfully 1,187 times over 7 days. Most are likely automated crawlers and bots — normal background internet traffic hitting any public server.</div>
+    </div>
+  </div>
+
+  <div class="callout callout-amber">
+    <p><strong>Lab 003 vs Lab 008 — a critical difference:</strong> In <a href="lab_log_003.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(26,79,160,.4)">Lab 003</a>, HTTP traffic at 2.3% stood out because it was abnormally low for a corporate network — all traffic should have been HTTPS. Here, HTTP at 100% stands out because this is a public server in 2026 with no TLS. Both situations are suspicious, but for opposite reasons. Context determines meaning.</p>
+  </div>
+</div>
+
+<!-- SECTION 04 — ATTACK VECTORS -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>Four Attack Vectors — Analysis</h2>
+
+  <h3>Vector 1 — Mass SYN Port Scan</h3>
+  <p>Filtering for TCP SYN packets with no corresponding ACK revealed the dominant attack pattern across the entire capture.</p>
+
+  <div class="code-label">Wireshark Filter — SYN Scan Detection</div>
+  <div class="code-block"><pre><span class="va">tcp.flags.syn == 1 and tcp.flags.ack == 0 and ip.dst == 203.161.44.208</span>
+
+Result: <span class="wa">108,506 packets</span>
+Ports: <span class="co">Multiple — spanning well-known, registered, and ephemeral ranges</span>
+Duration: <span class="co">Distributed across the entire 7-day capture window</span>
+
+<span class="co">How a SYN scan works:
+  Attacker sends SYN  → "Is this port open?"
+  Server sends SYN-ACK → "Yes, something is listening"   ← open port
+  Server sends RST    → "Nothing here"                   ← closed port
+  Attacker never completes the handshake — moves to next port</span></pre></div>
+
+  <p>108,506 half-open connections over seven days is not a human typing commands — it is an automated tool, most likely Nmap or a similar scanner, systematically probing every port on the server to build a complete map of what services are exposed. This is reconnaissance — the attacker learning the attack surface before choosing how to strike.</p>
+
+  <div class="callout callout-red">
+    <p><strong>What a SYN scan tells an attacker:</strong> Every open port is a potential entry point. Closed ports are confirmed dead ends. The scan result is essentially a blueprint of the server's exposed services — which the attacker then researches for known vulnerabilities. Port 80 being open and unfiltered is the direct result of this reconnaissance being useful.</p>
+  </div>
+
+  <h3>Vector 2 — Backup File Exfiltration Attempt</h3>
+  <p>Frame 66678 contained a GET request for <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">/back_up.zip</code> from external IP <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">54.70.53.60</code>. Three red flags appeared in the request headers alone — before checking the response.</p>
+
+  <div class="code-label">Frame 66678 — Suspicious Request Headers</div>
+  <div class="code-block"><pre>GET /back_up.zip HTTP/1.1
+Host: <span class="wa">203.161.44.208</span>          <span class="co">← raw IP, not a domain — scanner behavior</span>
+User-Agent: <span class="wa">Chrome/143.0.0.0</span>   <span class="co">← Chrome 143 did not exist in March 2026</span>
+Upgrade-Insecure-Requests: <span class="wa">1</span>   <span class="co">← requests HTTPS but connecting on port 80</span>
+Accept-Encoding: gzip, deflate  <span class="co">← no br — automated tool, not a real browser</span>
+
+<span class="co">Three indicators of a spoofed/automated request:
+  1. Raw IP in Host header — real users type domain names
+  2. Nonexistent browser version — fabricated user agent string
+  3. Contradictory headers — "prefer HTTPS" on an HTTP connection</span></pre></div>
+
+  <p>Following the TCP stream to frame 66680 confirmed the server's response.</p>
+
+  <div class="code-label">Frame 66680 — Server Response</div>
+  <div class="code-block"><pre>HTTP/1.1 <span class="hi">404 Not Found</span>
+Date: Thu, 12 Mar 2026 13:20:17 GMT
+Server: Apache/2.4.58 (Ubuntu)
+Content-Length: 276
+
+<span class="hi">&lt;p&gt;The requested URL was not found on this server.&lt;/p&gt;</span>
+
+<span class="co">Verdict: the file does not exist. No data was exfiltrated.
+The attack technique — requesting a predictably-named backup file
+from a web server's root — is a common opportunistic attack.
+Administrators who leave backup files publicly accessible have
+been compromised this way. This server was not.</span></pre></div>
+
+  <h3>Vector 3 — Web Shell Upload Attempt with EICAR Payload</h3>
+  <p>Frame 67748 contained the most technically interesting packet in the capture — a POST request to <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">/upload.exe</code> carrying a 68-byte hex-encoded payload.</p>
+
+  <div class="code-label">Frame 67748 — POST to /upload.exe</div>
+  <div class="code-block"><pre>POST /upload.exe HTTP/1.1
+Host: <span class="wa">www.baidu.com</span>            <span class="co">← Host header spoofed to different domain</span>
+User-Agent: Mozilla/5.0
+Content-Length: 68
+Source IP: <span class="wa">163.123.236.83</span>
+Destination: <span class="va">203.161.44.208</span>
+
+<span class="co">Payload (hex):</span>
+<span class="ke">58354f2150254041505b345c505a58353428505e2937434329377d2445494341522d</span>
+<span class="ke">5354414e444152442d414e544956495255532d544553542d46494c452124482b482a</span>
+
+<span class="co">Decoded (CyberChef → From Hex):</span>
+<span class="hi">X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*</span>
+
+<span class="co">This is the EICAR test string — a harmless sequence that every antivirus
+engine recognizes as a test signature. It is used by security researchers
+to verify that AV detection is working without deploying real malware.
+
+Why it matters here: the PAYLOAD was harmless, but the MECHANISM was not.
+A POST to a path ending in .exe via a web form is the standard technique
+for uploading a web shell — a backdoor that gives the attacker a command
+interface on the server. The attacker was testing whether the upload
+endpoint accepted executable content. The server rejected it.</span></pre></div>
+
+  <div class="callout callout-amber">
+    <p><strong>Decoding the payload — using CyberChef:</strong> CyberChef (gchq.github.io/CyberChef) is a browser-based data transformation tool used by analysts to detect, decode, and analyze payloads without executing them. Paste the hex string into CyberChef, add the "From Hex" operation, and the plaintext payload appears instantly. This is the safe way to examine potentially malicious content — no execution, no risk.</p>
+  </div>
+
+  <p>The server's response in frame 67786 confirmed the upload was rejected: <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">HTTP/1.1 400 Bad Request</code>. The attacker's spoofed Host header pointing to <code style="font-family:var(--mono);font-size:.85rem">www.baidu.com</code> while the actual destination was <code style="font-family:var(--mono);font-size:.85rem">203.161.44.208</code> caused Apache to reject the malformed request entirely.</p>
+
+  <h3>Vector 4 — RADIUS Authentication Probe</h3>
+  <p>Frame 220 revealed a UDP probe targeting port 1812 — the RADIUS authentication protocol used by VPNs, routers, and wireless controllers for centralized login management.</p>
+
+  <div class="code-label">Frame 220 — RADIUS Probe and ICMP Rejection</div>
+  <div class="code-block"><pre><span class="co">Probe (inbound):</span>
+  Source: <span class="wa">205.210.31.197</span>
+  Destination: 203.161.44.208
+  Protocol: <span class="wa">UDP</span>
+  Destination Port: <span class="wa">1812 (RADIUS)</span>
+
+<span class="co">Server response:</span>
+  ICMP Type 3 Code 3: <span class="hi">Destination Unreachable — Port Unreachable</span>
+
+<span class="co">Translation: nothing is listening on port 1812.
+The attacker was testing whether a RADIUS server was running —
+if found, it would have been a target for credential brute-force attacks
+against network authentication. The probe failed.</span></pre></div>
+</div>
+
+<!-- SECTION 05 — FINDINGS -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>Findings &amp; Verdict</h2>
+
+  <div class="verdict-grid">
+    <div class="verdict-box">
+      <div class="verdict-label red">Attack vectors</div>
+      <div class="verdict-val red">4</div>
+      <div class="verdict-sub">SYN scan · backup exfil · web shell upload · RADIUS probe</div>
+    </div>
+    <div class="verdict-box">
+      <div class="verdict-label green">Attacks blocked</div>
+      <div class="verdict-val green">4</div>
+      <div class="verdict-sub">All direct attacks failed or were rejected</div>
+    </div>
+    <div class="verdict-box">
+      <div class="verdict-label amber">Passive risks</div>
+      <div class="verdict-val amber">2</div>
+      <div class="verdict-sub">Server banner disclosure · no HTTPS</div>
+    </div>
+  </div>
+
+  <div class="finding">
+    <div class="finding-num">Finding 01 — High</div>
+    <div class="finding-title">108,506 SYN Packets — Sustained Port Scan Reconnaissance</div>
+    <p>An automated port scanner conducted sustained reconnaissance against <strong>203.161.44.208</strong> across the entire 7-day capture, probing across a wide port range. The scan mapped every open service on the server and produced a complete blueprint of its attack surface. Port 80 being open and unfiltered was confirmed by this scan and directly enabled the HTTP-based attacks that followed.</p>
+    <p>No single source IP dominated the scan — the traffic originated from multiple addresses, consistent with a distributed scanning infrastructure or a network of compromised hosts used as scanning proxies.</p>
+  </div>
+
+  <div class="finding amber">
+    <div class="finding-num">Finding 02 — High</div>
+    <div class="finding-title">Backup File Exfiltration Attempt — Blocked by 404</div>
+    <p>External IP <strong>54.70.53.60</strong> attempted to download <code style="font-family:var(--mono);font-size:.85rem">/back_up.zip</code> from the server root using a spoofed browser user agent (Chrome 143 — a version that did not exist at the time of the capture). The server returned HTTP 404 — the file was not present. The attack failed.</p>
+    <p>This technique — requesting predictably-named backup files from web server roots — succeeds against servers where administrators leave compressed backups publicly accessible during maintenance. The file's absence protected this server. The more robust fix is a firewall rule blocking direct access to non-web files regardless of their presence.</p>
+  </div>
+
+  <div class="finding amber">
+    <div class="finding-num">Finding 03 — High</div>
+    <div class="finding-title">Web Shell Upload Attempt via POST /upload.exe — Rejected</div>
+    <p>External IP <strong>163.123.236.83</strong> attempted to upload a file to <code style="font-family:var(--mono);font-size:.85rem">/upload.exe</code> using the EICAR antivirus test string as payload — a technique used to test whether a web server will accept and store executable content before deploying a real payload. The server returned HTTP 400 Bad Request, rejecting the malformed request. The spoofed Host header pointing to <code style="font-family:var(--mono);font-size:.85rem">www.baidu.com</code> caused the rejection.</p>
+    <p>This was a probe, not a full attack — the EICAR payload confirmed the attacker was testing the upload mechanism rather than deploying a real web shell. Had the upload succeeded, the attacker would have had a persistent remote access backdoor on the server.</p>
+  </div>
+
+  <div class="finding">
+    <div class="finding-num">Finding 04 — Critical (Passive)</div>
+    <div class="finding-title">Server Banner Disclosure — Apache 2.4.58 (Ubuntu) in Every Response</div>
+    <p>Every HTTP response sent by the server — including 200 OK, 404 Not Found, and 400 Bad Request error pages — contained the exact software version and operating system: <code style="font-family:var(--mono);font-size:.85rem">Apache/2.4.58 (Ubuntu)</code>. This information was delivered to every scanner, bot, and attacker that made any HTTP request during the 7-day window.</p>
+    <p>With the exact version known, an attacker can query the CVE database for vulnerabilities specific to Apache 2.4.58 and attempt targeted exploits. The fix requires one line in <code style="font-family:var(--mono);font-size:.85rem">apache2.conf</code>: <code style="font-family:var(--mono);font-size:.85rem">ServerTokens Prod</code>. This reduces all server headers to just <code style="font-family:var(--mono);font-size:.85rem">Server: Apache</code> — confirming the software type without revealing the version.</p>
+  </div>
+
+  <div class="finding amber">
+    <div class="finding-num">Finding 05 — Medium</div>
+    <div class="finding-title">No HTTPS — All Traffic Transmitted in Plaintext</div>
+    <p>The server operated exclusively on HTTP port 80. Port 443 probes from external scanners received TCP error responses — nothing was listening. Every request sent to the server and every response returned was fully readable in Wireshark without any decryption step.</p>
+    <p>For a web server handling any user data, credentials, or sensitive content, unencrypted HTTP is a critical misconfiguration. In this analysis, the plaintext channel was an advantage for the defender — the EICAR payload, the backup file request, and all attack traffic was fully visible. In a real investigation involving legitimate user traffic, the same unencrypted channel would expose user credentials and session data to any network observer.</p>
+  </div>
+
+  <div class="finding green">
+    <div class="finding-num">Finding 06 — Informational</div>
+    <div class="finding-title">Outbound Connection to 172.234.207.202 — Refused, Not Exfiltration</div>
+    <p>Frame 79353 showed a TCP RST,ACK from the server to <strong>172.234.207.202</strong> on port 3053 — flagged initially as a potential data relay. The RST,ACK flag combination means the server <em>refused</em> the connection, not initiated data transfer. An inbound probe hit port 3053, found nothing listening, and the server reset the connection. This is normal server behavior and not an indicator of compromise.</p>
+  </div>
+</div>
+
+<!-- SECTION 06 — FILTER REFERENCE -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>Wireshark Filter Reference — Internet-Facing Server Triage</h2>
+
+  <p>The filters below form a repeatable workflow for analyzing traffic hitting a public web server. They differ from the Lab 003 workflow — there is no DHCP or Kerberos to pivot from. Instead the methodology starts with scale (how much traffic?), then structure (what kinds?), then specifics (what did attackers actually do?).</p>
+
+  <div class="filter-list">
+    <div class="filter-item">
+      <div class="filter-syntax">tcp.flags.syn == 1 and tcp.flags.ack == 0</div>
+      <div class="filter-desc">Isolate all TCP SYN packets with no ACK. These are half-open connection attempts — the signature of port scanning. High count = automated reconnaissance in progress.</div>
+    </div>
+    <div class="filter-item">
+      <div class="filter-syntax">http.request.method == "POST" and !(http.host contains "microsoft")</div>
+      <div class="filter-desc">All non-Microsoft POST requests. POST is the method used for form submissions, file uploads, and API calls — and for web shell uploads and C2 check-ins. Investigate every external POST.</div>
+    </div>
+    <div class="filter-item">
+      <div class="filter-syntax">http.request.uri contains ".exe" or http.request.uri contains ".zip" or http.request.uri contains ".ps1" or http.request.uri contains ".dll"</div>
+      <div class="filter-desc">Requests for executable file types. Legitimate web servers rarely serve .exe, .ps1, or .dll files. Any hit warrants investigation — either an attacker attempting to upload malware, or attempting to download a payload the server has already been seeded with.</div>
+    </div>
+    <div class="filter-item">
+      <div class="filter-syntax">http.response.code == 200</div>
+      <div class="filter-desc">All successful HTTP responses. The server gave something to someone 1,187 times in 7 days. Cross-reference the URI column — what was actually served? A 200 on a .zip or .exe URI is a confirmed delivery event.</div>
+    </div>
+    <div class="filter-item">
+      <div class="filter-syntax">icmp.type == 3</div>
+      <div class="filter-desc">ICMP Destination Unreachable messages. These are the server's rejection notices for probes hitting closed ports. High count = active port reconnaissance. The code field (3 = Port Unreachable, 0 = Net Unreachable) distinguishes the type of rejection.</div>
+    </div>
+    <div class="filter-item">
+      <div class="filter-syntax">tcp.flags == 0x014</div>
+      <div class="filter-desc">TCP RST,ACK packets — connection resets. When a server sends RST,ACK, it is closing a connection it did not initiate or rejecting an inbound request. Important for ruling out false positives: RST,ACK is a refusal, not an exfiltration.</div>
+    </div>
+    <div class="filter-item">
+      <div class="filter-syntax">http.response and http.server</div>
+      <div class="filter-desc">Any HTTP response containing a Server header. Use this to identify exactly what software is running — and to confirm whether the server is disclosing its version string in responses to arbitrary external requestors.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 07 — NIST MAPPING -->
+<div class="section">
+  <div class="section-num">Section 07</div>
+  <h2>NIST SP 800-171 Control Mapping</h2>
+  <div class="nist-box">
+    <div class="nist-box-title">Applicable Controls — This Analysis</div>
+    <div class="nist-items">
+      <div class="nist-item">
+        <div class="nist-control">3.13.1</div>
+        <div class="nist-desc"><strong>Boundary protection.</strong> The server had no firewall, no WAF, and no rate limiting between the internet and port 80. Any IP could send any request. A boundary control blocking known-malicious IPs or rate-limiting SYN packets would have reduced the 108,506 scan packets to zero.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.13.8</div>
+        <div class="nist-desc"><strong>Transmission confidentiality.</strong> All traffic was transmitted over HTTP with no encryption. NIST 800-171 requires protecting CUI in transit. A server handling any protected information over plaintext HTTP is in direct violation of this control.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.14.2</div>
+        <div class="nist-desc"><strong>Malicious code protection.</strong> The EICAR upload test probed whether the server would accept and store executable content. A WAF with file-type upload restrictions or an endpoint agent blocking executable writes would have caught a real web shell payload at the same point this test probe was rejected.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.14.6</div>
+        <div class="nist-desc"><strong>Monitor for malicious code.</strong> 108,506 SYN packets with no completed handshakes is a textbook scanning signature. This control requires organizations to detect exactly this type of anomalous network behavior. IDS rules for SYN flood / port scan detection would have generated an alert on day one.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.4.2</div>
+        <div class="nist-desc"><strong>Security configuration baseline.</strong> ServerTokens Full (the Apache default) disclosing the exact version in every response is a known misconfiguration. A hardened Apache configuration baseline includes ServerTokens Prod and ServerSignature Off as standard settings — removing version disclosure entirely.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 08 — LESSONS LEARNED -->
+<div class="section">
+  <div class="section-num">Section 08</div>
+  <h2>Lessons Learned</h2>
+
+  <h3>Any Public Server Is Under Constant Attack — This Is Normal</h3>
+  <p>Seven days of scans, probes, spoofed browser headers, and executable upload attempts is not unusual — it is the baseline reality for any IP address exposed to the public internet. Automated scanners run continuously, probing every reachable IP for open ports and known vulnerabilities. A SOC analyst seeing this volume of inbound SYN packets on a public server should not immediately escalate to incident response — the first job is to distinguish the background noise from genuine targeted activity.</p>
+
+  <h3>Follow the Response, Not Just the Request</h3>
+  <p>The most important frames in this entire analysis were the responses — not the attacks. The 404 on <code style="font-family:var(--mono);font-size:.85rem">/back_up.zip</code> and the 400 on <code style="font-family:var(--mono);font-size:.85rem">/upload.exe</code> changed the severity of those findings from Critical to High. A request alone tells you what was attempted. The response tells you what actually happened. Always follow the TCP stream.</p>
+
+  <h3>RST,ACK Means Refused — Not Exfiltrated</h3>
+  <p>The connection from the server to <code style="font-family:var(--mono);font-size:.85rem">172.234.207.202</code> looked alarming at first — an outbound connection to an unknown external IP. The RST,ACK flags resolved it immediately: the server slammed the door shut. Understanding TCP flag combinations is the difference between a false positive escalation and a correctly dismissed finding.</p>
+
+  <h3>The Biggest Risk Was Passive, Not Active</h3>
+  <p>None of the four attack vectors succeeded. But the server was broadcasting its exact software version to every requestor for the entire seven-day window. The passive information disclosure finding — <code style="font-family:var(--mono);font-size:.85rem">Apache/2.4.58 (Ubuntu)</code> in every response — required no attack to exploit. It just required an attacker to read the response. The most impactful remediation was not blocking a specific attack but changing one configuration line that reduced the server's intelligence value to every future scanner.</p>
+
+  <h3>The SOC Rules This Analysis Produces</h3>
+  <div class="callout callout-green">
+    <p><strong>Rule 1 — SYN scan alert:</strong> Any source IP sending more than 100 TCP SYN packets to a single destination within 60 seconds, with fewer than 10% completing the handshake, constitutes a port scan. Log the source IP and rate-limit further connections.</p>
+  </div>
+  <div class="callout callout-green">
+    <p><strong>Rule 2 — Executable upload alert:</strong> Any HTTP POST request with a URI containing .exe, .dll, .ps1, .bat, or .msi should generate an immediate alert regardless of the server's response. Probe today, real payload tomorrow.</p>
+  </div>
+  <div class="callout callout-green">
+    <p><strong>Rule 3 — Spoofed user agent flag:</strong> Any HTTP request with a User-Agent containing a browser version number that does not match any released version at the time of the request should be tagged as a likely automated tool or scanner.</p>
+  </div>
+
+  <h3>Next Lab</h3>
+  <p><a href="lab_log_009.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Lab Log 009</a> will build on this analysis by introducing command-line tools for network analysis — moving from Wireshark's GUI to terminal-based workflows using <code style="font-family:var(--mono);font-size:.85rem">tshark</code>, the command-line version of Wireshark, to automate the triage process demonstrated here.</p>
+</div>
+
+</div></div>
+
+<footer>
+  <span>Lab Log 008 — Seven Days Under Attack &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; March 2026 &nbsp;·&nbsp; Educational use only</span>
+  <a href="index.html">← Portfolio</a>
+</footer>
+
+</body>
+</html>

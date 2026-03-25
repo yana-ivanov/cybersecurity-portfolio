@@ -1,0 +1,29 @@
+# Simulated DNS query log export — 2026-03-15
+# Format: timestamp  client_ip  query_type  domain  response_ip
+#
+# Normal traffic mixed with suspicious blockchain connections
+# as would appear in a real network log from a compromised workstation
+
+2026-03-15 08:12:04  10.4.22.91  A  windowsupdate.microsoft.com  13.107.4.52
+2026-03-15 08:12:11  10.4.22.91  A  login.microsoftonline.com  20.190.159.2
+2026-03-15 08:14:33  10.4.22.91  A  outlook.office365.com  52.96.88.162
+2026-03-15 08:22:17  10.4.22.91  A  www.google.com  142.250.80.46
+2026-03-15 08:31:05  10.4.22.91  A  api.mainnet-beta.solana.com  174.138.43.121
+2026-03-15 08:31:06  10.4.22.91  A  api.mainnet-beta.solana.com  174.138.43.121
+2026-03-15 08:31:07  10.4.22.91  A  api.mainnet-beta.solana.com  174.138.43.121
+2026-03-15 08:45:19  10.4.22.91  A  teams.microsoft.com  52.112.0.1
+2026-03-15 09:03:44  10.4.22.91  A  gateway.ipfs.io  209.94.90.1
+2026-03-15 09:03:45  10.4.22.91  A  gateway.ipfs.io  209.94.90.1
+2026-03-15 09:15:22  10.4.22.91  A  sharepoint.com  13.107.136.9
+2026-03-15 09:33:01  10.4.22.91  A  infura.io  34.196.8.163
+2026-03-15 09:33:02  10.4.22.91  AAAA  infura.io  2600:1f18:2489:8200::1
+2026-03-15 10:01:55  10.4.22.91  A  cloudflare.com  104.16.132.229
+2026-03-15 10:22:08  10.4.22.91  A  rpc.ankr.com  162.55.133.8
+2026-03-15 10:44:17  10.4.22.91  A  bing.com  13.107.21.200
+2026-03-15 11:05:33  10.4.22.91  A  helius-rpc.com  145.40.96.11
+2026-03-15 11:05:34  10.4.22.91  A  mainnet.helius-rpc.com  145.40.96.11
+2026-03-15 11:18:44  10.4.22.91  A  azure.microsoft.com  40.112.72.205
+2026-03-15 11:31:09  10.4.22.91  A  pinata.cloud  104.21.18.56
+2026-03-15 11:55:22  10.4.22.91  A  live.com  40.126.32.135
+2026-03-15 12:03:17  10.4.22.91  A  etherscan.io  172.64.147.36
+2026-03-15 13:14:50  10.4.22.91  A  office.com  13.107.6.156

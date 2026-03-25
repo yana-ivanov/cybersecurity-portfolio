@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yana Ivanov — Cybersecurity Analysis Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--amber:#b45309;--blue:#1a4fa0;--green:#145a32;
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:22px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 2.5rem;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:1100px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.25em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.25rem}
+.mast-name{font-family:var(--display);font-size:clamp(2.2rem,5vw,3.5rem);font-weight:900;line-height:1.1;letter-spacing:-.02em;color:#fff;margin-bottom:.5rem}
+.mast-name span{color:#ef4444}
+.mast-title{font-family:var(--serif);font-size:.95rem;color:#94a3b8;margin-bottom:2rem;font-style:italic}
+.mast-bio{max-width:640px;font-size:.88rem;color:#cbd5e1;line-height:1.75;margin-bottom:2rem}
+.mast-links{display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.mast-link{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;color:#94a3b8;text-decoration:none;text-transform:uppercase;padding-bottom:2px;border-bottom:1px solid rgba(148,163,184,.3);transition:color .2s,border-color .2s}
+.mast-link:hover{color:#60a5fa;border-color:#60a5fa}
+.mast-stats{display:flex;gap:3rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,.1)}
+.stat-item .stat-num{font-family:var(--display);font-size:1.8rem;font-weight:700;color:#fff;line-height:1}
+.stat-item .stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;color:#64748b;text-transform:uppercase;margin-top:.25rem}
+.filter-bar{background:#fff;border-bottom:2px solid var(--rule);padding:1rem 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.filter-inner{max-width:1100px;margin:0 auto;padding:0 3rem;display:flex;flex-direction:column;gap:.75rem}
+.search-wrap{position:relative;width:100%}
+.search-wrap input{width:100%;padding:.55rem 1rem .55rem 2.4rem;border:1px solid var(--rule);border-radius:2px;font-family:var(--mono);font-size:.75rem;color:var(--ink);background:#fff;outline:none;transition:border-color .2s}
+.search-wrap input:focus{border-color:var(--blue)}
+.search-wrap input::placeholder{color:#94a3b8}
+.search-icon{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:.8rem;pointer-events:none}
+.filter-chips-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.filter-chips{display:flex;gap:.5rem;flex-wrap:wrap;flex:1}
+.search-icon{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:.8rem;pointer-events:none}
+.filter-chips{display:flex;gap:.5rem;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .75rem;border:1px solid var(--rule);border-radius:2px;cursor:pointer;color:#64748b;background:#fff;transition:all .15s;white-space:nowrap}
+.chip:hover{border-color:var(--ink);color:var(--ink)}
+.chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.results-count{font-family:var(--mono);font-size:.65rem;color:#94a3b8;margin-left:auto;white-space:nowrap}
+.main{max-width:1100px;margin:0 auto;padding:3rem}
+/* section groups — hidden when filtering */
+.section-group{margin-bottom:3.5rem}
+.section-group.hidden-group{display:none}
+.section-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--rule)}
+.section-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.4rem}
+.section-title{font-family:var(--display);font-size:1.45rem;font-weight:700;color:var(--ink)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem}
+.card{background:var(--paper);border:1px solid var(--rule);border-radius:2px;text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.1);border-color:#cbd5e1}
+.card-accent{height:3px;width:100%}
+.card-accent.red{background:var(--red)}
+.card-accent.blue{background:var(--blue)}
+.card-accent.amber{background:var(--amber)}
+.card-accent.green{background:var(--green)}
+.card-accent.dark{background:#0a0f1a}
+.card-body{padding:1.5rem;flex:1;display:flex;flex-direction:column}
+.card-category{font-family:var(--mono);font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.6rem}
+.card-category.red{color:var(--red)}
+.card-category.blue{color:var(--blue)}
+.card-category.amber{color:var(--amber)}
+.card-category.green{color:var(--green)}
+.card-category.dark{color:#64748b}
+.card-title{font-family:var(--display);font-size:1rem;font-weight:700;line-height:1.3;color:var(--ink);margin-bottom:.6rem}
+.card-desc{font-size:.82rem;color:var(--ink3);line-height:1.65;flex:1;margin-bottom:1rem}
+.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:.75rem;border-top:1px solid var(--rule)}
+.card-tags{display:flex;gap:.4rem;flex-wrap:wrap}
+.card-tag{font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;padding:.2rem .5rem;border:1px solid var(--rule);color:#94a3b8;border-radius:1px}
+.card-arrow{font-family:var(--mono);font-size:.65rem;color:#94a3b8;transition:color .2s,transform .2s}
+.card:hover .card-arrow{color:var(--blue);transform:translateX(3px)}
+.card-date{font-family:var(--mono);font-size:.6rem;color:#94a3b8}
+.card-featured{grid-column:1/-1;flex-direction:row;align-items:stretch}
+.card-featured .card-accent{width:4px;height:auto;min-height:100%}
+.card-featured .card-body{padding:2rem 2rem 2rem 1.75rem}
+.card-featured .card-title{font-size:1.3rem}
+.card-featured-badge{font-family:var(--mono);font-size:.55rem;letter-spacing:.15em;color:#fff;background:var(--red);padding:.2rem .6rem;text-transform:uppercase;display:inline-block;margin-bottom:.75rem}
+.card-soon{opacity:.55;cursor:default;pointer-events:none}
+.card-soon-badge{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;color:#94a3b8;border:1px dashed #cbd5e1;padding:.2rem .5rem;display:inline-block;margin-bottom:.5rem}
+.empty-state{text-align:center;padding:4rem 2rem;display:none}
+.empty-state.visible{display:block}
+.empty-icon{font-size:2.5rem;margin-bottom:1rem;opacity:.3}
+.empty-text{font-family:var(--mono);font-size:.75rem;color:#94a3b8;letter-spacing:.1em}
+footer{background:#0a0f1a;color:#64748b;padding:2rem 3rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+footer a{color:#4a9eff;text-decoration:none}
+footer a:hover{color:#60a5fa}
+.portfolio-item.hidden{display:none}
+/* Single visible card in a grid always takes full width */
+.card-grid .portfolio-item:not(.hidden):only-child,
+.card-grid .portfolio-item:not(.hidden):first-child:nth-last-child(1){
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: stretch;
+}
+.card-grid .portfolio-item:not(.hidden):only-child .card-accent,
+.card-grid .portfolio-item:not(.hidden):first-child:nth-last-child(1) .card-accent{
+  width:4px;height:auto;min-height:100%;
+}
+@media(max-width:680px){
+  .mast-inner,.filter-inner,.main{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-stats{gap:1.5rem}
+  .card-featured{flex-direction:column}
+  .card-featured .card-accent{width:100%;height:3px}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Cybersecurity Analysis Portfolio</div>
+    <div class="mast-name">Yana Ivanov</div>
+    <div class="mast-title">Cloud Security Engineer · Azure · CMMC Consultant · Milford, CT</div>
+    <p class="mast-bio">Transitioning into Cloud Security and CMMC consulting with a focus on the defense industrial base. MS Information Systems · Security+ SY0-701 in progress · Azure certifications targeted for June 2026. Background in enterprise UX/UI brings a practitioner perspective that makes complex threat intelligence accessible to non-technical defense contractor leadership. This portfolio documents that transition.</p>
+    <div class="mast-links">
+      <a href="https://linkedin.com/in/yanaivanov" target="_blank" class="mast-link">LinkedIn</a>
+      <a href="resume.html" class="mast-link">Resume</a>
+    </div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <div class="filter-inner">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Search reports, topics, threat actors..." oninput="updateLatestReportCard();filterPortfolio()">
+    </div>
+    <div class="filter-chips-row">
+      <div class="filter-chips">
+        <button class="chip active" data-filter="all" onclick="setFilter('all',this)">All</button>
+        <button class="chip" data-filter="threat-analysis" onclick="setFilter('threat-analysis',this)">Threat Analysis</button>
+        <button class="chip" data-filter="nation-state" onclick="setFilter('nation-state',this)">Nation-State</button>
+        <button class="chip" data-filter="infrastructure" onclick="setFilter('infrastructure',this)">Infrastructure</button>
+        <button class="chip" data-filter="supply-chain" onclick="setFilter('supply-chain',this)">Supply Chain</button>
+        <button class="chip" data-filter="cmmc" onclick="setFilter('cmmc',this)">CMMC</button>
+        <button class="chip" data-filter="training" onclick="setFilter('training',this)">Training</button>
+        <button class="chip" data-filter="identity" onclick="setFilter('identity',this)">Identity & Credentials</button>
+        <button class="chip" data-filter="tools" onclick="setFilter('tools',this)">Tools</button>
+        <button class="chip" data-filter="lab" onclick="setFilter('lab',this)">Lab Logs</button>
+      </div>
+      <div class="results-count" id="resultsCount">loading...</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- THREAT ANALYSIS -->
+  <div class="section-group" id="group-analysis">
+    <div class="section-header">
+      <div class="section-label">Analysis Reports</div>
+      <div class="section-title">Threat Intelligence & Policy Research</div>
+    </div>
+    <div class="card-grid">
+
+      <!-- newest → oldest: Mar 25, Mar 17, Mar 16, Mar 15 (x2), Mar 14 (x2), Mar 2026 (x2), then policy -->
+
+      <a href="data-breach-exposure-analysis.html" class="card card-featured portfolio-item" id="latest-report-card"
+         data-tags="threat-analysis identity"
+         data-title="data breach exposure analysis credential stuffing mitre attack cloud identity sso google azure entra id 38 breaches haveibeenpwned">
+        <div class="card-accent red" style="width:4px;height:auto;min-height:100%"></div>
+        <div class="card-body">
+          <div class="card-featured-badge">Latest Report</div>
+          <div class="card-category red">Threat Analysis · Identity & Credentials</div>
+          <div class="card-title">38 Breaches, One Email Address — Anatomy of a Credential Attack Surface</div>
+          <div class="card-desc">A SOC analyst case study mapping 13 years of personal data breach exposure to attacker methodology, threat actor profiles, and cloud identity risk. Covers credential stuffing attack chains, Everest ransomware, infostealer operators, MITRE ATT&CK mapping, and the SSO single-point-of-failure risk that mirrors Azure Entra ID vulnerabilities at enterprise scale. Includes live pwned password checker.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">MITRE ATT&CK</span><span class="card-tag">Credential Stuffing</span><span class="card-tag">Cloud Identity</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="water_infrastructure_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis infrastructure"
+         data-title="water infrastructure open tap weapon scada ics new york city nyc critical">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Critical Infrastructure</div>
+          <div class="card-title">The Open Tap — When Water Becomes a Weapon</div>
+          <div class="card-desc">Wake-up call analysis of water infrastructure cybersecurity. Ukraine confirmed attacks, Oldsmar Florida proof of concept, and a full scenario against NYC's 9-million-person unfiltered water supply.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">ICS/SCADA</span><span class="card-tag">Water</span><span class="card-tag">Infrastructure</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="signal_whatsapp_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis nation-state"
+         data-title="signal whatsapp russia encryption social engineering defense contractor cmmc">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Russia</div>
+          <div class="card-title">The Encryption Illusion — Russia's Signal Campaign</div>
+          <div class="card-desc">How Russian intelligence bypassed Signal and WhatsApp without breaking encryption — exploiting the human layer instead. CMMC implications for defense contractors using personal messaging apps.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Russia</span><span class="card-tag">Social Engineering</span><span class="card-tag">CMMC</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="the_cascade_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis infrastructure"
+         data-title="the cascade when america goes dark coordinated infrastructure attack china russia">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Infrastructure</div>
+          <div class="card-title">The Cascade — When America Goes Dark</div>
+          <div class="card-desc">Coordinated infrastructure attack scenario analysis examining how simultaneous failures in communications, power grid, and transportation create cascading societal collapse. Explores the dependency stack that transforms three technical failures into an uncontestable national security crisis.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Nation-State</span><span class="card-tag">Infrastructure</span><span class="card-tag">Supply Chain</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="cmmc_supply_chain.html" class="card portfolio-item"
+         data-tags="cmmc"
+         data-title="cmmc supply chain weakest link morsecorp fca cost sharing mandatory training">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Policy Analysis · CMMC</div>
+          <div class="card-title">The Weakest Link — CMMC Supply Chain</div>
+          <div class="card-desc">Analysis of how CMMC compliance gaps in small subcontractors expose entire defense programs. Covers the MORSECORP $4.6M FCA settlement and the case for mandatory structured training.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">CMMC</span><span class="card-tag">FCA</span><span class="card-tag">MORSECORP</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="volt_typhoon_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis nation-state"
+         data-title="volt typhoon china living off the land lotl audit log infrastructure">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · APT</div>
+          <div class="card-title">Volt Typhoon — Living Off the Land</div>
+          <div class="card-desc">Deep analysis of China's Volt Typhoon campaign targeting US critical infrastructure using LOTL techniques. Covers audit log deletion and years-long persistence inside defended networks.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">China</span><span class="card-tag">LOTL</span><span class="card-tag">Critical Infrastructure</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="stryker_threat_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis nation-state"
+         data-title="stryker corporation wiper attack handala 200000 devices credential mfa">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Case Study</div>
+          <div class="card-title">Stryker Corporation — The Wiper Attack</div>
+          <div class="card-desc">Analysis of the Handala threat actor's wiper attack that remotely destroyed 200,000 devices across 79 countries via a single admin credential lacking MFA.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Handala</span><span class="card-tag">Wiper</span><span class="card-tag">MFA</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="homoglyph_bec_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis supply-chain"
+         data-title="unicode homoglyph business email compromise BEC domain spoofing wire fraud cyrillic">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Business Email Compromise</div>
+          <div class="card-title">The Identical Lie — Unicode Homoglyph Attacks & BEC</div>
+          <div class="card-desc">How attackers use visually identical Unicode characters to register spoofed domains and steal millions through fraudulent wire transfers. $55.5 billion lost over the past decade. The one defense that stops it unconditionally costs nothing.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">BEC</span><span class="card-tag">Homoglyph</span><span class="card-tag">Wire Fraud</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="glassworm_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis supply-chain"
+         data-title="glassworm invisible unicode supply chain attack blockchain c2 github npm defense contractor">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Supply Chain</div>
+          <div class="card-title">The Invisible Threat — Glassworm & Unicode Supply Chain Attack</div>
+          <div class="card-desc">How Glassworm hid malicious payloads in invisible Unicode characters across 151+ GitHub repositories, npm packages, and VS Code extensions — undetectable by human code review. Active campaign as of March 2026.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Glassworm</span><span class="card-tag">Supply Chain</span><span class="card-tag">Unicode</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="hiring_trap_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis supply-chain identity"
+         data-title="hiring trap job search browser extension jobright manifest permissions national security surveillance defense contractor">
+        <div class="card-accent amber"></div>
+        <div class="card-body">
+          <div class="card-category amber">Threat Analysis · Privacy</div>
+          <div class="card-title">The Hiring Trap — How Job Search Tools Became a National Security Exposure</div>
+          <div class="card-desc">First-person analysis of how a broken hiring process pushes job seekers — including defense industry professionals — into installing browser extensions with surveillance-level access to their entire digital life. Includes live manifest.json permission scanner.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Browser Extensions</span><span class="card-tag">Supply Chain</span><span class="card-tag">Permissions</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- TRAINING -->
+  <div class="section-group" id="group-training">
+    <div class="section-header">
+      <div class="section-label">Training & Education</div>
+      <div class="section-title">Self-Study Resources</div>
+    </div>
+    <div class="card-grid">
+
+      <a href="cmmc_training.html" class="card portfolio-item"
+         data-tags="training"
+         data-title="cmmc cybersecurity awareness training 14 module self study guide defense contractor">
+        <div class="card-accent green"></div>
+        <div class="card-body">
+          <div class="card-category green">Self-Study Guide · CMMC</div>
+          <div class="card-title">CMMC Cybersecurity Awareness — 14-Module Self-Study Guide</div>
+          <div class="card-desc">Interactive self-study guide covering CMMC awareness topics for defense supply chain employees. 14 modules, scenario-based quizzes, real case studies. Completion record included.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Interactive</span><span class="card-tag">14 Modules</span><span class="card-tag">Certificate</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- TOOLS -->
+  <div class="section-group" id="group-tools">
+    <div class="section-header">
+      <div class="section-label">Interactive Tools</div>
+      <div class="section-title">Analyst Toolkit</div>
+    </div>
+    <div class="card-grid">
+
+      <a href="zeek_triage_tool.html" class="card portfolio-item"
+           data-tags="tools zeek automation blue-team"
+           data-title="zeek triage tool pcap analysis ioc threat detection browser interactive">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Interactive Tool · Zeek Analysis</div>
+          <div class="card-title">Zeek Triage — pcap IOC Analyzer</div>
+          <div class="card-desc">Upload a .pcap file and get an automated IOC threat report — HTTP, TLS, DHCP, and data-volume analysis with severity scoring. Runs entirely in your browser. No data leaves your machine. Built on the zeek_triage.py workflow from Lab Log 006.</div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag">Zeek</span>
+              <span class="card-tag">IOC Detection</span>
+              <span class="card-tag">Browser</span>
+              <span class="card-tag">Training Only</span>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+      <a href="aes_tool.html" class="card portfolio-item"
+         data-tags="tools encryption security"
+         data-title="aes 256 file encryption decryption browser tool gcm web crypto security">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Interactive Tool · Encryption</div>
+          <div class="card-title">AES-256 File Encryption & Decryption</div>
+          <div class="card-desc">Encrypt and decrypt any file using AES-256-GCM — the same standard used to protect classified government data. Random key generation, integrity verification via GCM authentication tag. Runs entirely in your browser. No file ever leaves your machine.</div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag">AES-256-GCM</span>
+              <span class="card-tag">Web Crypto API</span>
+              <span class="card-tag">Client-Side</span>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="cvss_calculator.html" class="card portfolio-item"
+         data-tags="tools vulnerability security"
+         data-title="cvss 3.1 score calculator vulnerability severity soc analyst security plus">
+        <div class="card-accent amber"></div>
+        <div class="card-body">
+          <div class="card-category amber">Interactive Tool · Vulnerability Scoring</div>
+          <div class="card-title">CVSS 3.1 Score Calculator</div>
+          <div class="card-desc">Calculate the severity of any vulnerability using the industry-standard Common Vulnerability Scoring System. Eight metric questions, live score calculation, plain-language explanations of each factor. Used for every CVE published by NIST.</div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag">CVSS 3.1</span>
+              <span class="card-tag">Vulnerability</span>
+              <span class="card-tag">SOC Analyst</span>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="glassworm_detector.html" class="card portfolio-item"
+         data-tags="tools supply-chain security"
+         data-title="glassworm detector invisible unicode supply chain attack blockchain c2 scanner">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Interactive Tool · Supply Chain Security</div>
+          <div class="card-title">Glassworm Detector</div>
+          <div class="card-desc">Scan source code files for invisible Unicode payloads and detect blockchain C2 connections. Identifies Glassworm PUA codepoints that render as blank space in every editor but carry malicious execution payloads. Runs entirely in your browser.</div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag">Unicode</span>
+              <span class="card-tag">Supply Chain</span>
+              <span class="card-tag">Blockchain C2</span>
+              <span class="card-tag">Glassworm</span>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- LAB LOGS -->
+  <div class="section-group" id="group-labs">
+    <div class="section-header">
+      <div class="section-label">Hands-On Security Work</div>
+      <div class="section-title">Lab Logs</div>
+    </div>
+    <div class="card-grid">
+
+      <a href="labs/lab_log_001.html" class="card portfolio-item"
+         data-tags="lab reconnaissance blue-team"
+         data-title="lab log 001 network reconnaissance nmap port scan kali linux">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 001 · Reconnaissance</div>
+          <div class="card-title">Network Reconnaissance — What an Attacker Sees First</div>
+          <div class="card-desc">Nmap SYN scan of a Docker host from Kali Linux. Full port enumeration, service detection, and analysis of two open RPC services mapped to NIST 800-171 controls.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Nmap</span><span class="card-tag">Kali</span><span class="card-tag">NIST</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_002.html" class="card portfolio-item"
+         data-tags="lab traffic-analysis blue-team tcpdump"
+         data-title="lab log 002 network traffic analysis tcpdump packet capture tcp syn">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 002 · Traffic Analysis</div>
+          <div class="card-title">Network Traffic Analysis — Reading the Language of Packets</div>
+          <div class="card-desc">tcpdump packet capture of a live Nmap scan. TCP SYN/RST handshake breakdown, Nmap behavioral fingerprints visible in raw traffic, defender detection methodology.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">tcpdump</span><span class="card-tag">TCP/IP</span><span class="card-tag">Blue Team</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_003.html" class="card portfolio-item"
+         data-tags="lab malware-analysis wireshark blue-team"
+         data-title="lab log 003 wireshark malware analysis c2 beaconing infected host dhcp kerberos">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 003 · Malware Analysis</div>
+          <div class="card-title">Wireshark Malware Analysis — Identifying an Infected Host</div>
+          <div class="card-desc">Real malware pcap analysis using Wireshark. DHCP and Kerberos triage workflow to identify infected machine and user. C2 beaconing pattern detection — 264 POST requests at 60-second intervals confirmed.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Wireshark</span><span class="card-tag">C2</span><span class="card-tag">Beaconing</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_004.html" class="card portfolio-item"
+         data-tags="lab malware-analysis wireshark lumma-stealer blue-team"
+         data-title="lab log 004 wireshark profile lumma stealer credential theft tls exfiltration">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 004 · Custom Profile + Malware</div>
+          <div class="card-title">Custom Wireshark Profile & Lumma Stealer Analysis</div>
+          <div class="card-desc">Built a purpose-configured SOC analyst Wireshark profile with color rules and one-click filter buttons. Independent analysis of Lumma Stealer — browser fingerprinting, dual Chrome/Edge infection, TLS credential exfiltration to whitepepper.su.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Lumma Stealer</span><span class="card-tag">TLS</span><span class="card-tag">Exfiltration</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_005.html" class="card portfolio-item"
+         data-tags="lab zeek malware-analysis blue-team automation"
+         data-title="lab log 005 zeek network analysis automated log generation lumma stealer">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 005 · Zeek Analysis</div>
+          <div class="card-title">Zeek Network Analysis — Automated Log Generation & Threat Discovery</div>
+          <div class="card-desc">Installed and ran Zeek 8.1.1 against the Lumma Stealer pcap. Five-command triage workflow producing structured logs. ssl.log revealed four additional C2 domains invisible to Wireshark — 1.67MB exfiltration confirmed.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Zeek</span><span class="card-tag">ssl.log</span><span class="card-tag">C2 Discovery</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_006.html" class="card portfolio-item"
+         data-tags="lab python automation zeek blue-team"
+         data-title="lab log 006 python triage script zeek automated threat detection lumma stealer">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 006 · Python Automation</div>
+          <div class="card-title">zeek_triage.py — Automated Threat Detection with Python</div>
+          <div class="card-desc">Python script automating the full Zeek triage workflow — DHCP, Kerberos, HTTP, TLS, and data volume analysis in one command. Color-coded output, severity scoring, validated against two real malware families. Zero external dependencies.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Python</span><span class="card-tag">Automation</span><span class="card-tag">ANSI Colors</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_007.html" class="card portfolio-item"
+         data-tags="lab python automation zeek blue-team"
+         data-title="lab log 007 ioc detection severity scoring dynamic dns confirmed malicious">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 007 · IOC Detection</div>
+          <div class="card-title">Confirmed IOC Matching & Severity Scoring Correction</div>
+          <div class="card-desc">Added confirmed malicious domain matching and dynamic DNS detection to the triage script. Corrected severity scoring flaw — a confirmed C2 beacon always scores CRITICAL regardless of data volume. Validated against two malware families.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">IOC Matching</span><span class="card-tag">Dynamic DNS</span><span class="card-tag">Severity Logic</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_008.html" class="card portfolio-item"
+         data-tags="lab threat-analysis blue-team wireshark"
+         data-title="lab log 008 seven days scans probes web traffic server wireshark apache syn scan eicar">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 008 · Internet-Facing Server Analysis</div>
+          <div class="card-title">Seven Days Under Attack — Analyzing a Live Web Server's Traffic</div>
+          <div class="card-desc">Analysis of 313,968 packets across seven days of real internet traffic hitting an exposed Apache server. Four attack vectors identified — SYN port scan, backup exfiltration attempt, EICAR web shell upload probe, and RADIUS auth scan. All attacks blocked. Server banner disclosure identified as the critical passive risk.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Wireshark</span><span class="card-tag">Apache</span><span class="card-tag">SYN Scan</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">◎</div>
+    <div class="empty-text">No matching items — try a different search or filter</div>
+  </div>
+
+</div>
+
+<footer>
+  <span>Yana Ivanov · Cloud Security & CMMC Portfolio · Milford, CT · 2026</span>
+  <span>Independent analysis · For educational use</span>
+</footer>
+
+<script>
+let activeFilter = 'all';
+
+function setFilter(filter, el) {
+  activeFilter = filter;
+  document.querySelectorAll('.chip').forEach(c => {
+    c.className = 'chip';
+    if (c.dataset.filter === filter) c.className = 'chip active';
+  });
+  updateLatestReportCard();
+  filterPortfolio();
+}
+
+function updateLatestReportCard() {
+  const card = document.getElementById('latest-report-card');
+  if (!card) return;
+  const isAll = activeFilter === 'all' && document.getElementById('searchInput').value.trim() === '';
+  const accent = card.querySelector('.card-accent');
+  const badge = card.querySelector('.card-featured-badge');
+  if (isAll) {
+    card.classList.add('card-featured');
+    if (accent) { accent.style.width = '4px'; accent.style.height = 'auto'; accent.style.minHeight = '100%'; }
+    if (badge) badge.style.display = '';
+  } else {
+    card.classList.remove('card-featured');
+    if (accent) { accent.style.width = ''; accent.style.height = ''; accent.style.minHeight = ''; }
+    if (badge) badge.style.display = 'none';
+  }
+}
+
+function filterPortfolio() {
+  const query = document.getElementById('searchInput').value.toLowerCase().trim();
+  const items = document.querySelectorAll('.portfolio-item');
+  const groups = document.querySelectorAll('.section-group');
+  let visible = 0;
+
+  // When filtering (not "all" or search), hide section headers
+  const isFiltering = activeFilter !== 'all' || query.length > 0;
+
+  items.forEach(item => {
+    const tags = (item.dataset.tags || '').toLowerCase();
+    const title = (item.dataset.title || '').toLowerCase();
+    const cardText = item.textContent.toLowerCase();
+    const isSoon = item.classList.contains('card-soon');
+
+    const matchesFilter = activeFilter === 'all' || tags.includes(activeFilter);
+    const matchesSearch = !query || title.includes(query) || tags.includes(query) || cardText.includes(query);
+
+    if (isSoon) {
+      // Only show coming-soon cards when viewing all with no search
+      item.classList.toggle('hidden', isFiltering);
+    } else if (matchesFilter && matchesSearch) {
+      item.classList.remove('hidden');
+      visible++;
+    } else {
+      item.classList.add('hidden');
+    }
+  });
+
+  // Show/hide section groups — show header whenever any card in group is visible
+  groups.forEach(group => {
+    const anyVisible = Array.from(group.querySelectorAll('.portfolio-item')).some(
+      item => !item.classList.contains('hidden')
+    );
+    const header = group.querySelector('.section-header');
+    if (anyVisible) {
+      group.classList.remove('hidden-group');
+      header.style.display = '';
+    } else {
+      group.classList.add('hidden-group');
+      header.style.display = 'none';
+    }
+  });
+
+  document.getElementById('resultsCount').textContent = visible + (visible === 1 ? ' item' : ' items');
+  document.getElementById('emptyState').classList.toggle('visible', visible === 0);
+}
+
+// Run on load
+updateLatestReportCard();
+filterPortfolio();
+
+</script>
+</body>
+</html>

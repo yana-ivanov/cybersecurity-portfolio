@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volt Typhoon — Investigative Analysis | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;
+  text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;
+  line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#ef4444}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;
+  padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;
+  color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#ef4444;margin-top:2.5rem;padding:.6rem 3rem;
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;
+  display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0 0}
+
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);
+  text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;
+  line-height:1.2;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);
+  margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:rgba(192,57,43,0.06);border-color:var(--red)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;
+  letter-spacing:.1em;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--red)}
+
+.diagram{background:var(--paper);border:1px solid var(--rule);border-radius:4px;
+  padding:2rem;margin:2rem 0;overflow-x:auto}
+.diagram-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--ink3);margin-bottom:1.5rem;
+  padding-bottom:.75rem;border-bottom:1px solid var(--rule)}
+
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);border-radius:2px;
+  background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:#0a0f1a;color:#fff}
+.finding-body{}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.35rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.65rem;
+  padding:.15rem .5rem;border-radius:2px;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:rgba(10,15,26,0.06);color:#0a0f1a}
+
+.bio-section{background:#0a0f1a;width:100%}
+.bio{color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start;max-width:780px;margin:0 auto}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;
+  display:flex;align-items:center;justify-content:center;font-family:var(--display);
+  font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;width:100vw;position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;box-sizing:border-box}
+footer span{color:#94a3b8}
+
+@media(max-width:680px){
+  .wrap,.mast-inner{padding:0 1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .mast-bar{padding:.6rem 1.5rem;flex-wrap:wrap;gap:.5rem}
+  h1.title{font-size:1.8rem}
+  .bio{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}
+}
+
+/* ── GOOGLE MATERIAL ICONS ── */
+.material-icons{font-family:'Material Icons';font-style:normal;font-weight:400;
+  font-size:24px;display:inline-block;line-height:1;letter-spacing:normal;
+  text-transform:none;white-space:nowrap;word-wrap:normal;direction:ltr;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+/* ── FIGURE CONTAINER ── */
+.figure{background:var(--paper);border:1px solid var(--rule);border-radius:4px;
+  margin:2rem 0;overflow:hidden}
+.figure-header{background:#0a0f1a;color:#fff;padding:.7rem 1.25rem;
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;
+  display:flex;align-items:center;gap:.6rem}
+.figure-header .material-icons{font-size:1rem;color:#4a9eff}
+.figure-body{padding:1.5rem}
+.figure-caption{padding:.6rem 1.25rem;background:var(--bg);border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;color:#94a3b8;font-style:normal}
+
+/* ── STAT ROW ── */
+.fig-stat-row{display:grid;gap:0;margin:0}
+.fig-stat-row.cols-4{grid-template-columns:repeat(4,1fr)}
+.fig-stat-row.cols-3{grid-template-columns:repeat(3,1fr)}
+.fig-stat-row.cols-2{grid-template-columns:repeat(2,1fr)}
+.fig-stat{padding:1.5rem 1.25rem;border-right:1px solid var(--rule);text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:.4rem}
+.fig-stat:last-child{border-right:none}
+.fig-stat .material-icons{font-size:1.75rem;margin-bottom:.25rem}
+.fig-stat-num{font-family:var(--display);font-size:2.2rem;font-weight:900;line-height:1}
+.fig-stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink3);line-height:1.4;margin-top:.15rem}
+.fig-stat-sub{font-size:.78rem;color:#94a3b8;line-height:1.5;margin-top:.2rem}
+.fig-stat.red .material-icons,.fig-stat.red .fig-stat-num{color:var(--red)}
+.fig-stat.amber .material-icons,.fig-stat.amber .fig-stat-num{color:var(--amber)}
+.fig-stat.blue .material-icons,.fig-stat.blue .fig-stat-num{color:var(--blue)}
+.fig-stat.green .material-icons,.fig-stat.green .fig-stat-num{color:var(--green)}
+.fig-stat.dark .material-icons,.fig-stat.dark .fig-stat-num{color:var(--ink)}
+
+/* ── FLOW CHAIN ── */
+.fig-flow{display:flex;align-items:stretch;gap:0;flex-wrap:nowrap;margin:0}
+.fig-flow-step{flex:1;min-width:0;padding:1.25rem 1rem;border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:.4rem}
+.fig-flow-step:last-child{border-right:none}
+.fig-flow-step .material-icons{font-size:1.6rem}
+.fig-flow-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;
+  text-transform:uppercase;font-weight:700;line-height:1.3}
+.fig-flow-title{font-family:var(--display-clean);font-size:.82rem;font-weight:700;
+  color:var(--ink);line-height:1.3}
+.fig-flow-desc{font-size:.75rem;color:var(--ink3);line-height:1.45}
+.fig-flow-step.red{background:#fef2f2;border-top:3px solid var(--red)}
+.fig-flow-step.red .material-icons,.fig-flow-step.red .fig-flow-label{color:var(--red)}
+.fig-flow-step.amber{background:#fffbeb;border-top:3px solid var(--amber)}
+.fig-flow-step.amber .material-icons,.fig-flow-step.amber .fig-flow-label{color:var(--amber)}
+.fig-flow-step.green{background:#f0fdf4;border-top:3px solid var(--green)}
+.fig-flow-step.green .material-icons,.fig-flow-step.green .fig-flow-label{color:var(--green)}
+.fig-flow-step.blue{background:#eff6ff;border-top:3px solid var(--blue)}
+.fig-flow-step.blue .material-icons,.fig-flow-step.blue .fig-flow-label{color:var(--blue)}
+.fig-flow-step.dark{background:#0a0f1a;border-top:3px solid #374151}
+.fig-flow-step.dark .fig-flow-label{color:#60a5fa}
+.fig-flow-step.dark .fig-flow-title{color:#e2e8f0}
+.fig-flow-step.dark .fig-flow-desc{color:#94a3b8}
+
+/* ── TIMELINE ── */
+.fig-timeline{display:grid;gap:0}
+.fig-tl-item{display:grid;grid-template-columns:160px 1fr;border-bottom:1px solid var(--rule)}
+.fig-tl-item:last-child{border-bottom:none}
+.fig-tl-left{padding:1.25rem;border-right:1px solid var(--rule);background:var(--bg);
+  display:flex;flex-direction:column;gap:.3rem}
+.fig-tl-date{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--green)}
+.fig-tl-date.red{color:var(--red)}
+.fig-tl-date.amber{color:var(--amber)}
+.fig-tl-date.dark{color:var(--ink)}
+.fig-tl-stage{font-family:var(--mono);font-size:.6rem;color:#94a3b8;
+  letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.fig-tl-right{padding:1.25rem 1.5rem}
+.fig-tl-title{font-family:var(--display);font-size:.95rem;font-weight:700;
+  color:var(--ink);margin-bottom:.4rem;line-height:1.3}
+.fig-tl-body{font-size:.85rem;color:var(--ink3);line-height:1.65}
+.fig-tl-item.active .fig-tl-left{background:#fef2f2}
+.fig-tl-item.active .fig-tl-date{color:var(--red)}
+
+/* ── AUTHORITY / HUB-SPOKE GRID ── */
+.fig-hub-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center}
+.fig-hub-col{display:flex;flex-direction:column;gap:.75rem}
+.fig-hub-card{padding:1rem 1.25rem;border:1px solid var(--rule);border-radius:3px;
+  background:var(--paper);border-left:3px solid var(--amber)}
+.fig-hub-card-title{font-family:var(--mono);font-size:.7rem;font-weight:700;
+  color:var(--amber);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.35rem;
+  display:flex;align-items:center;gap:.4rem}
+.fig-hub-card-title .material-icons{font-size:.95rem}
+.fig-hub-card-mandate{font-size:.82rem;color:var(--ink3);line-height:1.5;margin-bottom:.25rem}
+.fig-hub-card-limit{font-family:var(--mono);font-size:.65rem;color:var(--amber);letter-spacing:.04em}
+.fig-hub-center{text-align:center;padding:1.5rem 1rem;background:#0a0f1a;border-radius:4px;
+  border:2px solid var(--red)}
+.fig-hub-center .material-icons{font-size:2rem;color:#ef4444;display:block;margin-bottom:.5rem}
+.fig-hub-center-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;
+  text-transform:uppercase;color:#ef4444;margin-bottom:.5rem}
+.fig-hub-center-title{font-family:var(--display-clean);font-size:.95rem;font-weight:700;
+  color:#fff;line-height:1.3;margin-bottom:.4rem}
+.fig-hub-center-sub{font-size:.75rem;color:#94a3b8;line-height:1.5}
+.fig-hub-caption{grid-column:1/-1;text-align:center;font-family:var(--mono);
+  font-size:.62rem;color:var(--red);letter-spacing:.04em;padding-top:.5rem;
+  border-top:1px solid var(--rule)}
+
+/* ── ACCESS CHAIN ── */
+.fig-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:0;align-items:stretch}
+.fig-chain-node{padding:1.25rem 1rem;border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;gap:.4rem}
+.fig-chain-node:last-child{border-right:none}
+.fig-chain-node .material-icons{font-size:1.5rem}
+.fig-chain-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;
+  text-transform:uppercase;font-weight:700}
+.fig-chain-title{font-family:var(--display-clean);font-size:.82rem;font-weight:700;
+  color:var(--ink);line-height:1.3}
+.fig-chain-items{list-style:none;padding:0;margin:.25rem 0 0}
+.fig-chain-items li{font-size:.75rem;color:var(--ink3);line-height:1.5;
+  padding:.1rem 0;border-bottom:1px solid var(--rule)}
+.fig-chain-items li:last-child{border-bottom:none}
+.fig-chain-node.entry{background:#fef2f2;border-top:3px solid var(--red)}
+.fig-chain-node.entry .material-icons,.fig-chain-node.entry .fig-chain-label{color:var(--red)}
+.fig-chain-node.pivot{background:#fffbeb;border-top:3px solid var(--amber)}
+.fig-chain-node.pivot .material-icons,.fig-chain-node.pivot .fig-chain-label{color:var(--amber)}
+.fig-chain-node.supply{background:#fef2f2;border-top:3px solid var(--red)}
+.fig-chain-node.supply .material-icons,.fig-chain-node.supply .fig-chain-label{color:var(--red)}
+.fig-chain-node.target{background:var(--paper);border-top:3px solid var(--ink)}
+.fig-chain-node.target .material-icons{color:var(--ink)}
+.fig-chain-node.target .fig-chain-label{color:#64748b}
+
+/* ── SEQUENCE / CORRECT vs WRONG ── */
+.fig-sequence{display:grid;gap:.75rem;margin:0}
+.fig-seq-row{display:grid;grid-template-columns:120px 1fr;gap:0;border-radius:3px;overflow:hidden}
+.fig-seq-badge{padding:.75rem 1rem;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:.3rem;text-align:center;flex-shrink:0}
+.fig-seq-badge .material-icons{font-size:1.4rem}
+.fig-seq-badge-label{font-family:var(--mono);font-size:.55rem;letter-spacing:.08em;
+  text-transform:uppercase;font-weight:700;line-height:1.3}
+.fig-seq-row.wrong .fig-seq-badge{background:var(--red);color:#fff}
+.fig-seq-row.correct .fig-seq-badge{background:var(--green);color:#fff}
+.fig-seq-steps{display:flex;align-items:center;flex-wrap:wrap;gap:0;flex:1}
+.fig-seq-step{flex:1;padding:.75rem .85rem;border-right:1px solid var(--rule);
+  min-width:120px;display:flex;flex-direction:column;gap:.2rem}
+.fig-seq-step:last-child{border-right:none}
+.fig-seq-step-title{font-family:var(--mono);font-size:.7rem;font-weight:700;line-height:1.3}
+.fig-seq-step-sub{font-size:.72rem;color:var(--ink3);line-height:1.4}
+.fig-seq-row.wrong .fig-seq-steps{background:#fef2f2}
+.fig-seq-row.wrong .fig-seq-step-title{color:var(--red)}
+.fig-seq-row.correct .fig-seq-steps{background:#f0fdf4}
+.fig-seq-row.correct .fig-seq-step-title{color:var(--green)}
+
+@media(max-width:700px){
+  .fig-stat-row.cols-4,.fig-stat-row.cols-3{grid-template-columns:1fr 1fr}
+  .fig-stat{border-bottom:1px solid var(--rule)}
+  .fig-flow{flex-direction:column}
+  .fig-tl-item{grid-template-columns:1fr}
+  .fig-tl-left{border-right:none;border-bottom:1px solid var(--rule)}
+  .fig-hub-grid{grid-template-columns:1fr}
+  .fig-chain{grid-template-columns:1fr 1fr}
+  .fig-seq-row{grid-template-columns:1fr}
+  .fig-seq-badge{flex-direction:row;padding:.6rem 1rem}
+}
+
+</style>
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+
+<!-- ══ MASTHEAD ══════════════════════════════════════════════ -->
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Investigative Threat Analysis</div>
+    <h1 class="title">Volt Typhoon — China's<br><span>Silent War Inside America's Infrastructure</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">March 14, 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — For Educational Use</div></div>
+      <div class="meta-item"><div class="label">Threat Actor</div><div class="value">Volt Typhoon / Voltzite (PRC)</div></div>
+      <div class="meta-item"><div class="label">Active Since</div><div class="value">2021 — Ongoing</div></div>
+      <div class="meta-item"><div class="label">Severity</div><div class="value">Critical — Nation-State / Pre-War</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    ONGOING OPERATION &nbsp;·&nbsp; CRITICAL INFRASTRUCTURE COMPROMISED &nbsp;·&nbsp; SOME FOOTHOLDS WILL NEVER BE FOUND &nbsp;·&nbsp; ANALYSIS CURRENT AS OF MARCH 14 2026
+  </div>
+</div>
+
+<!-- ══ CONTENT ══════════════════════════════════════════════ -->
+<div class="wrap">
+<div class="content">
+
+<!-- ── 1. EXECUTIVE SUMMARY ── -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>Since at least 2021, a Chinese state-sponsored threat group designated <strong>Volt Typhoon</strong> — also tracked as Voltzite, Bronze Silhouette, and Vanguard Panda — has been methodically embedding itself inside the most critical infrastructure in the United States. Power grids. Water systems. Transportation networks. Communications. Military support facilities. Not to steal data. Not to demand ransom. Not to make noise. To wait.</p>
+
+  <p>This is not espionage in the traditional sense. The US Intelligence Community assesses with high confidence that Volt Typhoon's objective is <strong>pre-positioning</strong> — gaining persistent access to infrastructure that can be disabled or destroyed at a moment of their choosing, specifically in the event of military conflict over Taiwan. They are not looking through windows. They are installing the charges on the load-bearing walls.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Defining Assessment:</strong> Dragos CEO Rob Lee stated publicly in February 2026 that there are sites compromised by Volt Typhoon in the United States and NATO countries that "we will never find." The FBI Director called it preparation to "cause real-world harm to American citizens and communities in the event of conflict." The Air Force cyber commander said if those capabilities are activated during a Taiwan crisis, "that is total war in my definition."</p>
+  </div>
+
+  <p>This analysis examines how Volt Typhoon achieved five years of undetected persistence, why the obvious remediation steps fail, where the true investigation must begin, and what the policy failure at the heart of this crisis actually is. It is written from the perspective of a security analyst and CMMC consultant who works directly with the defense industrial base in Connecticut — the supply chain that builds the submarines, aircraft engines, and helicopters that would respond to a Taiwan conflict.</p>
+
+  <div class="figure">
+  <div class="figure-header"><span class="material-icons">public</span>Figure 1 — Scale and Scope of Volt Typhoon Operations</div>
+  <div class="figure-body">
+    <div class="fig-stat-row cols-4">
+      <div class="fig-stat red">
+        <span class="material-icons">schedule</span>
+        <div class="fig-stat-num">5+</div>
+        <div class="fig-stat-label">Years Active</div>
+        <div class="fig-stat-sub">Persistent access since at least 2021 — still ongoing in 2026</div>
+      </div>
+      <div class="fig-stat red">
+        <span class="material-icons">corporate_fare</span>
+        <div class="fig-stat-num">9+</div>
+        <div class="fig-stat-label">Sectors Targeted</div>
+        <div class="fig-stat-sub">Energy · Water · Transport · Comms · Maritime · Gov · IT · Manufacturing · Defense</div>
+      </div>
+      <div class="fig-stat amber">
+        <span class="material-icons">bolt</span>
+        <div class="fig-stat-num">300</div>
+        <div class="fig-stat-label">Days in Electric Grid</div>
+        <div class="fig-stat-sub">Confirmed dwell time in one US utility alone — Dragos confirmed 2025</div>
+      </div>
+      <div class="fig-stat red">
+        <span class="material-icons">search_off</span>
+        <div class="fig-stat-num">∞</div>
+        <div class="fig-stat-label">Some Sites Never Found</div>
+        <div class="fig-stat-sub">Dragos CEO: footholds in US and NATO countries "we will never find"</div>
+      </div>
+    </div>
+  </div>
+  <div class="figure-caption">CISA · NSA · FBI · Dragos · Microsoft Threat Intelligence — all confirm active ongoing operation as of March 2026</div>
+</div>
+
+<!-- ── 2. WHO IS VOLT TYPHOON ── -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>Who Is Volt Typhoon — Attribution and Strategic Context</h2>
+
+  <p>Volt Typhoon is a People's Republic of China state-sponsored threat actor assessed by CISA, NSA, FBI, and the Five Eyes intelligence alliance to be operating on behalf of the Chinese government — most likely the People's Liberation Army or the Ministry of State Security. Unlike Chinese APT groups focused on intellectual property theft, Volt Typhoon's targeting pattern is inconsistent with traditional espionage. They target infrastructure with minimal intelligence value but maximum disruption potential.</p>
+
+  <h3>The Taiwan Trigger — Why This Exists</h3>
+  <p>The strategic logic was confirmed at a December 2024 Geneva summit between Chinese and American officials where Chinese representatives made indirect but unmistakable remarks the US delegation interpreted as a tacit admission — the Volt Typhoon campaign was conducted in response to US support for Taiwan, as a warning about the cost of military intervention in a Taiwan conflict.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Strategic Assessment:</strong> China does not need to attack US infrastructure today. They need the US to know that if things go badly over Taiwan, the lights could go out in American cities, water treatment fails, communications collapse, and port operations freeze — all simultaneously, within hours, before US forces can mobilize. It is deterrence through pre-positioned destruction. The cyber equivalent of pointing a loaded weapon at civilian infrastructure to change political decision-making without pulling the trigger.</p>
+  </div>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Alias</th><th>Assigned By</th><th>Assessment</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Volt Typhoon</strong></td><td>Microsoft</td><td>Primary designation — PRC state-sponsored, critical infrastructure focus</td></tr>
+      <tr><td><strong>Voltzite</strong></td><td>Dragos</td><td>OT-focused tracking — confirmed still active through 2025 and 2026</td></tr>
+      <tr><td><strong>Bronze Silhouette</strong></td><td>Secureworks</td><td>Long-term persistence specialist — pre-positioning for disruption</td></tr>
+      <tr><td><strong>Insidious Taurus</strong></td><td>CrowdStrike</td><td>Assessed PLA or MSS affiliation — Taiwan contingency focus</td></tr>
+      <tr><td><strong>UNC3236</strong></td><td>Mandiant</td><td>Living-off-the-land specialist — minimal malware footprint</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="figure">
+  <div class="figure-header"><span class="material-icons">account_tree</span>Figure 2 — Strategic Logic: Pre-Positioning as Deterrence</div>
+  <div class="figure-body">
+    <div class="fig-flow">
+      <div class="fig-flow-step dark">
+        <span class="material-icons" style="color:#60a5fa">flag</span>
+        <div class="fig-flow-label">PRC / PLA</div>
+        <div class="fig-flow-title" style="color:#e2e8f0">Strategic Objective</div>
+        <div class="fig-flow-desc">Deter US military intervention in any Taiwan conflict without firing a single shot</div>
+      </div>
+      <div class="fig-flow-step red">
+        <span class="material-icons">login</span>
+        <div class="fig-flow-label">Pre-Position</div>
+        <div class="fig-flow-title">Embed Access</div>
+        <div class="fig-flow-desc">Infiltrate US power, water, comms, ports, and defense supply chain — quietly, over years</div>
+      </div>
+      <div class="fig-flow-step amber">
+        <span class="material-icons">pending</span>
+        <div class="fig-flow-label">Wait</div>
+        <div class="fig-flow-title">Geopolitical Trigger</div>
+        <div class="fig-flow-desc">Taiwan crisis. US military mobilization. The moment the access is needed — it's already there</div>
+      </div>
+      <div class="fig-flow-step green">
+        <span class="material-icons">fork_right</span>
+        <div class="fig-flow-label">Branch Point</div>
+        <div class="fig-flow-title">Deter or Destroy</div>
+        <div class="fig-flow-desc">If US stands down: access never activated. If not: grid down, water fails, ports freeze, comms collapse — simultaneously</div>
+      </div>
+    </div>
+  </div>
+  <div class="figure-caption">Phase 1: Embed quietly for years — Phase 2: Either deter or destroy on command</div>
+</div>
+
+<!-- ── 3. HOW THEY STAYED HIDDEN ── -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>Five Years Undetected — How They Did It</h2>
+
+  <p>The single most important question about Volt Typhoon is the one most analysts have not answered satisfactorily: how does a nation-state threat actor operate inside US critical infrastructure for five-plus years without being detected? The answer operates at three levels — technical, architectural, and human — and each one alone would be insufficient. Together they created a near-perfect cloak.</p>
+
+  <h3>Level 1 — Living Off The Land: No Malware to Find</h3>
+  <p>Traditional security tools — antivirus, endpoint detection, intrusion detection systems — all work on the same fundamental principle: they look for things that should not be there. Malicious files. Known bad signatures. Suspicious executables. Volt Typhoon brought none of those. They used only tools already installed on every Windows system in the country.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The LOTL Principle:</strong> When a Volt Typhoon operator ran <code style="font-family:'JetBrains Mono',monospace;font-size:.85em">netstat -ano</code> to map active network connections, that command is identical to what your IT administrator runs on Tuesday morning. When they used PowerShell to query Windows Event Logs, that is identical to what your security team does during normal operations. When they used <code style="font-family:'JetBrains Mono',monospace;font-size:.85em">vssadmin</code> to create a shadow copy — that is a standard Windows backup function. Every tool they used came pre-installed. No antivirus has a signature for your own operating system's built-in utilities.</p>
+  </div>
+
+  <h3>Level 2 — The KV-Botnet: Making China Look Like Kansas City</h3>
+  <p>The first question I asked when examining this intrusion is the right one — there must be a login trace. Every network connection leaves a source IP address in the logs. Volt Typhoon solved this with extraordinary ingenuity: they built a secret highway entirely inside America using other people's equipment, without those people's knowledge.</p>
+
+  <p>The <strong>KV-Botnet</strong> — discovered by Lumen Technologies' Black Lotus Labs in December 2023 — is a network of compromised small office and home office routers. Cisco RV320s, Netgear ProSAFE firewalls, DrayTek Vigor routers. End-of-life devices running unpatched 2019 firmware sitting in basements across America, never rebooted, never updated. China compromised them silently and turned them into relay nodes in a secret proxy network.</p>
+
+  <div class="figure">
+  <div class="figure-header"><span class="material-icons">router</span>Figure 3 — KV-Botnet Traffic Routing: How China Looks Like Kansas City</div>
+  <div class="figure-body">
+    <div class="fig-flow">
+      <div class="fig-flow-step dark">
+        <span class="material-icons" style="color:#60a5fa">computer</span>
+        <div class="fig-flow-label">Origin</div>
+        <div class="fig-flow-title" style="color:#e2e8f0">China</div>
+        <div class="fig-flow-desc">Operator issues command from Beijing — encrypted, anonymized immediately</div>
+      </div>
+      <div class="fig-flow-step red">
+        <span class="material-icons">public</span>
+        <div class="fig-flow-label">Relay 1</div>
+        <div class="fig-flow-title">New Caledonia</div>
+        <div class="fig-flow-desc">Compromised VPN — Pacific relay hub. Traffic appears to originate here</div>
+      </div>
+      <div class="fig-flow-step red">
+        <span class="material-icons">router</span>
+        <div class="fig-flow-label">Relay 2</div>
+        <div class="fig-flow-title">Sacramento, CA</div>
+        <div class="fig-flow-desc">Netgear home router — KV-Botnet node. Homeowner has no idea</div>
+      </div>
+      <div class="fig-flow-step red">
+        <span class="material-icons">router</span>
+        <div class="fig-flow-label">Relay 3</div>
+        <div class="fig-flow-title">Phoenix, AZ</div>
+        <div class="fig-flow-desc">Cisco RV320 — small office. End-of-life firmware. Never patched</div>
+      </div>
+      <div class="fig-flow-step green">
+        <span class="material-icons">bolt</span>
+        <div class="fig-flow-label">Target</div>
+        <div class="fig-flow-title">US Power Grid</div>
+        <div class="fig-flow-desc">Log records: "Connection from Phoenix, AZ" — attacker is in Beijing</div>
+      </div>
+    </div>
+  </div>
+  <div class="figure-caption">All traffic encrypted — each hop appears as legitimate HTTPS on port 443 — indistinguishable from normal traffic. FBI confirmed in court filings.</div>
+</div>
+
+<!-- ── 4. THE CREDENTIAL TRAP ── -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>The NTDS.dit Problem — Why "Just Change the Passwords" Fails</h2>
+
+  <p>One of the most common questions when Volt Typhoon's credential dumping activity is disclosed is: why not simply rotate all credentials? They stole the password database — change all the passwords and the stolen data is worthless. This is logical on the surface and completely wrong in practice. Understanding why requires understanding what NTDS.dit actually is and what it enables.</p>
+
+  <h3>What NTDS.dit Contains</h3>
+  <p>NTDS.dit is the Active Directory database stored on every Windows Domain Controller — the central authentication authority for an entire organization. It contains password hashes for every user account in the domain, service account credentials, Kerberos authentication keys, and critically — the <strong>KRBTGT account hash</strong>, which allows an attacker to forge what are called Golden Tickets: authentication tokens that grant access to any system in the domain for up to 10 years without requiring a password at all.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Why Rotating Passwords Alone Fails:</strong> Rotating all credentials while Volt Typhoon still holds a foothold through a web shell or compromised edge device accomplishes nothing — they dump the new credentials the following day. They have persistent access to the system that stores the credentials. Rotating passwords without first completely evicting the actor is like changing the locks while the burglar is still inside — they watch the new key get hidden. The rotation must be simultaneous across thousands of accounts, after confirmed complete eviction, with the KRBTGT account rotated twice to invalidate all forged tickets. Only then does credential rotation become meaningful.</p>
+  </div>
+
+  <div class="figure">
+  <div class="figure-header"><span class="material-icons">lock_reset</span>Figure 4 — The Credential Rotation Trap</div>
+  <div class="figure-body">
+    <div class="fig-sequence">
+      <div class="fig-seq-row wrong">
+        <div class="fig-seq-badge">
+          <span class="material-icons">close</span>
+          <div class="fig-seq-badge-label">Wrong Sequence — Fails Every Time</div>
+        </div>
+        <div class="fig-seq-steps">
+          <div class="fig-seq-step">
+            <div class="fig-seq-step-title">Discover Breach</div>
+            <div class="fig-seq-step-sub">Volt Typhoon still has active foothold inside the network</div>
+          </div>
+          <div class="fig-seq-step">
+            <div class="fig-seq-step-title">Rotate All Passwords</div>
+            <div class="fig-seq-step-sub">Feels like the right step — comprehensive, immediate action</div>
+          </div>
+          <div class="fig-seq-step">
+            <div class="fig-seq-step-title">Attacker Dumps Again</div>
+            <div class="fig-seq-step-sub">Foothold still active — new credentials harvested the next day</div>
+          </div>
+          <div class="fig-seq-step">
+            <div class="fig-seq-step-title">Back to Start</div>
+            <div class="fig-seq-step-sub">Rotation achieved nothing. The lock was changed while they were inside.</div>
+          </div>
+        </div>
+      </div>
+      <div class="fig-seq-row correct">
+        <div class="fig-seq-badge">
+          <span class="material-icons">check</span>
+          <div class="fig-seq-badge-label">Correct Sequence — The Only Solution</div>
+        </div>
+        <div class="fig-seq-steps">
+          <div class="fig-seq-step">
+            <div class="fig-seq-step-title">Find ALL Footholds</div>
+            <div class="fig-seq-step-sub">Web shells, scheduled tasks, compromised edge devices — every one</div>
+          </div>
+          <div class="fig-seq-step">
+            <div class="fig-seq-step-title">Evict Completely</div>
+            <div class="fig-seq-step-sub">Simultaneous across all known access points — not sequential</div>
+          </div>
+          <div class="fig-seq-step">
+            <div class="fig-seq-step-title">Rotate KRBTGT ×2</div>
+            <div class="fig-seq-step-sub">Invalidates all Golden Tickets already forged — both rotations required</div>
+          </div>
+          <div class="fig-seq-step">
+            <div class="fig-seq-step-title">Rotate All Credentials</div>
+            <div class="fig-seq-step-sub">Simultaneously — now effective and meaningful. No foothold to re-harvest from.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="figure-caption">Credential rotation without complete eviction first is security theater — the attacker simply dumps the new credentials the following day</div>
+</div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div class="finding-body">
+        <div class="finding-title">Just-In-Time Elevation — Eliminate Standing Privileges</div>
+        <div class="finding-desc">If there are no standing Domain Admin or Global Admin accounts, there is nothing of value to dump repeatedly. Privileged Identity Management grants elevated access for 30-60 minute windows for approved tasks only. Outside those windows the account does not hold domain admin rights. Volt Typhoon can dump NTDS.dit all they want — the accounts with meaningful privileges do not exist in it persistently.</div>
+        <span class="finding-tag">CRITICAL — Privileged Access Management</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">3</div>
+      <div class="finding-body">
+        <div class="finding-title">Behavioral Detection on the Dump Itself</div>
+        <div class="finding-desc">The NTDS.dit dump requires a specific sequence of commands — vssadmin, ntdsutil, or DCSync replication traffic from a non-Domain Controller IP. Alert on any combination of shadow copy creation, SYSTEM hive access, and NTDS.dit file read in a short sequence. Alert on replication protocol traffic originating from any IP that is not a known Domain Controller. These sequences have almost no legitimate explanation and should trigger immediate incident response.</div>
+        <span class="finding-tag">HIGH — Detection Engineering</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 5. WHERE TO START THE INVESTIGATION ── -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>The Investigation Methodology — Start at the Weakest Link</h2>
+
+  <p>The counterintuitive insight I draw from analyzing Volt Typhoon's access chain is that investigation must not begin at the high-value target. It must begin at the smallest, least-funded, most overlooked facility in the region — because that is almost certainly where the access chain originated.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Investigator's Principle:</strong> A Chinese intelligence operation targeting Electric Boat's submarine program does not start by attacking Electric Boat's hardened network directly. It starts by compromising the water treatment plant three miles away that shares a regional communications network. Or the small HVAC vendor whose technician has physical access to the facility. Or the staffing agency that places contractors. The weakest link in the supply chain determines the security of the entire chain — and in critical infrastructure, the weakest links are rural utilities, municipal water systems, and small defense subcontractors who cannot afford dedicated security staff.</p>
+  </div>
+
+  <div class="figure">
+  <div class="figure-header"><span class="material-icons">account_tree</span>Figure 5 — The Supply Chain Access Map: From Weak Link to High-Value Target</div>
+  <div class="figure-body">
+    <div class="fig-chain">
+      <div class="fig-chain-node entry">
+        <span class="material-icons">water</span>
+        <div class="fig-chain-label">Entry Points</div>
+        <div class="fig-chain-title">Weakest Links</div>
+        <ul class="fig-chain-items">
+          <li>Municipal water plant — legacy SCADA, no security staff</li>
+          <li>SOHO router — EOL firmware, KV-Botnet node</li>
+          <li>Internet-exposed HMI at rural utility</li>
+          <li>Small HVAC vendor with remote facility access</li>
+        </ul>
+      </div>
+      <div class="fig-chain-node pivot">
+        <span class="material-icons">sync_alt</span>
+        <div class="fig-chain-label">Pivot</div>
+        <div class="fig-chain-title">Lateral Movement</div>
+        <ul class="fig-chain-items">
+          <li>Shared regional network infrastructure</li>
+          <li>IT managed service provider — shared credentials</li>
+          <li>Vendor remote access tunnel</li>
+          <li>Credential reuse · Living-off-the-land</li>
+        </ul>
+      </div>
+      <div class="fig-chain-node supply">
+        <span class="material-icons">precision_manufacturing</span>
+        <div class="fig-chain-label">Supply Chain</div>
+        <div class="fig-chain-title">Defense Subcontractor</div>
+        <ul class="fig-chain-items">
+          <li>CMMC not yet certified</li>
+          <li>Handles CUI technical data</li>
+          <li>Small team — limited SecOps</li>
+          <li>Component supplier to prime contractor</li>
+        </ul>
+      </div>
+      <div class="fig-chain-node target">
+        <span class="material-icons">shield</span>
+        <div class="fig-chain-label">Final Target</div>
+        <div class="fig-chain-title">Defense Primes</div>
+        <ul class="fig-chain-items">
+          <li>Electric Boat — Groton CT</li>
+          <li>Pratt &amp; Whitney — East Hartford</li>
+          <li>Sikorsky — Stratford CT</li>
+          <li style="color:var(--red)">Supply chain is the door</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="figure-caption">The weakest link in the access chain determines the security of the entire chain — including the most hardened target at the end of it</div>
+</div>
+
+<!-- ── 6. THE OT PROBLEM ── -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>The Legacy OT Crisis — A Policy Failure That Can Cost Lives</h2>
+
+  <p>The most important statement in this entire analysis is also the simplest: <strong>legacy operational technology must be replaced, and the cost of replacement cannot be the reason it is not done.</strong> This is not a technology position. It is a public safety position. It is a national security position. The infrastructure that controls water treatment, power distribution, and transportation for millions of Americans is running on software that was never designed to be connected to any network — let alone a network accessible to Chinese state intelligence.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The Cost Accounting Failure:</strong> Replacing legacy OT infrastructure at a single utility costs tens to hundreds of millions of dollars. That number appears on the balance sheet immediately and visibly. The cost of a successful Volt Typhoon activation — water contamination, grid failure, transportation collapse, loss of life — appears nowhere on the balance sheet until the day it happens. This asymmetry in how costs are counted has allowed the security failure to persist for decades. We do not allow water treatment facilities to run corroded pipes because replacement is expensive. We should not allow them to run 2003-era SCADA firmware because cybersecurity investment is expensive.</p>
+  </div>
+
+  <h3>Why the Current Approach Has Failed</h3>
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div class="finding-body">
+        <div class="finding-title">Voluntary Guidance Without Binding Requirements</div>
+        <div class="finding-desc">CISA can advise critical infrastructure operators to patch, segment, and monitor. It cannot compel them. Unlike the defense industrial base — which has CMMC with real legal and contractual consequences for non-compliance — a water treatment plant in rural Connecticut has almost no binding cybersecurity obligations. The result is a massive security gap across exactly the infrastructure a nation-state would target to maximize civilian disruption.</div>
+        <span class="finding-tag">CRITICAL — Regulatory Gap</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div class="finding-body">
+        <div class="finding-title">No Liability Framework for Infrastructure Operators</div>
+        <div class="finding-desc">If a utility operating on 20-year-old unpatched SCADA firmware suffers a cyberattack that contaminates water and harms people, who is legally liable? Currently — almost nobody. The absence of liability removes the financial incentive to invest in security modernization. Physical safety standards for this same infrastructure — minimum pipe pressures, chemical treatment levels, structural integrity — are mandatory and enforceable. Cybersecurity should carry identical standing.</div>
+        <span class="finding-tag">CRITICAL — Legal Framework</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">3</div>
+      <div class="finding-body">
+        <div class="finding-title">Funding Exists — Political Will Does Not</div>
+        <div class="finding-desc">The federal government has existing mechanisms to fund critical infrastructure security modernization — infrastructure grants, Critical Infrastructure Protection funds, FEMA preparedness grants, and Department of Energy grid modernization programs. The money exists. What does not exist is the political will to make OT security investment a condition of accessing those funds, or to establish minimum binding cybersecurity standards for infrastructure whose failure would constitute a national emergency.</div>
+        <span class="finding-tag">HIGH — Policy Failure</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>OT Security Control</th><th>Current State</th><th>Required State</th><th>Cost Reality</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Network segmentation</strong></td><td class="red">IT and OT on same network at many facilities</td><td>Strict industrial DMZ — OT never directly reachable from IT</td><td class="amber">High but fundable</td></tr>
+      <tr><td><strong>Patch currency</strong></td><td class="red">Many OT systems running EOL firmware from 2003-2015</td><td>Supported firmware only — replacement of EOL equipment</td><td class="red">Very high — but mandatory</td></tr>
+      <tr><td><strong>Remote access</strong></td><td class="red">Internet-exposed HMI interfaces at many small utilities</td><td>No direct internet exposure — jump server required for any remote access</td><td class="amber">Moderate</td></tr>
+      <tr><td><strong>Behavioral monitoring</strong></td><td class="red">Little or no OT-specific monitoring at small facilities</td><td>Continuous baseline monitoring with anomaly detection on all OT traffic</td><td class="amber">Moderate with right tooling</td></tr>
+      <tr><td><strong>Incident response plan</strong></td><td class="red">Most small utilities have no documented cyber IR plan</td><td>Tested, exercised IR playbook including OT-specific scenarios</td><td class="green">Low — primarily staff time</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ── 7. DETECTION RECOMMENDATIONS ── -->
+<div class="section">
+  <div class="section-num">Section 07</div>
+  <h2>What Would Actually Catch This — Detection Recommendations</h2>
+
+  <p>Detecting Volt Typhoon requires abandoning signature-based thinking entirely. There are no malicious files to scan for. There are no known-bad IP addresses in the logs. The entire detection strategy must shift from "what is here that should not be" to "what is happening that looks different from what normally happens." Behavioral analytics. Baseline deviation. Anomaly at scale.</p>
+
+  <h3>Network-Level Detection</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Detection Target</th><th>What to Monitor</th><th>ATT&amp;CK Technique</th></tr></thead>
+    <tbody>
+      <tr><td><strong>DCSync from non-DC</strong></td><td class="code">Replication protocol (MS-DRSR) traffic from any IP not in the known Domain Controller list</td><td class="code">T1003.006</td></tr>
+      <tr><td><strong>NTDS.dit access sequence</strong></td><td class="code">vssadmin + SYSTEM hive copy + NTDS file read within short window — treat as critical incident</td><td class="code">T1003.003</td></tr>
+      <tr><td><strong>LOTL admin command burst</strong></td><td class="code">netstat, whoami, ipconfig, net user sequence from single account in short period</td><td class="code">T1087, T1049</td></tr>
+      <tr><td><strong>Off-hours admin auth</strong></td><td class="code">Privileged account authentication outside 07:00-19:00 local time from any source</td><td class="code">T1078</td></tr>
+      <tr><td><strong>IT-to-OT lateral movement</strong></td><td class="code">Any new connection from IT network segment to OT/SCADA IP range — flag and alert immediately</td><td class="code">T1021</td></tr>
+      <tr><td><strong>Selective log deletion</strong></td><td class="code">Windows Event Log cleared (Event ID 1102) — especially on Domain Controllers — treat as active incident</td><td class="code">T1070.001</td></tr>
+      <tr><td><strong>SOHO admin interface exposure</strong></td><td class="code">Any router or firewall with management interface reachable from internet on port 80, 443, 8080, 8443</td><td class="code">T1133</td></tr>
+      <tr><td><strong>Anomalous outbound volume</strong></td><td class="code">Outbound traffic to any destination exceeding 3x 30-day baseline from OT-adjacent systems</td><td class="code">T1041</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>The Behavioral Baseline Imperative</h3>
+  <p>The single most important detection capability against LOTL attacks is a mature behavioral baseline — knowing what normal looks like in granular detail so that abnormal is visible even when it uses legitimate tools. This means:</p>
+
+  <div class="callout callout-green">
+    <p><strong>What Good Baseline Detection Looks Like:</strong> Admin account X logs in Monday through Friday between 8am and 6pm from IP range 10.x.x.x. They run 15-20 standard commands per session. They access 3-4 specific server groups. They never touch OT systems. The day they log in at 2am from a Phoenix Arizona IP address, run 47 commands in 12 minutes including netstat and whoami, and query Active Directory for all user accounts — that pattern fires an alert regardless of whether any individual command is technically malicious. The deviation from baseline IS the detection. This is the approach that Volt Typhoon's technique cannot evade — because their behavior, however carefully executed, deviates from the established normal of the account they compromised.</p>
+  </div>
+</div>
+
+<!-- ── 8. IMPLICATIONS FOR DEFENSE CONTRACTORS ── -->
+<div class="section">
+  <div class="section-num">Section 08</div>
+  <h2>Implications for Connecticut Defense Contractors</h2>
+
+  <p>This analysis is written specifically for the defense industrial base in Connecticut — the supply chain that builds nuclear submarines at Electric Boat in Groton, jet engines at Pratt and Whitney in East Hartford, and military helicopters at Sikorsky in Stratford. These are among the most secure private facilities in the country internally. The threat is not to their internal networks directly. The threat is to the infrastructure around them — and through that infrastructure, to them.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The Uncomfortable Reality:</strong> If Volt Typhoon is embedded in the regional power grid that supplies Electric Boat's facility, the submarine program has a vulnerability that no amount of internal cybersecurity investment addresses. If they are in the water treatment system that serves Groton, the manufacturing facility has a physical security dependency on infrastructure it does not control. If they are in the regional communications network, the facility's backup communications are compromised. CMMC compliance protects the contractor's own systems. It does not protect the ecosystem those systems depend on.</p>
+  </div>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>NIST SP 800-171 Control</th><th>Control ID</th><th>Volt Typhoon Relevance</th><th>Gap Assessment</th></tr></thead>
+    <tbody>
+      <tr><td><strong>System and communications protection</strong></td><td class="code">3.13.1</td><td>Network segmentation between IT and OT</td><td class="red">Frequently absent at small subcontractors</td></tr>
+      <tr><td><strong>Audit and accountability</strong></td><td class="code">3.3.1</td><td>Log retention and review — catching LOTL activity</td><td class="amber">Logs kept but rarely reviewed actively</td></tr>
+      <tr><td><strong>Configuration management</strong></td><td class="code">3.4.1</td><td>Baseline configurations — detect deviations</td><td class="red">OT baselines rarely documented</td></tr>
+      <tr><td><strong>Identification and authentication</strong></td><td class="code">3.5.3</td><td>MFA on all privileged and remote access</td><td class="amber">IT MFA common — OT MFA rare</td></tr>
+      <tr><td><strong>Incident response</strong></td><td class="code">3.6.1</td><td>Playbooks for LOTL and credential theft scenarios</td><td class="red">OT-specific IR plans largely absent</td></tr>
+      <tr><td><strong>Supply chain risk management</strong></td><td class="code">3.1.20</td><td>Vendor access controls and monitoring</td><td class="red">Most critical gap — supply chain is the entry point</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ── 9. CONCLUSION ── -->
+<div class="section">
+  <div class="section-num">Section 09</div>
+  <h2>Conclusion — The War That Is Already Happening</h2>
+
+  <p>Volt Typhoon is not a theoretical future threat. It is an active, ongoing, confirmed operation that has been running inside the infrastructure Americans depend on for basic survival — power, water, communications, transportation — for more than five years. The FBI Director has confirmed it. The Air Force cyber commander has called its potential activation "total war." Dragos has confirmed some footholds will never be found.</p>
+
+  <p>The question this analysis has tried to answer is not whether the threat is real — it is demonstrably real. The question is why it persists, why remediation is so difficult, and what actually needs to change. The answers point not primarily to technology failures but to policy failures: voluntary guidance where mandatory standards are needed, absent liability where accountability should exist, and deferred investment in legacy OT infrastructure where replacement should have been funded a decade ago.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Final Assessment:</strong> A water treatment plant running on unpatched 2003-era SCADA firmware three miles from a nuclear submarine construction facility is not an acceptable national security posture. Neither is a regional power grid with a Chinese state actor embedded in its control loop. The technical solutions exist. The detection methods exist. The funding mechanisms exist. What is missing is the political will to treat critical infrastructure cybersecurity as the life-safety issue it already is — and to act accordingly before the first activation, not after. The cost of prevention is measured in millions. The cost of the alternative is measured in lives.</p>
+  </div>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">All findings in this report are based on publicly available information including reports from CISA, NSA, FBI, Microsoft Threat Intelligence, Dragos, Lumen Black Lotus Labs, Mandiant, CrowdStrike, Secureworks, SecurityScorecard, the US Air Force, Congressional Research Service, and MITRE ATT&CK. This represents the author's independent analysis and does not reflect the views of any employer or client organization.</p>
+</div><!-- end content -->
+
+</div><!-- end wrap -->
+
+<!-- ── AUTHOR BIO ── -->
+<div class="bio-section">
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Consultant &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base — Electric Boat, Pratt and Whitney, Sikorsky, and their supply chains. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis with a focus on the intersection of operational technology security, CMMC compliance, and nation-state threat actors. She is pursuing CompTIA Security+ and CMMC Registered Practitioner certification. This analysis was produced independently as a contribution to the security community's understanding of persistent nation-state threats to US critical infrastructure.</p>
+    <p class="bio-text" style="margin-top:.75rem">
+      <a href="index.html" class="back-nav-link">Portfolio</a>
+    </p>
+  </div>
+</div>
+</div><!-- end bio-section -->
+
+<footer>
+  <span>Volt Typhoon Analysis · Yana Ivanov · March 2026</span>
+  <span>Based on public reporting · For educational use · Independent analysis</span>
+</footer>
+
+</body>
+</html>

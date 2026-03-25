@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Log 003 — Wireshark Malware Traffic Analysis | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--display-clean);font-size:clamp(2rem,5vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#4a9eff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:#0a0f1a;line-height:1.2;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+.code-block{background:#0a0f1a;border-radius:3px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap}
+.co{color:#64748b}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem;table-layout:fixed}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;font-weight:600;word-wrap:break-word;overflow-wrap:break-word}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top;word-wrap:break-word;overflow-wrap:break-word}
+tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue);word-break:break-all}
+.env-box{background:var(--paper);border:1px solid var(--rule);border-radius:2px;padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+.host-card{background:#0a0f1a;border-radius:3px;padding:1.5rem;margin:1.75rem 0;display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.hf-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:#64748b;text-transform:uppercase;margin-bottom:.3rem}
+.hf-value{font-family:var(--mono);font-size:.9rem;color:#4a9eff;font-weight:600}
+.hf-value.red{color:#ef4444}
+.proto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);margin:1.75rem 0}
+.proto-box{background:var(--paper);padding:1.1rem 1rem}
+.proto-name{font-family:var(--mono);font-size:.7rem;font-weight:600;color:var(--ink);margin-bottom:.2rem}
+.proto-pct{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--blue);margin-bottom:.4rem}
+.proto-pct.red{color:var(--red)}
+.proto-pct.amber{color:var(--amber)}
+.proto-desc{font-size:.78rem;color:var(--ink3);line-height:1.5}
+.finding{background:var(--paper);border:1px solid var(--rule);border-left:3px solid var(--red);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.finding.amber{border-left-color:var(--amber)}
+.finding-num{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:var(--red);text-transform:uppercase;margin-bottom:.3rem}
+.finding.amber .finding-num{color:var(--amber)}
+.finding-title{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.6rem}
+.finding p{margin-bottom:.6rem;font-size:.88rem;border-radius:3px;padding:1.5rem;margin:1.75rem 0}
+.beacon-title{font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;color:#64748b;text-transform:uppercase;margin-bottom:1rem}
+.beacon-track{display:flex;align-items:flex-end;gap:0;margin-bottom:.75rem;overflow:hidden;height:40px}
+.beacon-pulse{width:10px;height:32px;background:#1a4fa0;margin-right:46px;border-radius:1px;flex-shrink:0}
+.beacon-pulse.burst{background:#ef4444;height:40px}
+.beacon-legend{display:flex;gap:1.5rem;margin-top:.75rem}
+.beacon-legend-item{display:flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.62rem;color:#94a3b8}
+.beacon-legend-dot{width:10px;height:10px;border-radius:1px}
+.filter-list{margin:1.75rem 0}
+.filter-item{display:grid;grid-template-columns:240px 1fr;gap:1.25rem;padding:.85rem 0;border-bottom:1px solid var(--rule);align-items:start}
+.filter-item:first-child{border-top:1px solid var(--rule)}
+.filter-item:last-child{border-bottom:none}
+.filter-syntax{font-family:var(--mono);font-size:.8rem;color:var(--blue);font-weight:600;word-break:break-all;line-height:1.6}
+.filter-desc{font-size:.88rem;color:var(--ink3);line-height:1.6}
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);border-radius:2px;padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:130px 1fr;gap:1rem;font-size:.92rem}
+.nist-desc{color:var(--ink3);font-size:.92rem;line-height:1.7}
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer a{color:#4a9eff;text-decoration:none}
+footer a:hover{color:#93c5fd}
+@media(max-width:680px){
+  .mast-inner,.wrap{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .env-grid,.host-card{grid-template-columns:1fr}
+  .nist-item,.filter-item{grid-template-columns:1fr;gap:.25rem}
+  .proto-grid{grid-template-columns:1fr 1fr}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Security Lab Log · Entry 003</div>
+    <h1 class="title">Wireshark Malware Analysis — Identifying an Infected Host from Live Traffic</h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Date</div><div class="value">March 18, 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational Use</div></div>
+      <div class="meta-item"><div class="label">Lab Type</div><div class="value">Malware Traffic Analysis / Blue Team</div></div>
+      <div class="meta-item"><div class="label">Tools</div><div class="value">Wireshark 4.x · macOS</div></div>
+      <div class="meta-item"><div class="label">Source</div><div class="value">malware-traffic-analysis.net · 2026-02-28</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    REAL MALWARE PCAP &nbsp;·&nbsp; EXERCISE ENVIRONMENT &nbsp;·&nbsp; EASYAS123 DOMAIN &nbsp;·&nbsp; C2 BEACONING CONFIRMED &nbsp;·&nbsp; MARCH 18 2026
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>Lab Environment</h2>
+  <p>This lab moves from a controlled Docker environment to a real-world malware pcap. Previous labs — Lab Log 001 and Lab Log 002 — generated traffic intentionally — Nmap scans, tcpdump captures — in an isolated container. This exercise uses a packet capture from <a href="https://malware-traffic-analysis.net/2026/02/28/index.html" style="color:var(--blue)">malware-traffic-analysis.net (2026-02-28)</a>, a site maintained by security researchers that publishes real malware traffic captures for analyst training.</p>
+  <p>The scenario: an IDS alert fired. An internal IP was flagged for suspicious outbound connections to <strong>45.131.214.85</strong> over TCP port 80. The pcap of that traffic has been retrieved. The task is to identify the infected machine and document what the malware was doing — the same workflow a SOC analyst runs before escalating to incident response.</p>
+  <div class="env-box">
+    <div class="env-box-title">Exercise Configuration</div>
+    <div class="env-grid">
+      <div class="env-item"><div class="env-label">Pcap Source</div><div class="env-value">malware-traffic-analysis.net · 2026-02-28</div></div>
+      <div class="env-item"><div class="env-label">Exercise Name</div><div class="env-value">Easy As 123</div></div>
+      <div class="env-item"><div class="env-label">Total Packets</div><div class="env-value">15,512</div></div>
+      <div class="env-item"><div class="env-label">Capture Duration</div><div class="env-value">~15,600 seconds (~4.3 hours)</div></div>
+      <div class="env-item"><div class="env-label">Analysis Tool</div><div class="env-value">Wireshark 4.x · macOS Universal</div></div>
+      <div class="env-item"><div class="env-label">AD Domain</div><div class="env-value">EASYAS123</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>Methodology — The Standard Host Identification Workflow</h2>
+  <p>When a SOC analyst receives a pcap linked to a suspicious IP alert, the first objective is always the same: identify the machine and user behind that IP. The three-step workflow below applies to any Windows Active Directory environment.</p>
+
+  <h3>Step 1 — DHCP: Machine Identity</h3>
+  <p>DHCP (Dynamic Host Configuration Protocol) is how a Windows machine announces itself when it boots. The <strong>DHCP Request</strong> packet contains the machine's self-reported identity: its MAC address, hostname, and the IP address it is requesting. One filter, one packet, three answers.</p>
+  <div class="callout callout-blue">
+    <p><strong>Key rule:</strong> Always examine the Request packet, not the ACK. The Request comes from the client and contains the client's information. The ACK comes from the DHCP server and contains the server's configuration. If you want to know about the machine, read what the machine said.</p>
+  </div>
+  <div class="code-label">Wireshark Filter — DHCP</div>
+  <div class="code-block"><pre><span class="va">dhcp</span>
+<span class="co">
+→ Click the Request packet (source: 0.0.0.0)
+→ Expand packet details and look for:
+     Client MAC address
+     Option (12) Host Name
+     Option (50) Requested IP Address</span></pre></div>
+
+  <h3>Step 2 — Kerberos: User Identity</h3>
+  <p>DHCP identifies the machine. Kerberos identifies the person logged into it. Every Windows domain login generates a Kerberos AS-REQ — the machine telling the domain controller "this user wants to authenticate." The <strong>CNameString</strong> field inside the AS-REQ contains the username.</p>
+  <div class="code-label">Wireshark Filter — Kerberos</div>
+  <div class="code-block"><pre><span class="va">kerberos</span>
+<span class="co">
+→ Find an AS-REQ packet in the Info column
+→ Expand: req-body → cname → cname-string
+→ CNameString = username
+→ realm = Active Directory domain name</span></pre></div>
+
+  <h3>Step 3 — HTTP: Malware Behavior</h3>
+  <p>With machine and user identified, the next step is understanding what the malware was doing. HTTP traffic is unencrypted — every request and response is fully readable. Filtering to non-Microsoft HTTP strips out Windows Update noise and surfaces only suspicious external connections.</p>
+  <div class="code-label">Wireshark Filter — External HTTP (non-Microsoft)</div>
+  <div class="code-block"><pre><span class="va">http.request and !(http.host contains "microsoft") and !(http.host contains "windowsupdate") and !(http.host contains "msocsp")</span>
+<span class="co">
+→ Eliminates Windows Update background noise
+→ What remains is worth investigating</span></pre></div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>Protocol Hierarchy — Reading the Capture at a Glance</h2>
+  <p>Before applying any filters, <strong>Statistics → Protocol Hierarchy</strong> gives an immediate map of the entire capture. The distribution of protocols tells a story about the environment and where to focus attention.</p>
+  <div class="proto-grid">
+    <div class="proto-box">
+      <div class="proto-name">TCP</div>
+      <div class="proto-pct">80.9%</div>
+      <div class="proto-desc">Dominant protocol — expected in a corporate Windows environment. Contains all the interesting traffic.</div>
+    </div>
+    <div class="proto-box">
+      <div class="proto-name">TLS</div>
+      <div class="proto-pct amber">12.0%</div>
+      <div class="proto-desc">Encrypted traffic. Cannot read contents but can see destination IPs and certificate details.</div>
+    </div>
+    <div class="proto-box">
+      <div class="proto-name">SMB2 / NetBIOS</div>
+      <div class="proto-pct">5.1%</div>
+      <div class="proto-desc">Windows file sharing. Confirms this is a domain-joined Windows machine on a corporate network.</div>
+    </div>
+    <div class="proto-box">
+      <div class="proto-name">DNS</div>
+      <div class="proto-pct">5.2%</div>
+      <div class="proto-desc">Domain lookups. What hostnames was this machine resolving? Malware C2 often uses domains.</div>
+    </div>
+    <div class="proto-box">
+      <div class="proto-name red">HTTP</div>
+      <div class="proto-pct red">2.3%</div>
+      <div class="proto-desc">Unencrypted — fully readable. Small percentage but contains the most actionable evidence in this capture.</div>
+    </div>
+    <div class="proto-box">
+      <div class="proto-name">Kerberos</div>
+      <div class="proto-pct">0.1%</div>
+      <div class="proto-desc">Windows authentication. Small packet count but high value — contains the logged-in username.</div>
+    </div>
+  </div>
+  <div class="callout callout-amber">
+    <p><strong>Analyst note:</strong> HTTP at only 2.3% stands out because modern legitimate web traffic is almost entirely HTTPS. Unencrypted HTTP in 2026 is either legacy software, a misconfigured application, or malware that does not bother encrypting its C2 communications. All three warrant investigation.</p>
+  </div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>Host Identification</h2>
+  <p>Applying the DHCP and Kerberos filters in sequence produced all four required identifiers within minutes of opening the capture.</p>
+
+  <h3>DHCP Analysis — Packet 2 (DHCP Request)</h3>
+  <p>Filtering to <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">dhcp</code> returned 4 packets. Packet 2 was the Request — the client's self-introduction to the network. The machine's identity was in the DHCP options fields.</p>
+  <div class="code-label">DHCP Request — Key Fields</div>
+  <div class="code-block"><pre><span class="co">Packet 2 — DHCP Request (source: 0.0.0.0 → 255.255.255.255)</span>
+
+Client MAC address: <span class="hi">Intel_b2:4d:ad (00:19:d1:b2:4d:ad)</span>
+Option (50) Requested IP Address: <span class="hi">10.2.28.88</span>
+Option (12) Host Name: <span class="hi">DESKTOP-TEYQ2NR</span>
+
+<span class="co">Packet 104 — DHCP ACK
+  Server 10.2.28.1 confirmed IP assignment to 10.2.28.88</span></pre></div>
+
+  <h3>Kerberos Analysis — AS-REQ Packets</h3>
+  <p>Filtering to <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">kerberos</code> returned 16 packets. Expanding any AS-REQ and navigating to <strong>req-body → cname → cname-string</strong> revealed the username. The realm field confirmed the Active Directory domain.</p>
+  <div class="code-label">Kerberos AS-REQ — Key Fields</div>
+  <div class="code-block"><pre><span class="co">AS-REQ — Authentication Service Request</span>
+
+req-body:
+  cname:
+    CNameString: <span class="hi">brolf</span>          <span class="co">← username</span>
+  realm: <span class="ke">EASYAS123</span>              <span class="co">← Active Directory domain</span>
+  sname:
+    SNameString: <span class="va">krbtgt</span>          <span class="co">← Kerberos Ticket Granting Ticket</span></pre></div>
+
+  <h3>Confirmed Host Identity</h3>
+  <div class="host-card">
+    <div class="host-field"><div class="hf-label">IP Address</div><div class="hf-value">10.2.28.88</div></div>
+    <div class="host-field"><div class="hf-label">MAC Address</div><div class="hf-value">00:19:d1:b2:4d:ad</div></div>
+    <div class="host-field"><div class="hf-label">Hostname</div><div class="hf-value">DESKTOP-TEYQ2NR</div></div>
+    <div class="host-field"><div class="hf-label">Username</div><div class="hf-value red">brolf</div></div>
+    <div class="host-field"><div class="hf-label">Domain</div><div class="hf-value">EASYAS123</div></div>
+    <div class="host-field"><div class="hf-label">NIC Vendor</div><div class="hf-value">Intel (00:19:d1 prefix)</div></div>
+  </div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>Malware Behavior Analysis</h2>
+  <p>With the infected host identified, the next step is understanding what the malware was doing. Applying the external HTTP filter stripped out Windows Update traffic, leaving only connections to non-Microsoft hosts. The result was unambiguous.</p>
+
+  <h3>C2 Communication — POST to 45.131.214.85</h3>
+  <p>Every non-Microsoft HTTP request in the capture was a POST to the same external IP — <strong>45.131.214.85</strong> — at the path <strong>/fakeurl.htm</strong>. This is the command-and-control server. The 264 POST requests were not user-initiated web traffic. They were automated check-ins from malware running on brolf's machine.</p>
+  <div class="code-label">C2 POST Request — Packet Contents</div>
+  <div class="code-block"><pre><span class="co">POST http://45.131.214.85/fakeurl.htm HTTP/1.1</span>
+Content-Type: <span class="va">application/x-www-form-urlencoded</span>
+
+<span class="co">HTML Form URL Encoded payload:</span>
+  Key:   <span class="ke">CMD</span>
+  Value: <span class="hi">POLL\nINFO=1\nACK=1\n</span>
+
+<span class="co">Translation:
+  POLL    → "I am alive, do you have instructions for me?"
+  INFO=1  → "Send me information back"
+  ACK=1   → "Acknowledge this message"
+
+This is a beacon check-in. The malware reports its presence
+to the C2 server and waits for commands.</span></pre></div>
+
+  <div class="callout callout-red">
+    <p><strong>Why /fakeurl.htm?</strong> In this training exercise the URL was named obviously for educational purposes. In a real attack the path would be indistinguishable from legitimate traffic — <code style="font-family:var(--mono);font-size:.85rem">/api/v2/telemetry</code> or <code style="font-family:var(--mono);font-size:.85rem">/assets/config.json</code>. Detection cannot rely on the URL name — it must rely on the behavior: same destination, same payload structure, same interval, repeated hundreds of times.</p>
+  </div>
+
+  <h3>Beacon Interval Analysis</h3>
+  <p>Examining timestamps on consecutive POST packets revealed a consistent <strong>60-second interval</strong> between check-ins after an initial burst of activity. This regularity is the defining characteristic of automated beaconing — no human produces network traffic at machine-precision intervals for 4+ hours.</p>
+
+  <div class="beacon-visual">
+    <div class="beacon-title">Beacon Pattern — 45.131.214.85 — 60-Second Interval (entire 4.3-hour capture)</div>
+    <div class="beacon-track">
+      <div class="beacon-pulse burst"></div>
+      <div class="beacon-pulse"></div>
+      <div class="beacon-pulse"></div>
+      <div class="beacon-pulse"></div>
+      <div class="beacon-pulse"></div>
+      <div class="beacon-pulse"></div>
+      <div class="beacon-pulse"></div>
+      <div class="beacon-pulse"></div>
+      <div class="beacon-pulse"></div>
+      <div class="beacon-pulse"></div>
+      <div class="beacon-pulse"></div>
+      <div class="beacon-pulse"></div>
+    </div>
+    <div class="beacon-legend">
+      <div class="beacon-legend-item"><div class="beacon-legend-dot" style="background:#ef4444"></div>Initial burst (T+45s)</div>
+      <div class="beacon-legend-item"><div class="beacon-legend-dot" style="background:#1a4fa0"></div>Regular beacon (every ~60s)</div>
+    </div>
+  </div>
+
+  <div class="code-label">Timestamp Sample — 60-Second Interval Confirmed</div>
+  <div class="code-block"><pre><span class="co">Packet timestamps (seconds since capture start):</span>
+
+T+45.04   <span class="hi">POST /fakeurl.htm</span>   <span class="co">← initial burst</span>
+T+45.19   <span class="hi">POST /fakeurl.htm</span>
+T+45.55   <span class="hi">POST /fakeurl.htm</span>
+T+45.75   <span class="hi">POST /fakeurl.htm</span>
+T+105.93  <span class="hi">POST /fakeurl.htm</span>   <span class="co">← Δ 60.18s</span>
+T+166.00  <span class="hi">POST /fakeurl.htm</span>   <span class="co">← Δ 60.07s</span>
+T+226.08  <span class="hi">POST /fakeurl.htm</span>   <span class="co">← Δ 60.08s</span>
+T+286.16  <span class="hi">POST /fakeurl.htm</span>   <span class="co">← Δ 60.08s</span>
+T+346.34  <span class="hi">POST /fakeurl.htm</span>   <span class="co">← Δ 60.18s</span>
+<span class="co">
+... pattern continues for entire 15,600-second capture
+264 total POST requests · ~60-second interval · machine-precision timing</span></pre></div>
+
+  <p>The I/O Graph (Statistics → I/O Graph, filter: <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">ip.dst == 45.131.214.85</code>) confirmed the pattern visually — a perfectly regular sequence of single-packet spikes running continuously across the entire capture with no gaps or variation.</p>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>Findings</h2>
+
+  <div class="finding">
+    <div class="finding-num">Finding 01 — Critical</div>
+    <div class="finding-title">Active C2 Beaconing Confirmed — 264 Check-ins Over 4.3 Hours</div>
+    <p>Host <strong>DESKTOP-TEYQ2NR</strong> (10.2.28.88, user: brolf) has been actively beaconing to external IP <strong>45.131.214.85</strong> via unencrypted HTTP POST for the entire duration of the capture. The malware survived at minimum one full working day without detection. The beacon payload <code style="font-family:var(--mono);font-size:.85rem">CMD=POLL</code> indicates the malware is in a listening state — waiting for commands from the operator.</p>
+    <p>The machine must be isolated immediately. The C2 channel is open and the operator can issue commands at any time.</p>
+  </div>
+
+  <div class="finding amber">
+    <div class="finding-num">Finding 02 — High</div>
+    <div class="finding-title">Unencrypted C2 Channel — HTTP on Port 80</div>
+    <p>The malware communicates over plain HTTP rather than HTTPS. This is unusual for modern malware — most contemporary C2 frameworks use TLS to evade detection. The unencrypted channel allowed full visibility into the beacon payload and command structure. The POLL/INFO/ACK command structure and 60-second beacon interval are characteristic of a remote access trojan (RAT) framework.</p>
+  </div>
+
+  <div class="finding amber">
+    <div class="finding-num">Finding 03 — High</div>
+    <div class="finding-title">No Lateral Movement Observed — Scope Appears Limited to Single Host</div>
+    <p>SMB2 and Active Directory traffic in the capture appears consistent with normal domain activity. No anomalous internal scanning, credential harvesting, or connections to other internal hosts from 10.2.28.88 were observed in this pcap. This does not confirm containment — the malware may use encrypted channels for lateral movement — but there is no evidence of active spreading behavior in this capture.</p>
+  </div>
+</div>
+
+<!-- SECTION 07 -->
+<div class="section">
+  <div class="section-num">Section 07</div>
+  <h2>Wireshark Filter Reference — Analyst Workflow</h2>
+  <p>The filters below form a repeatable workflow for host identification and malware behavior analysis in any Windows Active Directory pcap. Applied in sequence, they answer the four core questions of initial triage: what is the machine, who is the user, what external hosts is it talking to, and is the behavior automated or human.</p>
+
+  <div class="filter-list">
+    <div class="filter-item">
+      <div class="filter-syntax">dhcp</div>
+      <div class="filter-desc">Show DHCP traffic. Click the Request packet (source 0.0.0.0) to find MAC address, hostname, and requested IP. Always the first filter in a Windows environment triage.</div>
+    </div>
+    <div class="filter-item">
+      <div class="filter-syntax">kerberos</div>
+      <div class="filter-desc">Show Kerberos authentication packets. Find AS-REQ packets and expand req-body → cname → CNameString for the username. The realm field shows the Active Directory domain name.</div>
+    </div>
+    <div class="filter-item">
+      <div class="filter-syntax">dns</div>
+      <div class="filter-desc">Show all DNS lookups. What domains is this machine resolving? Malware C2 often uses domain names rather than raw IPs. Unusual or randomized-looking domains are indicators of compromise.</div>
+    </div>
+    <div class="filter-item">
+      <div class="filter-syntax">http</div>
+      <div class="filter-desc">Show all unencrypted HTTP traffic. In 2026, legitimate web traffic is almost entirely HTTPS. Any plain HTTP to external hosts warrants investigation.</div>
+    </div>
+    <div class="filter-item">
+      <div class="filter-syntax">http.request and !(http.host contains "microsoft") and !(http.host contains "windowsupdate") and !(http.host contains "msocsp")</div>
+      <div class="filter-desc">HTTP requests with Windows Update and certificate validation noise removed. What remains is external HTTP traffic with no automatic legitimate explanation — the highest-value filter for identifying C2 in a Windows environment.</div>
+    </div>
+    <div class="filter-item">
+      <div class="filter-syntax">ip.dst == [suspicious IP]</div>
+      <div class="filter-desc">Isolate all traffic to a specific destination IP. Use after identifying a suspicious host to see the full scope — how many packets, what time period, what protocols. Combine with I/O Graph to visualize beaconing rhythm.</div>
+    </div>
+    <div class="filter-item">
+      <div class="filter-syntax">ip.addr == [internal IP]</div>
+      <div class="filter-desc">Show all traffic to or from a specific internal IP — both inbound and outbound. Use to get a complete picture of what one host was doing across the entire capture.</div>
+    </div>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>Beaconing detection tip:</strong> After isolating traffic with <code style="font-family:var(--mono);font-size:.85rem">ip.dst ==</code>, right-click any column header → Column Preferences → add a column with type "Delta time displayed." Scroll through — if the same interval repeats consistently, that is automated beaconing. Use Statistics → I/O Graph with the same filter to visualize the pattern across the full capture.</p>
+  </div>
+</div>
+
+<!-- SECTION 08 -->
+<div class="section">
+  <div class="section-num">Section 08</div>
+  <h2>NIST SP 800-171 Control Mapping</h2>
+  <div class="nist-box">
+    <div class="nist-box-title">Applicable Controls — This Analysis</div>
+    <div class="nist-items">
+      <div class="nist-item">
+        <div class="nist-control">3.3.1</div>
+        <div class="nist-desc"><strong>Audit logging.</strong> Create and retain system audit logs. The pcap is the network-layer audit log — it captured 4.3 hours of C2 activity that endpoint logs may not have recorded if the malware disabled them.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.3.2</div>
+        <div class="nist-desc"><strong>User activity traceability.</strong> Kerberos analysis attributed network activity to user <em>brolf</em> on <em>DESKTOP-TEYQ2NR</em> — a complete chain of attribution from packet to person.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.14.6</div>
+        <div class="nist-desc"><strong>Monitor for malicious code.</strong> The beaconing pattern — 264 identical POST requests at 60-second intervals — is exactly the anomaly this control requires organizations to detect.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.14.7</div>
+        <div class="nist-desc"><strong>Identify unauthorized use.</strong> The outbound C2 connection to 45.131.214.85 represents unauthorized use of the network. Traffic analysis was the only control that surfaced this.</div>
+      </div>
+      <div class="nist-item">
+        <div class="nist-control">3.13.1</div>
+        <div class="nist-desc"><strong>Boundary protection.</strong> An egress filter blocking outbound HTTP POST to unknown external IPs would have disrupted this C2 channel entirely — the malware would have beaconed into silence.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 09 -->
+<div class="section">
+  <div class="section-num">Section 09</div>
+  <h2>Lessons Learned</h2>
+
+  <h3>DHCP and Kerberos Are the First Two Filters in Any Windows Triage</h3>
+  <p>The answer to "whose machine is this and who was logged in?" lives in two places in every Windows pcap: the DHCP Request packet and the Kerberos AS-REQ. These filters are not specific to this exercise or this malware family — they work on any pcap from any Windows Active Directory environment. The first two questions of any triage can be answered in under five minutes.</p>
+
+  <h3>Beaconing Is Unmistakable Once You Know What to Look For</h3>
+  <p>264 POST requests to the same external IP at 60-second intervals for 4.3 hours. No human behavior produces that pattern. The I/O Graph made it visually obvious — a perfectly regular sequence of spikes that no legitimate application generates. Recognizing the visual signature of beaconing transfers to every future pcap analysis regardless of malware family.</p>
+
+  <h3>Unencrypted C2 Is a Gift to the Defender</h3>
+  <p>This malware communicated over plain HTTP. The entire beacon payload — <code style="font-family:var(--mono);font-size:.85rem">CMD=POLL\nINFO=1\nACK=1</code> — was readable in cleartext. When C2 is unencrypted, the defender can read exactly what the malware is saying, identify the command structure, and build precise detection rules. Always check HTTP first.</p>
+
+  <h3>The SOC Rule This Analysis Produces</h3>
+  <div class="callout callout-green">
+    <p><strong>Recommended alert rule:</strong> Any internal IP sending more than 5 HTTP POST requests to the same external IP within a 10-minute window, where the POST payload contains <code style="font-family:var(--mono);font-size:.85rem">CMD=POLL</code>, constitutes a confirmed C2 beacon. Isolate the source host immediately and escalate to incident response.</p>
+  </div>
+
+  <h3>Next Lab</h3>
+  <p>Lab Log 004 will cover building a <strong>custom Wireshark analyst profile</strong> — color-coded packet rules, an optimized column layout including Delta Time, and a one-click filter toolbar that automates the workflow demonstrated in this lab. The profile will be documented as a reusable tool for any Windows environment triage.</p>
+</div>
+
+</div></div>
+
+<footer>
+  <span>Lab Log 003 — Wireshark Malware Analysis &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; March 18, 2026 &nbsp;·&nbsp; Educational use only</span>
+  <a href="index.html">← Portfolio</a>
+</footer>
+
+</body>
+</html>

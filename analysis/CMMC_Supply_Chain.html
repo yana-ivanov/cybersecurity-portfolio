@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Weakest Link — CMMC Supply Chain Gap Analysis | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;
+  text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;
+  line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#ef4444}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;
+  padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;
+  color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#ef4444;margin-top:2.5rem;padding:.6rem 3rem;
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;
+  display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0 0}
+
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);
+  text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;
+  line-height:1.2;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);
+  margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;
+  letter-spacing:.1em;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--red)}
+
+.diagram{background:var(--paper);border:1px solid var(--rule);border-radius:4px;
+  padding:2rem;margin:2rem 0;overflow-x:auto}
+.diagram-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--ink3);margin-bottom:1.5rem;
+  padding-bottom:.75rem;border-bottom:1px solid var(--rule)}
+
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);border-radius:2px;
+  background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:#0a0f1a;color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.35rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.65rem;
+  padding:.15rem .5rem;border-radius:2px;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:rgba(10,15,26,0.06);color:#0a0f1a}
+
+.bio-section{background:#0a0f1a;width:100%}
+.bio{color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start;max-width:780px;margin:0 auto}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;
+  display:flex;align-items:center;justify-content:center;font-family:var(--display);
+  font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;width:100vw;position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;box-sizing:border-box}
+footer span{color:#94a3b8}
+
+@media(max-width:680px){
+  .wrap,.mast-inner{padding:0 1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .mast-bar{padding:.6rem 1.5rem;flex-wrap:wrap;gap:.5rem}
+  h1.title{font-size:1.8rem}
+  .bio{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}
+}
+
+/* ── GOOGLE MATERIAL ICONS ── */
+.material-icons{font-family:'Material Icons';font-style:normal;font-weight:400;
+  font-size:24px;display:inline-block;line-height:1;letter-spacing:normal;
+  text-transform:none;white-space:nowrap;word-wrap:normal;direction:ltr;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+/* ── FIGURE CONTAINER ── */
+.figure{background:var(--paper);border:1px solid var(--rule);border-radius:4px;
+  margin:2rem 0;overflow:hidden}
+.figure-header{background:#0a0f1a;color:#fff;padding:.7rem 1.25rem;
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;
+  display:flex;align-items:center;gap:.6rem}
+.figure-header .material-icons{font-size:1rem;color:#4a9eff}
+.figure-body{padding:1.5rem}
+.figure-caption{padding:.6rem 1.25rem;background:var(--bg);border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;color:#94a3b8;font-style:normal}
+
+/* ── STAT ROW ── */
+.fig-stat-row{display:grid;gap:0;margin:0}
+.fig-stat-row.cols-4{grid-template-columns:repeat(4,1fr)}
+.fig-stat-row.cols-3{grid-template-columns:repeat(3,1fr)}
+.fig-stat-row.cols-2{grid-template-columns:repeat(2,1fr)}
+.fig-stat{padding:1.5rem 1.25rem;border-right:1px solid var(--rule);text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:.4rem}
+.fig-stat:last-child{border-right:none}
+.fig-stat .material-icons{font-size:1.75rem;margin-bottom:.25rem}
+.fig-stat-num{font-family:var(--display);font-size:2.2rem;font-weight:900;line-height:1}
+.fig-stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink3);line-height:1.4;margin-top:.15rem}
+.fig-stat-sub{font-size:.78rem;color:#94a3b8;line-height:1.5;margin-top:.2rem}
+.fig-stat.red .material-icons,.fig-stat.red .fig-stat-num{color:var(--red)}
+.fig-stat.amber .material-icons,.fig-stat.amber .fig-stat-num{color:var(--amber)}
+.fig-stat.blue .material-icons,.fig-stat.blue .fig-stat-num{color:var(--blue)}
+.fig-stat.green .material-icons,.fig-stat.green .fig-stat-num{color:var(--green)}
+.fig-stat.dark .material-icons,.fig-stat.dark .fig-stat-num{color:var(--ink)}
+
+/* ── FLOW CHAIN ── */
+.fig-flow{display:flex;align-items:stretch;gap:0;flex-wrap:nowrap;margin:0}
+.fig-flow-step{flex:1;min-width:0;padding:1.25rem 1rem;border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:.4rem}
+.fig-flow-step:last-child{border-right:none}
+.fig-flow-step .material-icons{font-size:1.6rem}
+.fig-flow-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;
+  text-transform:uppercase;font-weight:700;line-height:1.3}
+.fig-flow-title{font-family:var(--display-clean);font-size:.82rem;font-weight:700;
+  color:var(--ink);line-height:1.3}
+.fig-flow-desc{font-size:.75rem;color:var(--ink3);line-height:1.45}
+.fig-flow-step.red{background:#fef2f2;border-top:3px solid var(--red)}
+.fig-flow-step.red .material-icons,.fig-flow-step.red .fig-flow-label{color:var(--red)}
+.fig-flow-step.amber{background:#fffbeb;border-top:3px solid var(--amber)}
+.fig-flow-step.amber .material-icons,.fig-flow-step.amber .fig-flow-label{color:var(--amber)}
+.fig-flow-step.green{background:#f0fdf4;border-top:3px solid var(--green)}
+.fig-flow-step.green .material-icons,.fig-flow-step.green .fig-flow-label{color:var(--green)}
+.fig-flow-step.blue{background:#eff6ff;border-top:3px solid var(--blue)}
+.fig-flow-step.blue .material-icons,.fig-flow-step.blue .fig-flow-label{color:var(--blue)}
+.fig-flow-step.dark{background:#0a0f1a;border-top:3px solid #374151}
+.fig-flow-step.dark .fig-flow-label{color:#60a5fa}
+.fig-flow-step.dark .fig-flow-title{color:#e2e8f0}
+.fig-flow-step.dark .fig-flow-desc{color:#94a3b8}
+
+/* ── TIMELINE ── */
+.fig-timeline{display:grid;gap:0}
+.fig-tl-item{display:grid;grid-template-columns:160px 1fr;border-bottom:1px solid var(--rule)}
+.fig-tl-item:last-child{border-bottom:none}
+.fig-tl-left{padding:1.25rem;border-right:1px solid var(--rule);background:var(--bg);
+  display:flex;flex-direction:column;gap:.3rem}
+.fig-tl-date{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--green)}
+.fig-tl-date.red{color:var(--red)}
+.fig-tl-date.amber{color:var(--amber)}
+.fig-tl-date.dark{color:var(--ink)}
+.fig-tl-stage{font-family:var(--mono);font-size:.6rem;color:#94a3b8;
+  letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.fig-tl-right{padding:1.25rem 1.5rem}
+.fig-tl-title{font-family:var(--display);font-size:.95rem;font-weight:700;
+  color:var(--ink);margin-bottom:.4rem;line-height:1.3}
+.fig-tl-body{font-size:.85rem;color:var(--ink3);line-height:1.65}
+.fig-tl-item.active .fig-tl-left{background:#fef2f2}
+.fig-tl-item.active .fig-tl-date{color:var(--red)}
+
+/* ── AUTHORITY / HUB-SPOKE GRID ── */
+.fig-hub-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center}
+.fig-hub-col{display:flex;flex-direction:column;gap:.75rem}
+.fig-hub-card{padding:1rem 1.25rem;border:1px solid var(--rule);border-radius:3px;
+  background:var(--paper);border-left:3px solid var(--amber)}
+.fig-hub-card-title{font-family:var(--mono);font-size:.7rem;font-weight:700;
+  color:var(--amber);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.35rem;
+  display:flex;align-items:center;gap:.4rem}
+.fig-hub-card-title .material-icons{font-size:.95rem}
+.fig-hub-card-mandate{font-size:.82rem;color:var(--ink3);line-height:1.5;margin-bottom:.25rem}
+.fig-hub-card-limit{font-family:var(--mono);font-size:.65rem;color:var(--amber);letter-spacing:.04em}
+.fig-hub-center{text-align:center;padding:1.5rem 1rem;background:#0a0f1a;border-radius:4px;
+  border:2px solid var(--red)}
+.fig-hub-center .material-icons{font-size:2rem;color:#ef4444;display:block;margin-bottom:.5rem}
+.fig-hub-center-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;
+  text-transform:uppercase;color:#ef4444;margin-bottom:.5rem}
+.fig-hub-center-title{font-family:var(--display-clean);font-size:.95rem;font-weight:700;
+  color:#fff;line-height:1.3;margin-bottom:.4rem}
+.fig-hub-center-sub{font-size:.75rem;color:#94a3b8;line-height:1.5}
+.fig-hub-caption{grid-column:1/-1;text-align:center;font-family:var(--mono);
+  font-size:.62rem;color:var(--red);letter-spacing:.04em;padding-top:.5rem;
+  border-top:1px solid var(--rule)}
+
+/* ── ACCESS CHAIN ── */
+.fig-chain{display:grid;grid-template-columns:repeat(4,1fr);gap:0;align-items:stretch}
+.fig-chain-node{padding:1.25rem 1rem;border-right:1px solid var(--rule);
+  display:flex;flex-direction:column;gap:.4rem}
+.fig-chain-node:last-child{border-right:none}
+.fig-chain-node .material-icons{font-size:1.5rem}
+.fig-chain-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.1em;
+  text-transform:uppercase;font-weight:700}
+.fig-chain-title{font-family:var(--display-clean);font-size:.82rem;font-weight:700;
+  color:var(--ink);line-height:1.3}
+.fig-chain-items{list-style:none;padding:0;margin:.25rem 0 0}
+.fig-chain-items li{font-size:.75rem;color:var(--ink3);line-height:1.5;
+  padding:.1rem 0;border-bottom:1px solid var(--rule)}
+.fig-chain-items li:last-child{border-bottom:none}
+.fig-chain-node.entry{background:#fef2f2;border-top:3px solid var(--red)}
+.fig-chain-node.entry .material-icons,.fig-chain-node.entry .fig-chain-label{color:var(--red)}
+.fig-chain-node.pivot{background:#fffbeb;border-top:3px solid var(--amber)}
+.fig-chain-node.pivot .material-icons,.fig-chain-node.pivot .fig-chain-label{color:var(--amber)}
+.fig-chain-node.supply{background:#fef2f2;border-top:3px solid var(--red)}
+.fig-chain-node.supply .material-icons,.fig-chain-node.supply .fig-chain-label{color:var(--red)}
+.fig-chain-node.target{background:var(--paper);border-top:3px solid var(--ink)}
+.fig-chain-node.target .material-icons{color:var(--ink)}
+.fig-chain-node.target .fig-chain-label{color:#64748b}
+
+/* ── SEQUENCE / CORRECT vs WRONG ── */
+.fig-sequence{display:grid;gap:.75rem;margin:0}
+.fig-seq-row{display:grid;grid-template-columns:120px 1fr;gap:0;border-radius:3px;overflow:hidden}
+.fig-seq-badge{padding:.75rem 1rem;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:.3rem;text-align:center;flex-shrink:0}
+.fig-seq-badge .material-icons{font-size:1.4rem}
+.fig-seq-badge-label{font-family:var(--mono);font-size:.55rem;letter-spacing:.08em;
+  text-transform:uppercase;font-weight:700;line-height:1.3}
+.fig-seq-row.wrong .fig-seq-badge{background:var(--red);color:#fff}
+.fig-seq-row.correct .fig-seq-badge{background:var(--green);color:#fff}
+.fig-seq-steps{display:flex;align-items:center;flex-wrap:wrap;gap:0;flex:1}
+.fig-seq-step{flex:1;padding:.75rem .85rem;border-right:1px solid var(--rule);
+  min-width:120px;display:flex;flex-direction:column;gap:.2rem}
+.fig-seq-step:last-child{border-right:none}
+.fig-seq-step-title{font-family:var(--mono);font-size:.7rem;font-weight:700;line-height:1.3}
+.fig-seq-step-sub{font-size:.72rem;color:var(--ink3);line-height:1.4}
+.fig-seq-row.wrong .fig-seq-steps{background:#fef2f2}
+.fig-seq-row.wrong .fig-seq-step-title{color:var(--red)}
+.fig-seq-row.correct .fig-seq-steps{background:#f0fdf4}
+.fig-seq-row.correct .fig-seq-step-title{color:var(--green)}
+
+@media(max-width:700px){
+  .fig-stat-row.cols-4,.fig-stat-row.cols-3{grid-template-columns:1fr 1fr}
+  .fig-stat{border-bottom:1px solid var(--rule)}
+  .fig-flow{flex-direction:column}
+  .fig-tl-item{grid-template-columns:1fr}
+  .fig-tl-left{border-right:none;border-bottom:1px solid var(--rule)}
+  .fig-hub-grid{grid-template-columns:1fr}
+  .fig-chain{grid-template-columns:1fr 1fr}
+  .fig-seq-row{grid-template-columns:1fr}
+  .fig-seq-badge{flex-direction:row;padding:.6rem 1rem}
+}
+
+</style>
+
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+
+<!-- ══ MASTHEAD ══════════════════════════════════════════════ -->
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">CMMC Compliance Analysis</div>
+    <h1 class="title">The Weakest Link<br><span>CMMC, the Defense Supply Chain, and the National Security Gap That Is Already Being Exploited</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">March 15, 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — For Educational Use</div></div>
+      <div class="meta-item"><div class="label">Framework</div><div class="value">CMMC 2.0 / NIST SP 800-171</div></div>
+      <div class="meta-item"><div class="label">Enforcement</div><div class="value">Active — Phase 1 Since Nov 2025</div></div>
+      <div class="meta-item"><div class="label">Risk Level</div><div class="value">Critical — National Security</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    CMMC PHASE 1 IN EFFECT SINCE NOV 2025 &nbsp;·&nbsp; PHASE 2 MANDATORY C3PAO CERTIFICATION NOV 10, 2026 &nbsp;·&nbsp; 8 MONTHS REMAINING &nbsp;·&nbsp; 99% OF CONTRACTORS NOT AUDIT-READY
+  </div>
+</div>
+
+<!-- ══ CONTENT ══════════════════════════════════════════════ -->
+<div class="wrap">
+<div class="content">
+
+<!-- ── 1. EXECUTIVE SUMMARY ── -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>In December 2025, a precision machining subcontractor in Illinois agreed to pay $421,000 to the federal government to resolve allegations that it had falsely certified cybersecurity compliance on contracts involving technical drawings supplied to defense prime contractors. The case originated as a whistleblower lawsuit filed by a former quality control manager from the shop floor. The company had been signing annual affirmations in the Supplier Performance Risk System attesting that its cybersecurity controls met the required standards. They did not.</p>
+
+  <p>This was not an isolated incident of fraud. It was the first confirmed enforcement action in what the Department of Justice has signaled will be an expanding campaign against cybersecurity non-compliance throughout the defense supply chain. Seven cybersecurity fraud cases were settled by the DOJ in 2025 alone. The False Claims Act — a Civil War-era statute designed to combat government contract fraud — now applies to any defense contractor or subcontractor whose senior executive signs a compliance affirmation they cannot verify.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The Central Finding:</strong> Only 1% of defense contractors are fully audit-ready for CMMC — down from 8% in 2023. There are 600 certified assessors available for 350,000+ contractors requiring certification, with wait times already exceeding 18 months. Phase 2 mandatory third-party certification begins November 2026. The math does not work, the threat is real, and the compliance gap is not an administrative inconvenience — it is an open door into the defense programs that protect American national security. The DOJ has now settled nine cybersecurity False Claims Act cases, including the March 2025 MORSECORP settlement for $4.6 million — demonstrating that the cost of non-compliance dwarfs the cybersecurity investment avoided.</p>
+  </div>
+
+  <div class="figure">
+  <div class="figure-header"><span class="material-icons">warning</span>Figure 1 — The CMMC Crisis in Numbers</div>
+  <div class="figure-body">
+    <div class="fig-stat-row cols-4">
+      <div class="fig-stat red">
+        <span class="material-icons">trending_down</span>
+        <div class="fig-stat-num">1%</div>
+        <div class="fig-stat-label">Audit-Ready</div>
+        <div class="fig-stat-sub">Down from 8% in 2023 · Down from 4% in 2025 · Declining as enforcement rises</div>
+      </div>
+      <div class="fig-stat red">
+        <span class="material-icons">groups</span>
+        <div class="fig-stat-num">350K</div>
+        <div class="fig-stat-label">Contractors Need Cert.</div>
+        <div class="fig-stat-sub">Only 600 certified assessors available — 18-month wait by Q3 2026</div>
+      </div>
+      <div class="fig-stat amber">
+        <span class="material-icons">event</span>
+        <div class="fig-stat-num">Nov '26</div>
+        <div class="fig-stat-label">Phase 2 Deadline</div>
+        <div class="fig-stat-sub">Mandatory 3rd-party C3PAO certification — no cert = no contracts</div>
+      </div>
+      <div class="fig-stat red">
+        <span class="material-icons">gavel</span>
+        <div class="fig-stat-num">$421K</div>
+        <div class="fig-stat-label">First FCA Settlement</div>
+        <div class="fig-stat-sub">Illinois machining shop · Technical drawings · Dec 2025 · Qui tam — floor employee</div>
+      </div>
+    </div>
+  </div>
+  <div class="figure-caption">Source: ISACA · DoD · DOJ — readiness declining while enforcement accelerates</div>
+</div>
+
+<!-- ── 2. WHAT CMMC WAS BUILT TO STOP ── -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>What CMMC Was Built to Stop — The Threat Is Real and Confirmed</h2>
+
+  <p>The Cybersecurity Maturity Model Certification is not a bureaucratic compliance exercise. It is the direct policy response to a decade of documented, confirmed, ongoing nation-state penetration of the US defense supply chain through its smallest and least-defended members. Understanding what the framework was built to stop is prerequisite to understanding why 99% non-compliance is not an administrative inconvenience — it is a continuing invitation.</p>
+
+  <h3>The F-35 Subcontractor with Default Passwords</h3>
+  <p>A small Australian subcontractor on the F-35 Joint Strike Fighter program — a platform that will cost US taxpayers $1.5 trillion over its lifespan — suffered a confirmed cybersecurity breach. Approximately 30 gigabytes of data was stolen including detailed F-35 design specifications. The attackers gained access using the domain administrator's account credentials. The passwords had never been changed from the manufacturer defaults: "admin" and "guest."</p>
+
+  <p>A weapon system costing $1.5 trillion. A subcontractor with default passwords. Thirty gigabytes of design data in the hands of an adversary. This is the scenario CMMC exists to prevent — and it happened before CMMC was mandatory, using an attack method so simple it requires no technical sophistication whatsoever.</p>
+
+  <h3>Russian Targeting of Cleared Defense Contractors — Every Tier</h3>
+  <p>From at least January 2020 through February 2022, the FBI, NSA, and CISA jointly documented regular targeting of US cleared defense contractors by Russian state-sponsored cyber actors — targeting both large and small CDCs and subcontractors with varying levels of cybersecurity protocols. The targeted contractors supported programs including command, control, communications, and combat systems; intelligence, surveillance, reconnaissance, and targeting; and weapons and missile development.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The Supply Chain Logic:</strong> Nation-state adversaries do not attack the prime contractor directly when the path of least resistance is a subcontractor three tiers down with inadequate security. A precision machining shop handling technical drawings for a rotor component does not think of itself as a national security target. The adversary does. Every technical drawing in that shop's unprotected network is a data point in a comprehensive intelligence picture of the weapon system being built — its tolerances, its materials, its vulnerabilities.</p>
+  </div>
+
+  <h3>Chinese APT5 — Targeting Engineers Personally</h3>
+  <p>In 2024 and 2025, the Chinese nation-state threat actor APT5 conducted sustained campaigns against current and former employees of major aerospace and defense contractors. The operational approach was notable: rather than attacking corporate networks directly, APT5 sent spearphishing emails to employees' personal email addresses — not their work accounts — with lures meticulously crafted to align with their professional roles, geographical locations, and personal interests, including fake invitations to defense industry conferences and fabricated training course notifications.</p>
+
+  <p>This approach bypasses every corporate cybersecurity control. The employee's personal Gmail account has no enterprise DLP, no advanced threat protection, no security monitoring. The laptop they use to check personal email at home may also connect to their company VPN. The path from a convincing fake conference invitation to a compromised defense contractor network can be as short as one click.</p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Threat Actor</th><th>Method</th><th>Target in Supply Chain</th><th>What Was Taken / At Risk</th></tr></thead>
+    <tbody>
+      <tr><td><strong>China / APT5</strong></td><td>Personal email spearphishing of engineers</td><td>Aerospace and defense employees at all tiers</td><td class="red">Credentials, intellectual property, program details</td></tr>
+      <tr><td><strong>Russia / SVR</strong></td><td>Credential harvesting, vulnerability exploitation</td><td>Small and mid-tier CDCs with weak security</td><td class="red">CUI, weapon system specs, communications, targeting data</td></tr>
+      <tr><td><strong>China / Volt Typhoon</strong></td><td>Living-off-the-land, LOTL persistence</td><td>Critical infrastructure supporting defense facilities</td><td class="red">Network access, OT system mapping, pre-positioned disruption</td></tr>
+      <tr><td><strong>Illinois machining shop attacker</strong></td><td>Unknown — compliance gap enabled access</td><td>Precision subcontractor with technical drawings</td><td class="amber">CUI — technical specifications flowed down from prime</td></tr>
+      <tr><td><strong>F-35 subcontractor attacker</strong></td><td>Default credentials (admin/guest)</td><td>Small hardware subcontractor — aircraft program</td><td class="red">30GB F-35 design data — $1.5T program compromised</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ── 3. THE GAP ── -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>The Gap — 99% Non-Compliant, 600 Assessors, 350,000 Contractors</h2>
+
+  <p>The numbers that define the CMMC compliance crisis are not the result of bad faith by defense contractors. They are the result of a structural failure that has been building for years and is now colliding with mandatory enforcement in a way that the system is not equipped to handle.</p>
+
+  <h3>Readiness Is Declining as Enforcement Increases</h3>
+  <p>The most alarming data point in the current CMMC landscape is not the 1% readiness figure itself — it is the direction. In 2023, 8% of contractors were fully audit-ready. In 2025, that number had dropped to 4%. Now it is 1%. As the enforcement deadline approached and the requirements became clearer, readiness went down, not up. This is the signature of a structural problem, not a knowledge or motivation problem. The requirements are understood. The tools to meet them are available. Something else is preventing compliance at scale.</p>
+
+  <h3>The Three Barriers: Cost, Negligence, and Communication Failure</h3>
+  <p>In my assessment, the compliance gap has three compounding causes. The first is cost. For a 20-person precision machining shop operating on tight margins, achieving CMMC Level 2 compliance can consume a significant portion of annual revenue. The investment is real, it is immediate, and the return — continued eligibility for contracts the company already has — is not visible on a balance sheet until the day a non-compliance stops work.</p>
+
+  <p>The second cause is years of voluntary non-enforcement creating a culture of justified negligence. The cybersecurity requirements in DFARS 252.204-7012 have existed since 2017. For eight years, contractors self-attested compliance, the government rarely verified, and nothing happened. The reasonable conclusion for a small manufacturer was that these requirements were aspirational paperwork, not operational imperatives. That conclusion was wrong, but it was rational given what the enforcement environment communicated.</p>
+
+  <p>The third cause — and the one I consider most analytically significant — is a failure of communication design. The 110 controls in NIST SP 800-171 are presented in federal regulatory language to people who are machinists, engineers, and shop floor managers. They do not describe what they are protecting or what happens if those protections fail. A control requiring "protection of audit logs" does not convey that unprotected audit logs allowed Volt Typhoon to operate inside US infrastructure for five years undetected. A control requiring "multi-factor authentication for privileged accounts" does not explain that its absence allowed a single compromised admin account to wipe 200,000 devices at Stryker Corporation in March 2026. The compliance framework is technically correct. As a communication to the humans who must implement it, it is nearly incomprehensible.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The Assessor Math That Does Not Work:</strong> There are currently 600 certified C3PAO assessors available for approximately 350,000 contractors requiring certification. CMMC Level 2 third-party assessments are mandatory starting November 10, 2026 — eight months from today, March 15, 2026. Even if every assessor worked continuously with zero scheduling gaps, each conducting one assessment per week, the total assessment capacity is approximately 31,200 per year. At that rate, certifying the full contractor base would take more than 11 years. Wait times are already exceeding 18 months. The system cannot certify its own requirements at the pace the requirements demand — and the DoD has not provided a credible plan to close that gap.</p>
+  </div>
+
+  <div class="figure">
+  <div class="figure-header"><span class="material-icons">linear_scale</span>Figure 2 — CMMC Phase Implementation Timeline and What Each Deadline Means</div>
+  <div class="figure-body">
+    <div class="fig-flow">
+      <div class="fig-flow-step green">
+        <span class="material-icons">task_alt</span>
+        <div class="fig-flow-label">Nov 2025</div>
+        <div class="fig-flow-title">Phase 1 — Now Active</div>
+        <div class="fig-flow-desc">Self-assessment required for Level 1 and 2. Annual SPRS affirmation. FCA personal liability begins.</div>
+      </div>
+      <div class="fig-flow-step red">
+        <span class="material-icons">verified_user</span>
+        <div class="fig-flow-label">Nov 2026 — Critical</div>
+        <div class="fig-flow-title">Phase 2 — C3PAO Mandatory</div>
+        <div class="fig-flow-desc">3rd-party audit required for Level 2 contracts. No certification = no award. 8 months remaining.</div>
+      </div>
+      <div class="fig-flow-step amber">
+        <span class="material-icons">expand_more</span>
+        <div class="fig-flow-label">Nov 2027</div>
+        <div class="fig-flow-title">Phase 3 — Level 3 Expands</div>
+        <div class="fig-flow-desc">Level 2 C3PAO in active contract options. NIST 800-172 controls begin phasing in.</div>
+      </div>
+      <div class="fig-flow-step dark">
+        <span class="material-icons">shield</span>
+        <div class="fig-flow-label">Nov 2028</div>
+        <div class="fig-flow-title">Full Enforcement</div>
+        <div class="fig-flow-desc">CMMC mandatory in all applicable DoD contracts — no exceptions, no waivers.</div>
+      </div>
+    </div>
+  </div>
+  <div class="figure-caption">32 CFR Part 170 · DFARS 252.204-7021 — timeline is law, not guidance</div>
+</div>
+
+<!-- ── 4. THE HELICOPTER PRINCIPLE ── -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>The Helicopter Principle — One Part Changes Everything</h2>
+
+  <p>A weapon system is only as secure as the least-secured node in its supply chain. This is not a theoretical assertion. It is a documented operational reality that adversaries have exploited repeatedly and that CMMC was specifically designed to address.</p>
+
+  <p>Consider how a military helicopter reaches a warzone. The airframe is built by a prime contractor with mature cybersecurity programs, cleared personnel, and rigorous security controls. But the rotor assembly components are machined by a specialized shop in Connecticut. The hydraulic system components are fabricated by a supplier in Ohio. The avionics software includes modules developed by a small engineering firm in Virginia. Each of these suppliers handles Controlled Unclassified Information — technical drawings, specifications, tolerances, materials data — that collectively describes how the aircraft is built and where it might be vulnerable.</p>
+
+  <p>If the Connecticut machining shop's network is compromised, the adversary does not just steal a drawing. They acquire a precise understanding of component specifications that could inform the development of countermeasures, inform targeting of maintenance operations, or enable the fabrication of counterfeit parts. A compromised small supplier is not a minor inconvenience in the supply chain. It is a window into the entire program.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The F-35 Precedent:</strong> Thirty gigabytes of F-35 design data stolen from a small subcontractor through default admin credentials. The prime contractor — Lockheed Martin — had extensive security controls. The subcontractor had "admin" and "guest" as administrator passwords. The adversary did not need to breach Lockheed Martin. They needed to breach the weakest supplier with access to the program's technical data. This is not a failure of the prime's security. It is a structural vulnerability of the supply chain model itself — one that CMMC is specifically designed to close and that 99% non-compliance leaves wide open.</p>
+  </div>
+
+  <h3>The False Claims Act — Personal Liability for Every Signing Executive</h3>
+  <p>The legal dimension of CMMC non-compliance has changed fundamentally with the December 2025 Illinois settlement. The mechanism is the False Claims Act, and its application to CMMC creates a personal liability exposure that most small subcontractor executives do not yet understand they have assumed.</p>
+
+  <p>Under CMMC, every contractor must post an annual affirmation in the Supplier Performance Risk System signed by a senior company official — typically the CEO or COO — attesting that the organization has implemented and is maintaining all required cybersecurity controls. This is not a checkbox on a form. It is a legal certification with federal criminal fraud implications.</p>
+
+  <p>The FCA does not require intent to defraud. A contractor executive who signs the SPRS affirmation without verifying the accuracy of their compliance status — or who is aware of known gaps and signs anyway — may be found to have acted with "reckless disregard" sufficient to establish FCA liability. The Illinois settlement originated from a former quality control manager who knew the shop's network was not adequately secured, and who filed a qui tam action on behalf of the government. Any employee in any non-compliant defense subcontractor's facility is now a potential whistleblower with financial incentive to report what they observe.</p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Scenario</th><th>Who Is Liable</th><th>Mechanism</th><th>Consequence</th></tr></thead>
+    <tbody>
+      <tr><td><strong>CEO signs SPRS affirmation — controls not implemented</strong></td><td class="red">CEO personally — FCA "reckless disregard"</td><td>False Claims Act 31 U.S.C. §3729</td><td class="red">Civil penalties up to 3x damages plus $27K per claim</td></tr>
+      <tr><td><strong>Prime awards subcontract to non-compliant supplier</strong></td><td class="amber">Prime contractor — flowdown responsibility</td><td>DFARS 252.204-7021 flowdown obligation</td><td class="red">Prime's own CMMC status at risk — contract eligibility jeopardized</td></tr>
+      <tr><td><strong>Acquisition of a non-compliant contractor</strong></td><td class="red">Acquiring company — successor liability</td><td>July 2025 FCA successor settlement precedent</td><td class="red">Inherited FCA exposure for pre-acquisition cybersecurity failures</td></tr>
+      <tr><td><strong>Employee observes compliance gap — reports it</strong></td><td class="amber">Employer — qui tam whistleblower action</td><td>FCA qui tam provision</td><td class="amber">Whistleblower receives 15-30% of government recovery</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ── 5. THE DIB CONTRACTION RISK ── -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>What Non-Compliance Actually Costs — Real Numbers, Real Cases</h2>
+
+  <p>The defense contracting community has spent years treating cybersecurity compliance as an abstract future obligation. That era ended on March 26, 2025, when the Department of Justice announced its $4.6 million False Claims Act settlement with MORSECORP, Inc. — a Cambridge, Massachusetts defense contractor serving the Army and Air Force. The case is not just a cautionary tale. It is a detailed roadmap of exactly how non-compliance unravels, and it demonstrates that the cost of <em>not</em> investing in cybersecurity dwarfs the cost of doing so correctly.</p>
+
+  <h3>Case Study: MORSECORP — The $4.6 Million Lesson</h3>
+  <p>MORSECORP provided technology services to the Departments of the Army and Air Force under contracts that required compliance with NIST SP 800-171 cybersecurity controls. Between 2018 and 2023 — five years — the company admitted to two compounding failures. First, it used a third-party cloud email provider that did not meet the required FedRAMP Moderate security baseline. Second, and more damaging, it submitted self-assessment scores to the Supplier Performance Risk System claiming compliance — then received a third-party assessment showing a substantially lower, failing score, and did not update the SPRS record.</p>
+
+  <p>That second failure is what made this the first FCA case of its kind. <strong>MORSECORP knew its score was wrong. It did not correct it.</strong> A whistleblower — an insider with direct knowledge — filed a qui tam complaint under the False Claims Act. The government intervened. The settlement: $4.6 million plus interest. The whistleblower received $851,000 — 18.5% of the recovery. MORSECORP's contracts with the Army and Air Force were placed at risk. Its reputation in the defense contracting community was permanently affected. And this is the ninth cyber FCA settlement under the DOJ's Civil Cyber-Fraud Initiative, which launched in 2021 — with the two largest settlements reaching $11 million each.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The DOJ's Message Was Explicit:</strong> "Federal contractors must fulfill their obligations to protect sensitive government information from cyber threats. We will continue to hold contractors to their commitments to follow cybersecurity standards to ensure that federal agencies and taxpayers get what they paid for, and make sure that contractors who follow the rules are not at a competitive disadvantage." — DOJ statement, March 26, 2025. The enforcement campaign is not slowing down. Seven cybersecurity FCA settlements were reached in 2025. With Phase 2 mandatory certification beginning November 2026, that number will accelerate.</p>
+  </div>
+
+  <h3>What CMMC Level 2 Actually Costs — Real Numbers by Company Size</h3>
+  <p>The cost of CMMC compliance is real, and for small manufacturers it is genuinely burdensome. But the data from industry sources and the DoD's own cost projections tells a more nuanced story than the headline numbers suggest — one in which the investment is almost always rational when measured against the value of the contracts being protected.</p>
+
+  <div class="figure">
+  <div class="figure-header"><span class="material-icons">attach_money</span>Figure 3 — CMMC Level 2 True Cost Breakdown by Organization Size (2026 Data)</div>
+  <div class="figure-body">
+    <div class="tbl-wrap" style="margin:0">
+    <table>
+      <thead>
+        <tr>
+          <th>Cost Category</th>
+          <th>Small &lt;50 Staff</th>
+          <th>Medium 50–200 Staff</th>
+          <th>Large 200+ Staff</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Gap Assessment</strong></td>
+          <td>$3,500 – $10,000</td>
+          <td>$8,000 – $20,000</td>
+          <td>$15,000 – $20,000</td>
+        </tr>
+        <tr>
+          <td><strong>Remediation &amp; Controls</strong></td>
+          <td class="red">$20,000 – $80,000</td>
+          <td class="red">$50,000 – $150,000</td>
+          <td class="red">$100,000 – $250,000</td>
+        </tr>
+        <tr>
+          <td><strong>C3PAO Assessment Fee</strong></td>
+          <td>$30,000 – $50,000</td>
+          <td>$50,000 – $80,000</td>
+          <td>$80,000 – $150,000</td>
+        </tr>
+        <tr>
+          <td><strong>Annual Maintenance</strong></td>
+          <td>$24,000 – $60,000 / yr</td>
+          <td>$60,000 – $120,000 / yr</td>
+          <td>$120,000+ / yr</td>
+        </tr>
+        <tr style="background:#0a0f1a">
+          <td><strong style="color:#fff">Year-1 Total</strong><br><span style="font-family:var(--mono);font-size:.65rem;color:#94a3b8">DoD estimate: $105K–$118K</span></td>
+          <td class="red" style="font-size:1rem;font-weight:900">$75K – $130K<br><span style="font-size:.72rem;font-weight:400;color:var(--ink3)">$3,200 / employee avg</span></td>
+          <td class="red" style="font-size:1rem;font-weight:900">$138K – $285K<br><span style="font-size:.72rem;font-weight:400;color:var(--ink3)">$1,100 / employee avg</span></td>
+          <td class="red" style="font-size:1rem;font-weight:900">$285K – $500K+<br><span style="font-size:.72rem;font-weight:400;color:var(--ink3)">$850 / employee avg</span></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+  <div class="figure-caption">Source: ISACA · DoD cost projections · C3PAO market data — organizations that prepare thoroughly have consistently lower total costs and higher first-attempt pass rates</div>
+</div>
+
+<!-- ── 6. COMPLIANCE AS COMMUNICATION ── -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>The Training Gap — Why the Human Layer Is CMMC's Biggest Unfixed Problem</h2>
+
+  <p>In my 15 years as a UX designer working with enterprise technology, I have observed a consistent pattern: the most technically correct systems fail at scale when they are not designed for the humans who must use them. CMMC has this problem in a particularly acute form. The framework is technically sound. The requirements map directly to documented attack vectors. The controls, implemented correctly, would close the supply chain security gap. But it is failing to achieve adoption because it was designed by security professionals for security professionals and is being delivered to machinists, engineers, shop floor managers, and small business owners who have no security background and no frame of reference for why any of it matters.</p>
+
+  <p>And then there is the training requirement — which is where the gap becomes most visible. NIST SP 800-171 Control 3.2, the entire Awareness and Training domain, consists of just three controls. Control 3.2.1 requires that employees be made aware of security risks. Control 3.2.2 requires that they be trained to carry out their security-related duties. Control 3.2.3 requires awareness of insider threat indicators. That is the complete federal requirement. No minimum hours. No required content structure. No mandatory quiz. No documentation format. No recurrence schedule beyond "at least annual." Organizations determine the content and frequency themselves. The result, in practice, is a 30-minute annual video that employees click through while doing something else, followed by a checkbox that becomes a compliance artifact. The video covers nothing specific to the actual threats targeting that organization's industry. Nobody learns what APT5's fake conference invitations look like. Nobody learns that Volt Typhoon deletes audit logs to stay invisible for years. Nobody learns that the F-35 program was compromised through default passwords that had never been changed.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The Human Factor Is the Attack Surface:</strong> The most common technical failure vectors in defense contractor breaches — phishing, credential theft, default passwords, social engineering — are not technology failures. They are human awareness failures. You can implement all 110 NIST SP 800-171 controls perfectly and still be compromised by an employee who clicks a fake conference invitation in their personal Gmail, because APT5 specifically targets personal accounts to bypass corporate security controls. No technical control prevents that. Only an educated employee prevents that.</p>
+  </div>
+
+  <h3>The Model That Already Works — And That Every Working Professional Understands</h3>
+  <p>There is an instructive parallel hiding in plain sight for anyone who has started a new job in the last 20 years. On your first week, you were almost certainly required to complete mandatory training on sexual harassment prevention — structured video modules, specific scenarios, comprehension quizzes after each section, a completion certificate recorded in HR systems, and annual recertification. The same format often covers workplace safety, OSHA regulations, data privacy under CCPA or GDPR, and export control procedures for ITAR-regulated companies. These programs exist because legislators and regulators recognized that awareness of specific risks does not happen passively — it requires structured, documented, verified education delivered at a defined point in the employment lifecycle and refreshed on a regular schedule.</p>
+
+  <p>The legal architecture behind mandatory harassment training is instructive. California AB 1825 established minimum hour requirements. New York State Law Section 201-g requires annual interactive training. Connecticut Public Act 19-16 mandates specific content topics and documentation. These laws exist because voluntary awareness programs were failing — and because the cost of that failure, measured in litigation and organizational harm, was ultimately borne by people who had no control over the environment they worked in. The argument for mandatory, structured cybersecurity training in the defense supply chain is identical in every structural dimension.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The Recommendation:</strong> Mandatory CMMC cybersecurity training should follow the established onboarding compliance model: structured video modules with quizzes after each section, a minimum hour requirement based on role, completion certificates recorded and retained for audit, and annual recertification. Content should not be generic security awareness material. It should be specific to defense supply chain threats — what APT5 spearphishing looks like, what happened at the F-35 subcontractor, what the Volt Typhoon playbook is, what default passwords cost the submarine program. Risk-specific education that makes the threat real for the person watching it. That is what changes behavior.</p>
+  </div>
+
+  <div class="callout callout-green">
+    <p><strong>This Is What It Looks Like in Practice:</strong> The 14-module CMMC Cybersecurity Awareness self-study guide referenced in this report applies exactly this model — structured modules, scenario-based questions, comprehension quizzes, and a completion record. Built for defense supply chain employees with no prior security background. <a href="https://devprogresschallenge.github.io/CMMC_Training.html" target="_blank" style="color:#145a32;font-weight:600;text-decoration:underline;text-underline-offset:3px">Access the training program →</a></p>
+  </div>
+
+  <h3>What the Proposed Training Standard Would Look Like</h3>
+  <p>Drawing from the existing compliance training model used across American corporate onboarding, a CMMC-aligned cybersecurity education standard could be structured as follows. The proposal is practical and builds on infrastructure that already exists in every HR and learning management system used by organizations of any size.</p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Training Element</th><th>Current NIST 800-171 Standard</th><th>Proposed Defense Supply Chain Standard</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Timing</strong></td><td class="amber">Annual — no onboarding requirement specified</td><td class="green">Upon hire (before CUI access), then annual recertification</td></tr>
+      <tr><td><strong>Minimum Duration</strong></td><td class="amber">Not specified — organization decides</td><td class="green">2 hours onboarding / 1 hour annual refresh</td></tr>
+      <tr><td><strong>Content Structure</strong></td><td class="amber">Not specified — organization decides</td><td class="green">Modular video with quiz after each module — minimum passing score required</td></tr>
+      <tr><td><strong>Content Topics</strong></td><td class="amber">Security risk awareness — no specifics required</td><td class="green">Phishing/spearphishing, credential hygiene, CUI handling, insider threat indicators, specific threat actor examples (APT5, Volt Typhoon), reporting procedures</td></tr>
+      <tr><td><strong>Role Differentiation</strong></td><td class="amber">Implied but not required</td><td class="green">Role-based tracks: general employee, system administrator, CUI handler, supervisor/manager</td></tr>
+      <tr><td><strong>Completion Documentation</strong></td><td class="amber">Retain evidence — format not specified</td><td class="green">Certificate of completion retained in personnel file — auditable by C3PAO assessor</td></tr>
+      <tr><td><strong>Failure Consequence</strong></td><td class="amber">Not specified</td><td class="green">CUI access revoked until training completed — same as ITAR training requirement</td></tr>
+      <tr><td><strong>Verification</strong></td><td class="amber">Self-attested by organization</td><td class="green">Completion records reviewed during C3PAO assessment as evidence for Control 3.2</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Why This Changes the Compliance Culture — Not Just the Checkbox</h3>
+  <p>The most important effect of mandatory structured training is not the information transferred during the training session. It is the signal the training sends about organizational priority. When a new employee arrives at their first day and their onboarding week includes several hours of required cybersecurity modules with graded quizzes — structured the same way as harassment prevention training — the message is unmistakable: this organization treats cybersecurity as a professional responsibility, not an IT department problem. That culture shift is what makes the difference between a workforce that reports suspicious emails and one that clicks on them.</p>
+
+  <p>A control requiring "protection of audit information" means nothing to a machinist on day one. A 12-minute video module titled "How We Lost 30GB of F-35 Data: The Default Password Story" — with a quiz at the end — means something. It is the same information. The delivery method determines whether it lands.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The ITAR Precedent:</strong> The defense industrial base already has a working model of mandatory, role-based, documented training as a condition of handling sensitive information: ITAR export control training. Anyone at a defense contractor who will handle technology subject to International Traffic in Arms Regulations must complete structured ITAR training before accessing controlled items, must be recertified annually, and their completion records are subject to State Department inspection. ITAR violations carry civil penalties up to $1.3 million per violation and criminal penalties up to 20 years in prison. The training requirement is taken seriously because the consequence is serious. Cybersecurity training for CUI handlers should operate under the identical framework — with identical seriousness.</p>
+  </div>
+</div>
+
+<!-- ── 7. RECOMMENDATIONS ── -->
+<div class="section">
+  <div class="section-num">Section 07</div>
+  <h2>Recommendations — Phase 1 Is Live. Phase 2 Is Eight Months Away.</h2>
+
+  <p>As of March 15, 2026, CMMC Phase 1 is not a future requirement — it is current law. Self-assessment affirmations have been a condition of contract award since November 10, 2025. Every defense contractor that has signed an SPRS affirmation since that date has assumed False Claims Act liability for its accuracy. Phase 2 — mandatory third-party C3PAO certification for Level 2 contracts — begins November 10, 2026, eight months from today. The C3PAO assessment pipeline is already overloaded. Organizations that have not begun their readiness process are not running behind. They are running out of time. The recommendations below are urgent, not aspirational.</p>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div class="finding-body">
+        <div class="finding-title">Prime Contractors: Fund Critical Supplier Compliance Now</div>
+        <div class="finding-desc">Electric Boat, Pratt &amp; Whitney, Sikorsky, and every other prime contractor with critical single-source or limited-source suppliers should identify those suppliers immediately, assess their current CMMC posture, and invest directly in bringing them to compliance. The cost per supplier is $50K–$150K. The cost of losing a critical specialized supplier to compliance attrition — qualification of a replacement, schedule impact, program delay — routinely exceeds $1M. This is not charity. It is supply chain risk management with a strongly positive return on investment, and it closes a security gap that creates legal exposure for the prime itself under DFARS flowdown requirements.</div>
+        <span class="finding-tag">CRITICAL — Supply Chain Security Investment</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div class="finding-body">
+        <div class="finding-title">Subcontractors: Understand Your FCA Exposure Before the Next SPRS Affirmation</div>
+        <div class="finding-desc">Every CEO, COO, or senior official who signs an annual SPRS compliance affirmation without independently verifying the accuracy of their organization's cybersecurity controls is personally exposed to False Claims Act liability. The Illinois machining shop settlement was not an isolated prosecution — it was the opening of an enforcement campaign. Before signing any SPRS affirmation, conduct a documented gap assessment, establish a Plan of Action and Milestones for any identified deficiencies, and retain evidence of the assessment. Self-disclosure of known gaps, while uncomfortable, is legally preferable to signing an affirmation that a whistleblower can later challenge.</div>
+        <span class="finding-tag">CRITICAL — Legal Risk Management</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">3</div>
+      <div class="finding-body">
+        <div class="finding-title">Enclave Strategy: Shrink the Compliance Scope First</div>
+        <div class="finding-desc">For small manufacturers facing the full cost of CMMC Level 2 across their entire IT environment, the most effective cost-reduction strategy is enclave isolation — creating a separate, tightly controlled network segment that contains only the systems and data that touch CUI. CMMC requirements apply only to systems that process, store, or transmit FCI or CUI. Shrinking that scope through an enclave reduces the number of systems requiring assessment, the number of controls requiring implementation, and the total cost of certification. A precision machining shop that isolates its CNC machine network and CAD workstations in a compliant enclave may be able to achieve certification for a fraction of what full-environment certification would cost.</div>
+        <span class="finding-tag">HIGH — Cost Reduction Architecture</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">4</div>
+      <div class="finding-body">
+        <div class="finding-title">DoD: Expand Assessor Capacity as a National Security Priority</div>
+        <div class="finding-desc">The 600-assessor, 350,000-contractor math is a structural failure that the DoD must address directly. ISACA has assumed responsibility for scaling the assessor workforce, but the current pace is insufficient for the November 2026 deadline. The DoD should treat C3PAO assessor training and certification as a national security workforce development priority — funding accelerated training pipelines, establishing government-subsidized assessment programs for small and mid-tier suppliers below a revenue threshold, and creating mutual recognition pathways that allow organizations with current ISO 27001 or FedRAMP certifications to receive expedited CMMC assessment timelines.</div>
+        <span class="finding-tag">HIGH — Systemic Policy Fix</span>
+      </div>
+    </div>
+    <div class="finding fn-medium">
+      <div class="finding-num">5</div>
+      <div class="finding-body">
+        <div class="finding-title">Mandate Structured Onboarding Cybersecurity Training — Same Model as Harassment Prevention</div>
+        <div class="finding-desc">NIST SP 800-171 Control 3.2 requires cybersecurity awareness training but specifies no minimum duration, no content structure, no quiz requirement, and no mandatory onboarding timing. This is the weakest human-behavior standard in any major compliance framework. The model that works is the one every working professional has already experienced: mandatory onboarding compliance modules, structured by topic, with comprehension quizzes after each section, a minimum passing score, a completion certificate retained in personnel records, and annual recertification. California, New York, and Connecticut all mandate this format for sexual harassment prevention because voluntary awareness programs were failing. The same logic applies here with equivalent urgency. CUI access should be conditioned on completion of structured cybersecurity training — documented, auditable, and role-specific — the same way that ITAR access is conditioned on export control training completion. The training content must not be generic security awareness material. It must be specific to the actual threat environment: what APT5 spearphishing campaigns look like, what happened at the F-35 subcontractor, what Volt Typhoon's playbook is, and what each NIST control is specifically designed to prevent — told as a risk story, not a regulatory checklist.</div>
+        <span class="finding-tag">MEDIUM — Human Behavior Layer</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 8. CONNECTICUT DEFENSE INDUSTRIAL BASE ── -->
+<div class="section">
+  <div class="section-num">Section 08</div>
+  <h2>The Connecticut Defense Industrial Base — What Is Specifically at Stake</h2>
+
+  <p>Connecticut's defense industrial base is one of the most strategically significant in the country. Electric Boat in Groton builds nuclear submarines — the most complex and sensitive weapon systems in the American arsenal. Pratt &amp; Whitney in East Hartford builds the engines that power Air Force fighters and military transport aircraft. Sikorsky in Stratford builds military helicopters deployed in active combat zones. These three primes collectively support thousands of jobs and tens of billions in DoD contract value. Their supply chains run through hundreds of Connecticut small manufacturers.</p>
+
+  <p>Based on the national readiness data — 1% audit-ready, declining — the reasonable inference is that a substantial majority of those Connecticut suppliers are not currently CMMC-compliant. They are handling technical drawings, specifications, and controlled unclassified information for the most sensitive defense programs in the country, on networks that likely do not meet the security standards DFARS has technically required since 2017 and that CMMC now makes legally enforceable.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The Local Consequence:</strong> A precision machining shop in Groton that loses its Electric Boat subcontract because it cannot achieve CMMC compliance before Phase 2 is not just a business failure. It is a supply chain gap in the nuclear submarine program. The specialized machining capability that took decades to qualify, the institutional knowledge held by the shop's engineers and machinists, the relationship between that shop and the submarine program — none of that can be quickly replaced. The question that every prime contractor in Connecticut should be asking right now is not which suppliers will be excluded. It is which suppliers cannot afford to comply and what the prime is going to do about it.</p>
+  </div>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">All findings in this report are based on publicly available information including reports from the Department of Justice, CISA, NSA, FBI, Department of Defense, Lockheed Martin program documentation, Holland &amp; Knight legal analysis, DefenseScoop, GovConWire, Accorian, and CompassMSP. CMMC requirements and deadlines are sourced directly from 32 CFR Part 170 and DFARS 252.204-7021. This represents the author's independent analysis and does not reflect the views of any employer, client, or government agency.</p>
+</div>
+
+<!-- ── AUTHOR BIO ── -->
+</div><!-- end content -->
+
+</div><!-- end wrap -->
+
+<div class="bio-section">
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Consultant &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC Registered Practitioner candidate based in Connecticut, specializing in cybersecurity risk assessment and CMMC compliance consulting for defense contractors in the Connecticut defense industrial base — Electric Boat, Pratt &amp; Whitney, Sikorsky, and their supply chains. With 15 years of enterprise technology and UX design experience and an MS in Information Systems, she brings a practitioner perspective that bridges technical security analysis and human-centered communication design — recognizing that compliance frameworks succeed or fail based on how well they are understood by the humans who must implement them. This analysis was produced independently as a contribution to the defense community's understanding of the CMMC supply chain compliance gap and its national security implications.</p>
+    <p class="bio-text" style="margin-top:.75rem">
+      <a href="index.html" class="back-nav-link">Portfolio</a>
+    </p>
+  </div>
+</div>
+</div><!-- end bio-section -->
+
+<footer>
+  <span>CMMC Supply Chain Analysis · Yana Ivanov · March 2026</span>
+  <span>Based on public reporting · For educational use · Independent analysis</span>
+</footer>
+
+</body>
+</html>

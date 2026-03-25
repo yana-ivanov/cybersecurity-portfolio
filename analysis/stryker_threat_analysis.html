@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stryker Corporation Wiper Attack — Threat Analysis | Yana Ivanov</title>
+<link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+
+/* ── MASTHEAD ── */
+.masthead{background:var(--ink);color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;
+  text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;
+  line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#ef4444}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;
+  padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;
+  color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#ef4444;margin-top:2.5rem;padding:.6rem 3rem;
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;
+  display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+
+/* ── SECTIONS ── */
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);
+  text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:var(--ink);
+  line-height:1.2;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);
+  margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:var(--ink);color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;
+  letter-spacing:.1em;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── DIAGRAMS ── */
+.diagram{background:var(--paper);border:1px solid var(--rule);border-radius:4px;
+  padding:2rem;margin:2rem 0;overflow-x:auto}
+.diagram-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--ink3);margin-bottom:1.5rem;
+  padding-bottom:.75rem;border-bottom:1px solid var(--rule)}
+
+/* ── FINDINGS ── */
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);border-radius:2px;
+  background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:#1a4fa0;color:#fff}
+.finding-body{}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.35rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.65rem;
+  padding:.15rem .5rem;border-radius:2px;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--blue-dim);color:var(--blue)}
+
+/* ── AUTHOR BIO ── */
+.bio{background:var(--ink);color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:4rem}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:var(--blue);
+  display:flex;align-items:center;justify-content:center;font-family:var(--display);
+  font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:var(--ink2);color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── PRINT / RESPONSIVE ── */
+@media(max-width:680px){
+  .wrap,.mast-inner{padding:0 1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .mast-bar{padding:.6rem 1.5rem;flex-wrap:wrap;gap:.5rem}
+  h1.title{font-size:1.8rem}
+  .bio{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}
+}
+
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+/* ── FIGURES ── */
+.fig-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--rule);border-radius:2px;overflow:hidden;background:var(--paper)}
+.fig-stat{padding:1.5rem 1rem;text-align:center;border-right:1px solid var(--rule)}
+.fig-stat:last-child{border-right:none}
+.fig-stat-num{font-family:var(--display);font-size:1.8rem;font-weight:900;line-height:1;margin-bottom:.35rem}
+.fig-stat-label{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:var(--ink2);text-transform:uppercase;margin-bottom:.25rem}
+.fig-stat-sub{font-size:.85rem;color:#94a3b8;line-height:1.5}
+.fig-stat.red .fig-stat-num{color:var(--red)}
+.fig-stat.amber .fig-stat-num{color:var(--amber)}
+.fig-stat.blue .fig-stat-num{color:var(--blue)}
+.fig-chain{display:grid;grid-template-columns:1fr 240px;gap:1.5rem;align-items:start;padding:.25rem}
+.fig-chain-main{display:grid;gap:.35rem}
+.fig-chain-box{padding:1rem 1.5rem;border-radius:2px;text-align:center}
+.fig-chain-box.dark{background:#0a0f1a;border:1px solid #374151}
+.fig-chain-box.mid{background:#1e2d45;border:1.5px solid #60a5fa}
+.fig-chain-box.lite{background:#fef2f2;border:1.5px solid var(--red)}
+.fig-chain-title{font-family:var(--mono);font-size:.75rem;font-weight:700;margin-bottom:.2rem}
+.fig-chain-box.dark .fig-chain-title{color:#fff}
+.fig-chain-box.mid .fig-chain-title{color:#60a5fa}
+.fig-chain-box.lite .fig-chain-title{color:var(--red)}
+.fig-chain-sub{font-size:.78rem;color:#94a3b8}
+.fig-chain-box.lite .fig-chain-sub{color:#7f1d1d}
+.fig-chain-arrow{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.2rem 0;font-size:1.1rem;color:#374151}
+.fig-chain-arrow.red{color:var(--red)}
+.fig-chain-note{font-family:var(--mono);font-size:.72rem;color:#9ca3af}
+.fig-chain-label{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#94a3b8;text-transform:uppercase;margin-bottom:.2rem}
+.fig-chain-precedent{background:#f8fafc;border:1px solid var(--rule);border-radius:2px;padding:1rem 1.1rem;overflow:hidden}
+.fig-chain-precedent-title{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--ink3);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.08em}
+.fig-chain-precedent li{font-size:.78rem;color:#6b7280;margin-bottom:.2rem;list-style:none;white-space:nowrap}
+.fig-chain-precedent li::before{content:'· '}
+.fig-chain-precedent li.hi{color:var(--red);font-weight:600}
+.fig-kill{display:grid;gap:.75rem}
+.fig-kill-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.fks,.fkd{padding:1rem 1.25rem;border-radius:2px;border:1.5px solid}
+.fks.amber{background:#fffbeb;border-color:#fcd34d}
+.fks.red{background:#fef2f2;border-color:#fca5a5}
+.fks.dark{background:#c0392b;border-color:#c0392b}
+.fkd.green{background:#f0fdf4;border-color:#86efac}
+.fkd.slate{background:#1e2d45;border-color:#374151}
+.fk-tag{font-family:var(--mono);font-size:.78rem;font-weight:700;letter-spacing:.06em;margin-bottom:.4rem;display:flex;align-items:center;gap:.35rem}
+.fks.amber .fk-tag{color:#78350f}
+.fks.red .fk-tag{color:#7f1d1d}
+.fks.dark .fk-tag{color:#fecaca}
+.fkd.green .fk-tag{color:#145a32}
+.fkd.slate .fk-tag{color:#94a3b8}
+.fk-text{font-size:.88rem;line-height:1.65;margin:0}
+.fks.amber .fk-text,.fks.red .fk-text{color:#6b7280}
+.fks.dark .fk-text{color:#fecaca}
+.fkd.green .fk-text{color:#374151}
+.fkd.slate .fk-text{color:#64748b}
+.fig-kill-missed{font-family:var(--mono);font-size:.78rem;color:var(--red);letter-spacing:.08em;padding:.15rem 0 .15rem .5rem;display:flex;align-items:center;gap:.35rem}
+.fig-kill-footer{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.5rem}
+.fkf{padding:.75rem 1rem;border-radius:2px;font-family:var(--mono);font-size:.78rem;font-weight:700;text-align:center}
+.fkf.red{background:var(--red-dim);border:1px solid rgba(192,57,43,.2);color:var(--red)}
+.fkf.green{background:var(--green-dim);border:1px solid rgba(20,90,50,.2);color:var(--green)}
+.fig-recruit{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center}
+.fig-recruit-col{display:grid;gap:.75rem}
+.fig-recruit-hub{width:120px;height:120px;border-radius:50%;background:#0a0f1a;border:2px solid #374151;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto}
+.fig-recruit-hub-t{font-family:var(--mono);font-size:.92rem;font-weight:700;color:#fff}
+.fig-recruit-hub-s{font-family:var(--mono);font-size:.75rem;color:#60a5fa}
+.frn{padding:.9rem 1rem;border-radius:2px;border:1px solid}
+.frn.red{background:#fef2f2;border-color:#fca5a5}
+.frn.amber{background:#fffbeb;border-color:#fcd34d}
+.frn.blue{background:#eff6ff;border-color:#93c5fd}
+.frn.green{background:#f0fdf4;border-color:#86efac}
+.frn-t{font-family:var(--mono);font-size:.78rem;font-weight:700;margin-bottom:.25rem}
+.frn.red .frn-t{color:#7f1d1d}
+.frn.amber .frn-t{color:#78350f}
+.frn.blue .frn-t{color:#1e3a5f}
+.frn.green .frn-t{color:#145a32}
+.frn-s{font-size:.85rem;color:#6b7280;line-height:1.5;margin:0}
+.fig-defense{display:grid;gap:.6rem}
+.fd-label{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;text-align:center;padding:.3rem;margin-bottom:.1rem}
+.fd-label.red{color:var(--red)}
+.fd-label.dim{color:#64748b}
+.fd-row{display:grid;gap:.5rem}
+.fd-row.c3{grid-template-columns:1fr 1fr 1fr}
+.fd-row.c2{grid-template-columns:1fr 1fr}
+.fd-row.c1{grid-template-columns:1fr}
+.fdb{padding:.9rem 1rem;border-radius:2px;border:1.5px solid}
+.fdb.atk{background:#fef2f2;border-color:#fca5a5}
+.fdb.blk{background:#f0fdf4;border-color:#145a32}
+.fdb.late{background:#1e2d45;border-color:#374151}
+.fdb.result{background:#f0fdf4;border-color:#145a32;border-width:2px}
+.fdb-t{font-family:var(--mono);font-size:.82rem;font-weight:700;margin-bottom:.25rem;display:flex;align-items:center;gap:.3rem}
+.fdb.atk .fdb-t{color:#7f1d1d}
+.fdb.blk .fdb-t{color:#145a32}
+.fdb.late .fdb-t{color:#94a3b8}
+.fdb.result .fdb-t{color:#145a32;font-size:.9rem;justify-content:center}
+.fdb-s{font-size:.85rem;line-height:1.55;margin:0}
+.fdb.atk .fdb-s{color:#6b7280}
+.fdb.blk .fdb-s{color:#374151}
+.fdb.late .fdb-s{color:#64748b}
+.fdb.result .fdb-s{color:var(--ink3);text-align:center;font-size:.88rem}
+.fd-cost{font-family:var(--mono);font-size:.78rem;color:#94a3b8;text-align:center;margin-top:.25rem}
+@media(max-width:680px){
+  .fig-stat-grid{grid-template-columns:1fr 1fr}
+  .fig-chain{grid-template-columns:1fr}
+  .fig-kill-row,.fig-kill-footer,.fig-recruit,.fd-row.c3,.fd-row.c2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══════════════════════════════════════════════ -->
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Threat Intelligence Analysis</div>
+    <h1 class="title">Stryker Corporation Wiper Attack<br><span>Threat Analysis &amp; Detection Gap Assessment</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">March 14, 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — For Educational Use</div></div>
+      <div class="meta-item"><div class="label">Incident Date</div><div class="value">March 11, 2026</div></div>
+      <div class="meta-item"><div class="label">Threat Actor</div><div class="value">Handala / Void Manticore (MOIS)</div></div>
+      <div class="meta-item"><div class="label">Severity</div><div class="value">Critical — Nation-State</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    ACTIVE INCIDENT &nbsp;·&nbsp; INVESTIGATION ONGOING &nbsp;·&nbsp; ALL FINDINGS BASED ON PUBLIC REPORTING &nbsp;·&nbsp; ANALYSIS CURRENT AS OF MARCH 14 2026
+  </div>
+</div>
+
+<!-- ══ CONTENT ══════════════════════════════════════════════ -->
+<div class="wrap">
+<div class="content">
+
+<!-- ── 1. EXECUTIVE SUMMARY ── -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>On March 11, 2026, Stryker Corporation — a Fortune 500 medical technology company with $25.1 billion in 2025 revenue and 56,000 employees across 61 countries — suffered one of the most operationally destructive cyberattacks ever executed against a US healthcare company. The attack wiped more than 200,000 corporate devices simultaneously across 79 countries, forced the closure of offices globally, and allegedly exfiltrated 50 terabytes of sensitive data before the destructive phase was triggered.</p>
+
+  <p>The Iran-linked threat group Handala, assessed by Palo Alto Networks and Check Point Research to be a front for Iran's Ministry of Intelligence and Security (MOIS), claimed responsibility. The attack was framed as geopolitical retaliation for a US-Israeli military strike on a school in Minab, Iran, on February 28, 2026.</p>
+
+  <p>Critically, <strong>this was not a conventional malware attack.</strong> No novel exploit was deployed. No zero-day vulnerability was used. The attackers weaponized Stryker's own enterprise management infrastructure — Microsoft Intune — using legitimately obtained administrative credentials to issue a mass remote wipe command that the operating systems of every enrolled device obeyed without question.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Key Finding:</strong> This attack succeeded not because of sophisticated offensive tooling, but because of fundamental failures in privileged access management, authentication controls, and behavioral monitoring. Every failure that made this attack possible is detectable, preventable, and directly addressable through controls that exist today.</p>
+  </div>
+
+  <div class="diagram">
+    <div class="diagram-title">Figure 1 — Attack Scale at a Glance</div>
+    <div class="fig-stat-grid">
+      <div class="fig-stat red"><div class="fig-stat-num">200K+</div><div class="fig-stat-label">Devices Wiped</div><div class="fig-stat-sub">Windows servers, laptops, mobile phones, BYOD devices</div></div>
+      <div class="fig-stat red"><div class="fig-stat-num">79</div><div class="fig-stat-label">Countries Affected</div><div class="fig-stat-sub">Global operations shutdown — 5,500 employees in Cork, Ireland</div></div>
+      <div class="fig-stat amber"><div class="fig-stat-num">50 TB</div><div class="fig-stat-label">Data Allegedly Exfiltrated</div><div class="fig-stat-sub">Before wipe triggered — unverified, treat as credible</div></div>
+      <div class="fig-stat blue"><div class="fig-stat-num">$25B</div><div class="fig-stat-label">Target Revenue 2025</div><div class="fig-stat-sub">DoD contractor — $450M military device supply contract</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 2. ATTRIBUTION ── -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>Attack Attribution — Handala, Void Manticore, and MOIS</h2>
+
+  <p>Attribution in this case is assessed with high confidence based on convergent intelligence from multiple security firms and the operational characteristics of the attack itself.</p>
+
+  <h3>The Handala Persona</h3>
+  <p>Handala presents publicly as a pro-Palestinian, pro-Iranian hacktivist group that emerged in late 2023 following the onset of the Gaza conflict. However, multiple intelligence assessments have concluded this characterization is a deliberate cover for state-directed operations.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Intelligence Assessment:</strong> Palo Alto Networks assesses Handala as a front persona operated by <strong>Void Manticore</strong>, a threat actor with direct ties to Iran's Ministry of Intelligence and Security (MOIS). Check Point Research and FalconFeeds independently corroborate this assessment. Research from Optiv's gTIC suggests significant operational overlap between Handala (Void Manticore) and <strong>Scarred Manticore</strong>, another IRGC-linked APT group. This deniability structure — a hacktivist front for a state intelligence operation — is the same model Iran used with the Shamoon attacks against Saudi Aramco in 2012 and the Las Vegas Sands Casino attack in 2014.</p>
+  </div>
+
+  <div class="diagram">
+    <div class="diagram-title">Figure 2 — Iranian Cyber Ecosystem Attribution Chain</div>
+    <div class="fig-chain">
+      <div class="fig-chain-main">
+        <div class="fig-chain-label">State direction</div>
+        <div class="fig-chain-box dark"><div class="fig-chain-title">MOIS</div><div class="fig-chain-sub">Ministry of Intelligence &amp; Security — Iran</div></div>
+        <div class="fig-chain-arrow"><span class="mdi mdi-arrow-down"></span></div>
+        <div class="fig-chain-label">Operational layer</div>
+        <div class="fig-chain-box mid"><div class="fig-chain-title">Void Manticore / Scarred Manticore</div><div class="fig-chain-sub">IRGC/MOIS APT — actual operational capability</div></div>
+        <div class="fig-chain-arrow red"><span class="mdi mdi-arrow-down"></span><span class="fig-chain-note">Deniable front</span></div>
+        <div class="fig-chain-label">Public persona</div>
+        <div class="fig-chain-box lite"><div class="fig-chain-title">Handala</div><div class="fig-chain-sub">"Hacktivist" persona — public face — plausible deniability</div></div>
+      </div>
+      <div class="fig-chain-precedent">
+        <div class="fig-chain-precedent-title">Same playbook used</div>
+        <ul><li>Saudi Aramco 2012</li><li>Sands Casino 2014</li><li>Albanian Govt 2022</li><li>Israeli Healthcare 2026</li><li class="hi">Stryker Corp 2026</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <h3>Geopolitical Context</h3>
+  <p>The attack was triggered by the US-Israeli military campaign against Iran that began February 28, 2026. Handala stated the attack was retaliation for the Minab school strike that killed more than 175 people, most of them children. Stryker was selected because of its acquisition of Israeli orthopedic device company OrthoSpace in 2019, its $450 million US Department of Defense supply contract, and its role as critical healthcare infrastructure — maximizing disruption impact.</p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Attribution Indicator</th><th>Details</th><th>Confidence</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Public claim</strong></td><td>Handala posted detailed manifesto on Telegram and X with operational specifics consistent with confirmed damage</td><td class="green">High</td></tr>
+      <tr><td><strong>Technical signature</strong></td><td>Intune weaponization consistent with Handala's documented Hatef wiper malware and RMM tool abuse TTPs</td><td class="green">High</td></tr>
+      <tr><td><strong>MOIS linkage</strong></td><td>Palo Alto, Check Point, FalconFeeds independently assess Handala as Void Manticore MOIS front</td><td class="green">High</td></tr>
+      <tr><td><strong>Timing correlation</strong></td><td>Attack executed 11 days after US-Israeli Iran strikes — consistent with MOIS planning timelines</td><td class="amber">Medium</td></tr>
+      <tr><td><strong>50TB exfiltration claim</strong></td><td>Handala has documented history of inflating breach claims — treat as plausible, not confirmed</td><td class="amber">Medium</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ── 3. KILL CHAIN ── -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>Kill Chain Analysis — Stage by Stage</h2>
+
+  <p>The attack followed a patient, multi-stage progression that almost certainly began weeks or months before the destructive phase on March 11. Each stage represents both an attack step and a detection opportunity that Stryker's security team failed to act on — or more critically, was not positioned to detect at all.</p>
+
+  <div class="diagram">
+    <div class="diagram-title">Figure 3 — Kill Chain with Detection Opportunities</div>
+    <div class="fig-kill">
+      <div class="fig-kill-row">
+        <div class="fks amber"><div class="fk-tag"><span class="mdi mdi-magnify"></span> Stage 1 — Reconnaissance</div><p class="fk-text">Target selection: Stryker profiled for Israeli connection, DoD contracts, critical healthcare supply chain role.</p></div>
+        <div class="fkd green"><div class="fk-tag"><span class="mdi mdi-shield-check-outline"></span> Detection Opportunity</div><p class="fk-text">Threat intel feeds (OTX, Feodo) had Handala infrastructure flagged. Proactive threat hunting could have identified pre-attack scanning.</p></div>
+      </div>
+      <div class="fig-kill-missed"><span class="mdi mdi-arrow-down-circle-outline"></span> Missed</div>
+      <div class="fig-kill-row">
+        <div class="fks red"><div class="fk-tag"><span class="mdi mdi-login-variant"></span> Stage 2 — Initial Access</div><p class="fk-text">Credential compromise via AiTM phishing or supply chain. Admin account with Intune Global Admin rights targeted.</p></div>
+        <div class="fkd green"><div class="fk-tag"><span class="mdi mdi-shield-check-outline"></span> Detection Opportunity</div><p class="fk-text">Phishing-resistant FIDO2 MFA would have blocked AiTM. Separate admin identity from email account prevents phish-to-admin path.</p></div>
+      </div>
+      <div class="fig-kill-missed"><span class="mdi mdi-arrow-down-circle-outline"></span> Missed</div>
+      <div class="fig-kill-row">
+        <div class="fks red"><div class="fk-tag"><span class="mdi mdi-timer-sand"></span> Stage 3 — Persistence (Weeks / Months)</div><p class="fk-text">Attacker maintains quiet access. Maps device fleet. Waits for geopolitical trigger event. Minimal footprint.</p></div>
+        <div class="fkd green"><div class="fk-tag"><span class="mdi mdi-shield-check-outline"></span> Detection Opportunity</div><p class="fk-text">Behavioral baseline would flag admin account accessing unusual systems or at unusual times over weeks of activity.</p></div>
+      </div>
+      <div class="fig-kill-missed"><span class="mdi mdi-arrow-down-circle-outline"></span> Missed</div>
+      <div class="fig-kill-row">
+        <div class="fks red"><div class="fk-tag"><span class="mdi mdi-database-export-outline"></span> Stage 4 — Data Exfiltration (Pre-Wipe)</div><p class="fk-text">50TB allegedly extracted before destructive phase. Large outbound transfers over days or weeks.</p></div>
+        <div class="fkd green"><div class="fk-tag"><span class="mdi mdi-alert-circle-outline"></span> Clearest Signal — Should Have Fired</div><p class="fk-text">50TB outbound is a massive anomaly. DLP tools, SIEM volume alerts, and network monitoring all should have triggered.</p></div>
+      </div>
+      <div class="fig-kill-missed"><span class="mdi mdi-arrow-down-circle-outline"></span> Missed</div>
+      <div class="fig-kill-row">
+        <div class="fks dark"><div class="fk-tag"><span class="mdi mdi-nuke"></span> Stage 5 — Mass Wipe Triggered (March 11, 00:01 EST)</div><p class="fk-text">Single Intune wipe command pushed to all enrolled devices. 200,000 devices wiped. 79 countries offline. Attack complete.</p></div>
+        <div class="fkd slate"><div class="fk-tag"><span class="mdi mdi-clock-alert-outline"></span> Too Late — Last Chance Window: Seconds</div><p class="fk-text">Bulk wipe alert (5+ devices in seconds) could have triggered. Multi-Admin Approval would have required second confirmation.</p></div>
+      </div>
+      <div class="fig-kill-footer">
+        <div class="fkf red">Four missed detection opportunities</div>
+        <div class="fkf green">Any one would have stopped the attack</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 4. HUMAN INTELLIGENCE VECTOR ── -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>The Human Intelligence Vector — What the Technical Community Missed</h2>
+
+  <p>The dominant narrative in post-incident coverage framed this as a phishing attack. While phishing is Handala's documented primary initial access vector, this analysis assesses that the technical community has significantly underweighted the probability of a <strong>pre-positioned human intelligence operation</strong> — either a recruited insider, a coerced employee, or a long-term planted asset with legitimate access.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Analyst Assessment:</strong> For an organization with Iran's Ministry of Intelligence operational sophistication, a phishing attack against a $25 billion target with a US Department of Defense contract is a lower-probability, higher-detection-risk approach. MOIS operational doctrine — documented through years of FBI, CISA, and allied intelligence reporting — strongly favors patient human asset cultivation over opportunistic technical exploitation against high-value targets.</p>
+  </div>
+
+  <h3>Why AiTM Phishing Alone Is Insufficient as an Explanation</h3>
+  <p>The attack achieved something that simple credential theft cannot explain on its own: simultaneous wipe of 200,000 devices across 79 countries at midnight, with the Handala logo appearing on login screens before the wipe completed. This required knowledge of the full device fleet, confirmed access to Intune Global Admin rights, and confidence that the operation would succeed before any response could occur. That level of operational certainty suggests access that was established, tested, and verified over weeks or months — not a same-day phishing conversion.</p>
+
+  <div class="diagram">
+    <div class="diagram-title">Figure 4 — MOIS Human Asset Recruitment Methodology (Documented)</div>
+    <div class="fig-recruit">
+      <div class="fig-recruit-col">
+        <div class="frn red"><div class="frn-t">Financial Vulnerability</div><p class="frn-s">Debt, divorce, medical bills. Approach with cash offer or consulting contract.</p></div>
+        <div class="frn amber"><div class="frn-t">Ideological Alignment</div><p class="frn-s">Political or religious beliefs. Cultivate via social media over months.</p></div>
+        <div class="frn green"><div class="frn-t">Vendor / MSP Infiltration</div><p class="frn-s">IT provider with admin access to target systems. One hop into protected environment.</p></div>
+      </div>
+      <div><div class="fig-recruit-hub"><div class="fig-recruit-hub-t">MOIS</div><div class="fig-recruit-hub-s">TARGET</div></div></div>
+      <div class="fig-recruit-col">
+        <div class="frn blue"><div class="frn-t">LinkedIn Lure</div><p class="frn-s">Fake recruiter builds rapport. Delivers access via "job offer" or consulting engagement.</p></div>
+        <div class="frn red"><div class="frn-t">Coercion / Leverage</div><p class="frn-s">Family in Iran threatened. Compliance demanded. No willing cooperation required.</p></div>
+        <div class="frn red"><div class="frn-t">Planted Employee</div><p class="frn-s">Deliberately placed into target company IT team over months or years.</p></div>
+      </div>
+    </div>
+    <p style="font-family:var(--mono);font-size:.75rem;color:#94a3b8;text-align:center;margin-top:.5rem">All vectors documented in FBI, CISA, and allied intelligence reporting on MOIS operations</p>
+  </div>
+
+  <h3>The Forensic Investigation the FBI Is Running Right Now</h3>
+  <p>Based on established counterintelligence methodology, investigators are working through a structured process that starts with the shortest possible list — accounts with Intune Global Administrator privileges — and expands outward.</p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Investigation Track</th><th>What They Are Looking For</th><th>Why It Matters</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Privileged account audit</strong></td><td>Every account with Intune Admin or Global Admin rights globally — likely 50-200 accounts</td><td>The attacker had to be on this list. It is the shortest possible suspect pool.</td></tr>
+      <tr><td><strong>Azure AD login history</strong></td><td>Anomalous login times, geolocations, and device fingerprints for every privileged account</td><td>The attacker logged in from somewhere — that IP address is a thread to pull.</td></tr>
+      <tr><td><strong>Departure audit</strong></td><td>HR termination dates cross-referenced against Active Directory account status</td><td>Former employees with active admin accounts are one of the most common and most exploited failures.</td></tr>
+      <tr><td><strong>Vendor access list</strong></td><td>Every MSP, IT contractor, and third-party provider with admin access to the Microsoft environment</td><td>Handala documented focus on supply chain footholds through IT providers to reach downstream victims.</td></tr>
+      <tr><td><strong>Behavioral timeline</strong></td><td>Which admin accounts showed unusual activity 30-180 days before March 11</td><td>Patient persistence leaves subtle traces — off-hours access, unusual system queries, small data transfers.</td></tr>
+      <tr><td><strong>Social media correlation</strong></td><td>Public social media activity cross-referenced against the privileged account list</td><td>Ideologically motivated insiders often reveal alignment publicly before taking action professionally.</td></tr>
+      <tr><td><strong>2024 breach connection</strong></td><td>Whether previously disclosed 2024 Stryker incident involved the same environment</td><td>Public reporting suggests possible persistent access from earlier compromise — same threat actor, different phase.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout callout-amber">
+    <p><strong>Important Distinction:</strong> Counterintelligence investigation targets <em>behavior, access, and documented connections to foreign intelligence services</em> — not nationality, ethnicity, or religion. This is both a legal requirement and a practical necessity. MOIS recruitment operations have successfully cultivated assets of every background, including natural-born US citizens with no heritage connection to Iran, by exploiting financial pressure, ideological grievance, and professional vulnerability.</p>
+  </div>
+</div>
+
+<!-- ── 5. SECURITY FAILURES ── -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>Security Failures Identified</h2>
+
+  <p>The following failures are assessed with high confidence based on the attack's technical characteristics and publicly confirmed details. Each represents a control that, had it been in place, would have prevented or significantly limited the impact of the attack.</p>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div class="finding-body">
+        <div class="finding-title">No Phishing-Resistant MFA on Admin Accounts</div>
+        <div class="finding-desc">Standard authenticator app MFA is bypassable via Adversary-in-the-Middle (AiTM) phishing, which intercepts authenticated session tokens in real time. Stryker admin accounts appear to have used standard MFA rather than FIDO2 hardware security keys or certificate-based authentication. FIDO2 binds credentials to the legitimate domain — it cannot be intercepted by an AiTM proxy because the authentication is device-local and domain-verified. A single hardware key costing $50 per admin account would have stopped this attack at the credential compromise stage.</div>
+        <span class="finding-tag">CRITICAL — Authentication Control</span>
+      </div>
+    </div>
+
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div class="finding-body">
+        <div class="finding-title">Admin Account Identity Not Separated from Email Account</div>
+        <div class="finding-desc">The Intune Global Admin account used to wipe 200,000 devices appears to have been the same account used for email, Teams, and daily work activities. This is a fundamental privileged access management failure. An admin account that reads email is an admin account that can be phished. The control is straightforward: create a separate cloud-only admin account used exclusively for Intune administration — no email, no Teams, no web browsing. That account should never receive a phishing email because it should never receive email at all.</div>
+        <span class="finding-tag">CRITICAL — Privileged Access Management</span>
+      </div>
+    </div>
+
+    <div class="finding fn-critical">
+      <div class="finding-num">3</div>
+      <div class="finding-body">
+        <div class="finding-title">No Multi-Admin Approval for Bulk Device Actions</div>
+        <div class="finding-desc">Microsoft Intune has a built-in feature called Multi-Admin Approval (MAA) that requires a second administrator to confirm before wipe, retire, or delete commands execute. This feature was apparently not configured. With MAA enabled, the attacker's wipe command would have generated an approval request to a second admin — who would have seen an unexpected bulk wipe request at midnight and either rejected it or triggered an incident response. A single configuration change in Intune would have broken the attack chain at the final stage.</div>
+        <span class="finding-tag">CRITICAL — Authorization Control</span>
+      </div>
+    </div>
+
+    <div class="finding fn-high">
+      <div class="finding-num">4</div>
+      <div class="finding-body">
+        <div class="finding-title">No Behavioral Monitoring on Privileged Accounts</div>
+        <div class="finding-desc">No evidence suggests that Stryker was monitoring Azure AD audit logs for anomalous admin behavior — unusual login times, unusual source IPs, unusual actions, or unusual volume of device interactions. A compromised admin account logging in at midnight from an IP address never previously seen, accessing Intune, and issuing commands touching 200,000 devices simultaneously is an anomaly score near the theoretical maximum. An alerting rule with the threshold of "alert me if any admin account issues wipe commands to more than 5 devices in under 60 seconds" would have fired with seconds remaining to respond.</div>
+        <span class="finding-tag">HIGH — Detection and Monitoring</span>
+      </div>
+    </div>
+
+    <div class="finding fn-high">
+      <div class="finding-num">5</div>
+      <div class="finding-body">
+        <div class="finding-title">No Conditional Access Restricting Admin Portal Access</div>
+        <div class="finding-desc">Azure Conditional Access policies can restrict access to the Intune management console to specific named IP ranges, specific compliant managed devices, and specific geographic locations. An admin logging into Intune from an unknown IP address at an unusual hour should have triggered a hard block — not a step-up prompt, but a complete denial. The absence of these policies meant that once credentials were obtained, there was no second layer preventing access from any device, any location, at any time.</div>
+        <span class="finding-tag">HIGH — Access Control</span>
+      </div>
+    </div>
+
+    <div class="finding fn-high">
+      <div class="finding-num">6</div>
+      <div class="finding-body">
+        <div class="finding-title">BYOD Policy Created Personal Device Liability Without Adequate Protections</div>
+        <div class="finding-desc">Stryker's Bring Your Own Device policy enrolled personal employee phones and devices into Intune without adequate protections against a full-device wipe command. When the wipe executed, personal photos, banking apps, authenticator apps for personal 2FA, and eSIMs were permanently destroyed alongside corporate data. Employees lost access to their personal bank accounts because the second factor authenticator was gone. This represents a catastrophic BYOD architecture failure — corporate MDM enrollment should never provide a path to complete personal device destruction.</div>
+        <span class="finding-tag">HIGH — BYOD Architecture</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 6. WHAT WOULD HAVE CAUGHT IT ── -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>What Would Have Caught It — Controls Mapped to Each Failure</h2>
+
+  <div class="diagram">
+    <div class="diagram-title">Figure 5 — Control Architecture That Would Have Stopped This Attack</div>
+    <div class="fig-defense">
+      <div class="fd-label red">Attack Path — Stopped at Each Layer</div>
+      <div class="fd-row c3">
+        <div class="fdb atk"><div class="fdb-t"><span class="mdi mdi-email-alert-outline"></span> Phishing Email</div><p class="fdb-s">AiTM credential theft attempt against admin account</p></div>
+        <div class="fdb blk"><div class="fdb-t"><span class="mdi mdi-shield-key-outline"></span> Block 1 — FIDO2 MFA</div><p class="fdb-s">Cannot be intercepted — domain-bound hardware key, device-local authentication</p></div>
+        <div class="fdb blk"><div class="fdb-t"><span class="mdi mdi-account-cancel-outline"></span> Block 2 — Separate Admin Identity</div><p class="fdb-s">Admin account has no email — no phishing path to admin rights exists</p></div>
+      </div>
+      <div class="fd-row c1">
+        <div class="fdb blk"><div class="fdb-t"><span class="mdi mdi-ip-network-outline"></span> Block 3 — Conditional Access</div><p class="fdb-s">Unknown IP or non-compliant device is hard-blocked from Intune portal — deny, not step-up prompt</p></div>
+      </div>
+      <div class="fd-label dim">If all three failed — behavioral detection layer</div>
+      <div class="fd-row c2">
+        <div class="fdb atk"><div class="fdb-t"><span class="mdi mdi-account-alert-outline"></span> Attacker in Intune</div><p class="fdb-s">12:01am, unknown IP, accessing device management console</p></div>
+        <div class="fdb blk"><div class="fdb-t"><span class="mdi mdi-bell-alert-outline"></span> Block 4 — Behavioral Baseline Alert</div><p class="fdb-s">Off-hours login + unknown IP + admin portal access = immediate SOC alert</p></div>
+      </div>
+      <div class="fd-row c1">
+        <div class="fdb blk"><div class="fdb-t"><span class="mdi mdi-account-multiple-check-outline"></span> Block 5 — Bulk Wipe Alert + Multi-Admin Approval</div><p class="fdb-s">5+ device wipe commands in 60 seconds triggers immediate alert. MAA requires a second admin to confirm before any wipe executes.</p></div>
+      </div>
+      <div class="fd-row c1">
+        <div class="fdb result"><div class="fdb-t">Result: 0 devices wiped — attack contained at whichever layer fired first</div><p class="fdb-s">Any single one of these five controls would have broken the attack chain. All five were absent.</p></div>
+      </div>
+      <div class="fd-cost">Total estimated cost of implementing all five controls: under $50,000. Cost of the attack: incalculable.</div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Control</th><th>What It Does</th><th>Implementation</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr><td><strong>FIDO2 hardware MFA</strong></td><td>Cannot be intercepted by AiTM phishing — domain-bound and device-local</td><td>Enforce via Azure Conditional Access for all admin accounts</td><td class="green">$50/key</td></tr>
+      <tr><td><strong>Separate admin identity</strong></td><td>Admin account never receives email — no phishing path to admin rights</td><td>Create cloud-only admin accounts, disable email</td><td class="green">$0</td></tr>
+      <tr><td><strong>Conditional Access for Intune</strong></td><td>Block portal access from unknown IPs, non-compliant devices, unusual locations</td><td>Azure AD Conditional Access policy — Named Locations</td><td class="green">$0</td></tr>
+      <tr><td><strong>Privileged Identity Management (PIM)</strong></td><td>Just-in-time elevation — no standing Global Admin rights, requires approval to activate</td><td>Microsoft Entra PIM — included in P2 license</td><td class="green">Included</td></tr>
+      <tr><td><strong>Multi-Admin Approval (MAA)</strong></td><td>Bulk wipe requires second admin to confirm — single compromised account cannot wipe alone</td><td>Intune built-in feature — configuration change only</td><td class="green">$0</td></tr>
+      <tr><td><strong>Bulk wipe alerting rule</strong></td><td>Alert fires if any account issues wipe to more than 5 devices in 60 seconds</td><td>Intune audit log → Sentinel alert → SOC notification</td><td class="green">$0</td></tr>
+      <tr><td><strong>Behavioral baseline monitoring</strong></td><td>Flags admin logins at unusual hours, from unusual IPs, accessing unusual systems</td><td>Azure AD Sign-in logs → SIEM correlation rule</td><td class="green">Included in SIEM</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ── 7. DEFENSE CONTRACTORS ── -->
+<div class="section">
+  <div class="section-num">Section 07</div>
+  <h2>Implications for Defense Contractors</h2>
+
+  <p>Stryker is not a defense contractor in the traditional sense — but it holds a $450 million Department of Defense medical device supply contract, which made it a legitimate geopolitical target. For the 75,000+ companies in the defense industrial base — including the Connecticut corridor suppliers to Electric Boat, Pratt and Whitney, and Sikorsky — the Stryker attack is a direct preview of the threat environment they operate in.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>CMMC Context:</strong> The Cybersecurity Maturity Model Certification (CMMC) 2.0 framework, now fully enforced, exists precisely because of attacks like this. The controls that would have stopped the Stryker attack — privileged access management, multi-factor authentication, audit log monitoring, incident response — are all directly required by NIST SP 800-171, the foundation of CMMC Level 2. A company that achieves genuine CMMC Level 2 compliance — not checkbox compliance, but actual implementation — would have had most of these controls in place.</p>
+  </div>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>NIST SP 800-171 Control</th><th>Control ID</th><th>What It Requires</th><th>Stryker Gap</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Multi-factor authentication</strong></td><td class="code">3.5.3</td><td>MFA for all privileged and remote access</td><td class="red">Not phishing-resistant</td></tr>
+      <tr><td><strong>Least privilege</strong></td><td class="code">3.1.5</td><td>Limit admin rights to minimum necessary</td><td class="red">Standing Global Admin</td></tr>
+      <tr><td><strong>Privileged account management</strong></td><td class="code">3.1.6</td><td>Separate privileged accounts for admin tasks</td><td class="red">Admin = email account</td></tr>
+      <tr><td><strong>Audit log review</strong></td><td class="code">3.3.1</td><td>Create, protect and review audit records</td><td class="red">No bulk action alerting</td></tr>
+      <tr><td><strong>Incident response</strong></td><td class="code">3.6.1</td><td>Establish incident response capability</td><td class="amber">Response was reactive</td></tr>
+      <tr><td><strong>Configuration management</strong></td><td class="code">3.4.5</td><td>Define and enforce security configuration baseline</td><td class="red">No MAA configured</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>The Harder Truth for Defense Contractors</h3>
+  <p>Stryker's failure is not unique. It is representative of how most large organizations actually implement Microsoft environments — with convenience prioritized over security, with standing admin rights rather than just-in-time elevation, with authenticator apps rather than hardware keys. The difference between Stryker and the 75,000 companies in the defense industrial base is that Stryker was large enough to attract nation-state attention. As Iran expands its targeting — explicitly threatening economic centers and US companies with any Israeli or DoD connection — smaller defense contractors face the same threat with significantly fewer resources to defend against it.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Direct Warning:</strong> Iranian officials explicitly stated in March 2026 that Tehran would expand targeting to include US companies with ties to the US military or Israel. Any company manufacturing a component that ends up in a US military platform — a fastener, a sensor, a software module — is a potential target. The sophistication of the attack does not need to match Stryker's scale to cause existential damage to a 50-person manufacturer. This is not a theoretical risk. It is the stated intent of an active nation-state intelligence operation.</p>
+  </div>
+</div>
+
+<!-- ── 8. DETECTION RECOMMENDATIONS ── -->
+<div class="section">
+  <div class="section-num">Section 08</div>
+  <h2>Detection Recommendations — Immediate Actions</h2>
+
+  <h3>This Week — Zero-Cost Configuration Changes</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Action</th><th>Where</th><th>Time Required</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Audit all Intune admin role assignments</strong> — who has Global Admin, Intune Admin, or Intune RBAC wipe permissions right now</td><td>Intune Portal → Tenant Admin → Roles</td><td class="green">30 minutes</td></tr>
+      <tr><td><strong>Enable Multi-Admin Approval</strong> for Wipe, Retire, and Delete actions in Intune</td><td>Intune → Tenant Admin → Multi-admin approval</td><td class="green">15 minutes</td></tr>
+      <tr><td><strong>Create alert rule</strong> for bulk device actions — any account issuing wipe to more than 5 devices in 60 seconds triggers immediate notification</td><td>Intune Audit Logs → SIEM → Alert Rule</td><td class="amber">2-4 hours</td></tr>
+      <tr><td><strong>Verify all departed employees</strong> have disabled accounts — cross-reference HR termination list against Active Directory enabled accounts</td><td>HR system + Azure Active Directory</td><td class="amber">4-8 hours</td></tr>
+      <tr><td><strong>Audit vendor and MSP access</strong> — every third party with admin rights should be inventoried, verified active, and scoped to minimum required permissions</td><td>Azure AD → External Identities</td><td class="amber">1-2 days</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Network-Level Filters — Wireshark / SIEM</h3>
+  <p>The following filters detect the reconnaissance and lateral movement patterns consistent with Handala TTPs documented by IBM X-Force, Palo Alto, and Check Point Research.</p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Detection Target</th><th>Wireshark Filter / SIEM Rule</th><th>ATT&amp;CK Technique</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Port scan reconnaissance</strong></td><td class="code">tcp.flags.syn==1 and tcp.flags.ack==0 and tcp.dstport != 80 and tcp.dstport != 443</td><td class="code">T1595.001</td></tr>
+      <tr><td><strong>Outbound SMB to external IP</strong></td><td class="code">tcp.port==445 and not ip.dst matches "10\\.|192\\.168|172\\.16"</td><td class="code">T1187</td></tr>
+      <tr><td><strong>NTLM authentication capture</strong></td><td class="code">ntlmssp</td><td class="code">T1003.001</td></tr>
+      <tr><td><strong>DNS tunneling — unusual port</strong></td><td class="code">dns and udp.dstport != 53</td><td class="code">T1071.004</td></tr>
+      <tr><td><strong>Large outbound data transfer</strong></td><td class="code">tcp.len > 1400 and not ip.dst matches "10\\.|192\\.168"</td><td class="code">T1041</td></tr>
+      <tr><td><strong>Starlink IP range recon</strong></td><td class="code">ip.src matches "98\\.97\\." or ip.src matches "206\\.51\\.7"</td><td class="code">T1090</td></tr>
+      <tr><td><strong>Off-hours admin authentication</strong></td><td class="code">SIEM: auth.time NOT BETWEEN 07:00 AND 19:00 AND user.role CONTAINS "admin"</td><td class="code">T1078</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Longer-Term Architecture Recommendations</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Recommendation</th><th>Priority</th><th>Addresses</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Replace authenticator app MFA with FIDO2 hardware keys</strong> for all accounts with privileged access to management consoles</td><td class="red">Critical</td><td>AiTM bypass of standard MFA</td></tr>
+      <tr><td><strong>Implement Privileged Identity Management</strong> — no standing admin rights, just-in-time elevation with approval workflow and time limit</td><td class="red">Critical</td><td>Persistent compromised admin account</td></tr>
+      <tr><td><strong>Separate admin identity from working identity</strong> — dedicated cloud-only accounts for Intune and Azure AD administration, no email capability</td><td class="red">Critical</td><td>Phishing path to admin rights</td></tr>
+      <tr><td><strong>Implement Zero Trust network segmentation</strong> — assume breach, verify everything, limit blast radius so one compromised admin cannot reach every device</td><td class="amber">High</td><td>Lateral movement at scale</td></tr>
+      <tr><td><strong>Behavioral baseline monitoring on all privileged accounts</strong> — continuous anomaly detection flagging deviations from established patterns</td><td class="amber">High</td><td>Patient persistent access going undetected</td></tr>
+      <tr><td><strong>Revise BYOD MDM enrollment policy</strong> — personal devices should use work profile isolation that cannot receive a full-device factory reset command</td><td class="amber">High</td><td>Personal device destruction via corporate MDM</td></tr>
+      <tr><td><strong>Conduct geopolitical risk review quarterly</strong> — assess which threat actors might target the organization based on current events and business relationships</td><td class="amber">High</td><td>Being caught unprepared by escalating tensions</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ── UPDATE: TELEGRAM C2 ── -->
+<div class="section">
+  <div class="section-num">Update — March 24, 2026</div>
+  <h2>FBI Confirms Handala's Telegram C2 Infrastructure</h2>
+
+  <p>Two weeks after this report was first published, the FBI released a flash alert directly confirming a key element of the attribution analysis in Section 02: Handala's use of Telegram as command-and-control infrastructure for malware operations. The alert was released alongside a separate advisory on Russian targeting of Signal accounts — both issued the same day, reflecting the urgency of the threat landscape.</p>
+
+  <p>According to the FBI, Iran's Ministry of Intelligence and Security is using Telegram as a C2 channel to manage malware infections targeting dissidents, journalists, and high-value individuals. The malware is delivered by disguising malicious files as legitimate software — AI video tools, password managers, and in some cases Telegram itself. Once installed, the malware connects to attacker-controlled Telegram bots, enabling remote access, screen capture, audio recording, and file exfiltration from compromised devices.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Why this matters for the Stryker analysis:</strong> The FBI explicitly ties this Telegram C2 infrastructure to Handala Hack — the same group responsible for the Stryker wiper attack. The technique is significant beyond this specific incident: Telegram is widely trusted and most enterprise security controls allow its traffic by default. Malicious C2 communications over Telegram blend into legitimate traffic and are invisible to filters looking for known-bad domains or IP addresses. This is the same evasion principle that makes blockchain C2 infrastructure effective — using trusted, legitimate platforms as command channels that cannot be blocked without blocking the platform entirely.</p>
+  </div>
+
+  <p>The FBI alert also confirms the reconnaissance methodology described in Section 04 of this report. The advisory noted that the stage-one malware appeared tailored to each victim's pattern of life — meaning targets were profiled before the malware was delivered, increasing the probability of successful infection. This is consistent with the patient, research-driven MOIS operational doctrine described in the Human Intelligence Vector analysis above.</p>
+
+  <p>For defense contractors monitoring their networks, the practical implication is that Telegram traffic from workstations is now a legitimate indicator of interest — not because Telegram is inherently malicious, but because it has been confirmed as active C2 infrastructure in operations targeting US organizations. Unusual Telegram connection patterns, especially from servers or devices that have no business reason to use the platform, warrant investigation.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Russia targeting Signal simultaneously:</strong> The same FBI advisory documented Russian intelligence actively targeting Signal accounts across government, military, political, and media sectors — sending phishing messages disguised as legitimate service notifications to trick victims into sharing verification codes or linking attacker-controlled devices. Thousands of accounts have been compromised. Both campaigns reflect a broader adversary shift toward encrypted messaging platforms as both targets and tools.</p>
+  </div>
+</div>
+
+<!-- ── CONCLUSION ── -->
+<div class="section">
+  <div class="section-num">Conclusion</div>
+  <h2>The Lesson That Cannot Be Ignored</h2>
+
+  <p>The Stryker attack will be studied in security operations programs for years. Not because it was technically sophisticated — it was not. Handala did not deploy a novel zero-day exploit. They did not write custom malware. They pressed a button that Stryker's own IT infrastructure had been designed to respond to, because someone gave them the keys.</p>
+
+  <p>The lesson is not that Microsoft Intune is dangerous. The lesson is that any tool powerful enough to manage 200,000 devices globally is a weapon if its administrative access is not protected with the same rigor as a physical facility housing those devices. No organization would leave master keys to 79 global offices under a doormat. The digital equivalent of that doormat was apparently in place at Stryker — and it cost them everything.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Final Assessment:</strong> This attack was preventable at five separate points. The cost of prevention at any one of those points was under $50,000. The cost of the attack — device replacement, lost productivity across 56,000 employees, incident response, potential regulatory action, reputational damage, and stock decline — is in the hundreds of millions. The math of security investment has never been clearer. The question for every defense contractor and critical infrastructure operator is not whether they can afford to implement these controls. It is whether they can afford not to.</p>
+  </div>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">All findings in this report are based entirely on publicly available information including reports from SecurityWeek, MedTech Dive, Cybersecurity Dive, TechCrunch, IBM X-Force, Palo Alto Networks, Check Point Research, Optiv gTIC, ThreatLocker, Forrester Research, Cyclotron, SecureWorld, ShieldWorkz, and Stryker Corporation's own public statements and SEC filings. This report represents the author's independent analysis and does not reflect the views of any employer or client organization.</p>
+</div>
+
+</div><!-- end content -->
+
+<!-- ── AUTHOR BIO ── -->
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Consultant &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance. This analysis was produced independently as a contribution to the security community's understanding of nation-state threats against US commercial and defense-adjacent organizations.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+</div><!-- end wrap -->
+
+<footer>
+  <span>Stryker Threat Analysis · Yana Ivanov · March 14, 2026</span>
+  <span>Based entirely on public reporting · For educational use · Independent analysis</span>
+</footer>
+
+</body>
+</html>

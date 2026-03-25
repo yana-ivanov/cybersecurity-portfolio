@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Invisible Threat — Glassworm Unicode Supply Chain Attack | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:var(--ink);color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#ef4444}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#ef4444;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:4px;margin:1.75rem 0;border-left:4px solid;box-shadow:var(--shadow)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0;border-radius:4px;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:var(--ink);color:#fff}
+th{padding:.85rem 1rem;text-align:left;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;font-weight:600}
+td{padding:.75rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── MATERIAL CARDS ── */
+.mat-card{background:var(--paper);border-radius:6px;box-shadow:var(--shadow-md);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:1rem 1.5rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+
+/* ── STAT GRID ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--display);font-size:2.4rem;font-weight:900;line-height:1;margin-bottom:.4rem}
+.stat-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;margin-bottom:.4rem;line-height:1.4}
+.stat-sub{font-size:.78rem;color:#94a3b8;line-height:1.5}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── CODE COMPARE ── */
+.code-compare{display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:4px;overflow:hidden;box-shadow:var(--shadow-md);margin:2rem 0}
+.code-pane{padding:1.5rem}
+.code-pane.safe{background:#f0fdf4;border-top:3px solid var(--green)}
+.code-pane.danger{background:#fef2f2;border-top:3px solid var(--red)}
+.code-pane-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1rem;font-weight:700}
+.code-pane.safe .code-pane-label{color:var(--green)}
+.code-pane.danger .code-pane-label{color:var(--red)}
+.code-pane code{font-family:var(--mono);font-size:.82rem;display:block;line-height:1.7;word-break:break-all}
+.code-pane.safe code{color:#0a0f1a}
+.code-pane.danger code{color:var(--red)}
+.code-pane-note{font-size:.78rem;margin-top:.75rem;line-height:1.6}
+.code-pane.safe .code-pane-note{color:var(--green)}
+.code-pane.danger .code-pane-note{color:var(--red)}
+
+/* ── TIMELINE ── */
+.timeline{margin:0;display:grid;gap:0}
+.tl-item{display:grid;grid-template-columns:180px 1fr;border-bottom:1px solid var(--rule)}
+.tl-item:last-child{border-bottom:none}
+.tl-left{padding:1.5rem 1.25rem;border-right:1px solid var(--rule);background:#f8fafc}
+.tl-date{font-family:var(--mono);font-size:.72rem;color:var(--blue);font-weight:700;margin-bottom:.3rem;white-space:nowrap}
+.tl-stage{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.tl-right{padding:1.5rem}
+.tl-title{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3}
+.tl-body{font-size:.88rem;color:var(--ink3);line-height:1.7;margin:0}
+.tl-harvest{font-family:var(--mono);font-size:.62rem;color:#94a3b8;margin-top:.6rem;letter-spacing:.03em;line-height:1.6;word-break:break-word}
+.tl-item.active .tl-left{background:#fef2f2}
+.tl-item.active .tl-date{color:var(--red)}
+.tl-item.active .tl-title{color:var(--red)}
+
+/* ── FLOW DIAGRAM (CSS) ── */
+.flow{display:flex;align-items:center;gap:0;margin:2rem 0;flex-wrap:wrap}
+.flow-step{flex:1;min-width:140px;padding:1.25rem;background:var(--paper);border:1px solid var(--rule);border-radius:4px;text-align:center;box-shadow:var(--shadow);position:relative}
+.flow-step.red{border-top:3px solid var(--red);background:#fef2f2}
+.flow-step.amber{border-top:3px solid var(--amber);background:#fffbeb}
+.flow-step.green{border-top:3px solid var(--green);background:#f0fdf4}
+.flow-step.blue{border-top:3px solid var(--blue);background:#eff6ff}
+.flow-arrow{font-size:1.4rem;color:#94a3b8;padding:0 .25rem;flex-shrink:0}
+.flow-step-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.4rem}
+.flow-step.red .flow-step-label{color:var(--red)}
+.flow-step.amber .flow-step-label{color:var(--amber)}
+.flow-step.green .flow-step-label{color:var(--green)}
+.flow-step.blue .flow-step-label{color:var(--blue)}
+.flow-step-title{font-family:var(--display-clean);font-size:.88rem;font-weight:700;color:var(--ink);margin-bottom:.3rem;line-height:1.3}
+.flow-step-body{font-size:.75rem;color:var(--ink3);line-height:1.5}
+
+/* ── FINDINGS ── */
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);border-radius:4px;background:var(--paper);box-shadow:var(--shadow);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--blue);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;border-radius:3px;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--blue-dim);color:var(--blue)}
+
+/* ── CODE BLOCK ── */
+.code-block{background:#0a0f1a;border-radius:4px;padding:1.5rem 1.75rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid var(--blue);box-shadow:var(--shadow-md)}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.75;white-space:pre-wrap;word-break:break-word}
+.co{color:#64748b}.hi{color:#4ade80}.ke{color:#fbbf24}.va{color:#4a9eff}
+
+/* ── BIO ── */
+.bio{background:var(--ink);color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:4rem}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:var(--ink2);color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+@media(max-width:700px){
+  .wrap,.mast-inner{padding:0 1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .code-compare{grid-template-columns:1fr}
+  .tl-item{grid-template-columns:1fr}
+  .tl-left{border-right:none;border-bottom:1px solid var(--rule);padding:1rem 1.25rem}
+  .flow{flex-direction:column}
+  .flow-arrow{transform:rotate(90deg)}
+  .bio{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Threat Intelligence Analysis</div>
+    <h1 class="title">The Invisible Threat<br><span>Glassworm &amp; the Unicode Supply Chain Attack</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">March 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Threat Actor</div><div class="value">Glassworm</div></div>
+      <div class="meta-item"><div class="label">Attack Type</div><div class="value">Supply Chain · Invisible Unicode</div></div>
+      <div class="meta-item"><div class="label">DIB Relevance</div><div class="value">Critical — Active Campaign</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    ACTIVE CAMPAIGN &nbsp;·&nbsp; 151+ GITHUB REPOS COMPROMISED &nbsp;·&nbsp; MARCH 2026 &nbsp;·&nbsp; DEFENSE SUPPLY CHAIN RISK
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+  <p>A threat actor tracked as Glassworm has been actively compromising software development infrastructure since early 2025 using a technique that exploits invisible Unicode characters to hide malicious code. The payloads are literally invisible — they render as blank space in every major code editor, terminal, and code review interface. No human reviewer, regardless of experience level, can detect them by looking at the code.</p>
+  <p>As of March 2026, over 151 GitHub repositories have been confirmed compromised, with the campaign expanding simultaneously to npm packages and VS Code extensions. The malware steals developer credentials, deploys remote access tools, and uses the Solana blockchain as its command-and-control channel — making it resistant to traditional IP-based detection and blocking.</p>
+  <p>For defense contractors in Connecticut's defense industrial base — Electric Boat, Pratt &amp; Whitney, Sikorsky — this campaign represents a direct and present risk. Software developers at these organizations use the exact same tools Glassworm has targeted. A single compromised development machine inside a prime contractor's network creates a pathway to classified programs, source code repositories, and controlled unclassified information.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Key Finding:</strong> This attack cannot be stopped by human code review. The invisible Unicode payload is undetectable to the human eye. Detection requires automated scanning at the toolchain level — something the majority of defense contractor software teams do not currently have in place.</p>
+  </div>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Figure 1 — Campaign Scale at a Glance</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-red">
+        <div class="stat-num">151+</div>
+        <div class="stat-label">GitHub Repos<br>Compromised</div>
+        <div class="stat-sub">March 3–9, 2026<br>Expanding to npm and VS Code</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Ecosystems<br>Compromised</div>
+        <div class="stat-sub">npm · VS Code · GitHub<br>PyPI actively targeted next</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">12+</div>
+        <div class="stat-label">Months<br>Active</div>
+        <div class="stat-sub">March 2025 — present<br>Despite public disclosure</div>
+      </div>
+      <div class="stat-item stat-blue">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Visible Characters<br>in Payload</div>
+        <div class="stat-sub">Entire malware encoded in<br>invisible Unicode codepoints</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>How the Attack Works</h2>
+
+  <h3>The Invisible Unicode Technique</h3>
+  <p>Unicode is the international standard that allows computers to represent text in every language on earth. Within the Unicode standard exists a range called the Private Use Area (PUA) — characters defined decades ago with no standard visual representation. They render as nothing. Zero width. Invisible to every code editor, terminal, and code review tool in common use.</p>
+  <p>Glassworm encodes a complete malicious payload as a sequence of PUA characters and embeds it inside what appears to be an empty string in source code. At runtime, a compact decoder reads the invisible characters, extracts the real bytes, and passes them to JavaScript's <code style="font-family:var(--mono);font-size:.85em;background:#f1f5f9;padding:.1rem .3rem;border-radius:3px">eval()</code> function — executing the full payload silently with no visible trace.</p>
+
+  <div class="code-compare">
+    <div class="code-pane safe">
+      <div class="code-pane-label">✓ What the developer sees in the editor</div>
+      <code>const data = "";</code>
+      <div class="code-pane-note">Looks like an empty string. Nothing suspicious. Code review approved.</div>
+    </div>
+    <div class="code-pane danger">
+      <div class="code-pane-label">✗ What is actually stored in the file</div>
+      <code>const data = "&#xFE00;&#xFE01;&#xFE02;&#xFE03;&#xFE04;&#xFE05;&#xFE06;&#xFE07;&#xFE08;&#xFE09;&#xFE0A;&#xFE0B;&#xFE0C;&#xFE0D;&#xFE0E;&#xFE0F;";</code>
+      <div class="code-pane-note">PUA codepoints U+FE00–U+FE0F encode the full malicious payload. Completely invisible to humans. Executed at runtime.</div>
+    </div>
+  </div>
+
+  <h3>The Three-Stage Escalation</h3>
+  <p>Glassworm did not target GitHub directly. The campaign moved methodically through the software development ecosystem over twelve months, each stage using stolen credentials to compromise the next.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Figure 2 — Glassworm Escalation Timeline</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date">March 2025</div>
+          <div class="tl-stage">Stage 1</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">npm Package Registry</div>
+          <div class="tl-body">Malicious packages published to npm — the JavaScript package registry used by virtually every web developer. Packages appeared legitimate with real download counts. Invisible Unicode payload executed on install and harvested developer credentials silently.</div>
+          <div class="tl-harvest">Harvested: npm tokens · GitHub access keys · Git configuration credentials</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date">October 2025</div>
+          <div class="tl-stage">Stage 2</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">VS Code Extension Marketplace</div>
+          <div class="tl-body">Using credentials stolen in Stage 1, Glassworm published compromised extensions to the Open VSX registry. VS Code extensions have privileged access to the development environment — file system, terminal, environment variables. Every developer who installed a compromised extension handed the attacker a foothold on their machine.</div>
+          <div class="tl-harvest">Harvested: Git credentials · Environment secrets · Repository access tokens</div>
+        </div>
+      </div>
+      <div class="tl-item active">
+        <div class="tl-left">
+          <div class="tl-date">March 2026</div>
+          <div class="tl-stage">Stage 3 — Active Now</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">GitHub Repositories — Direct Compromise</div>
+          <div class="tl-body">Using credentials stolen across Stages 1 and 2, Glassworm accessed developer GitHub accounts and injected invisible Unicode payloads into existing legitimate repositories. Any developer who pulled from a compromised repository received the malicious code as part of what appeared to be a routine update. 151+ repositories confirmed compromised March 3–9, 2026.</div>
+          <div class="tl-harvest">Deploys: Hidden VNC servers · SOCKS proxies · Solana blockchain C2 channel</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date">Ongoing</div>
+          <div class="tl-stage">Expanding</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">PyPI and Beyond</div>
+          <div class="tl-body">The same technique has been observed in Python's PyPI registry. The pattern is consistent — compromise credentials in one ecosystem, use them to poison another. Any developer tool that accepts third-party packages or extensions is a potential next target. The technique is ecosystem-agnostic.</div>
+          <div class="tl-harvest">Same PUA codepoint ranges · Same decoder pattern · Same C2 infrastructure</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>The Blockchain C2 Channel</h3>
+  <p>Once installed, the malware connects to the Solana blockchain rather than a traditional command-and-control server. Traditional C2 detection works by blocking malicious IP addresses or domains. The Solana blockchain has no single IP to block — its infrastructure is distributed across thousands of legitimate nodes worldwide. The malware's outbound traffic looks like HTTPS to a legitimate financial technology service. Standard firewall rules miss it entirely.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The defense contractor response:</strong> Block all outbound connections to cryptocurrency and blockchain infrastructure at the perimeter firewall. There is no legitimate reason for a defense contractor's development workstations to communicate with Solana RPC nodes or any blockchain network. Any such connection should be treated as a confirmed indicator of compromise. This is a single firewall rule that requires no sophisticated tooling.</p>
+  </div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>Why Defense Contractors Face Elevated Risk</h2>
+
+  <h3>The Open Source Dependency Problem</h3>
+  <p>Modern software development is built on open source. A typical application pulls in hundreds of third-party packages — libraries that handle everything from date formatting to encryption. The developer writes perhaps 10% of the code that actually runs. The other 90% comes from the open source ecosystem, and most of it is never individually reviewed.</p>
+  <p>A developer at Electric Boat pulls in a npm package that looks legitimate, has thousands of downloads, and has been in use for years. That package was compromised by Glassworm six months ago. The code review shows nothing because the payload is invisible. The malware runs on their machine, inside the contractor's network, with their credentials and their network access.</p>
+
+  <h3>AI Coding Assistants as an Attack Multiplier</h3>
+  <p>The risk is significantly compounded by AI coding assistants — tools like GitHub Copilot and Cursor that suggest code completions and automatically recommend packages as developers write. A developer using an AI assistant may have a compromised dependency pulled into their project that they never explicitly chose. The AI suggested it, it appeared in the project, and the developer accepted it as part of a larger block of generated code without reviewing each package individually.</p>
+  <p>Public AI coding assistants trained on public code repositories present an additional concern: if those training datasets include compromised code, the AI may actively recommend compromised packages as legitimate solutions. The attack spreads not through developer decision-making but through AI recommendations.</p>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">!</div>
+      <div class="finding-body">
+        <div class="finding-title">Public AI Coding Tools Are Not Appropriate for Defense Contractor Environments</div>
+        <div class="finding-desc">AI coding assistants that connect to public cloud infrastructure, transmit code for analysis, and suggest packages from public registries represent an unacceptable risk in environments handling CUI or classified programs. The appropriate solution is a private, sandboxed AI deployment trained exclusively on approved internal libraries with no access to public package registries. Organizations that have not addressed this exposure should treat public AI coding assistant usage on contractor workstations as an open vulnerability requiring immediate policy action.</div>
+        <span class="finding-tag">CRITICAL — AI Tool Policy</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>The Credential Theft Cascade</h3>
+  <p>What makes Glassworm particularly dangerous for defense contractors is not the initial compromise — it is what follows. The malware targets developer credentials specifically: GitHub tokens, npm keys, Git configuration files. A single compromised developer machine at a prime contractor can yield credentials providing access to source code repositories containing proprietary defense system designs, CI/CD pipelines that build and deploy software to production systems, and internal registries distributing code across the entire organization. The ForceMemo campaign that followed Glassworm compromised hundreds of Python repositories across hundreds of GitHub accounts using credentials stolen in the original VS Code attack. One infection cascaded into hundreds.</p>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>Security Failures That Enabled This Campaign</h2>
+  <p>The following gaps are present in most defense contractor development environments today. Each represents a control that would detect or prevent Glassworm activity if implemented.</p>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div class="finding-body">
+        <div class="finding-title">No Unicode Scanning in the Development Pipeline</div>
+        <div class="finding-desc">Private Use Area Unicode characters in the ranges U+FE00–U+FE0F and U+E0100–U+E01EF have no legitimate use in production source code. Their presence is an unambiguous indicator of malicious activity. Yet virtually no organization scans for them as part of code review or CI/CD pipeline checks. The scanner itself is trivial — a script that checks every file for codepoints in those ranges would detect every known Glassworm variant in every ecosystem.</div>
+        <span class="finding-tag">CRITICAL — Detection Gap</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div class="finding-body">
+        <div class="finding-title">No Approved Package Registry or Software Bill of Materials</div>
+        <div class="finding-desc">Most defense contractor development environments allow developers to pull packages directly from public npm, PyPI, and similar registries with no approval process. An SBOM requirement combined with an internal approved package registry — a vetted mirror of scanned third-party libraries — would have prevented Glassworm packages from ever entering the development environment. Any new package requires security review before addition to the approved list.</div>
+        <span class="finding-tag">CRITICAL — Supply Chain Control</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">3</div>
+      <div class="finding-body">
+        <div class="finding-title">Blockchain Infrastructure Not Blocked at the Perimeter</div>
+        <div class="finding-desc">Glassworm's command-and-control traffic routes through Solana blockchain nodes over HTTPS — traffic that standard firewalls allow because the destination looks like legitimate financial technology. A perimeter rule blocking all outbound connections to cryptocurrency and blockchain RPC infrastructure would sever the C2 channel completely. There is no legitimate business justification for defense contractor workstations communicating with blockchain networks.</div>
+        <span class="finding-tag">HIGH — Network Control</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">4</div>
+      <div class="finding-body">
+        <div class="finding-title">No Repository Behavioral Monitoring</div>
+        <div class="finding-desc">Glassworm left behavioral fingerprints even when the code itself was invisible — commits from unusual geolocations, pushes at hours inconsistent with the account's normal activity, modifications by accounts with no prior history in that repository. Automated repository activity monitoring would have flagged these anomalies before payloads were deployed at scale.</div>
+        <span class="finding-tag">HIGH — Behavioral Detection</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">5</div>
+      <div class="finding-body">
+        <div class="finding-title">No Developer-Specific Security Awareness Training</div>
+        <div class="finding-desc">Standard CMMC security awareness training does not cover software supply chain attacks. Developers need specific training on evaluating third-party packages, reading package metadata for red flags, recognizing suspicious repository activity, and understanding SBOM requirements in practice. This is not a general phishing topic — it requires curriculum built specifically for software engineers.</div>
+        <span class="finding-tag">HIGH — Awareness Gap</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>The Detection Fingerprint</h2>
+  <p>While the payload is invisible to humans, it leaves a consistent machine-readable fingerprint. The same PUA codepoint ranges appear in every Glassworm variant across all three ecosystems. A scanner built on this principle catches npm packages, VS Code extensions, and GitHub repository injections with identical logic — the technique is the same regardless of where it appears.</p>
+
+  <div class="code-block"><pre><span class="co"># Detection logic — flag any source file containing Glassworm PUA Unicode ranges</span>
+<span class="ke">def</span> <span class="va">scan_for_invisible_unicode</span>(filepath):
+    suspicious = []
+    <span class="ke">with</span> open(filepath, <span class="hi">'r'</span>, encoding=<span class="hi">'utf-8'</span>, errors=<span class="hi">'replace'</span>) <span class="ke">as</span> f:
+        <span class="ke">for</span> line_num, line <span class="ke">in</span> enumerate(f, 1):
+            <span class="ke">for</span> char_pos, char <span class="ke">in</span> enumerate(line):
+                cp = ord(char)
+                <span class="co"># Glassworm PUA ranges — zero legitimate use in production code</span>
+                <span class="ke">if</span> 0xFE00 <= cp <= 0xFE0F <span class="ke">or</span> 0xE0100 <= cp <= 0xE01EF:
+                    suspicious.append({
+                        <span class="hi">'line'</span>: line_num,
+                        <span class="hi">'position'</span>: char_pos,
+                        <span class="hi">'codepoint'</span>: <span class="hi">f'U+{cp:04X}'</span>,
+                        <span class="hi">'context'</span>: line.strip()[:80]
+                    })
+    <span class="ke">return</span> suspicious  <span class="co"># Empty list = clean. Any result = investigate immediately.</span></pre></div>
+
+  <p>This detection logic produces zero false positives in legitimate codebases. It can be deployed as a pre-commit hook, a CI/CD pipeline gate, or a repository-wide audit in hours. A defense contractor that runs this scan across its entire codebase today will know within hours whether Glassworm payloads are present anywhere in their software supply chain.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>For CMMC assessors:</strong> An organization that has deployed this scanner as a mandatory CI/CD pipeline gate, blocked blockchain outbound traffic, and established an approved package registry has addressed the Glassworm attack class completely. These three controls are fast to implement, require no licensing cost, and directly satisfy NIST 800-171 requirements for malicious code protection, system monitoring, and configuration management.</p>
+  </div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>Recommendations and NIST 800-171 Mapping</h2>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Recommendation</th><th>Priority</th><th>NIST 800-171</th><th>Time to Implement</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Deploy Unicode scanner as CI/CD gate</strong> — block any commit containing PUA codepoints U+FE00–U+FE0F or U+E0100–U+E01EF from merging into any branch</td><td class="red">Critical</td><td class="code">3.14.2</td><td class="green">Hours</td></tr>
+      <tr><td><strong>Block all blockchain and cryptocurrency outbound traffic</strong> — Solana RPC nodes, Ethereum nodes, all crypto domain endpoints — at perimeter firewall</td><td class="red">Critical</td><td class="code">3.14.6</td><td class="green">Afternoon</td></tr>
+      <tr><td><strong>Establish approved package registry</strong> — internal vetted mirror; developers pull only from approved list; all new packages require security review before addition</td><td class="red">Critical</td><td class="code">3.13.2</td><td class="amber">Weeks</td></tr>
+      <tr><td><strong>Prohibit public AI coding assistants</strong> on workstations handling CUI or accessing contractor networks; evaluate private sandboxed AI deployment for approved use</td><td class="red">Critical</td><td class="code">3.13.2</td><td class="green">Days (policy)</td></tr>
+      <tr><td><strong>Run full repository audit now</strong> — scan all existing codebases for PUA Unicode characters to identify any currently compromised files across the organization</td><td class="amber">High</td><td class="code">3.14.2</td><td class="green">Hours</td></tr>
+      <tr><td><strong>Implement repository behavioral monitoring</strong> — alert on commits from new geolocations, off-hours pushes, and file modifications by accounts with no prior history in that repository</td><td class="amber">High</td><td class="code">3.3.1</td><td class="amber">Days</td></tr>
+      <tr><td><strong>Require SBOM for all software</strong> — document every third-party dependency in production and development environments; integrate with vulnerability tracking feeds</td><td class="amber">High</td><td class="code">3.13.2</td><td class="amber">Months</td></tr>
+      <tr><td><strong>Deliver developer-specific supply chain training</strong> — package evaluation methodology, red flags in repository metadata, and incident reporting procedures for suspicious code</td><td class="amber">High</td><td class="code">3.2.2</td><td class="amber">Weeks</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- CONCLUSION -->
+<div class="section">
+  <div class="section-num">Conclusion</div>
+  <h2>The Threat That Hides in Plain Sight</h2>
+
+  <p>Glassworm represents a maturation of software supply chain attacks. Earlier campaigns relied on typosquatting — registering package names similar to legitimate ones and hoping developers mistyped. Glassworm poisons legitimate packages that developers are already using, makes the malicious code physically invisible, and uses infrastructure that traditional network monitoring is not designed to flag.</p>
+  <p>The defenses are not complicated. A Unicode scanner in the CI/CD pipeline costs a day to deploy. Blocking outbound connections to blockchain infrastructure costs an afternoon of firewall configuration. An approved package registry is a project measured in weeks. None of these controls require significant budget — they require awareness that the threat exists and the organizational will to act on it.</p>
+  <p>The majority of defense contractors in Connecticut's defense industrial base do not have these controls in place today. The same developers who build software for submarine navigation systems, jet engine controls, and helicopter avionics are using the same VS Code installations, npm packages, and GitHub repositories that Glassworm has been systematically compromising for over a year.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The window is open.</strong> Glassworm's March 2026 campaign is active. Credentials stolen from VS Code extension users in October 2025 are being used right now to access GitHub repositories. Defense contractors who have not audited their development environments for invisible Unicode payloads, blocked blockchain outbound traffic, and reviewed their open source dependency practices are operating with an unaddressed exposure in their software supply chain.</p>
+  </div>
+
+  <div class="callout callout-blue" style="margin-top:2rem">
+    <p><strong>Detection tool available:</strong> The invisible Unicode scanner and blockchain C2 detector described in this report are implemented as an interactive browser tool — <a href="glassworm_detector.html" style="color:var(--blue)">Glassworm Detector</a>. Drop any source code file in to scan for PUA codepoints, or upload a DNS log to check for blockchain infrastructure contacts. Sample test files are provided. Runs entirely in the browser — no data leaves your machine.</p>
+  </div>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">All findings in this report are based entirely on publicly available information including reports from Aikido Security, Tom's Hardware, SecurityWeek, Technology.org, and WinBuzzer. This report represents the author's independent analysis and does not reflect the views of any employer or client organization.</p>
+</div>
+
+</div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Consultant &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance. This analysis was produced independently as a contribution to the security community's understanding of active supply chain threats against US defense infrastructure.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+</div>
+
+<footer>
+  <span>Glassworm Analysis · Yana Ivanov · March 2026</span>
+  <span>Based entirely on public reporting · For educational use · Independent analysis</span>
+</footer>
+
+</body>
+</html>
