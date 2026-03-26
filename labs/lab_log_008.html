@@ -128,7 +128,7 @@ footer a:hover{color:#93c5fd}
 </head>
 <body>
 
-<div class="back-nav"><a href="index.html">Portfolio</a></div>
+<div class="back-nav"><a href="../index.html">Portfolio</a></div>
 
 <div class="masthead">
   <div class="mast-inner">
@@ -156,7 +156,7 @@ footer a:hover{color:#93c5fd}
   <div class="section-num">Section 01</div>
   <h2>Why This Lab Is Different <span class="diff-badge">Step Up from Lab 003</span></h2>
 
-  <p><a href="lab_log_003.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Lab 003</a> analyzed a compromised machine <em>inside</em> a network — an infected Windows workstation beaconing outward to a C2 server on a predictable 60-second interval. The scenario was relatively contained: one infected host, one C2 address, one malware family, clean beaconing signature.</p>
+  <p><a href="../labs/lab_log_003.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Lab 003</a> analyzed a compromised machine <em>inside</em> a network — an infected Windows workstation beaconing outward to a C2 server on a predictable 60-second interval. The scenario was relatively contained: one infected host, one C2 address, one malware family, clean beaconing signature.</p>
 
   <p>This lab inverts that perspective entirely. Instead of watching malware phone home, we are analyzing a <strong>public-facing web server being attacked from the internet</strong> over seven consecutive days. The pcap file name tells the story: <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">seven-days-of-scans-and-probes-and-web-traffic</code>. What looks like noise at first glance is actually multiple distinct attackers, multiple attack vectors, and a server that — as this analysis will show — defended itself on every front while unknowingly advertising its own vulnerabilities in every response it sent.</p>
 
@@ -250,7 +250,7 @@ exact software version and operating system to every requestor.</span></pre></di
   </div>
 
   <div class="callout callout-amber">
-    <p><strong>Lab 003 vs Lab 008 — a critical difference:</strong> In <a href="lab_log_003.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(26,79,160,.4)">Lab 003</a>, HTTP traffic at 2.3% stood out because it was abnormally low for a corporate network — all traffic should have been HTTPS. Here, HTTP at 100% stands out because this is a public server in 2026 with no TLS. Both situations are suspicious, but for opposite reasons. Context determines meaning.</p>
+    <p><strong>Lab 003 vs Lab 008 — a critical difference:</strong> In <a href="../labs/lab_log_003.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(26,79,160,.4)">Lab 003</a>, HTTP traffic at 2.3% stood out because it was abnormally low for a corporate network — all traffic should have been HTTPS. Here, HTTP at 100% stands out because this is a public server in 2026 with no TLS. Both situations are suspicious, but for opposite reasons. Context determines meaning.</p>
   </div>
 </div>
 
@@ -529,14 +529,14 @@ against network authentication. The probe failed.</span></pre></div>
   </div>
 
   <h3>Next Lab</h3>
-  <p><a href="lab_log_009.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Lab Log 009</a> will build on this analysis by introducing command-line tools for network analysis — moving from Wireshark's GUI to terminal-based workflows using <code style="font-family:var(--mono);font-size:.85rem">tshark</code>, the command-line version of Wireshark, to automate the triage process demonstrated here.</p>
+  <p><a href="../labs/lab_log_009.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Lab Log 009</a> will build on this analysis by introducing command-line tools for network analysis — moving from Wireshark's GUI to terminal-based workflows using <code style="font-family:var(--mono);font-size:.85rem">tshark</code>, the command-line version of Wireshark, to automate the triage process demonstrated here.</p>
 </div>
 
 </div></div>
 
 <footer>
   <span>Lab Log 008 — Seven Days Under Attack &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; March 2026 &nbsp;·&nbsp; Educational use only</span>
-  <a href="index.html">← Portfolio</a>
+  <a href="../index.html">← Portfolio</a>
 </footer>
 
 </body>

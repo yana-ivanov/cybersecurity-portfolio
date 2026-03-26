@@ -130,7 +130,7 @@ footer a:hover{color:#93c5fd}
 </head>
 <body>
 
-<div class="back-nav"><a href="index.html">Portfolio</a></div>
+<div class="back-nav"><a href="../index.html">Portfolio</a></div>
 
 <div class="masthead">
   <div class="mast-inner">
@@ -494,7 +494,7 @@ grep -v "^#" <span class="ke">logname.log</span> | awk -F'\t' '{print $8, $9, $1
     <div class="finding-num">Finding 01 — Critical</div>
     <div class="finding-title">Full C2 Infrastructure Mapped — Five Domains, 1.67MB Exfiltrated</div>
     <p>Zeek ssl.log analysis identified five suspicious domains communicating with DESKTOP-ES9F3ML (10.1.21.58, user: gwyatt). The primary C2 server at <strong>whitepepper.su</strong> (153.92.1.49) received approximately 1.67MB of outbound data — gwyatt's Chrome and Edge browser credentials, cookies, and saved passwords. Four additional domains delivered a combined 299KB of payload to the infected machine over encrypted TLS connections.</p>
-    <p>The <a href="lab_log_004.html" style="color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink)">Wireshark analysis in Lab Log 004</a> identified only whitepepper.su. Zeek's ssl.log revealed the complete infrastructure scope, including four additional C2 and payload delivery domains operating exclusively over TLS.</p>
+    <p>The <a href="../labs/lab_log_004.html" style="color:var(--ink);text-decoration:none;border-bottom:1px solid var(--ink)">Wireshark analysis in Lab Log 004</a> identified only whitepepper.su. Zeek's ssl.log revealed the complete infrastructure scope, including four additional C2 and payload delivery domains operating exclusively over TLS.</p>
   </div>
 
   <div class="finding amber">
@@ -619,7 +619,7 @@ grep -v "^#" <span class="ke">logname.log</span> | awk -F'\t' '{print $8, $9, $1
 
 <footer>
   <span>Lab Log 005 — Zeek Network Analysis &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; March 18, 2026 &nbsp;·&nbsp; Educational use only</span>
-  <a href="index.html">← Portfolio</a>
+  <a href="../index.html">← Portfolio</a>
 </footer>
 
 </body>

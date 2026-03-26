@@ -129,7 +129,7 @@ footer a:hover{color:#93c5fd}
 </head>
 <body>
 
-<div class="back-nav"><a href="index.html">Portfolio</a></div>
+<div class="back-nav"><a href="../index.html">Portfolio</a></div>
 
 <div class="masthead">
   <div class="mast-inner">
@@ -544,7 +544,7 @@ python3 zeek_triage.py ~/Desktop/zeek-easy123</pre></div>
   <h2>Lessons Learned</h2>
 
   <h3>Automation Does Not Replace Understanding — It Requires It</h3>
-  <p>The script works correctly because the underlying workflow was understood first. The DHCP → Kerberos → HTTP → TLS → conn.log sequence, the column offset in Zeek logs, the meaning of AS-REQ vs TGS, why SNI is visible in encrypted traffic — all of that knowledge from <a href="lab_log_003.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Lab Logs 003</a> through <a href="lab_log_005.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">005</a> went directly into the script logic. An analyst who skipped those labs and ran this script would not know whether to trust the output or how to investigate a finding it surfaced.</p>
+  <p>The script works correctly because the underlying workflow was understood first. The DHCP → Kerberos → HTTP → TLS → conn.log sequence, the column offset in Zeek logs, the meaning of AS-REQ vs TGS, why SNI is visible in encrypted traffic — all of that knowledge from <a href="../labs/lab_log_003.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Lab Logs 003</a> through <a href="../labs/lab_log_005.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">005</a> went directly into the script logic. An analyst who skipped those labs and ran this script would not know whether to trust the output or how to investigate a finding it surfaced.</p>
 
   <h3>Deduplication Changes What the Report Means</h3>
   <p>The first version of <code style="font-family:var(--mono);font-size:.85rem;color:var(--blue)">get_suspicious_http</code> printed every individual HTTP request — 264 identical POST lines for Easy As 123. That output is technically accurate but operationally useless. The revised version deduplicates by host and shows a count instead. The report went from 264 lines that required scrolling to 1 line that conveyed the same information instantly. Good security tooling presents findings at the right level of abstraction for the decision that needs to be made.</p>
@@ -560,7 +560,7 @@ python3 zeek_triage.py ~/Desktop/zeek-easy123</pre></div>
 
 <footer>
   <span>Lab Log 006 — Python Triage Script &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; March 18, 2026 &nbsp;·&nbsp; Educational use only</span>
-  <a href="index.html">← Portfolio</a>
+  <a href="../index.html">← Portfolio</a>
 </footer>
 
 </body>

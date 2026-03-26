@@ -133,7 +133,7 @@ footer span{color:#94a3b8}
 </head>
 <body>
 
-<div class="back-nav"><a href="index.html">Portfolio</a></div>
+<div class="back-nav"><a href="../index.html">Portfolio</a></div>
 
 <div class="masthead">
   <div class="mast-inner">
@@ -380,7 +380,7 @@ footer span{color:#94a3b8}
       <tr><td><strong>Always display full email address</strong> — configure Outlook / email client to show domain alongside display name</td><td>Removes the hiding place behind friendly names; forces visual domain verification</td><td class="amber">High</td><td class="green">$0 — configuration</td></tr>
       <tr><td><strong>Proactive homoglyph monitoring</strong> — DNSTwist or similar scanning for lookalike domain registrations</td><td>Early warning before an attack campaign launches; detects preparation phase</td><td class="amber">High</td><td class="green">Free tools available</td></tr>
       <tr><td><strong>BEC-specific awareness training</strong> — scenario training on payment redirect requests, vendor banking change requests</td><td>The human layer; employees who know the pattern are the last defense when technology fails</td><td class="amber">High</td><td class="amber">Training investment</td></tr>
-      <tr><td><strong>Network-level homoglyph detection</strong> — DNS log and HTTP log analysis for punycode and mixed-script domains</td><td>Catches homoglyph domains that employees are communicating with in real time; feeds into SOC alerting</td><td class="amber">High</td><td class="green">Implemented in <a href="zeek_triage_tool.html" style="color:var(--green)">zeek_triage.py</a></td></tr>
+      <tr><td><strong>Network-level homoglyph detection</strong> — DNS log and HTTP log analysis for punycode and mixed-script domains</td><td>Catches homoglyph domains that employees are communicating with in real time; feeds into SOC alerting</td><td class="amber">High</td><td class="green">Implemented in <a href="../tools/zeek_triage_tool.html" style="color:var(--green)">zeek_triage.py</a></td></tr>
     </tbody>
   </table>
   </div>
@@ -431,7 +431,7 @@ footer span{color:#94a3b8}
     </div>
   </div>
 
-  <p style="font-size:.82rem;color:#94a3b8;margin-top:.5rem">This tool runs entirely in your browser. No domain is transmitted anywhere. For bulk scanning of DNS logs, the homoglyph detection function is implemented in <a href="zeek_triage_tool.html" style="color:var(--blue)">zeek_triage.py</a>.</p>
+  <p style="font-size:.82rem;color:#94a3b8;margin-top:.5rem">This tool runs entirely in your browser. No domain is transmitted anywhere. For bulk scanning of DNS logs, the homoglyph detection function is implemented in <a href="../tools/zeek_triage_tool.html" style="color:var(--blue)">zeek_triage.py</a>.</p>
 </div>
 
 <!-- CONCLUSION -->
@@ -460,7 +460,7 @@ footer span{color:#94a3b8}
     <div class="bio-name">Yana Ivanov</div>
     <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Consultant &nbsp;·&nbsp; SiteWave Studio</div>
     <p class="bio-text">Yana Ivanov is a security analyst and CMMC consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance.</p>
-    <p class="bio-text" style="margin-top:.75rem"><a href="index.html" class="back-nav-link">Portfolio</a></p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
   </div>
 </div>
 
@@ -469,7 +469,7 @@ footer span{color:#94a3b8}
   <div class="wrap">
     <div style="font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:#94a3b8;margin-bottom:.5rem">Sample Test File</div>
     <h2 style="font-family:var(--display-clean);font-size:1.5rem;font-weight:600;color:var(--ink);margin-bottom:.5rem">Test the Detection</h2>
-    <p style="font-family:var(--serif);font-size:.9rem;color:var(--ink3);line-height:1.7;margin-bottom:1.75rem;max-width:680px">A synthetic network log simulating an accounts payable workstation at a defense subcontractor. Normal Microsoft and Google traffic is mixed with six Punycode-encoded homoglyph domains spoofing Pratt &amp; Whitney, Electric Boat, Sikorsky, General Dynamics, and RTX. Drop it into <a href="zeek_triage_tool.html" style="color:var(--blue)">zeek_triage.py</a> to see the homoglyph detection in action.</p>
+    <p style="font-family:var(--serif);font-size:.9rem;color:var(--ink3);line-height:1.7;margin-bottom:1.75rem;max-width:680px">A synthetic network log simulating an accounts payable workstation at a defense subcontractor. Normal Microsoft and Google traffic is mixed with six Punycode-encoded homoglyph domains spoofing Pratt &amp; Whitney, Electric Boat, Sikorsky, General Dynamics, and RTX. Drop it into <a href="../tools/zeek_triage_tool.html" style="color:var(--blue)">zeek_triage.py</a> to see the homoglyph detection in action.</p>
 
     <div style="background:var(--paper);border:1px solid var(--rule);border-top:3px solid var(--red);padding:1.5rem;max-width:520px">
       <div style="font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem">DNS &amp; HTTP Log · Homoglyph Detection</div>

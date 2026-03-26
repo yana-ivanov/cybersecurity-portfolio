@@ -165,7 +165,7 @@ footer a:hover{color:#93c5fd}
 <body>
 
 <div class="back-nav">
-  <a href="index.html">Portfolio</a>
+  <a href="../index.html">Portfolio</a>
 </div>
 
 <!-- MASTHEAD -->
@@ -372,7 +372,7 @@ Nmap done: 1 IP address (1 host up) scanned in 7.22 seconds</pre></div>
     <p>rpc.statd has a documented history of serious vulnerabilities. CVE-2000-0800 (rpc.statd format string vulnerability) was used in real-world attacks against Linux systems. While the macOS implementation differs, the presence of this service on an externally-reachable interface warrants attention.</p>
 
     <div class="callout callout-red">
-      <p><strong>Historical context:</strong> rpc.statd has been the target of remote code execution exploits. The <a href="stryker_threat_analysis.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Stryker wiper attack</a> documented in this portfolio demonstrates how a single exposed service without proper access controls can become a complete system compromise. The attack surface here is small but the service category is historically dangerous.</p>
+      <p><strong>Historical context:</strong> rpc.statd has been the target of remote code execution exploits. The <a href="../analysis/stryker_threat_analysis.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Stryker wiper attack</a> documented in this portfolio demonstrates how a single exposed service without proper access controls can become a complete system compromise. The attack surface here is small but the service category is historically dangerous.</p>
     </div>
   </div>
 
@@ -478,14 +478,14 @@ Nmap done: 1 IP address (1 host up) scanned in 7.22 seconds</pre></div>
     <p>Setting up the Docker-based Kali lab environment required understanding Docker networking, container isolation, and the relationship between container IPs and host IPs. The Docker bridge network (172.17.0.0/16) is isolated from the host's physical network — scans run inside the container cannot reach external internet targets, which is the correct security posture for a lab environment.</p>
 
     <h3>Connection to Portfolio Research</h3>
-    <p>The reconnaissance methodology documented here is the first step in every attack chain covered in this portfolio. The <a href="volt_typhoon_analysis.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Volt Typhoon campaign</a> began with reconnaissance of target infrastructure. The <a href="stryker_threat_analysis.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Stryker breach</a> required identifying the administrative credential endpoint. The F-35 breach exploited a service (default credentials on a network-facing interface) that would have been identified by exactly this kind of scan. Reconnaissance is not a technical exercise — it is the foundation of every security decision that follows.</p>
+    <p>The reconnaissance methodology documented here is the first step in every attack chain covered in this portfolio. The <a href="../analysis/Volt_Typhoon_Analysis.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Volt Typhoon campaign</a> began with reconnaissance of target infrastructure. The <a href="../analysis/stryker_threat_analysis.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Stryker breach</a> required identifying the administrative credential endpoint. The F-35 breach exploited a service (default credentials on a network-facing interface) that would have been identified by exactly this kind of scan. Reconnaissance is not a technical exercise — it is the foundation of every security decision that follows.</p>
   </div>
 
   <!-- NEXT STEPS -->
   <div class="section">
     <div class="section-num">Section 09</div>
     <h2>Next Lab</h2>
-    <p><a href="lab_log_002.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Lab Log 002</a> will cover <strong>network traffic capture and analysis</strong> using tcpdump and Wireshark inside the Kali container — capturing packets on the Docker bridge interface, identifying protocol patterns, and analyzing what network traffic reveals about host behavior. This is the defensive analog to this reconnaissance exercise: where Lab 001 asked "what can I see from outside," Lab 002 asks "what does traffic look like from inside."</p>
+    <p><a href="../labs/lab_log_002.html" style="color:var(--blue);text-decoration:none;border-bottom:1px solid var(--blue)">Lab Log 002</a> will cover <strong>network traffic capture and analysis</strong> using tcpdump and Wireshark inside the Kali container — capturing packets on the Docker bridge interface, identifying protocol patterns, and analyzing what network traffic reveals about host behavior. This is the defensive analog to this reconnaissance exercise: where Lab 001 asked "what can I see from outside," Lab 002 asks "what does traffic look like from inside."</p>
 
     <div class="callout callout-blue">
       <p><strong>CMMC relevance:</strong> NIST SP 800-171 Control 3.3.1 requires organizations to create and retain system audit logs to enable monitoring, analysis, investigation, and reporting. Network traffic analysis is the practical skill behind log-based detection — understanding what normal traffic looks like is prerequisite to identifying what abnormal looks like.</p>
@@ -497,7 +497,7 @@ Nmap done: 1 IP address (1 host up) scanned in 7.22 seconds</pre></div>
 
 <footer>
   <span>Lab Log 001 — Network Reconnaissance &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; March 15, 2026 &nbsp;·&nbsp; Controlled lab environment &nbsp;·&nbsp; Educational use only</span>
-  <a href="index.html" style="color:#4a9eff;text-decoration:none;white-space:nowrap">← Portfolio</a>
+  <a href="../index.html" style="color:#4a9eff;text-decoration:none;white-space:nowrap">← Portfolio</a>
 </footer>
 
 </body>
