@@ -161,7 +161,133 @@ footer a:hover{color:#93c5fd}
 }
 .print-btn:hover{border-color:var(--blue);color:var(--blue)}
 
-@media print{
+@media print {
+  :root {
+    --ink: #000000 !important;
+    --ink2: #000000 !important;
+    --ink3: #333333 !important;
+    --blue: #000000 !important;
+    --red: #000000 !important;
+    --rule: #cccccc !important;
+    --bg: #ffffff !important;
+    --paper: #ffffff !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  html { font-size: 13px !important; }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    line-height: 1.5 !important;
+  }
+
+  .back-nav, .print-btn { display: none !important; }
+
+  .masthead {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 0 12pt 0 !important;
+    border-bottom: 2pt solid #000000 !important;
+  }
+
+  .masthead::before { display: none !important; }
+
+  .mast-label {
+    color: #000000 !important;
+    font-size: 8pt !important;
+    margin-bottom: 4pt !important;
+  }
+
+  .mast-name {
+    color: #000000 !important;
+    font-size: 22pt !important;
+  }
+
+  .mast-title {
+    color: #333333 !important;
+    font-size: 10pt !important;
+  }
+
+  .mast-links {
+    border-top: 1pt solid #cccccc !important;
+    padding-top: 6pt !important;
+    gap: 1.5rem !important;
+  }
+
+  .mast-link {
+    color: #000000 !important;
+    font-size: 8pt !important;
+  }
+
+  .wrap { padding: 0 !important; }
+  .content { padding: 12pt 0 !important; }
+
+  .section {
+    margin-bottom: 14pt !important;
+    padding-bottom: 14pt !important;
+    border-bottom: 1pt solid #cccccc !important;
+    page-break-inside: avoid !important;
+  }
+
+  .section-num {
+    color: #666666 !important;
+    font-size: 7pt !important;
+  }
+
+  h2 {
+    color: #000000 !important;
+    font-size: 14pt !important;
+    margin-bottom: 8pt !important;
+  }
+
+  h3 {
+    color: #000000 !important;
+    font-size: 11pt !important;
+  }
+
+  a {
+    color: #000000 !important;
+    text-decoration: none !important;
+  }
+
+  .callout {
+    border-left: 2pt solid #000000 !important;
+    background: none !important;
+  }
+
+  .cert-status-text,
+  .cert-status-text.earned,
+  .cert-status-text.planned {
+    color: #333333 !important;
+  }
+
+  .skill-cat { color: #000000 !important; }
+  .skill-val { color: #333333 !important; }
+
+  .exp-company { color: #333333 !important; }
+  .exp-dates { color: #333333 !important; }
+
+  .exp-bullets li::before { color: #000000 !important; }
+  .exp-bullets li { color: #333333 !important; }
+
+  .portfolio-list li a { color: #000000 !important; }
+  .portfolio-list li a::before { color: #000000 !important; }
+  .p-desc { color: #666666 !important; }
+
+  .target-cols p { color: #333333 !important; }
+
+  footer { display: none !important; }
+
+  @page {
+    margin: 0.75in;
+    size: letter portrait;
+  }
+}dia print{
   .back-nav,.print-btn{display:none!important}
   .section{page-break-inside:avoid}
   body{font-size:15px}
