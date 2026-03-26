@@ -596,7 +596,7 @@ footer a:hover{color:#60a5fa}
     <div class="card-grid">
 
       <a href="writing/bookmark-security-article.html" class="card portfolio-item"
-         data-tags="writing tools threat-analysis"
+         data-tags="writing threat-analysis"
          data-title="bookmarks security risk http https homoglyph domain hijacking browser audit expired domains">
         <div class="card-accent blue"></div>
         <div class="card-body">
@@ -700,8 +700,10 @@ function filterPortfolio() {
     const matchesSearch = !query || title.includes(query) || tags.includes(query) || cardText.includes(query);
 
     if (isSoon) {
-      // Only show coming-soon cards when viewing all with no search
-      item.classList.toggle('hidden', isFiltering);
+      // Show soon cards only when their tag matches the active filter or viewing all with no search
+      const matchesFilter = activeFilter === 'all' || tags.includes(activeFilter);
+      const matchesSearch = !query || title.includes(query) || tags.includes(query) || cardText.includes(query);
+      item.classList.toggle('hidden', !(matchesFilter && matchesSearch && !query) && !(activeFilter === 'all' && !query));
     } else if (matchesFilter && matchesSearch) {
       item.classList.remove('hidden');
       visible++;
