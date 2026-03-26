@@ -1,0 +1,4107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bookmark Organizer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Changa+One:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/sansation" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0f1a;
+    --surface: #0f1623;
+    --surface2: #141e2e;
+    --border: #1e2d45;
+    --accent: #4a9eff;
+    --accent-dark: #1a4fa0;
+    --accent2: #4ecdc4;
+    --accent3: #ff6b6b;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #4a5568;
+    --success: #4ecdc4;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Mono', monospace;
+    --serif: 'Space Grotesk', sans-serif;
+    --display: 'Space Grotesk', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    margin-bottom: 48px;
+  }
+
+  .back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:9999}
+  .back-nav a{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+  .back-nav a:hover{color:#93c5fd}
+  .back-nav a::before{content:'←';font-size:15px}
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(74,158,255,0.1);
+    border: 1px solid rgba(74,158,255,0.25);
+    color: var(--accent);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 2px;
+    margin-bottom: 16px;
+    font-family: var(--mono);
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  h1 {
+    font-family: 'Changa One', sans-serif;
+    font-size: clamp(3.75rem, 9.5vw, 6rem);
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: 0.01em;
+    line-height: 0.88;
+    color: var(--text);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+  }
+
+  h1 span {
+    color: var(--accent);
+  }
+
+  .subtitle {
+    color: var(--text2);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.75;
+    max-width: 540px;
+  }
+
+  /* Steps */
+  .steps {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 2px;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    border: 1px solid var(--border);
+    color: var(--text3);
+    transition: all 0.3s;
+  }
+
+  .step.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(74,158,255,0.08);
+  }
+
+  .step.done {
+    border-color: var(--accent2);
+    color: var(--accent2);
+    background: rgba(78,205,196,0.08);
+  }
+
+  .step-num {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  .step.done .step-num::after {
+    content: '✓';
+    font-size: 10px;
+  }
+
+  /* Panels */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 28px;
+    margin-bottom: 24px;
+    display: none;
+    animation: fadeUp 0.4s ease;
+  }
+
+  .panel.visible { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .panel-label {
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text2);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+  }
+
+  .panel-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 220px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 16px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--text3); }
+
+  .input-hint {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+
+  .input-hint strong { color: var(--text2); }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover:not(:disabled) { background: #1a4fa0; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.25; cursor: not-allowed; transform: none; filter: grayscale(0.3); }
+  .btn-primary.ready { opacity: 1; box-shadow: 0 0 0 1px rgba(74,158,255,0.4); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text2);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-export {
+    background: rgba(78,205,196,0.12);
+    color: var(--accent2);
+    border: 1px solid rgba(78,205,196,0.3);
+  }
+
+  .btn-export:hover { background: rgba(78,205,196,0.2); }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  /* Loading */
+  .loading {
+    display: none;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 28px 4px;
+    color: var(--text2);
+    font-size: 14px;
+  }
+
+  .loading.visible { display: flex; }
+
+  .spinner {
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  .loading-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .loading-step {
+    font-size: 14px;
+    font-family: var(--mono);
+    color: var(--text3);
+    transition: color 0.3s;
+    letter-spacing: 0.01em;
+  }
+
+  .loading-step.active {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .loading-step.done { color: var(--accent2); }
+
+  /* Results */
+  .stats-bar {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .stat-num {
+    font-family: 'Changa One', sans-serif;
+    font-size: 28px;
+    font-weight: 400;
+    font-style: normal;
+    color: var(--accent);
+    line-height: 1;
+    letter-spacing: 0.01em;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+
+  .category-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .category-card:hover { border-color: rgba(74,158,255,0.4); }
+
+  .category-header {
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .category-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--serif);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .category-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .category-count {
+    font-size: 14px;
+    color: var(--text2);
+    font-family: var(--mono);
+    background: var(--surface);
+    padding: 3px 10px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+  }
+
+  .category-toggle {
+    color: var(--text3);
+    font-size: 14px;
+    transition: transform 0.2s;
+  }
+
+  .category-card.collapsed .category-toggle { transform: rotate(-90deg); }
+
+  .bookmark-list {
+    padding: 8px 0;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .bookmark-list::-webkit-scrollbar { width: 4px; }
+  .bookmark-list::-webkit-scrollbar-track { background: transparent; }
+  .bookmark-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .bookmark-item {
+    padding: 12px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    transition: background 0.15s;
+    border-bottom: 1px solid rgba(42,42,61,0.5);
+    cursor: grab;
+  }
+
+  .bookmark-item:last-child { border-bottom: none; }
+  .bookmark-item:hover { background: rgba(74,158,255,0.05); }
+  .bookmark-item.dragging { opacity: 0.35; cursor: grabbing; }
+  .bookmark-item.drag-over { border-top: 2px solid var(--accent); margin-top: -1px; }
+  .bookmark-list.drag-target { background: rgba(74,158,255,0.03); }
+  .category-card.drop-target { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+  /* Quick Access Bar */
+  .quick-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-height: 52px;
+    align-items: center;
+  }
+
+  .quick-empty {
+    font-size: 13px;
+    color: var(--text3);
+    letter-spacing: 0.04em;
+    font-family: var(--mono);
+    padding: 4px 0;
+  }
+
+  .quick-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 7px 12px 7px 9px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 12px;
+    font-family: var(--mono);
+    transition: all 0.15s;
+    position: relative;
+    max-width: 180px;
+  }
+
+  .quick-item:hover {
+    border-color: var(--accent);
+    background: rgba(74,158,255,0.06);
+  }
+
+  .quick-item img {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .quick-item-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .quick-unpin {
+    background: none;
+    border: none;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0 0 0 4px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s;
+    font-family: var(--mono);
+  }
+
+  .quick-unpin:hover { color: var(--accent3); }
+
+  .pin-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text3);
+    font-size: 16px;
+    flex-shrink: 0;
+    padding: 3px 5px;
+    border-radius: 2px;
+    transition: color 0.15s;
+    line-height: 1;
+    margin-top: 1px;
+    font-family: var(--mono);
+  }
+
+  .pin-btn:hover { color: var(--accent); }
+  .pin-btn.pinned { color: var(--accent); }
+
+  .bookmark-favicon {
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    background: var(--border);
+    object-fit: contain;
+  }
+
+  .bookmark-info { flex: 1; min-width: 0; }
+
+  .bookmark-title {
+    font-size: 14px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 3px;
+    line-height: 1.3;
+  }
+
+  .bookmark-url {
+    font-size: 12px;
+    color: var(--text3);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bookmark-link {
+    color: var(--text3);
+    font-size: 14px;
+    text-decoration: none;
+    flex-shrink: 0;
+    padding: 3px 6px;
+    border-radius: 2px;
+    transition: color 0.15s;
+    margin-top: 1px;
+  }
+
+  .bookmark-link:hover { color: var(--accent); }
+
+  .bookmark-delete {
+    color: var(--text3);
+    font-size: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 3px 6px;
+    border-radius: 2px;
+    transition: color 0.15s;
+    line-height: 1;
+    margin-top: 1px;
+    font-family: var(--mono);
+  }
+
+  .bookmark-delete:hover { color: var(--accent3); }
+
+  /* Move to modal */
+  .move-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .move-modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 360px;
+    max-width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .move-modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .move-modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .move-modal-close {
+    background: none;
+    border: none;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0;
+    line-height: 1;
+  }
+
+  .move-modal-close:hover { color: var(--text); }
+
+  .move-modal-subtitle {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: var(--mono);
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .move-modal-list {
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .move-modal-list::-webkit-scrollbar { width: 4px; }
+  .move-modal-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .move-modal-section {
+    padding: 8px 0 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .move-modal-section:last-child { border-bottom: none; }
+
+  .move-modal-main {
+    padding: 6px 20px 4px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    font-family: var(--mono);
+  }
+
+  .move-modal-option {
+    padding: 9px 20px 9px 32px;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .move-modal-option:hover {
+    background: rgba(74,158,255,0.08);
+    color: var(--accent);
+  }
+
+  .move-modal-option.current {
+    color: var(--text3);
+    cursor: default;
+    font-style: italic;
+  }
+
+  .move-modal-option.current:hover {
+    background: none;
+    color: var(--text3);
+  }
+
+  .move-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text3);
+    font-size: 15px;
+    flex-shrink: 0;
+    padding: 3px 6px;
+    border-radius: 2px;
+    transition: color 0.15s;
+    line-height: 1;
+    margin-top: 1px;
+    font-family: var(--mono);
+    letter-spacing: 0.02em;
+  }
+
+  .move-btn:hover { color: var(--accent); }
+
+  /* Category colors */
+  .cat-0 { background: rgba(74,158,255,0.15); }
+  .cat-1 { background: rgba(78,205,196,0.15); }
+  .cat-2 { background: rgba(255,107,107,0.15); }
+  .cat-3 { background: rgba(255,193,7,0.15); }
+  .cat-4 { background: rgba(40,167,69,0.15); }
+  .cat-5 { background: rgba(23,162,184,0.15); }
+  .cat-6 { background: rgba(232,62,140,0.15); }
+  .cat-7 { background: rgba(253,126,20,0.15); }
+
+  .cat-text-0 { color: #93c5fd; }
+  .cat-text-1 { color: #4ecdc4; }
+  .cat-text-2 { color: #ff8080; }
+  .cat-text-3 { color: #ffd54f; }
+  .cat-text-4 { color: #66bb6a; }
+  .cat-text-5 { color: #26c6da; }
+  .cat-text-6 { color: #f06292; }
+  .cat-text-7 { color: #ffa040; }
+
+  /* Error */
+  .error-box {
+    background: rgba(255,107,107,0.08);
+    border: 1px solid rgba(255,107,107,0.3);
+    border-radius: 3px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--accent3);
+    display: none;
+    margin-top: 16px;
+  }
+
+  .error-box.visible { display: block; }
+
+  /* Export preview */
+  .export-preview {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 16px;
+    font-size: 11px;
+    color: var(--text3);
+    font-family: var(--mono);
+    max-height: 180px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    line-height: 1.5;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
+
+  .category-card.collapsed .bookmark-list { display: none; }
+
+  /* Drop zone */
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 6px;
+    padding: 56px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    background: var(--surface2);
+    position: relative;
+  }
+
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(74,158,255,0.06);
+  }
+
+  .drop-zone.dragover .drop-icon { transform: scale(1.15); color: var(--accent); }
+  .drop-zone.file-loaded { border-color: var(--accent2); border-style: solid; background: rgba(78,205,196,0.05); }
+
+  .drop-icon {
+    font-size: 36px;
+    color: var(--text3);
+    margin-bottom: 16px;
+    transition: all 0.25s;
+    line-height: 1;
+    display: block;
+    font-family: var(--mono);
+    letter-spacing: -0.05em;
+  }
+
+  .drop-zone.file-loaded .drop-icon { color: var(--accent2); }
+
+  .drop-title {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--text2);
+    margin-bottom: 6px;
+  }
+
+  .drop-sub {
+    font-size: 11px;
+    color: var(--text3);
+    margin-bottom: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .drop-formats {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 2px;
+  }
+
+  .file-name-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(78,205,196,0.1);
+    border: 1px solid rgba(78,205,196,0.3);
+    color: var(--accent2);
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 3px;
+    margin-top: 14px;
+  }
+
+  /* Security Scanner */
+  .scan-clear {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(78,205,196,0.08);
+    border: 1px solid rgba(78,205,196,0.25);
+    border-radius: 4px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--accent2);
+    font-family: var(--mono);
+  }
+
+  .scan-clear-icon { font-size: 20px; }
+
+  .threat-summary {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .threat-stat {
+    padding: 10px 16px;
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid;
+  }
+
+  .threat-stat.critical { background: rgba(255,107,107,0.08); border-color: rgba(255,107,107,0.3); color: #ff8080; }
+  .threat-stat.high { background: rgba(255,165,0,0.08); border-color: rgba(255,165,0,0.3); color: #ffaa44; }
+  .threat-stat.medium { background: rgba(255,193,7,0.08); border-color: rgba(255,193,7,0.3); color: #ffd54f; }
+  .threat-stat-num { font-size: 20px; font-weight: 600; font-family: 'Syne', sans-serif; }
+
+  .threat-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .threat-item.critical { border-left: 3px solid #ff6b6b; }
+  .threat-item.high { border-left: 3px solid #ffaa44; }
+  .threat-item.medium { border-left: 3px solid #ffd54f; }
+
+  .threat-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .threat-header:hover { background: rgba(255,255,255,0.02); }
+
+  .threat-badge {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-family: var(--mono);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .threat-badge.critical { background: rgba(255,107,107,0.15); color: #ff8080; }
+  .threat-badge.high { background: rgba(255,170,68,0.15); color: #ffaa44; }
+  .threat-badge.medium { background: rgba(255,213,79,0.15); color: #ffd54f; }
+
+  .threat-domain {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .threat-type {
+    font-size: 12px;
+    color: var(--text3);
+    font-family: var(--mono);
+  }
+
+  .threat-chevron { color: var(--text3); font-size: 13px; transition: transform 0.2s; }
+  .threat-item.open .threat-chevron { transform: rotate(90deg); }
+
+  .threat-body {
+    display: none;
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .threat-item.open .threat-body { display: block; }
+
+  /* Quarantine */
+  .quarantine-btn {
+    background: rgba(255,107,107,0.1);
+    border: 1px solid rgba(255,107,107,0.35);
+    color: #ff8080;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .quarantine-btn:hover { background: rgba(255,107,107,0.2); }
+  .restore-btn {
+    background: rgba(78,205,196,0.1);
+    border: 1px solid rgba(78,205,196,0.35);
+    color: var(--accent2);
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .restore-btn:hover { background: rgba(78,205,196,0.2); }
+  .bookmark-item.quarantined {
+    opacity: 0.45;
+    border-left: 3px solid #ff6b6b !important;
+    background: rgba(255,107,107,0.04) !important;
+  }
+  .bookmark-item.quarantined .bookmark-title::after {
+    content: ' ⚠ QUARANTINED';
+    color: #ff8080;
+    font-size: 9px;
+    font-family: var(--mono);
+    letter-spacing: 0.08em;
+  }
+  .quarantine-panel {
+    background: rgba(255,107,107,0.05);
+    border: 1px solid rgba(255,107,107,0.2);
+    border-radius: 6px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .quarantine-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255,107,107,0.15);
+    cursor: pointer;
+  }
+  .quarantine-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #ff8080;
+    flex: 1;
+  }
+  .quarantine-body { padding: 12px 16px; }
+  .quarantine-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,107,107,0.08);
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .quarantine-row:last-child { border-bottom: none; }
+  .quarantine-url { flex: 1; color: var(--text2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .quarantine-reason { font-size: 10px; color: #ff8080; white-space: nowrap; }
+
+  .threat-desc {
+    font-size: 12px;
+    color: var(--text2);
+    margin: 12px 0 14px;
+    line-height: 1.6;
+    font-family: var(--mono);
+  }
+
+  .remediation-title {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    font-family: var(--mono);
+    margin-bottom: 10px;
+  }
+
+  .remediation-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .remediation-step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 12px;
+    font-family: var(--mono);
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  .step-num-badge {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--text3);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .affected-urls {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: var(--surface);
+    border-radius: 3px;
+    border: 1px solid var(--border);
+  }
+
+  .affected-url {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: var(--mono);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 2px 0;
+  }
+</style>
+</head>
+<body>
+<div class="back-nav">
+  <a href="../index.html">Portfolio</a>
+</div>
+<div class="container">
+  <header>
+    <h1>Bookmark<br><span>Organizer/Analyzer</span></h1>
+    <p class="subtitle">Drop your exported browser bookmarks file and Claude will automatically sort them into smart categories.</p>
+  </header>
+
+  <div class="steps">
+    <div class="step active" id="step1"><div class="step-num">1</div> Drop File</div>
+    <div class="step" id="step2"><div class="step-num">2</div> AI Categorizes</div>
+    <div class="step" id="step3"><div class="step-num">3</div> Review & Export</div>
+  </div>
+
+  <!-- Input Panel -->
+  <div class="panel visible" id="inputPanel">
+    <div class="panel-label">Drop Bookmark File</div>
+    <input type="file" id="fileInput" accept=".html,.htm" style="display:none">
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <div class="drop-icon" id="dropIcon">↓</div>
+      <div class="drop-title" id="dropTitle">Drop bookmarks file here</div>
+      <div class="drop-sub" id="dropSub">or click to browse</div>
+      <div class="drop-formats">Chrome · Safari · Firefox exported HTML</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="analyzeBtn" onclick="analyzeBookmarks()" disabled>
+        <span>✦</span> Analyze with AI
+      </button>
+    </div>
+    <div class="error-box" id="errorBox"></div>
+  </div>
+
+  <!-- Loading Panel -->
+  <div class="panel" id="loadingPanel">
+    <div class="loading visible">
+      <div class="spinner"></div>
+      <div class="loading-steps">
+        <div class="loading-step active" id="ls1">Parsing bookmarks...</div>
+        <div class="loading-step" id="ls2">Looking up domain categories...</div>
+        <div class="loading-step" id="ls3">Running AI on unknown sites...</div>
+        <div class="loading-step" id="ls4">Building organized view...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Panel -->
+  <div class="panel" id="resultsPanel">
+
+    <!-- TOP ALERT BAR — appears before everything else -->
+    <div id="topAlerts"></div>
+
+    <!-- Security Scan Panel -->
+    <div id="securityPanel" style="display:none;margin-bottom:28px;">
+      <div class="panel-label">🔒 Security Scan
+        <button class="btn btn-secondary" style="padding:6px 14px;font-size:13px;margin-left:12px;" onclick="runSecurityScan(_bookmarks)">↺ Rescan</button>
+        <button class="btn btn-secondary" id="quarantineViewBtn"
+          style="padding:6px 14px;font-size:13px;margin-left:8px;color:#ff8080;border-color:rgba(255,107,107,0.3);display:none"
+          title="Domains flagged by the security scanner — quarantined for investigation"
+          onclick="showQuarantinePanel()">☣ View Quarantine</button>
+      </div>
+      <div id="quarantinePanel" style="display:none;margin-bottom:16px;"></div>
+      <div id="securityResults"></div>
+      <div id="deadLinkResult"></div>
+    </div>
+
+    <!-- Quick Access Bar -->
+    <div id="quickAccessSection" style="display:none;margin-bottom:28px;">
+      <div class="panel-label">Quick Access</div>
+      <div class="quick-bar" id="quickBar">
+        <div class="quick-empty" id="quickEmpty">Pin bookmarks using the ◈ icon to add them here</div>
+      </div>
+    </div>
+
+    <div class="panel-label">Organized Bookmarks
+      <button class="btn btn-secondary" style="padding:6px 14px;font-size:13px;margin-left:12px;" onclick="addCustomCategory()">+ New Category</button>
+      <button class="btn btn-secondary" style="padding:6px 14px;font-size:13px;margin-left:8px;" onclick="checkDeadLinks()" id="deadLinkBtn">⚡ Check Dead Links</button>
+      <button class="btn btn-secondary" style="padding:6px 14px;font-size:13px;margin-left:auto;color:var(--accent);border-color:rgba(74,158,255,0.4);" onclick="reset()">↑ Load New File</button>
+    </div>
+    <div class="stats-bar" id="statsBar"></div>
+    <div class="categories-grid" id="categoriesGrid"></div>
+    <div class="divider"></div>
+    <div class="btn-row">
+      <button class="btn btn-export" onclick="exportBookmarks()">↓ Export as HTML</button>
+      <button class="btn btn-secondary" onclick="reset()">← Start over</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATEGORY_EMOJIS = {
+  'Security': '🔒', 'Cybersecurity': '🔒', 'Tools': '🔧', 'Development': '💻',
+  'Programming': '💻', 'News': '📰', 'Social Media': '💬', 'Shopping': '🛒',
+  'Finance': '💰', 'Entertainment': '🎬', 'Music': '🎵', 'Gaming': '🎮',
+  'Travel': '✈️', 'Food': '🍴', 'Health': '❤️', 'Education': '📚',
+  'Research': '🔬', 'Design': '🎨', 'Career': '💼', 'Government': '🏛️',
+  'International': '🌐', 'Career & Jobs': '💼', 'Medical & Health': '🏥', 'Kids & Family': '👨‍👩‍👧',
+  'Reference': '📖', 'Cloud': '☁️', 'AI': '🤖', 'AI & Machine Learning': '🤖',
+  'Productivity': '⚡', 'Documentation': '📄', 'Community': '👥', 'Storage': '💾',
+  'Accounts': '🔑', 'Government & Legal': '🏛️',
+};
+
+function getRootDomain(url) {
+  try {
+    const hostname = new URL(url).hostname.toLowerCase().replace('www.', '');
+    const parts = hostname.split('.');
+
+    // Known two-part TLDs — need 3 parts for root domain
+    const twoPartTlds = ['ac.in','ac.uk','ac.au','ac.nz','ac.za','ac.jp',
+                         'co.uk','co.nz','co.jp','co.za','co.in',
+                         'com.au','com.br','com.cn','com.mx','com.sg',
+                         'edu.au','edu.cn','gov.uk','gov.au','org.uk'];
+    const lastTwo = parts.slice(-2).join('.');
+    if (twoPartTlds.includes(lastTwo) && parts.length > 2) {
+      return parts.slice(-3).join('.');
+    }
+
+    if (parts.length > 2) return parts.slice(-2).join('.');
+    return hostname;
+  } catch { return url; }
+}
+
+function normalizeUrl(href) {
+  try {
+    const parsed = new URL(href);
+    const path = parsed.pathname.toLowerCase();
+    const params = parsed.search.toLowerCase();
+    const hostname = parsed.hostname.toLowerCase().replace('www.', '');
+    const rootDomain = getRootDomain(href);
+
+    // ── FINANCIAL & LOGIN DOMAINS ─────────────────────────────────────
+    // These sites require login — always strip to root hostname.
+    // The deep paths are session-specific and useless without being logged in.
+    // Stripping to root gives you the login page which redirects to dashboard.
+    const loginDomains = [
+      'chase.com','bankofamerica.com','wellsfargo.com','citibank.com','citi.com',
+      'usbank.com','capitalone.com','ally.com','discover.com','pnc.com',
+      'tdbank.com','schwab.com','fidelity.com','vanguard.com','etrade.com',
+      'tdameritrade.com','merrilledge.com','robinhood.com','webull.com',
+      'coinbase.com','binance.com','kraken.com','gemini.com',
+      'paypal.com','venmo.com','cashapp.com','zelle.com','wise.com',
+      'navient.com','salliemae.com','mohela.com','nelnet.com',
+      'turbotax.com','hrblock.com','taxact.com',
+      'cigna.com','aetna.com','bcbs.com','humana.com','unitedhealthcare.com',
+      'optum.com','caremark.com','expressscripts.com',
+      'mychart.com','healow.com','athenahealth.com',
+      'abbadox.com','labcorp.com','questdiagnostics.com',
+    ];
+
+    if (loginDomains.includes(rootDomain)) {
+      // Keep the subdomain (e.g. secure.chase.com, digital.fidelity.com)
+      // but strip everything after the hostname
+      return `${parsed.protocol}//${parsed.hostname}/`;
+    }
+
+    // ── ACCOUNT / SESSION PATHS ───────────────────────────────────────
+    // These path patterns indicate a session page — strip to root
+    // NOTE: Only match against the PATH, never against the hostname/subdomain
+    const accountPaths = [
+      '/customer/','/account/','/orders/','/dashboard/','/profile/',
+      '/patientportal/','/patient-portal/','/myaccount/','/my-account/',
+      '/signin','/login','/logout','/auth/','/oauth/','/sso/',
+      '/callback','/authorize','/token','/session',
+      '/cart','/checkout','/billing/','/payment/','/subscription/',
+      '/settings/','/preferences/','/notifications/',
+      '/portal/','/member/',
+      '/publish-confirmation','/post-confirmation','/confirm',
+      '/welcome','/onboard','/setup','/wizard',
+      '/pages/contact','/pages/about','/pages/faq',
+      '/ftgw/','/portfolio/summary','/positions','/balances',
+      '/statements/','/tax-forms/','/beneficiaries/',
+    ];
+
+    // These params are session/auth related — strip to root
+    const accountParams = ['client_id','redirect_uri','access_token','session','oauth',
+                           'blogid','postid','timestamp','javascriptenabled'];
+
+    const isAccountPath = accountPaths.some(p => path.startsWith(p) || path.includes(p));
+    const isAccountParam = accountParams.some(p => params.includes(p));
+
+    if (isAccountPath || isAccountParam) {
+      return `${parsed.protocol}//${parsed.hostname}/`;
+    }
+
+    // ── CONTENT DOMAINS ───────────────────────────────────────────────
+    // Keep full URL path (minus query params and hash fragments)
+    const contentDomains = [
+      'youtube.com','youtu.be','vimeo.com','twitch.tv',
+      'github.com','gitlab.com','codepen.io','codesandbox.io','replit.com',
+      'reddit.com','twitter.com','x.com','instagram.com','linkedin.com',
+      'medium.com','substack.com','dev.to','hashnode.com','wordpress.com',
+      'blogger.com','tumblr.com','ghost.io','beehiiv.com',
+      'amazon.com','ebay.com','etsy.com',
+      'wikipedia.org','wikihow.com',
+      'stackoverflow.com','stackexchange.com',
+      'nytimes.com','bbc.com','theguardian.com','wired.com','techcrunch.com',
+      'spotify.com','soundcloud.com','bandcamp.com',
+      'pinterest.com','flickr.com','unsplash.com',
+      'docs.google.com','notion.so','airtable.com',
+    ];
+
+    const isContentDomain = contentDomains.some(d => hostname === d || hostname.endsWith('.'+d));
+
+    if (isContentDomain) {
+      // Strip query params and hash fragments — keep only path
+      return `${parsed.protocol}//${parsed.hostname}${parsed.pathname}`;
+    }
+
+    // ── EVERYTHING ELSE ───────────────────────────────────────────────
+    // Keep if path is short (1-2 segments) or has a file extension
+    const hasFileExtension = /\.[a-z]{2,4}$/i.test(parsed.pathname);
+    if (hasFileExtension) {
+      return `${parsed.protocol}//${parsed.hostname}${parsed.pathname}`;
+    }
+
+    const pathSegments = parsed.pathname.split('/').filter(s => s.length > 0);
+    if (pathSegments.length <= 2) {
+      // Strip hash fragments but keep path
+      return `${parsed.protocol}//${parsed.hostname}${parsed.pathname}`;
+    }
+
+    // Deep path (3+ segments), no file extension — strip to root
+    return `${parsed.protocol}//${parsed.hostname}/`;
+
+  } catch {
+    return href;
+  }
+}
+
+function parseBookmarks(html) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  const links = doc.querySelectorAll('a[href]');
+  const seenDomains = new Set();
+  const seenUrls = new Set();
+  const bookmarks = [];
+  let httpCount = 0;
+  let placeholderCount = 0;
+  window._httpRemoved = [];
+
+  // Content domains where multiple bookmarks from the same domain are valid
+  const multiBookmarkDomains = [
+    'youtube.com','youtu.be','vimeo.com','twitch.tv','dailymotion.com',
+    'github.com','gitlab.com','github.io','gitlab.io',
+    'codepen.io','codesandbox.io','replit.com','gist.github.com',
+    'reddit.com','twitter.com','x.com','instagram.com','threads.net',
+    'medium.com','substack.com','dev.to','hashnode.com','wordpress.com','ghost.io',
+    'blogger.com','tumblr.com','beehiiv.com','typepad.com','livejournal.com',
+    'wikipedia.org','wikihow.com','wikimedia.org',
+    'stackoverflow.com','stackexchange.com','quora.com',
+    'nytimes.com','bbc.com','theguardian.com','wired.com','techcrunch.com',
+    'theatlantic.com','newyorker.com','economist.com','axios.com','politico.com',
+    'straitstimes.com',  // keep full URL — interactive graphics at subpaths
+    'spotify.com','soundcloud.com','bandcamp.com','genius.com',
+    'pinterest.com','flickr.com','unsplash.com','behance.net','dribbble.com',
+    'amazon.com','ebay.com','etsy.com',
+    'docs.google.com','notion.so','airtable.com','coda.io',
+    'arxiv.org','pubmed.ncbi.nlm.nih.gov','researchgate.net','academia.edu',
+    'linkedin.com','glassdoor.com','kickstarter.com','indiegogo.com',
+    'yelp.com','tripadvisor.com',
+    'netlify.app','vercel.app','pages.dev','web.app','firebaseapp.com',
+    'surge.sh','render.com','onrender.com','glitch.me',
+  ];
+
+  // Placeholder/template URLs that are never real bookmarks
+  const placeholderPaths = [
+    '/your/','/example/','/sample/','/placeholder/','/demo/',
+    '/username/','/profile/username','/user/username',
+  ];
+
+  const placeholderDomains = [
+    'example.com','example.org','test.com','localhost',
+  ];
+
+  links.forEach(a => {
+    const href = a.getAttribute('href');
+    if (!href) return;
+
+    // Skip HTTP — only allow HTTPS
+    if (href.startsWith('http://')) {
+      httpCount++;
+      window._httpRemoved = window._httpRemoved || [];
+      window._httpRemoved.push({ title: a.textContent.trim() || href, url: href });
+      return;
+    }
+    if (!href.startsWith('https://')) return;
+
+    // Skip placeholder/template URLs
+    const hrefLower = href.toLowerCase();
+    if (placeholderPaths.some(p => hrefLower.includes(p))) { placeholderCount++; return; }
+    if (placeholderDomains.some(d => hrefLower.includes(d))) { placeholderCount++; return; }
+
+    const rootDomain = getRootDomain(href);
+    const normalizedUrl = normalizeUrl(href);
+    const hostname = (() => { try { return new URL(href).hostname.replace('www.',''); } catch { return ''; } })();
+    const isContentDomain = multiBookmarkDomains.some(d => hostname === d || hostname.endsWith('.'+d));
+
+    if (isContentDomain) {
+      if (!seenUrls.has(normalizedUrl)) {
+        seenUrls.add(normalizedUrl);
+        bookmarks.push({ title: a.textContent.trim() || normalizedUrl, url: normalizedUrl, domain: rootDomain });
+      }
+    } else {
+      if (!seenDomains.has(rootDomain)) {
+        seenDomains.add(rootDomain);
+        bookmarks.push({ title: a.textContent.trim() || normalizedUrl, url: normalizedUrl, domain: rootDomain });
+      }
+    }
+  });
+
+  const totalSeen = httpCount + placeholderCount + bookmarks.length +
+    (seenDomains.size - bookmarks.filter(b => !multiBookmarkDomains.some(d => { try { const h = new URL(b.url).hostname.replace('www.',''); return h === d || h.endsWith('.'+d); } catch { return false; } })).length);
+
+  window._parseStats = {
+    httpFiltered: httpCount,
+    placeholderFiltered: placeholderCount,
+    totalInFile: httpCount + placeholderCount + seenDomains.size + seenUrls.size,
+  };
+  return bookmarks;
+}
+
+function getFavicon(url) {
+  try {
+    const domain = new URL(url).hostname;
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+  } catch { return ''; }
+}
+
+function getDomain(url) {
+  try { return new URL(url).hostname.replace('www.', ''); }
+  catch { return url; }
+}
+
+let _fileContent = null;
+
+function handleFileSelect(input) {
+  const file = input.files[0];
+  if (!file) {
+    showError('No file selected.');
+    return;
+  }
+  readFile(file);
+}
+
+function readFile(file) {
+  const reader = new FileReader();
+  reader.onerror = () => showError('Error reading file: ' + reader.error);
+  reader.onload = e => {
+    const content = e.target.result;
+    _fileContent = content;
+    const zone = document.getElementById('dropZone');
+    zone.classList.add('file-loaded');
+    document.getElementById('dropIcon').textContent = '✓';
+    document.getElementById('dropTitle').textContent = file.name;
+    document.getElementById('dropSub').textContent = `${(file.size / 1024).toFixed(1)} KB — ready to analyze`;
+    const btn = document.getElementById('analyzeBtn');
+    btn.disabled = false;
+    btn.classList.add('ready');
+  };
+  reader.readAsText(file);
+}
+
+// Drag and drop events
+document.addEventListener('DOMContentLoaded', () => {
+  const zone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+
+  // File input change — fires when user selects via browse
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (file) readFile(file);
+  });
+
+  // Prevent browser from opening files dropped anywhere on the page
+  document.body.addEventListener('dragover', e => e.preventDefault());
+  document.body.addEventListener('drop', e => e.preventDefault());
+
+  zone.addEventListener('dragenter', e => {
+    e.preventDefault();
+    zone.classList.add('dragover');
+  });
+
+  zone.addEventListener('dragover', e => {
+    e.preventDefault();
+    zone.classList.add('dragover');
+  });
+
+  zone.addEventListener('dragleave', e => {
+    e.preventDefault();
+    if (!zone.contains(e.relatedTarget)) zone.classList.remove('dragover');
+  });
+
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    zone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) readFile(file);
+  });
+});
+
+function showError(msg) {
+  const errorBox = document.getElementById('errorBox');
+  errorBox.textContent = msg;
+  errorBox.classList.add('visible');
+}
+
+// ─── PRE-CLASSIFIER ──────────────────────────────────────────────────────────
+// Main category → subcategory → { domains[], titleKeywords[], urlKeywords[] }
+const TAXONOMY = {
+  'Development': {
+    'JavaScript': {
+      domains: ['javascript.info','nodejs.org','npmjs.com','babeljs.io','eslint.org','jestjs.io','reactjs.org','react.dev','vuejs.org','angular.io','svelte.dev','nextjs.org','nuxt.com','vitejs.dev','webpack.js.org','rollupjs.org','typescriptlang.org','deno.land','bun.sh','expressjs.com'],
+      titleKw: ['javascript','js','node','npm','react','vue','angular','svelte','next.js','nuxt','typescript','webpack','babel','eslint','jest','vite','deno','bun','jquery','lodash','axios'],
+      urlKw: ['javascript','nodejs','react','vue','angular','svelte','typescript']
+    },
+    'Python': {
+      domains: ['python.org','pypi.org','docs.python.org','flask.palletsprojects.com','djangoproject.com','fastapi.tiangolo.com','pandas.pydata.org','numpy.org','scipy.org','matplotlib.org','pytorch.org','tensorflow.org','scikit-learn.org'],
+      titleKw: ['python','django','flask','fastapi','pandas','numpy','pytorch','tensorflow','scikit','pip','conda','jupyter'],
+      urlKw: ['python','django','flask','fastapi','pandas','numpy','pytorch']
+    },
+    'CSS & Design Systems': {
+      domains: ['css-tricks.com','tailwindcss.com','getbootstrap.com','bulma.io','sass-lang.com','postcss.org','styled-components.com','storybook.js.org','material-ui.com','mui.com','chakra-ui.com','radix-ui.com','shadcn.com','ant.design','mantine.dev','nextui.org'],
+      titleKw: ['css','tailwind','bootstrap','sass','scss','styled-components','material ui','chakra','flexbox','grid','animation','responsive'],
+      urlKw: ['css','tailwind','bootstrap','sass']
+    },
+    'Tools & DevOps': {
+      domains: ['github.com','gitlab.com','bitbucket.org','codepen.io','codesandbox.io','replit.com','vercel.com','netlify.com','heroku.com','railway.app','render.com','digitalocean.com','aws.amazon.com','cloud.google.com','azure.microsoft.com','docker.com','kubernetes.io','terraform.io','circleci.com','github.com/actions'],
+      titleKw: ['github','gitlab','docker','kubernetes','devops','ci/cd','pipeline','deploy','hosting','cloud','server','terminal','bash','shell','linux','git','repository','repo','commit','pull request'],
+      urlKw: ['github','gitlab','docker','kubernetes','deploy','devops']
+    },
+    'Documentation & Reference': {
+      domains: ['developer.mozilla.org','devdocs.io','docs.python.org','developer.chrome.com','web.dev','caniuse.com','regex101.com','json.org','openai.com/docs','docs.anthropic.com','developer.apple.com','developer.android.com'],
+      titleKw: ['docs','documentation','reference','api','mdn','devdocs','spec','specification','manual','guide','tutorial','how to','cheatsheet','cheat sheet'],
+      urlKw: ['docs','documentation','developer','reference','api','guide','tutorial']
+    },
+    'General': {
+      domains: ['stackoverflow.com','dev.to','hashnode.com','medium.com/tag/programming','hackernoon.com','lobste.rs','news.ycombinator.com','leetcode.com','hackerrank.com','codewars.com','exercism.org','projecteuler.net','frontendmentor.io','freecodecamp.org','theodinproject.com'],
+      titleKw: ['programming','coding','developer','software','engineering','algorithm','data structure','open source'],
+      urlKw: ['programming','coding','developer','software']
+    }
+  },
+  'Design': {
+    'UI/UX': {
+      domains: ['figma.com','sketch.com','invisionapp.com','zeplin.io','framer.com','protopie.io',
+                'maze.co','useberry.com','hotjar.com','uxpin.com','axure.com','balsamiq.com',
+                'ux.stackexchange.com','uxdesign.cc','nngroup.com','uiprep.com','lawsofux.com',
+                'app-ab14.marketo.com','docs.marketo.com'],
+      titleKw: ['figma','sketch','invision','wireframe','prototype','ux','ui','user experience','user interface','design system','component','mockup'],
+      urlKw: ['figma','sketch','wireframe','prototype','ux','ui']
+    },
+    'Inspiration': {
+      domains: ['dribbble.com','behance.net','awwwards.com','cssdesignawards.com','siteinspire.com','onepagelove.com','land-book.com','designspiration.com','pinterest.com','ui-patterns.com','mobbin.com','pttrns.com'],
+      titleKw: ['inspiration','gallery','showcase','portfolio','award','design ideas'],
+      urlKw: ['inspiration','gallery','showcase']
+    },
+    'Assets & Resources': {
+      domains: ['canva.com','adobe.com','unsplash.com','pexels.com','freepik.com','flaticon.com',
+                'iconify.design','heroicons.com','fontawesome.com','fonts.google.com','dafont.com',
+                'myfonts.com','creativefabrica.com','nounproject.com',
+                'rgb.to','colorhunt.co','coolors.co','colorhex.com','paletton.com',
+                'colorzilla.com','colorpicker.me','htmlcolorcodes.com','colordesigner.io',
+                'spline.design','rive.app','lottiefiles.com','motionarray.com',
+                'cloudconvert.com','convertio.co','ezgif.com','tinypng.com','squoosh.app',
+                'remove.bg','cleanup.pictures','unscreen.com','smallpdf.com'],
+      titleKw: ['icons','fonts','typography','illustrations','stock photos','assets','svg','vector','free resources','color palette','colors'],
+      urlKw: ['icons','fonts','unsplash','pexels','freepik','flaticon']
+    }
+  },
+  'Cybersecurity': {
+    'Learning & Practice': {
+      domains: ['tryhackme.com','hackthebox.com','cybrary.it','sans.org','offensive-security.com',
+                'portswigger.net','pentesterlab.com','vulnhub.com','root-me.org','overthewire.org',
+                'picoctf.org','ctftime.org','hackthissite.org','enigmagroup.org','icsrange.eu',
+                'letsdefend.io','blueteamlabs.online','cyberdefenders.org','attackdefense.com',
+                'hacker101.com','bugcrowd.com','hackerone.com','intigriti.com','yeswehack.com',
+                'pentesteracademy.com','elearnsecurity.com','tcm-sec.com','sektor7.net',
+                'malwareunicorn.org','opensecuritytraining2.github.io',
+                'learn.microsoft.com','docs.microsoft.com'],
+      titleKw: ['tryhackme','hackthebox','ctf','penetration testing','pentesting','ethical hacking','cybersecurity course','security training','capture the flag','offensive security'],
+      urlKw: ['tryhackme','hackthebox','ctf','pentest']
+    },
+    'Tools & Intelligence': {
+      domains: ['shodan.io','virustotal.com','mitre.org','attack.mitre.org','exploit-db.com',
+                'nvd.nist.gov','cve.mitre.org','cvedetails.com','abuse.ch','threatfox.abuse.ch','urlscan.io',
+                'crackstation.net','hashcat.net','openwall.com','gnupg.org','letsencrypt.org',
+                'cryptii.com','cyberchef.org','gchq.github.io','dcode.fr','cryptohack.org',
+                'hashkiller.io','hashes.com','md5decrypt.net','sha256.online',
+                'dash.cloudflare.com','cloudflare.com','console.groq.com',
+                'any.run','hybrid-analysis.com','censys.io','greynoise.io','malwarebazaar.abuse.ch',
+                'abuseipdb.com','haveibeenpwned.com','dehashed.com','intelx.io','spyse.com',
+                'securitytrails.com','whoisxmlapi.com','zoomeye.org','fofa.info','binaryedge.io',
+                'pulsedive.com','otx.alienvault.com','threatintelligenceplatform.com',
+                'mxtoolbox.com','dnsdumpster.com','robtex.com','threatminer.org',
+                'talosintelligence.com','ibm.com/security','recordedfuture.com','mandiant.com',
+                'crowdstrike.com','splunk.com','elastic.co','qradar.com','microsoft.com/security',
+                'sentinelone.com','carbonblack.com','cybereason.com','darktrace.com',
+                'tenable.com','qualys.com','rapid7.com','nessus.org','openvas.org',
+                'burpsuite.com','nmap.org','wireshark.org','metasploit.com','kali.org',
+                'parrotsec.org','remnux.org','flare-vm.com','cuckoo.cert.ee',
+                'snort.org','suricata.io','zeek.org','ossec.net','wazuh.com',
+                'sublime.security','abnormalsecurity.com','proofpoint.com','mimecast.com'],
+      titleKw: ['shodan','virustotal','mitre','exploit','cve','vulnerability','malware','threat intelligence','ioc','indicator','osint'],
+      urlKw: ['shodan','virustotal','exploit','vulnerability','cve','malware','threat']
+    },
+    'News & Research': {
+      domains: ['krebsonsecurity.com','darkreading.com','bleepingcomputer.com','thehackernews.com',
+                'threatpost.com','securityweek.com','schneier.com','troyhunt.com',
+                'portswigger.net','cisomag.com','infosecurity-magazine.com','helpnetsecurity.com',
+                'cyberscoops.com','cyberscoop.com','recordedfuture.com/blog','unit42.paloaltonetworks.com',
+                'research.checkpoint.com','securelist.com','welivesecurity.com','malwarebytes.com',
+                'trendmicro.com','sophos.com','f-secure.com','eset.com'],
+      titleKw: ['security news','breach','ransomware','phishing','vulnerability disclosure','security research','infosec'],
+      urlKw: ['security','infosec','cybersecurity']
+    }
+  },
+  'Finance': {
+    'Banking': {
+      domains: ['chase.com','bankofamerica.com','wellsfargo.com','citibank.com','citi.com',
+                'online.citi.com','usbank.com','capitalone.com','ally.com','discover.com',
+                'pnc.com','tdbank.com','schwab.com','fidelity.com','vanguard.com',
+                'etrade.com','tdameritrade.com','ameriprise.com'],
+      titleKw: ['bank','checking','savings','account','banking','credit union','wire transfer','deposit'],
+      urlKw: ['bank','checking','savings','banking']
+    },
+    'Loans & Student Debt': {
+      domains: ['navient.com','salliemae.com','mohela.com','myfedloan.org','studentaid.gov','nelnet.com','aidvantage.com','sofi.com','earnest.com','commonbond.com','lendkey.com','credible.com','lendingtree.com','bankrate.com'],
+      titleKw: ['student loan','loan','debt','repayment','refinance','financial aid','fafsa','navient','sallie mae','mohela'],
+      urlKw: ['loan','debt','student','navient','sallie','mohela','studentaid']
+    },
+    'Payments & Transfers': {
+      domains: ['paypal.com','venmo.com','cashapp.com','zelle.com','stripe.com','square.com','wise.com','revolut.com','chime.com'],
+      titleKw: ['paypal','venmo','cash app','zelle','payment','transfer','send money'],
+      urlKw: ['paypal','venmo','cashapp','payment','transfer']
+    },
+    'Investing & Crypto': {
+      domains: ['robinhood.com','coinbase.com','binance.com','kraken.com','gemini.com','etoro.com',
+                'webull.com','m1finance.com','acorns.com','stash.com','blockchain.com',
+                'coingecko.com','coinmarketcap.com','finviz.com','simplywall.st','stockanalysis.com',
+                'invest.ameritrade.com','finance.yahoo.com','seekingalpha.com','morningstar.com',
+                'marketwatch.com','investing.com','tradingview.com'],
+      titleKw: ['invest','stock','crypto','bitcoin','ethereum','portfolio','trading','market','fund','etf','401k','ira','retirement'],
+      urlKw: ['invest','stock','crypto','bitcoin','trading','market']
+    },
+    'Tax & Budgeting': {
+      domains: ['turbotax.com','hrblock.com','taxact.com','irs.gov','efile.com','freetaxusa.com','mint.com','quicken.com','ynab.com','personalcapital.com','nerdwallet.com'],
+      titleKw: ['tax','turbotax','irs','refund','budget','budgeting','expense','net worth','financial planning'],
+      urlKw: ['tax','irs','budget','financial']
+    }
+  },
+  'News & Media': {
+    'General News': {
+      domains: ['nytimes.com','bbc.com','cnn.com','theguardian.com','reuters.com','apnews.com','washingtonpost.com','wsj.com','usatoday.com','nbcnews.com','abcnews.go.com','cbsnews.com','npr.org','pbs.org'],
+      titleKw: ['news','breaking','latest','headlines','report','journalist','press','newspaper'],
+      urlKw: ['news','press','media']
+    },
+    'Tech News': {
+      domains: ['techcrunch.com','theverge.com','wired.com','arstechnica.com','engadget.com','gizmodo.com','9to5mac.com','macrumors.com','androidcentral.com','tomshardware.com','anandtech.com','hothardware.com'],
+      titleKw: ['tech news','technology news','gadgets','hardware','software release','apple','google','microsoft','ai news'],
+      urlKw: ['tech','gadget','hardware','apple','google','microsoft']
+    },
+    'Business & Finance News': {
+      domains: ['bloomberg.com','forbes.com','fortune.com','businessinsider.com','economist.com','ft.com','marketwatch.com','cnbc.com','barrons.com','seekingalpha.com'],
+      titleKw: ['business news','finance news','market','economy','stocks','earnings','startup','venture','ipo'],
+      urlKw: ['business','finance','market','economy']
+    }
+  },
+  'Entertainment': {
+    'Streaming': {
+      domains: ['netflix.com','hulu.com','disneyplus.com','hbomax.com','max.com','peacocktv.com','paramountplus.com','appletv.com','primevideo.com','crunchyroll.com','funimation.com','hidive.com','mubi.com'],
+      titleKw: ['netflix','hulu','disney+','hbo','streaming','watch','series','movie','film','show'],
+      urlKw: ['netflix','hulu','disney','hbo','streaming','watch']
+    },
+    'Music': {
+      domains: ['spotify.com','music.apple.com','youtube.com/music','soundcloud.com','bandcamp.com',
+                'tidal.com','deezer.com','pandora.com','last.fm','genius.com','musixmatch.com',
+                'musiclassroom.com','musictheory.net','teoria.com','musicnotes.com',
+                'sheetmusicplus.com','8notes.com','justinguitar.com'],
+      titleKw: ['spotify','apple music','music','playlist','album','artist','song','lyrics','concert'],
+      urlKw: ['spotify','music','soundcloud','bandcamp','tidal']
+    },
+    'Gaming': {
+      domains: ['steam.com','store.steampowered.com','epicgames.com','gog.com','itch.io','twitch.tv','xbox.com','playstation.com','nintendo.com','ign.com','gamespot.com','polygon.com','kotaku.com','pcgamer.com'],
+      titleKw: ['game','gaming','steam','xbox','playstation','nintendo','esports','twitch','streamer'],
+      urlKw: ['game','gaming','steam','xbox','playstation','nintendo','twitch']
+    },
+    'Video': {
+      domains: ['youtube.com','vimeo.com','dailymotion.com','rumble.com','odysee.com','nebula.tv',
+                'graphics.straitstimes.com','straitstimes.com'],
+      titleKw: ['youtube','video','watch','channel','vimeo','vlog','podcast video','interactive','marvel','marvel cinematic'],
+      urlKw: ['youtube','vimeo','video','watch','interactive']
+    }
+  },
+  'Social Media': {
+    'General': {
+      domains: ['twitter.com','x.com','instagram.com','facebook.com','threads.net','mastodon.social','bluesky.app','bsky.app'],
+      titleKw: ['twitter','instagram','facebook','threads','mastodon','bluesky','social'],
+      urlKw: ['twitter','instagram','facebook','threads','mastodon','bluesky']
+    },
+    'Professional': {
+      domains: ['linkedin.com','angel.co','wellfound.com','glassdoor.com','indeed.com'],
+      titleKw: ['linkedin','professional network','job','career','resume','portfolio'],
+      urlKw: ['linkedin','angel','wellfound','glassdoor']
+    },
+    'Communities': {
+      domains: ['reddit.com','discord.com','slack.com','hackernews.com','news.ycombinator.com','producthunt.com','indiehackers.com','dev.to','lobste.rs'],
+      titleKw: ['reddit','discord','community','forum','subreddit','channel','group','hacker news'],
+      urlKw: ['reddit','discord','community','forum']
+    }
+  },
+  'Shopping': {
+    'General': {
+      domains: ['amazon.com','ebay.com','etsy.com','walmart.com','target.com','costco.com','samsclub.com','aliexpress.com','wish.com','temu.com'],
+      titleKw: ['buy','shop','sale','deal','discount','cart','order','purchase','price','promo'],
+      urlKw: ['shop','buy','store','cart','order','deal']
+    },
+    'Electronics & Tech': {
+      domains: ['bestbuy.com','newegg.com','bhphotovideo.com','adorama.com','microcenter.com','apple.com/store','samsung.com','lg.com'],
+      titleKw: ['laptop','computer','phone','headphones','monitor','keyboard','gpu','cpu','electronics','gadget'],
+      urlKw: ['electronics','tech','gadget','computer','phone']
+    },
+    'Fashion & Lifestyle': {
+      domains: ['zara.com','h&m.com','hm.com','uniqlo.com','nordstrom.com','macys.com','gap.com','oldnavy.com','asos.com','shein.com','zappos.com','wayfair.com','ikea.com'],
+      titleKw: ['clothing','fashion','shoes','outfit','style','wardrobe','furniture','home decor','interior'],
+      urlKw: ['fashion','clothing','shoes','outfit','furniture','decor']
+    }
+  },
+  'Education': {
+    'Courses & Learning': {
+      domains: ['coursera.org','udemy.com','edx.org','pluralsight.com','lynda.com','linkedin.com/learning','skillshare.com','masterclass.com','domestika.org','udacity.com','datacamp.com'],
+      titleKw: ['course','learn','tutorial','lesson','class','certification','bootcamp','training','mooc','workshop'],
+      urlKw: ['course','learn','tutorial','lesson','training']
+    },
+    'Reference & Research': {
+      domains: ['wikipedia.org','britannica.com','scholar.google.com','jstor.org','pubmed.ncbi.nlm.nih.gov','arxiv.org','researchgate.net','academia.edu','wolframalpha.com'],
+      titleKw: ['wikipedia','research','paper','study','encyclopedia','academic','journal','citation'],
+      urlKw: ['wikipedia','research','scholar','arxiv','journal']
+    },
+    'Language Learning': {
+      domains: ['duolingo.com','babbel.com','rosettastone.com','busuu.com','pimsleur.com','italki.com','anki.com','memrise.com'],
+      titleKw: ['language','duolingo','spanish','french','german','japanese','chinese','vocabulary','grammar'],
+      urlKw: ['duolingo','language','vocab','grammar']
+    }
+  },
+  'Productivity': {
+    'Notes & Docs': {
+      domains: ['notion.so','obsidian.md','roamresearch.com','logseq.com','evernote.com','onenote.com','bear.app','craft.do','confluence.atlassian.com','coda.io'],
+      titleKw: ['notes','notion','obsidian','wiki','knowledge base','document','writing','journal'],
+      urlKw: ['notion','obsidian','notes','docs','wiki']
+    },
+    'Tasks & Projects': {
+      domains: ['trello.com','asana.com','monday.com','clickup.com','linear.app','basecamp.com',
+                'atlassian.com','atlassian.net','id.atlassian.com','jira.atlassian.com',
+                'confluence.atlassian.com','todoist.com','things.app','omnifocus.com','height.app'],
+      titleKw: ['task','project','todo','kanban','sprint','agile','trello','asana','jira','monday'],
+      urlKw: ['task','project','todo','trello','asana','jira']
+    },
+    'Communication': {
+      domains: ['gmail.com','mail.google.com','outlook.com','protonmail.com','hey.com','fastmail.com','slack.com','zoom.us','meet.google.com','teams.microsoft.com','calendly.com'],
+      titleKw: ['email','inbox','gmail','outlook','slack','zoom','meeting','calendar','schedule'],
+      urlKw: ['gmail','outlook','mail','slack','zoom','calendar','meeting']
+    },
+    'Storage & Files': {
+      domains: ['drive.google.com','dropbox.com','onedrive.live.com','box.com','icloud.com','mega.nz','pcloud.com','wetransfer.com'],
+      titleKw: ['cloud storage','drive','dropbox','onedrive','backup','file sharing','sync'],
+      urlKw: ['drive','dropbox','onedrive','storage','cloud']
+    }
+  },
+  'AI & Machine Learning': {
+    'Tools & Assistants': {
+      domains: ['chat.openai.com','claude.ai','gemini.google.com','copilot.microsoft.com','perplexity.ai','poe.com','character.ai','inflection.ai','you.com','phind.com'],
+      titleKw: ['chatgpt','claude','gemini','copilot','ai assistant','llm','gpt','ai tool','ai chat'],
+      urlKw: ['openai','claude','gemini','copilot','perplexity','ai','gpt']
+    },
+    'Image & Creative AI': {
+      domains: ['midjourney.com','dalle.com','stability.ai','runwayml.com','adobe.com/ai','canva.com','krea.ai','ideogram.ai','leonardoai.com','civitai.com','replicate.com'],
+      titleKw: ['midjourney','dalle','stable diffusion','ai image','ai art','image generation','ai video','ai music'],
+      urlKw: ['midjourney','dalle','stable-diffusion','runway','ai-image','image-gen']
+    },
+    'Research & Papers': {
+      domains: ['arxiv.org','huggingface.co','paperswithcode.com','distill.pub','openai.com/research','deepmind.google','anthropic.com','ai.google.research'],
+      titleKw: ['machine learning','deep learning','neural network','transformer','llm','paper','research','model','fine-tuning','rag'],
+      urlKw: ['arxiv','huggingface','papers','research','ml','ai']
+    }
+  },
+  'Medical & Health': {
+    'Patient Portals': {
+      domains: ['mychart.com','myhealth.com','followmyhealth.com','patientportal.com','healow.com',
+                'nextmd.com','athenahealth.com','epic.com','cerner.com','allscripts.com',
+                'abbadox.com','merge.com','intelerad.com','sectra.com','agfa.com',
+                'carecloud.com','drchrono.com','practicefusion.com','advancedmd.com',
+                'eclinicalworks.com','kareo.com','webpt.com','netsmart.com',
+                'meditab.com','chartlogic.com','modernizingmedicine.com','nvoq.com',
+                'doximity.com','zocdoc.com','healthgrades.com','vitals.com','ratemds.com',
+                'teladoc.com','mdlive.com','amwell.com','doxy.me','spruce.health',
+                'onemedical.com','forward.com','parsley.com','ro.co','hims.com',
+                'cigna.com','aetna.com','bcbs.com','humana.com','unitedhealthcare.com',
+                'anthem.com','molina.com','centene.com','magellanhealth.com',
+                'optum.com','express-scripts.com','caremark.com','medimpact.com',
+                'labcorp.com','questdiagnostics.com','bioreference.com','sonoraquest.com',
+                'nationwidechildrens.org','chop.edu','childrenshospital.org'],
+      titleKw: ['patient portal','mychart','my chart','my health','medical records','appointment','lab results','test results','my doctor','patient login','health portal','clinic login','hospital login','radiology','imaging','diagnostic','x-ray','mri','ct scan','ultrasound','pathology','dermatology','cardiology','oncology','orthopedic','pediatric','neurology','urology','gastroenterology','ophthalmology','pharmacy','prescription','insurance','copay','deductible','eob','explanation of benefits','referral','specialist'],
+      urlKw: ['patient','mychart','myhealth','medical','clinic','hospital','radiology','imaging','diagnostic','health','doctor','physician','dental','vision','pharmacy','rx','insurance','claims']
+    },
+    'Medical Reference': {
+      domains: ['webmd.com','mayoclinic.org','healthline.com','nih.gov','cdc.gov','medlineplus.gov','drugs.com','rxlist.com','clevelandclinic.org','hopkinsmedicine.org','medscape.com'],
+      titleKw: ['symptoms','diagnosis','medication','disease','condition','treatment','webmd','mayo clinic','healthline','medscape'],
+      urlKw: ['webmd','mayoclinic','healthline','medscape','nih.gov','cdc.gov']
+    },
+    'Fitness & Wellness': {
+      domains: ['myfitnesspal.com','fitbit.com','strava.com','garmin.com','whoop.com','cronometer.com','headspace.com','calm.com','noom.com'],
+      titleKw: ['workout','exercise','fitness','nutrition','calories','diet','yoga','meditation','wellness','running'],
+      urlKw: ['fitness','workout','nutrition','calories','yoga','meditation']
+    }
+  },
+  'Kids & Family': {
+    'School & Education': {
+      domains: ['clever.com','classlink.com','powerschool.com','schoology.com','canvas.com','google.com/edu','docs.google.com','classroom.google.com','ixl.com','khanacademy.org','readingeggs.com','starfall.com','abcmouse.com','brainpop.com','prodigymath.com','mathplayground.com','funbrain.com'],
+      titleKw: ['school','student','classroom','grade','homework','teacher','parent portal','learning','school login','student portal','clever','classlink','powerschool','schoology'],
+      urlKw: ['school','student','classroom','clever','classlink','powerschool','schoology','canvas','edu']
+    },
+    'Kids Entertainment': {
+      domains: ['pbskids.org','nickjr.com','disneyjunior.com','cartoonnetwork.com','nick.com','youtube.com/channel','youtubekids.com','poptropica.com','roblox.com','minecraft.net','scratch.mit.edu'],
+      titleKw: ['kids','children','cartoon','pbs kids','disney junior','nick jr','roblox','minecraft','scratch'],
+      urlKw: ['kids','children','pbskids','nickjr','roblox','minecraft','scratch']
+    },
+    'Family Resources': {
+      domains: ['pediatricsafety.com','aap.org','commonsensemedia.org','familyeducation.com','parenting.com'],
+      titleKw: ['parenting','family','pediatric','children health','library','public library'],
+      urlKw: ['parenting','family','pediatric','library']
+    }
+  },
+  'Travel': {
+    'Booking': {
+      domains: ['airbnb.com','booking.com','expedia.com','hotels.com','vrbo.com','kayak.com','priceline.com','hopper.com','skyscanner.com','google.com/flights','united.com','delta.com','southwest.com','aa.com'],
+      titleKw: ['hotel','flight','booking','airbnb','reservation','travel deal','vacation rental'],
+      urlKw: ['hotel','flight','booking','airbnb','travel','vacation']
+    },
+    'Maps & Navigation': {
+      domains: ['maps.google.com','maps.apple.com','waze.com','mapbox.com','openstreetmap.org','citymapper.com'],
+      titleKw: ['maps','directions','navigation','route','gps'],
+      urlKw: ['maps','directions','navigation','waze']
+    },
+    'Guides & Inspiration': {
+      domains: ['tripadvisor.com','lonelyplanet.com','nomadlist.com','worldpackers.com','couchsurfing.com','roadtrippers.com'],
+      titleKw: ['travel guide','destination','itinerary','things to do','travel tips','backpacking'],
+      urlKw: ['travel','destination','itinerary','guide']
+    }
+  },
+  'Government & Legal': {
+    'Government': {
+      domains: ['usa.gov','gov.uk','canada.ca','irs.gov','ssa.gov','medicare.gov','va.gov','state.gov','whitehouse.gov','congress.gov','federalregister.gov','studentaid.gov'],
+      titleKw: ['government','federal','state','department','agency','official','gov','public service','benefit','social security'],
+      urlKw: ['.gov','government','federal','official']
+    },
+    'Legal': {
+      domains: ['law.cornell.edu','justia.com','findlaw.com','avvo.com','nolo.com','courtlistener.com','pacer.gov','legalzoom.com','rocket lawyer.com'],
+      titleKw: ['law','legal','attorney','lawyer','court','contract','rights','legislation','statute'],
+      urlKw: ['law','legal','court','attorney','lawyer']
+    }
+  },
+  'International': {
+    'Korean': {
+      domains: ['naver.com','kakao.com','daum.net','nate.com','coupang.com','gmarket.co.kr',
+                '11st.co.kr','interpark.com','yes24.com','kyobo.co.kr','melon.com','bugs.co.kr'],
+      titleKw: [], urlKw: []
+    },
+    'Japanese': {
+      domains: ['rakuten.co.jp','yahoo.co.jp','amazon.co.jp','nicovideo.jp','pixiv.net',
+                'dmm.com','mercari.com','line.me','cookpad.com','tabelog.com','hatena.ne.jp'],
+      titleKw: [], urlKw: []
+    },
+    'Chinese': {
+      domains: ['baidu.com','weibo.com','taobao.com','tmall.com','jd.com','bilibili.com',
+                'qq.com','wechat.com','youku.com','iqiyi.com','tencent.com','alibaba.com',
+                'aliexpress.com','zhihu.com','douban.com','xiaohongshu.com'],
+      titleKw: [], urlKw: []
+    },
+    'European': {
+      domains: ['leboncoin.fr','zalando.de','bol.com','allegro.pl','idealo.de','otto.de',
+                'aboutyou.de','vinted.com','avito.ru','wildberries.ru','ozon.ru'],
+      titleKw: [], urlKw: []
+    },
+    'Other': {
+      domains: [],
+      titleKw: [], urlKw: []
+    }
+  },
+  'Accounts': {
+    'Telecom & Internet': {
+      domains: ['verizon.com','verizonwireless.com','att.com','tmobile.com','t-mobile.com',
+                'xfinity.com','comcast.com','spectrum.com','cox.com','optimum.com',
+                'uinet.com','portal.uinet.com','optimum.net'],
+      titleKw: ['verizon','at&t','xfinity','comcast','spectrum','internet','wireless','mobile plan'],
+      urlKw: ['verizon','xfinity','comcast','spectrum','uinet']
+    },
+    'Auto & Loans': {
+      domains: ['americanhondafinance.com','my.americanhondafinance.com',
+                'ally.com','carvana.com','autotrader.com','carmax.com',
+                'navient.com','myaccount.navient.com','salliemae.com',
+                'mohela.com','aidvantage.com','nelnet.com'],
+      titleKw: ['honda','auto','loan','car payment','student loan','navient'],
+      urlKw: ['honda','auto','navient','sallie','mohela']
+    },
+    'Subscriptions & Utilities': {
+      domains: ['directenergy.com','eversource.com','nationalgrid.com','coned.com',
+                'nrg.com','pseg.com','geico.com','progressive.com','statefarm.com',
+                'allstate.com','esurance.com'],
+      titleKw: ['energy','electric','gas','insurance','utility','bill'],
+      urlKw: ['energy','electric','utility','insurance']
+    }
+  }
+};
+
+// ─── DOMAIN KEYWORD MATCHER ──────────────────────────────────────────────────
+// Rules are checked in order — first match wins.
+// Each rule: { keywords: [], main, sub }
+// Keywords are matched against the ROOT DOMAIN only (e.g. "navient" from navient.com)
+// This means "pay" won't match "payroll.mycompany.com" — it matches the root domain part
+
+const DOMAIN_KEYWORD_RULES = [
+
+  // ── TLD RULES (highest priority) ─────────────────────────────────
+  { tld: '.gov', main: 'Government & Legal', sub: 'Government' },
+  { tld: '.mil', main: 'Government & Legal', sub: 'Government' },
+  { tld: '.edu', main: 'Education', sub: 'Reference & Research' },
+
+  // ── MEDICAL & HEALTH (must come BEFORE Finance to prevent false matches) ──
+  { kw: ['hospital','clinic','medical','medspa','medcenter','medgroup','medcare','medstar',
+         'healthsystem','healthnet','healthspring','healthwise','healthgrades',
+         'dental','dentist','dentistry','orthodont','periodon','endodon',
+         'vision','optical','optom','optician','eyecare','eyeclinic',
+         'ortho','orthoped','orthopedic','spine','spinecare','spinalcare',
+         'neurol','neurology','neurolog','neurosurg','neurocare',
+         'cardiol','cardiology','cardiolog','heartcare','heartclinic',
+         'oncol','oncology','cancercenter','cancercare',
+         'dermat','dermatol','skincare','skinclinic',
+         'urology','urolog','gastro','gastroenterol','pulmonol',
+         'radiol','radiology','radiolog','imaging','diagnosticimag',
+         'sonograph','ultrasound','xray','mri','petscans','pathol',
+         'pharmacy','pharmac','walgreens','cvs','riteaid',
+         'physician','doctor','doctorcare','primarycare','urgentcare','emergencycare',
+         'patient','patientportal','mychart','healow','followmyhealth',
+         'pediatric','pediatr','neonat','obstet','gynecol','womenshealth',
+         'rehab','rehabilitation','physio','physiother','occupational',
+         'psychiat','psychiatr','psychol','mentalhealth','behavioral',
+         'chiropractic','acupunct','massage','wellness','wellcare',
+         'surgery','surgical','surgicenter','surgcare',
+         'labcorp','questdiagnostic','bioreference','sonoraquest',
+         'abbadox','intelerad','sectra','agfa','merge','carecloud',
+         'eclinicalworks','kareo','practicefusion','advancedmd','drchrono'],
+    main: 'Medical & Health', sub: 'Patient Portals' },
+
+  // ── GOVERNMENT & LEGAL ───────────────────────────────────────────
+  // NOTE: Keywords must be specific enough not to match commercial .com domains
+  // e.g. "govern" matches "governance.com", "state" matches "statespace.com"
+  // Only use keywords that are unambiguously government-related
+  { kw: ['whitehouse','congress','senate','parliament','legislature','judiciary','courthouse',
+         'municipalit','countygov','cityofgov','publicworks','dmv.org','ssa.gov','medicare.gov',
+         'veterans.gov','military.mil','usps.com','tsa.gov','dhs.gov','fbi.gov','cia.gov',
+         'nsa.gov','uspto.gov','fda.gov','epa.gov','fcc.gov','sec.gov','ftc.gov','cdc.gov',
+         'nih.gov','noaa.gov','nasa.gov','usa.gov','data.gov'],
+    main: 'Government & Legal', sub: 'Government' },
+
+  { kw: ['legalzoom','findlaw','justia','avvo','nolo','lawfirm','lawgroup','lawoffice',
+         'attorney','lawyer','paralegal','litigation','lawsuit'],
+    main: 'Government & Legal', sub: 'Legal' },
+
+  // ── FINANCE ──────────────────────────────────────────────────────
+  { kw: ['navient','salliemae','mohela','nelnet','aidvantage','fedloan','studentaid','fafsa'],
+    main: 'Finance', sub: 'Loans & Student Debt' },
+
+  { kw: ['bankofamerica','wellsfargo','citibank','jpmorgan','usbank','tdbank','pncbank',
+         'suntrust','truist','keybank','fifththird','creditunion','navyfcu','pentagonfcu',
+         'bankingapp','onlinebanking','mobilebanking'],
+    main: 'Finance', sub: 'Banking' },
+
+  { kw: ['mortgage','homeloan','refinancing','heloc','moneylender','quickenloans','rocketmortgage',
+         'lendingclub','lendingpoint','sofi','earnest','credible','studentloan'],
+    main: 'Finance', sub: 'Loans & Student Debt' },
+
+  { kw: ['paypal','venmo','cashapp','zelle','stripe','square','wise','revolut','chime',
+         'remittance','moneytransfer','wiretransfer','moneyorder','payoneer'],
+    main: 'Finance', sub: 'Payments & Transfers' },
+
+  { kw: ['fidelity','vanguard','schwab','etrade','robinhood','webull','merrilledge',
+         'ameritrade','tdameritrade','morganstanley','goldmansachs','raymondjames','edwardjones',
+         'ameriprise','usaa','tiaa','fidelityinvestments','charlesschwab',
+         'coinbase','binance','kraken','gemini','bitfinex','blockchain',
+         'stockmarket','stockbroker','investing','cryptocurrency','bitcoin','ethereum'],
+    main: 'Finance', sub: 'Investing & Crypto' },
+
+  { kw: ['turbotax','hrblock','taxact','taxslayer','freetaxusa','taxfiling','taxreturn',
+         'creditkarma','creditscores','nerdwallet','personalfinance','budgeting','mint',
+         'ynab','personalcapital','wealthfront','betterment'],
+    main: 'Finance', sub: 'Tax & Budgeting' },
+
+  // ── SHOPPING ─────────────────────────────────────────────────────
+  { kw: ['food','grocery','grocer','supermarket','meat','deli','butcher','seafood','fish',
+         'produce','organic','farm','farmfresh','harvest','bakery','bread','pastry','cake',
+         'chocolate','candy','snack','gourmet','artisan','italian','mexican','asian','halal',
+         'kosher','vegan','vegetarian','natural','wholesome','pantry','kitchen','cook','recipe',
+         'restaurant','dining','eatery','bistro','cafe','coffee','tea','wine','beer','liquor',
+         'spirits','brewery','winery','distillery','bar','pub'],
+    main: 'Shopping', sub: 'Food & Grocery' },
+
+  { kw: ['lightspeed','shopify','bigcommerce','woocommerce','magento','prestashop','volusion',
+         'squarespace','wix','weebly','ecwid','shift4shop','3dcart','opencart','oscommerce',
+         'ecommerce','ecom','onlinestore','storefront','checkout','shoppingcart','merchantportal',
+         'sellercentral','vendorcentral','fulfillment','dropship','inventory','sku','catalog',
+         'klaviyo','omnisend','mailchimp','shopifyapp','appsumo',
+         'smartstore','cafe24','godo','imweb','naver'],
+    main: 'Shopping', sub: 'E-commerce Tools' },
+
+  { kw: ['amazon','ebay','etsy','walmart','target','costco','samsclub','aliexpress','wish','temu',
+         'wayfair','overstock','chewy','petco','petsmart','homedepot','lowes','ikea','crate',
+         'pottery','williams','williams-sonoma','anthropologie','urbanoutfitters','zara','hm',
+         'uniqlo','nordstrom','macys','bloomingdale','neiman','saks','jcrew','gap','banana',
+         'oldnavy','forever21','shein','asos','zappos','dsw','footlocker','nike','adidas',
+         'bestbuy','newegg','microcenter','bhphoto','adorama','bh','staples','officemax'],
+    main: 'Shopping', sub: 'General' },
+
+  { kw: ['laptop','computer','gaming','gpu','cpu','hardware','electronics','gadget','tech','apple',
+         'samsung','dell','hp','lenovo','asus','acer','monitor','keyboard','mouse','headphone',
+         'speaker','camera','drone','robot','smart','iot','wearable','phone','mobile','tablet'],
+    main: 'Shopping', sub: 'Electronics & Tech' },
+
+  { kw: ['fashion','style','boutique','cloth','apparel','outfit','dress','shirt','jean','shoe',
+         'sneaker','boot','bag','purse','handbag','jewelry','jewel','watch','luxury','brand',
+         'designer','couture','vintage','thrift','consign'],
+    main: 'Shopping', sub: 'Fashion & Lifestyle' },
+
+  // ── TRAVEL ───────────────────────────────────────────────────────
+  { kw: ['park','national','wilderness','forest','preserve','reserve','refuge','monument',
+         'recreation','campground','camping','hiking','trail','mountain','canyon','valley',
+         'glacier','lake','river','beach','coast','island','scenic','nature','wildlife','outdoor'],
+    main: 'Travel', sub: 'Guides & Inspiration' },
+
+  { kw: ['hotel','motel','inn','resort','lodge','hostel','airbnb','vrbo','vacation','rental',
+         'flight','airline','airways','airport','aviation','cruise','ship','amtrak','train',
+         'expedia','booking','kayak','priceline','hopper','skyscanner','travelocity','orbitz'],
+    main: 'Travel', sub: 'Booking' },
+
+  { kw: ['travel','trip','tour','tourism','tourist','destination','itinerary','passport','visa',
+         'backpack','nomad','wanderlust','adventure','explore','expedition','safari','cruise'],
+    main: 'Travel', sub: 'Guides & Inspiration' },
+
+  // ── EDUCATION ────────────────────────────────────────────────────
+  { kw: ['coursera','udemy','edx','pluralsight','skillshare','masterclass','udacity','datacamp',
+         'codecademy','freecodecamp','khanacademy','brilliant','duolingo','babbel','rosetta',
+         'lynda','linkedin-learning','treehouse','launchschool','bootcamp','bootcamp'],
+    main: 'Education', sub: 'Courses & Learning' },
+
+  { kw: ['university','college','academy','institute','school','campus','curriculum','syllabus',
+         'lecture','course','class','lesson','tutor','learn','study','student','education','degree',
+         'diploma','certificate','graduation','scholarship','fellowship','research','thesis'],
+    main: 'Education', sub: 'Courses & Learning' },
+
+  { kw: ['wikipedia','encyclopedia','britannica','reference','dictionary','thesaurus','atlas',
+         'almanac','archive','library','museum','exhibit','history','science','biology','chemistry',
+         'physics','math','mathematic','calculus','algebra','geometry','statistic','astronom',
+         'geology','ecology','botany','zoology','anthropolog','archaeolog','paleontol'],
+    main: 'Education', sub: 'Reference & Research' },
+
+  { kw: ['arxiv','pubmed','ncbi','scholar','journal','research','academic','peer-review','paper',
+         'publication','preprint','dissertation','thesis','ieee','acm','springer','elsevier','wiley'],
+    main: 'Education', sub: 'Reference & Research' },
+
+  // ── DEVELOPMENT ──────────────────────────────────────────────────
+  { kw: ['github','gitlab','bitbucket','stackoverflow','codepen','codesandbox','replit','glitch',
+         'vercel','netlify','heroku','railway','render','digitalocean','linode','vultr','aws',
+         'azure','gcloud','docker','kubernetes','terraform','ansible','jenkins','circleci',
+         'githubio','gitlabio','github-io','pages-dev'],
+    main: 'Development', sub: 'Tools & DevOps' },
+
+  { kw: ['javascript','typescript','nodejs','reactjs','vuejs','angular','svelte','nextjs','nuxt',
+         'webpack','vite','babel','eslint','jest','npm','yarn','pnpm','deno','bun'],
+    main: 'Development', sub: 'JavaScript' },
+
+  { kw: ['python','django','flask','fastapi','pandas','numpy','scipy','pytorch','tensorflow',
+         'scikit','jupyter','conda','pip','pypi','anaconda'],
+    main: 'Development', sub: 'Python' },
+
+  { kw: ['css','tailwind','bootstrap','sass','scss','postcss','figma','sketch','invision',
+         'storybook','framer','webflow','wordpress','wix','squarespace','shopify'],
+    main: 'Development', sub: 'CSS & Design Systems' },
+
+  { kw: ['developer','develop','devops','programming','coder','coding','software','engineer',
+         'api','sdk','framework','library','package','module','plugin','extension','open-source',
+         'opensource','git','repository','repo','commit','deploy','hosting','server','backend',
+         'frontend','fullstack','database','sql','nosql','postgresql','mysql','mongodb','redis'],
+    main: 'Development', sub: 'General' },
+
+  { kw: ['docs','documentation','reference','mdn','devdocs','manual','spec','guide','tutorial',
+         'howto','caniuse','regex','json','yaml','xml','markdown','lint','debug','test','qa'],
+    main: 'Development', sub: 'Documentation & Reference' },
+
+  // ── DESIGN ───────────────────────────────────────────────────────
+  { kw: ['figma','sketch','invision','zeplin','framer','protopie','marvel','balsamiq','axure',
+         'wireframe','prototype','mockup','ux','ui','userexperience','userinterfac','heuristic',
+         'usability','useberry','hotjar','nngroup','lawsofux','uiprep','uxpin',
+         'marketo','abtesting','optimizely','unbounce','instapage','vwo'],
+    main: 'Design', sub: 'UI/UX' },
+
+  { kw: ['dribbble','behance','awwwards','siteinspire','onepagelove','landbook','designspir',
+         'inspiration','gallery','showcase','creative','portfolio','award'],
+    main: 'Design', sub: 'Inspiration' },
+
+  { kw: ['canva','adobe','photoshop','illustrator','indesign','lightroom','premiere','aftereffect',
+         'unsplash','pexels','pixabay','freepik','flaticon','iconify','fontawesome','iconfinder',
+         'noun','hero','icon','font','typeface','typography',
+         'color','colour','palette','gradient','colorhunt','colorhex','colorpicker','coolors',
+         'paletton','colorzilla','colorspace','colordesign',
+         // Short keywords below use exact word-segment matching (see preClassify step 3)
+         'rgb','hex','cmyk','logo','art',
+         'svg','vector','illustration','asset','resource','stock','photo','image',
+         'mockup','spline','rive','lottie','motiondesign','aftereffects',
+         'artstation','deviantart','behance','dribbble','designspiration',
+         'logomaker','logotype','brandmark','looka','hatchful',
+         'cloudconvert','convertio','ezgif','tinypng','squoosh','smallpdf',
+         'remove.bg','unscreen','converter','webm','compress'],
+    main: 'Design', sub: 'Assets & Resources' },
+
+  // ── CYBERSECURITY ─────────────────────────────────────────────────
+  { kw: ['tryhackme','hackthebox','ctf','pentesting','pentest','cybersecurity','infosec','hacking',
+         'ethicalhack','offensivesecurity','defensivesecurity','blueteam','redteam','purpleteam',
+         'soc','siem','soar','xdr','edr','mdr','ueba','casb','dlp','ztna','zerotrust',
+         'shodan','virustotal','mitre','exploit','vulnerability','cve','nvd','nist','sans',
+         'cybrary','securityplus','ceh','oscp','cissp','gpen','gwapt','ejpt',
+         'malware','ransomware','phishing','spearphish','vishing','smishing','bec',
+         'threatintel','ioc','ttp','apt','threat','intelligence','darkweb','darknet',
+         'osint','recon','footprint','enumerat','nmap','metasploit','burpsuite','burp',
+         'wireshark','tcpdump','volatility','autopsy','sleuthkit','foremost',
+         'kali','parrot','blackarch','remnux','flare','cuckoo','anyrun',
+         'splunk','qradar','sentinel','defender','crowdstrike','carbonblack','cybereason',
+         'paloalto','fortinet','checkpoint','juniper','sonicwall','watchguard',
+         'snort','suricata','zeek','bro','ossec','wazuh','graylog','elastic',
+         'nessus','openvas','qualys','rapid7','tenable','nexpose','acunetix',
+         'securitytrails','whoisxml','censys','greynoise','threatfox','abuseipdb',
+         'haveibeenpwned','dehashed','intelx','spyse','zoomeye',
+         'hashcat','crackstation','hashkiller','rainbowtable','passwordcrack','johntheripper',
+         'cryptography','encryption','decryption','cipher','decipher','encode','decode',
+         'gnupg','pgp','ssl','tls','certificate','letsencrypt','pki','x509',
+         'yara','sigma','snort','ids','ips','firewall','waf','honeypot',
+         'seclists','wordlist','payload','shellcode','reverseshell','privesc',
+         'dfir','forensics','incident','breach','blueteam','soc','analyst'],
+    main: 'Cybersecurity', sub: 'Tools & Intelligence' },
+
+  // ── AI & MACHINE LEARNING ────────────────────────────────────────
+  { kw: ['openai','anthropic','claude','gemini','chatgpt','copilot','perplexity','midjourney',
+         'stability','runway','huggingface','replicate','ollama','llm','gpt','llama','mistral',
+         'cohere','ai','artificialintelligence','machinelearning','deeplearning','neural',
+         'diffusion','generative','genai','agi','chatbot','assistant'],
+    main: 'AI & Machine Learning', sub: 'Tools & Assistants' },
+
+  // ── ENTERTAINMENT ────────────────────────────────────────────────
+  { kw: ['netflix','hulu','disney','hbo','max','peacock','paramount','apple-tv','primevideo',
+         'crunchyroll','funimation','mubi','tubi','pluto','stream','watch','series','movie',
+         'film','cinema','theater','theatre','show','episode','season'],
+    main: 'Entertainment', sub: 'Streaming' },
+
+  { kw: ['spotify','soundcloud','bandcamp','tidal','deezer','pandora','lastfm','genius',
+         'music','song','album','artist','playlist','lyrics','concert','ticket','festival'],
+    main: 'Entertainment', sub: 'Music' },
+
+  { kw: ['steam','epicgame','gog','itch','roblox','minecraft','fortnite','valorant','league',
+         'twitch','gaming','game','esport','xbox','playstation','nintendo','console','arcade'],
+    main: 'Entertainment', sub: 'Gaming' },
+
+  { kw: ['youtube','vimeo','dailymotion','rumble','video','vlog','podcast','channel','creator'],
+    main: 'Entertainment', sub: 'Video' },
+
+  { kw: ['sport','football','soccer','basketball','baseball','hockey','tennis','golf','racing',
+         'volleyball','volleyball','lacrosse','cricket','rugby','swimming','swim','diving',
+         'gymnastics','gymnastic','wrestling','boxing','mma','ufc','martial','karate','judo',
+         'cycling','bicycle','triathlon','marathon','running','track','field','archery',
+         'bowling','billiard','darts','esport','nfl','nba','mlb','nhl','mls','wnba',
+         'fifa','uefa','ncaa','pga','ufc','wwe','f1','nascar','indycar','motogp',
+         'espn','bleacher','athletic','stadium','arena','league','franchise',
+         'playoff','championship','olympic','athlete','coach','referee','score','scoreboard',
+         'roster','draft','fantasy','bettor','sportsbook','fanatics','team'],
+    main: 'Entertainment', sub: 'Sports' },
+
+  // ── SOCIAL MEDIA ─────────────────────────────────────────────────
+  { kw: ['twitter','instagram','facebook','threads','mastodon','bluesky','snapchat','tiktok',
+         'pinterest','tumblr','social','network','community','forum','discussion','chat','message'],
+    main: 'Social Media', sub: 'General' },
+
+  { kw: ['linkedin','glassdoor','indeed','wellfound','angellist','hired','ziprecruiter','monster',
+         'careerbuilder','simplyhired','ladders','dice','flexjobs','weworkremotely',
+         'remote.co','remoteok','joblist','snagajob','internships','internmatch',
+         'handshake','wayup','chegg','collegegrad','aftercollege'],
+    main: 'Career & Jobs', sub: 'Job Search' },
+
+  { kw: ['reddit','discord','slack','hackernews','producthunt','indiehackers','devto','lobsters',
+         'quora','stackoverflow','community','subreddit','forum','thread','post','comment'],
+    main: 'Social Media', sub: 'Communities' },
+
+  // ── NEWS & MEDIA ─────────────────────────────────────────────────
+  { kw: ['news','press','media','times','post','herald','journal','tribune','gazette','observer',
+         'reporter','correspondent','telegraph','guardian','mirror','daily','weekly','magazine',
+         'broadcast','nbc','abc','cbs','cnn','fox','msnbc','npr','bbc','reuters','apnews',
+         'bloomberg','forbes','fortune','wsj','economist','politico','axios','thehill','buzzfeed'],
+    main: 'News & Media', sub: 'General News' },
+
+  { kw: ['techcrunch','theverge','wired','ars','arstechnica','engadget','gizmodo','cnet','zdnet',
+         'tomshardware','anandtech','macrumors','9to5','venturebeat','techradar'],
+    main: 'News & Media', sub: 'Tech News' },
+
+  // ── PRODUCTIVITY ─────────────────────────────────────────────────
+  { kw: ['notion','obsidian','roam','logseq','evernote','onenote','bear','craft','coda',
+         'confluence','wiki','knowledge','note','journal','diary','planner','organiz'],
+    main: 'Productivity', sub: 'Notes & Docs' },
+
+  { kw: ['trello','asana','monday','clickup','linear','basecamp','jira','todoist','things',
+         'omnifocus','task','todo','project','kanban','sprint','agile','scrum','workflow',
+         'atlassian','confluence','bitbucket','bamboo','statuspage'],
+    main: 'Productivity', sub: 'Tasks & Projects' },
+
+  { kw: ['gmail','outlook','protonmail','hey','fastmail','calendar','schedule','meeting',
+         'zoom','meet','teams','webex','calendly','doodle','acuity','email','inbox','mail'],
+    main: 'Productivity', sub: 'Communication' },
+
+  { kw: ['dropbox','onedrive','gdrive','box','icloud','mega','pcloud','wetransfer','backblaze',
+         'storage','backup','sync','cloud','drive','file','document','folder','share'],
+    main: 'Productivity', sub: 'Storage & Files' },
+
+  // ── KIDS & FAMILY ────────────────────────────────────────────────
+  { kw: ['clever','classlink','powerschool','schoology','canvas','ixl','readingeggs','starfall',
+         'abcmouse','brainpop','prodigy','mathplayground','funbrain','pbskids','nickjr',
+         'disneyjunior','cartoonnetwork','roblox','scratch','kidz','childrens','kids'],
+    main: 'Kids & Family', sub: 'School & Education' },
+
+  { kw: ['pediatric','pediatr','child','children','parenting','parent','family','baby','toddler',
+         'preschool','kindergarten','elementary','middle','highschool','student','homework',
+         'classroom','teacher','grade','tutor','afterschool','daycare','nanny'],
+    main: 'Kids & Family', sub: 'Family Resources' },
+
+  // ── LIFESTYLE & HOME ─────────────────────────────────────────────
+  { kw: ['zillow','redfin','trulia','realtor','realestate','homes','homeaway','apartments',
+         'rentals','rentcom','hotpads','loopnet','costar','crexi','remax','coldwell',
+         'keller','berkshire','compass','opendoor','offerpad','homie','homelight'],
+    main: 'Lifestyle', sub: 'Real Estate' },
+
+  { kw: ['fitness','gym','workout','exercise','yoga','pilates','crossfit','peloton','strava',
+         'garmin','fitbit','whoop','nutrition','diet','calories','meal','supplement','protein',
+         'wellness','mindful','meditat','mental','selfcare','spa','massage'],
+    main: 'Medical & Health', sub: 'Fitness & Wellness' },
+
+];
+
+// Pre-classify a single bookmark — domain keyword matching, no title guessing
+function preClassify(b) {
+  const domain = b.domain || getRootDomain(b.url);
+
+  // ── USER CORRECTIONS FIRST (highest priority) ─────────────────
+  const learned = applyUserLearning(domain);
+  if (learned) return { main: learned.main, sub: learned.sub };
+
+  // ── URL-LEVEL OVERRIDES (for specific paths on shared domains) ──
+  const urlLower = (b.url || '').toLowerCase();
+  if (urlLower.includes('youtube.com/@adammarczakyt') ||
+      urlLower.includes('youtube.com/@ibmtechnology') ||
+      urlLower.includes('youtube.com/@networkchuck') ||
+      urlLower.includes('youtube.com/@davidbombal') ||
+      urlLower.includes('youtube.com/@liveoverflow') ||
+      urlLower.includes('youtube.com/@ippsec') ||
+      urlLower.includes('youtube.com/@johnhammond')) {
+    return { main: 'Cybersecurity', sub: 'Learning & Practice' };
+  }
+  if (urlLower.includes('learn.microsoft.com')) {
+    return { main: 'Cybersecurity', sub: 'Learning & Practice' };
+  }
+  // These are domains where the subdomain changes the meaning entirely
+  const fullHostname = (() => { try { return new URL(b.url).hostname.toLowerCase().replace('www.',''); } catch { return ''; } })();
+  const hostnameOverrides = {
+    'ux.stackexchange.com':       { main: 'Design', sub: 'UI/UX' },
+    'security.stackexchange.com': { main: 'Cybersecurity', sub: 'Tools & Intelligence' },
+    'webmasters.stackexchange.com': { main: 'Development', sub: 'General' },
+    'money.stackexchange.com':    { main: 'Finance', sub: 'Tax & Budgeting' },
+    'travel.stackexchange.com':   { main: 'Travel', sub: 'Guides & Inspiration' },
+    'workplace.stackexchange.com':{ main: 'Career & Jobs', sub: 'Job Search' },
+    'writesonic.com':             { main: 'AI & Machine Learning', sub: 'Tools & Assistants' },
+    'app.writesonic.com':         { main: 'AI & Machine Learning', sub: 'Tools & Assistants' },
+    'monkeytype.com':             { main: 'Kids & Family', sub: 'School & Education' },
+    'finviz.com':                 { main: 'Finance', sub: 'Investing & Crypto' },
+    'online.citi.com':            { main: 'Finance', sub: 'Banking' },
+    'simplywall.st':              { main: 'Finance', sub: 'Investing & Crypto' },
+    'app.pluralsight.com':        { main: 'Education', sub: 'Courses & Learning' },
+    'xfinity.com':                { main: 'Accounts', sub: 'Telecom & Internet' },
+    'portal.uinet.com':           { main: 'Accounts', sub: 'Telecom & Internet' },
+    'uinet.com':                  { main: 'Accounts', sub: 'Telecom & Internet' },
+    'my.americanhondafinance.com':{ main: 'Accounts', sub: 'Auto & Loans' },
+    'americanhondafinance.com':   { main: 'Accounts', sub: 'Auto & Loans' },
+    'verizon.com':                { main: 'Accounts', sub: 'Telecom & Internet' },
+    'verizonwireless.com':        { main: 'Accounts', sub: 'Telecom & Internet' },
+    'upstart.com':                { main: 'Accounts', sub: 'Auto & Loans' },
+    // Cloudflare tools — infrastructure/security platform
+    'athenahealth.com':           { main: 'Medical & Health', sub: 'Patient Portals' },
+    'portal.athenahealth.com':    { main: 'Medical & Health', sub: 'Patient Portals' },
+    'cloudflare.com':             { main: 'Cybersecurity', sub: 'Tools & Intelligence' },
+    // Groq — AI/dev API console
+    'console.groq.com':           { main: 'AI & Machine Learning', sub: 'Tools & Assistants' },
+    'groq.com':                   { main: 'AI & Machine Learning', sub: 'Tools & Assistants' },
+    // Discord — cybersecurity communities
+    'discord.com':                { main: 'Social Media', sub: 'Communities' },
+    // Microsoft Learn — cybersecurity/Azure training
+    'learn.microsoft.com':        { main: 'Cybersecurity', sub: 'Learning & Practice' },
+    // YouTube cybersecurity channels — keep as content (full URL preserved)
+  };
+  if (hostnameOverrides[fullHostname]) return hostnameOverrides[fullHostname];
+  if (hostnameOverrides[domain]) return hostnameOverrides[domain];
+
+  // ── ABSOLUTE FIRST: TLD rules — cannot be overridden by anything ──
+  if (domain.endsWith('.gov')) return { main: 'Government & Legal', sub: 'Government' };
+  if (domain.endsWith('.mil')) return { main: 'Government & Legal', sub: 'Government' };
+  if (domain.endsWith('.edu')) return { main: 'Education', sub: 'Reference & Research' };
+  if (domain.endsWith('.ac.uk')) return { main: 'Education', sub: 'Reference & Research' };
+  if (domain.endsWith('.ac.au')) return { main: 'Education', sub: 'Reference & Research' };
+  if (domain.endsWith('.ac.nz')) return { main: 'Education', sub: 'Reference & Research' };
+  if (domain.endsWith('.ac.in')) return { main: 'Education', sub: 'Courses & Learning' };
+  if (domain.endsWith('.ac.za')) return { main: 'Education', sub: 'Reference & Research' };
+  if (domain.endsWith('.ac.jp')) return { main: 'Education', sub: 'Reference & Research' };
+  if (domain.endsWith('.edu.au')) return { main: 'Education', sub: 'Reference & Research' };
+  if (domain.endsWith('.edu.cn')) return { main: 'Education', sub: 'Reference & Research' };
+
+  // ── COUNTRY TLD DETECTION → International ──
+  // Korean ccTLD
+  if (domain.endsWith('.co.kr') || domain.endsWith('.or.kr') || domain.endsWith('.ne.kr'))
+    return { main: 'International', sub: 'Korean' };
+  // Japanese ccTLD
+  if (domain.endsWith('.co.jp') || domain.endsWith('.ne.jp') || domain.endsWith('.or.jp'))
+    return { main: 'International', sub: 'Japanese' };
+  // Chinese ccTLD
+  if (domain.endsWith('.cn') || domain.endsWith('.com.cn') || domain.endsWith('.net.cn'))
+    return { main: 'International', sub: 'Chinese' };
+  // Russian ccTLD
+  if (domain.endsWith('.ru') || domain.endsWith('.рф'))
+    return { main: 'International', sub: 'European' };
+  // Other common country ccTLDs
+  const europeanTlds = ['.de','.fr','.it','.es','.nl','.pl','.se','.no','.dk','.fi',
+                        '.pt','.be','.at','.ch','.cz','.hu','.ro','.gr','.uk','.ie'];
+  if (europeanTlds.some(t => domain.endsWith(t)))
+    return { main: 'International', sub: 'European' };
+  const otherTlds = ['.jp','.kr','.tw','.hk','.sg','.my','.th','.vn','.id','.ph',
+                     '.in','.pk','.bd','.lk','.np','.au','.nz','.za','.ng','.ke',
+                     '.br','.mx','.ar','.cl','.co','.pe','.tr','.il','.sa','.ae'];
+  if (otherTlds.some(t => domain.endsWith(t)))
+    return { main: 'International', sub: 'Other' };
+
+  // Known foreign domains on .com that are international platforms
+  const knownForeignDomains = {
+    'naver.com': 'Korean', 'kakao.com': 'Korean', 'daum.net': 'Korean', 'coupang.com': 'Korean',
+    'rakuten.com': 'Japanese', 'pixiv.net': 'Japanese', 'mercari.com': 'Japanese',
+    'nicovideo.jp': 'Japanese', 'cookpad.com': 'Japanese',
+    'baidu.com': 'Chinese', 'weibo.com': 'Chinese', 'bilibili.com': 'Chinese',
+    'alibaba.com': 'Chinese', 'taobao.com': 'Chinese', 'tmall.com': 'Chinese',
+    'jd.com': 'Chinese', 'tencent.com': 'Chinese', 'qq.com': 'Chinese',
+    'vk.com': 'European', 'yandex.com': 'European', 'yandex.ru': 'European',
+    'zalando.com': 'European', 'leboncoin.fr': 'European', 'vinted.com': 'European',
+  };
+  if (knownForeignDomains[domain]) {
+    return { main: 'International', sub: knownForeignDomains[domain] };
+  }
+
+  // GitHub Pages and similar static hosting — keep as Development or Cybersecurity
+  if (domain.endsWith('.github.io')) {
+    if (urlLower.includes('cybersecurity') || urlLower.includes('security') ||
+        urlLower.includes('pentest') || urlLower.includes('ctf') || urlLower.includes('infosec')) {
+      return { main: 'Cybersecurity', sub: 'Tools & Intelligence' };
+    }
+    if (urlLower.includes('portfolio') || urlLower.includes('resume') || urlLower.includes('cv')) {
+      return { main: 'Design', sub: 'Inspiration' };
+    }
+    return { main: 'Development', sub: 'Tools & DevOps' };
+  }
+  if (domain.endsWith('.gitlab.io') || domain.endsWith('.netlify.app') ||
+      domain.endsWith('.vercel.app') || domain.endsWith('.pages.dev')) {
+    return { main: 'Development', sub: 'Tools & DevOps' };
+  }
+  if (urlLower.includes('/patientportal') || urlLower.includes('/patient-portal') ||
+      urlLower.includes('/myhealth') || urlLower.includes('/mychart') ||
+      urlLower.includes('/oauth2') && urlLower.includes('patientportal')) {
+    return { main: 'Medical & Health', sub: 'Patient Portals' };
+  }
+
+  // Step 2: Exact domain list match from TAXONOMY
+  for (const [main, subs] of Object.entries(TAXONOMY)) {
+    for (const [sub, rules] of Object.entries(subs)) {
+      if (rules.domains && rules.domains.some(d => domain === d || domain.endsWith('.' + d))) {
+        return { main, sub };
+      }
+    }
+  }
+
+  // Step 3: Domain keyword matching
+  const domainCore = domain.replace(/\.[a-z]{2,}$/, '');
+  const domainWords = domainCore.replace(/[-_.]/g, ' ');
+
+  for (const rule of DOMAIN_KEYWORD_RULES) {
+    if (!rule.kw && !rule.tld) continue;
+    if (rule.tld) continue; // TLD already handled above
+    for (const kw of rule.kw) {
+      if (kw.length < 5) {
+        const segments = domainWords.split(' ');
+        if (segments.some(seg => seg === kw)) return { main: rule.main, sub: rule.sub };
+      } else {
+        if (domainWords.includes(kw) || domainCore.includes(kw)) return { main: rule.main, sub: rule.sub };
+      }
+    }
+  }
+
+  return null;
+}
+
+async function analyzeBookmarks() {
+  const input = _fileContent;
+  const errorBox = document.getElementById('errorBox');
+  errorBox.classList.remove('visible');
+
+  if (!input) { showError('Please drop your bookmarks HTML file first.'); return; }
+
+  const allBookmarks = parseBookmarks(input);
+  if (allBookmarks.length === 0) {
+    showError('No valid bookmarks found. Make sure you dropped the correct HTML export file.');
+    return;
+  }
+
+  document.getElementById('inputPanel').classList.remove('visible');
+  document.getElementById('loadingPanel').classList.add('visible');
+  setStep(2);
+
+  const lsSteps = ['ls1','ls2','ls3','ls4'];
+  let lsIdx = 0;
+  const lsInterval = setInterval(() => {
+    if (lsIdx > 0) {
+      document.getElementById(lsSteps[lsIdx-1]).classList.remove('active');
+      document.getElementById(lsSteps[lsIdx-1]).classList.add('done');
+      document.getElementById(lsSteps[lsIdx-1]).textContent = '✓ ' + document.getElementById(lsSteps[lsIdx-1]).textContent.replace('✓ ','');
+    }
+    if (lsIdx < lsSteps.length) { document.getElementById(lsSteps[lsIdx]).classList.add('active'); lsIdx++; }
+    else clearInterval(lsInterval);
+  }, 1200);
+
+  // Use ALL bookmarks
+  const sample = allBookmarks;
+
+  // Step 1: Pre-classify with local taxonomy
+  const preclassified = {};
+  const unclassified = [];
+
+  sample.forEach(b => {
+    const match = preClassify(b);
+    if (match) {
+      const key = `${match.main} > ${match.sub}`;
+      if (!preclassified[key]) preclassified[key] = [];
+      preclassified[key].push(b);
+    } else {
+      unclassified.push(b);
+    }
+  });
+
+  // Step 2: Cloudflare Radar domain lookup for unclassified
+  let cfCategories = [];
+  if (unclassified.length > 0) {
+    try {
+      // Get unique domains
+      const domainMap = {};
+      unclassified.forEach(b => {
+        try {
+          const d = new URL(b.url).hostname.replace('www.', '').toLowerCase();
+          if (!domainMap[d]) domainMap[d] = [];
+          domainMap[d].push(b);
+        } catch {}
+      });
+
+      const domains = Object.keys(domainMap);
+
+      // Batch into groups of 20
+      const batches = [];
+      for (let i = 0; i < domains.length; i += 20) {
+        batches.push(domains.slice(i, i + 20));
+      }
+
+      const cfResults = {};
+      for (const batch of batches) {
+        try {
+          const res = await fetch('https://bookmark-organizer-proxy.yanaivanov.workers.dev/categorize', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ domains: batch })
+          });
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            data.forEach(r => { cfResults[r.domain] = r.categories; });
+          }
+        } catch (e) { /* batch failed, continue */ }
+      }
+
+      // Map CF categories to our taxonomy
+      const cfCategoryMap = {
+        'Medical': ['Medical & Health', 'Patient Portals'],
+        'Health and Medicine': ['Medical & Health', 'Patient Portals'],
+        'Health': ['Medical & Health', 'Medical Reference'],
+        'Radiology/Medical Imaging': ['Medical & Health', 'Patient Portals'],
+        'Hospital': ['Medical & Health', 'Patient Portals'],
+        'Pharmacy': ['Medical & Health', 'Patient Portals'],
+        'Dental': ['Medical & Health', 'Patient Portals'],
+        'Children': ['Kids & Family', 'Kids Entertainment'],
+        'Kids': ['Kids & Family', 'Kids Entertainment'],
+        'Education': ['Education', 'Courses & Learning'],
+        'Online Education': ['Education', 'Courses & Learning'],
+        'E-Learning': ['Education', 'Courses & Learning'],
+        'School': ['Kids & Family', 'School & Education'],
+        'Finance': ['Finance', 'General'],
+        'Banking': ['Finance', 'Banking'],
+        'Investment': ['Finance', 'Investing & Crypto'],
+        'Shopping': ['Shopping', 'General'],
+        'E-Commerce': ['Shopping', 'General'],
+        'News': ['News & Media', 'General News'],
+        'Entertainment': ['Entertainment', 'General'],
+        'Streaming Media': ['Entertainment', 'Streaming'],
+        'Music': ['Entertainment', 'Music'],
+        'Gaming': ['Entertainment', 'Gaming'],
+        'Social Networks': ['Social Media', 'General'],
+        'Technology': ['Development', 'General'],
+        'Software': ['Development', 'Tools & DevOps'],
+        'Travel': ['Travel', 'Booking'],
+        'Government': ['Government & Legal', 'Government'],
+        'Legal': ['Government & Legal', 'Legal'],
+        'Sports': ['Entertainment', 'Sports'],
+        'Food and Drink': ['Lifestyle', 'Food & Recipes'],
+        'Productivity': ['Productivity', 'Notes & Docs'],
+        'Security': ['Cybersecurity', 'Tools & Intelligence'],
+        'Cybersecurity': ['Cybersecurity', 'Tools & Intelligence'],
+      };
+
+      // Apply CF results to unclassified
+      const cfClassified = new Set();
+      Object.entries(domainMap).forEach(([domain, bookmarks]) => {
+        const cats = cfResults[domain] || [];
+        for (const cat of cats) {
+          const mapped = cfCategoryMap[cat.name] || cfCategoryMap[cat.superCategory?.name];
+          if (mapped) {
+            const key = `${mapped[0]} > ${mapped[1]}`;
+            if (!preclassified[key]) preclassified[key] = [];
+            preclassified[key].push(...bookmarks);
+            bookmarks.forEach(b => cfClassified.add(b.url));
+            break;
+          }
+        }
+      });
+
+      // Remaining unclassified after CF lookup
+      const stillUnclassified = unclassified.filter(b => !cfClassified.has(b.url));
+      cfCategories = stillUnclassified;
+
+    } catch (e) {
+      cfCategories = unclassified;
+    }
+  }
+
+  // Step 3: Send remaining unclassified to AI in batches of 60
+  let aiCategories = [];
+  const forAI = cfCategories;
+
+  if (forAI.length > 0) {
+    const batches = [];
+    for (let i = 0; i < forAI.length; i += 60) {
+      batches.push(forAI.slice(i, i + 60));
+    }
+
+    for (const batch of batches) {
+      const bookmarkList = batch.map((b, i) => `${i}. domain: ${b.domain || getRootDomain(b.url)} | url: ${b.url}`).join('\n');
+      const prompt = `Categorize these bookmarks by DOMAIN ONLY. Ignore page titles completely.
+
+BOOKMARKS (domain | url):
+${bookmarkList}
+
+Return ONLY JSON: {"categories":[{"name":"Main > Sub","bookmarks":[0,1,2]}]}
+
+RULES — classify by domain name patterns:
+- ANY .edu domain → ALWAYS "Education > Reference & Research" — no exceptions
+- ANY .gov domain → ALWAYS "Government & Legal > Government" — no exceptions  
+- ANY .mil domain → ALWAYS "Government & Legal > Government" — no exceptions
+- Any domain containing: health, medical, clinic, hospital, imaging, radiology, diagnostic, dental, pharmacy, doctor, patient, ortho, cardio, neuro, sonograph, ultrasound → "Medical & Health > Patient Portals"
+- Any domain containing: bank, loan, credit, mortgage, invest, trading, finance, wealth → "Finance > Banking"
+- Any domain containing: shop, store, market, buy, deal, cart, food, meat, grocery → "Shopping > General"
+- Any domain containing: news, press, media, times, post, herald, journal → "News & Media > General News"
+- Any domain containing: sport, volleyball, basketball, soccer, football, hockey, tennis → "Entertainment > Sports"
+- Any domain containing: park, national, trail, wilderness, camp, hiking → "Travel > Guides & Inspiration"
+- Every index 0-${batch.length-1} must appear exactly once
+- Use "Main > Sub" format always
+- When unsure, use "Other > Uncategorized" — do NOT guess`;
+
+      try {
+        const res = await fetch('https://bookmark-organizer-proxy.yanaivanov.workers.dev/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] })
+        });
+        const data = await res.json();
+        const text = data.choices?.[0]?.message?.content || '';
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            const result = JSON.parse(jsonMatch[0]);
+            const used = new Set();
+            (result.categories || []).forEach(cat => {
+              const parts = cat.name.split('>').map(s => s.trim());
+              const main = parts[0] || 'Other';
+              const sub = parts[1] || 'General';
+              const key = `${main} > ${sub}`;
+              if (!preclassified[key]) preclassified[key] = [];
+              (cat.bookmarks || []).forEach(i => {
+                if (!used.has(i) && batch[i]) {
+                  preclassified[key].push(batch[i]);
+                  used.add(i);
+                }
+              });
+            });
+          } catch(e) { /* parse failed */ }
+        }
+      } catch(e) { /* AI batch failed */ }
+    }
+  }
+
+  clearInterval(lsInterval);
+
+  // Build tree from preclassified (which now includes CF + AI results)
+  const tree = {};
+  Object.entries(preclassified).forEach(([key, items]) => {
+    if (items.length === 0) return;
+    const [main, sub] = key.split(' > ');
+    if (!tree[main]) tree[main] = {};
+    if (!tree[main][sub]) tree[main][sub] = [];
+    // Deduplicate within subcategory by URL
+    const seen = new Set(tree[main][sub].map(b => b.url));
+    items.forEach(b => { if (!seen.has(b.url)) { tree[main][sub].push(b); seen.add(b.url); } });
+  });
+
+  // Any truly unclassified go to Other
+  const allClassifiedUrls = new Set(Object.values(preclassified).flatMap(items => items.map(b => b.url)));
+  const finalUnclassified = sample.filter(b => !allClassifiedUrls.has(b.url));
+  if (finalUnclassified.length > 0) {
+    if (!tree['Other']) tree['Other'] = {};
+    if (!tree['Other']['Uncategorized']) tree['Other']['Uncategorized'] = [];
+    tree['Other']['Uncategorized'].push(...finalUnclassified);
+  }
+
+  if (Object.keys(tree).length === 0) {
+    showError('Could not categorize bookmarks. Please try again.');
+    document.getElementById('loadingPanel').classList.remove('visible');
+    document.getElementById('inputPanel').classList.add('visible');
+    setStep(1);
+    return;
+  }
+
+  renderResults(sample, tree);
+  runSecurityScan(sample);
+  // Auto-check dead links in background
+  setTimeout(() => checkDeadLinks(), 1500);
+}
+
+// Global state for drag and delete
+let _bookmarks = [];
+let _categories = [];
+let _pinned = []; // { title, url }
+let _dragItem = null;
+let _dragFromCat = null;
+let _dragFromIdx = null;
+
+function renderResults(bookmarks, tree) {
+  document.getElementById('loadingPanel').classList.remove('visible');
+  document.getElementById('resultsPanel').classList.add('visible');
+  setStep(3);
+
+  _bookmarks = bookmarks;
+
+  // Preserve any custom categories and their items from previous run
+  const customCategories = _categories.filter(c => c._custom);
+  const userCorrectionsMap = {}; // domain → { main, sub } from previous moves
+  _categories.forEach(c => {
+    c.items.forEach(item => {
+      if (_userCorrections[item.domain]) {
+        userCorrectionsMap[item.domain] = { main: c.main, sub: c.sub };
+      }
+    });
+  });
+
+  // Rebuild from new classification tree
+  _categories = [];
+  Object.entries(tree).forEach(([main, subs], mi) => {
+    Object.entries(subs).forEach(([sub, items]) => {
+      if (items.length > 0) {
+        _categories.push({ main, sub, name: sub === 'General' ? main : sub, fullName: `${main} > ${sub}`, items: [...items] });
+      }
+    });
+  });
+
+  // Re-append custom categories that aren't already in the tree
+  customCategories.forEach(custom => {
+    const exists = _categories.find(c => c.main === custom.main && c.sub === custom.sub);
+    if (!exists) _categories.push(custom);
+  });
+
+  _pinned = [];
+  document.getElementById('quickAccessSection').style.display = 'block';
+  renderQuickBar();
+  renderGrid();
+  buildExportFromState();
+}
+
+async function checkDeadLinks() {
+  const btn = document.getElementById('deadLinkBtn');
+  btn.textContent = '⏳ Checking...';
+  btn.disabled = true;
+
+  const allBookmarks = _categories.flatMap(c => c.items);
+
+  // Skip domains that always require authentication — HEAD requests will
+  // return 401/403 even when the site is perfectly alive
+  const skipDomains = [
+    '.gov', '.mil',                          // government portals
+    'abbadox.com', 'mychart.com', 'athenahealth.com',  // patient portals
+    'atlassian.net', 'atlassian.com',        // Jira/Confluence
+    'slack.com', 'discord.com',              // messaging (login walls)
+    'facebook.com', 'instagram.com',         // social (login walls)
+    'linkedin.com',                          // social (login walls)
+    'ameritrade.com', 'fidelity.com',        // financial (require auth)
+    'vanguard.com', 'schwab.com',
+    'cloudflare.com',                        // dashboard requires login
+    'adobe.com', 'stock.adobe.com',          // Adobe requires login
+    'creativecloud.adobe.com',
+    'chase.com', 'bankofamerica.com',        // banking
+    'wellsfargo.com', 'citi.com',
+    'creditkarma.com', 'upstart.com',
+    'verizon.com', 'verizonwireless.com',
+    'xfinity.com',                           // telecom login
+    'uinet.com',                             // internet provider
+    'americanhondafinance.com',              // auto loan
+    'navient.com',                           // student loans
+  ];
+
+  const shouldSkip = (url) => {
+    try {
+      const hostname = new URL(url).hostname.toLowerCase();
+      return skipDomains.some(d => hostname.endsWith(d) || hostname.includes(d));
+    } catch { return false; }
+  };
+
+  const urls = allBookmarks.map(b => b.url).filter(u => !shouldSkip(u));
+  let skipped = allBookmarks.length - urls.length;
+  const dead = [];
+
+  const batches = [];
+  for (let i = 0; i < urls.length; i += 10) batches.push(urls.slice(i, i + 10));
+
+  let checked = 0;
+  for (const batch of batches) {
+    try {
+      const res = await fetch('https://bookmark-organizer-proxy.yanaivanov.workers.dev/check-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ urls: batch })
+      });
+      const results = await res.json();
+      if (Array.isArray(results)) results.forEach(r => {
+        // 401/403 = login required, 301/302/307/308 = redirect to login = alive
+        const loginStatuses = [401, 403, 301, 302, 307, 308];
+        const isLoginWall = loginStatuses.includes(r.status);
+        // status 0 = CORS/network block from Worker — treat as login wall
+        // if domain is in our known auth-required list
+        const isNetworkBlock = (r.status === 0 || r.status === undefined) && shouldSkip(r.url);
+        if (!r.alive && !isLoginWall && !isNetworkBlock) dead.push(r.url);
+        if (!r.alive && (isLoginWall || isNetworkBlock)) skipped++;
+      });
+    } catch(e) {}
+    checked += batch.length;
+    btn.textContent = `⏳ ${checked}/${urls.length}`;
+  }
+
+  btn.textContent = '⚡ Check Dead Links';
+  btn.disabled = false;
+  showDeadLinkResult(dead, allBookmarks.length, skipped);
+}
+
+function showDeadLinkResult(deadUrls, total, skipped = 0) {
+  const panel = document.getElementById('deadLinkResult');
+  if (!panel) return;
+
+  const skippedNote = skipped > 0
+    ? `<div style="font-size:12px;color:var(--text3);font-family:var(--mono);margin-top:6px">${skipped} login-required domains skipped (gov, banking, social) — these are alive but block automated checks</div>`
+    : '';
+
+  if (deadUrls.length === 0) {
+    panel.innerHTML = `
+      <div class="scan-clear" style="margin-top:12px;background:rgba(78,205,196,0.04);border-color:rgba(78,205,196,0.15)">
+        <span class="scan-clear-icon" style="opacity:0.5">✓</span>
+        <div>
+          <div style="font-size:14px;margin-bottom:4px;color:var(--text2)">${total - skipped} checked links are alive — no dead or 404 links found</div>
+          ${skippedNote}
+        </div>
+      </div>`;
+  } else {
+    const deadItems = deadUrls.map(url => {
+      let catName = '';
+      _categories.forEach(cat => { if (cat.items.find(b => b.url === url)) catName = `${cat.main} > ${cat.sub}`; });
+      return { url, catName };
+    });
+    window._deadUrls = deadUrls;
+
+    panel.innerHTML = `
+      <div style="margin-top:12px;background:rgba(255,107,107,0.06);border:1px solid rgba(255,107,107,0.25);border-radius:4px;overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid rgba(255,107,107,0.15);display:flex;align-items:center;gap:10px">
+          <span style="font-size:16px">🔗</span>
+          <span style="font-family:var(--mono);font-size:13px;color:#ff8080;flex:1">${deadUrls.length} dead link${deadUrls.length>1?'s':''} found out of ${total} bookmarks</span>
+          <button onclick="removeAllDeadLinks()"
+            style="background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.3);color:#ff8080;
+                   font-family:var(--mono);font-size:12px;padding:5px 12px;border-radius:3px;cursor:pointer;white-space:nowrap">
+            Remove All
+          </button>
+        </div>
+        ${deadItems.map(({url, catName}, i) => `
+          <div id="dead-row-${i}" style="padding:10px 16px;border-bottom:1px solid rgba(42,42,61,0.4);display:flex;align-items:center;gap:10px">
+            <div style="flex:1;min-width:0">
+              <div style="font-family:var(--mono);font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${url}</div>
+              <div style="font-size:11px;color:var(--text3);margin-top:2px">${catName}</div>
+            </div>
+            <button onclick="removeDeadLink('${url.replace(/'/g,"\\'")}','dead-row-${i}')"
+              style="background:transparent;border:1px solid rgba(255,107,107,0.3);color:#ff8080;
+                     font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:2px;cursor:pointer;flex-shrink:0">
+              Remove
+            </button>
+          </div>`).join('')}
+        ${skippedNote ? `<div style="padding:10px 16px">${skippedNote}</div>` : ''}
+      </div>`;
+  }
+}
+
+function removeDeadLink(url, rowId) {
+  _categories.forEach(cat => { cat.items = cat.items.filter(b => b.url !== url); });
+  document.getElementById(rowId)?.remove();
+  window._deadUrls = (window._deadUrls || []).filter(u => u !== url);
+  if (window._deadUrls.length === 0) document.getElementById('deadLinkResult').innerHTML = '';
+  renderGrid();
+  buildExportFromState();
+}
+
+function removeAllDeadLinks() {
+  const urlSet = new Set(window._deadUrls || []);
+  _categories.forEach(cat => { cat.items = cat.items.filter(b => !urlSet.has(b.url)); });
+  window._deadUrls = [];
+  document.getElementById('deadLinkResult').innerHTML = '';
+  renderGrid();
+  buildExportFromState();
+}
+
+function showHttpRemovedList() {
+  const removed = window._httpRemoved || [];
+
+  // Don't open if nothing left
+  if (removed.length === 0) {
+    renderGrid(); // will remove the banner
+    return;
+  }
+
+  const existing = document.getElementById('httpRemovedModal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.className = 'move-modal-overlay';
+  modal.id = 'httpRemovedModal';
+
+  // Deduplicate by root domain, keep count
+  const grouped = {};
+  removed.forEach(b => {
+    try {
+      const d = new URL(b.url).hostname.replace('www.','').split('.').slice(-2).join('.');
+      if (!grouped[d]) grouped[d] = { domain: d, items: [], selected: false };
+      grouped[d].items.push(b);
+    } catch {}
+  });
+
+  const domains = Object.values(grouped);
+
+  const rows = domains.map((g, gi) => `
+    <div id="http-row-${gi}" style="padding:10px 16px;border-bottom:1px solid rgba(42,42,61,0.4);
+         display:flex;align-items:center;gap:10px;">
+      <input type="checkbox" id="http-chk-${gi}" checked
+        style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer;flex-shrink:0"
+        onchange="updateHttpSelectionCount()">
+      <img src="https://www.google.com/s2/favicons?domain=${g.domain}&sz=16"
+           style="width:16px;height:16px;flex-shrink:0;opacity:0.6" onerror="this.style.display='none'">
+      <div style="flex:1;min-width:0">
+        <div style="font-family:var(--mono);font-size:13px;color:var(--text2)">${g.domain}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${g.items.length} bookmark${g.items.length > 1 ? 's' : ''}</div>
+      </div>
+      <span style="font-size:10px;background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.25);
+                   color:#ff8080;padding:2px 8px;border-radius:2px;font-family:var(--mono);flex-shrink:0">HTTP</span>
+    </div>`).join('');
+
+  modal.innerHTML = `
+    <div class="move-modal" style="width:580px;max-height:88vh;display:flex;flex-direction:column;">
+      <div class="move-modal-header">
+        <div class="move-modal-title">🔓 HTTP Bookmarks Review</div>
+        <button class="move-modal-close" onclick="document.getElementById('httpRemovedModal').remove()">×</button>
+      </div>
+
+      <!-- Education panel -->
+      <div style="padding:16px 20px;background:rgba(255,107,107,0.05);border-bottom:2px solid rgba(255,107,107,0.15);">
+        <div style="font-family:var(--mono);font-size:13px;color:#ff8080;margin-bottom:8px">
+          ⚠ Why HTTP bookmarks are a security risk
+        </div>
+        <div style="font-family:var(--mono);font-size:12px;color:var(--text2);line-height:1.7">
+          <div style="margin-bottom:6px">
+            HTTP is unencrypted. Any data sent between your browser and the site is transmitted in plain text — visible to anyone on the same network, your ISP, or a man-in-the-middle attacker.
+          </div>
+          <div style="margin-bottom:6px">
+            These are mostly old bookmarks (2010–2016). Many of these sites either no longer exist, have moved to HTTPS, or have changed ownership entirely — meaning clicking them could take you somewhere unexpected.
+          </div>
+          <div style="color:var(--text2)">
+            Recommendation: delete most of these. If a site you care about is listed, search for it directly using HTTPS (e.g. <span style="color:var(--accent)">https://sitename.com</span>) and re-bookmark the secure version.
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div style="font-family:var(--mono);font-size:12px;color:var(--text3);flex:1">
+          <span id="httpSelCount">${domains.length}</span> of ${domains.length} domains selected
+        </div>
+        <button onclick="httpSelectAll(true)" style="background:transparent;border:1px solid var(--border);color:var(--text3);font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:3px;cursor:pointer">Select all</button>
+        <button onclick="httpSelectAll(false)" style="background:transparent;border:1px solid var(--border);color:var(--text3);font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:3px;cursor:pointer">Deselect all</button>
+      </div>
+
+      <!-- List -->
+      <div class="move-modal-list" style="flex:1;overflow-y:auto">${rows}</div>
+
+      <!-- Action buttons -->
+      <div style="padding:14px 16px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--text3);flex:1">
+          Selected bookmarks will be permanently removed from this session
+        </div>
+        <button id="httpDeleteBtn" onclick="dismissHttpSelected()"
+          style="background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.35);color:#ff8080;
+                 font-family:var(--mono);font-size:13px;padding:9px 20px;border-radius:3px;cursor:pointer;white-space:nowrap">
+          🗑 Delete Selected
+        </button>
+        <button onclick="document.getElementById('httpRemovedModal').remove()"
+          style="background:transparent;border:1px solid var(--border);color:var(--text2);
+                 font-family:var(--mono);font-size:13px;padding:9px 16px;border-radius:3px;cursor:pointer;white-space:nowrap">
+          Keep All & Close
+        </button>
+      </div>
+    </div>`;
+
+  // Store domains on window for action functions
+  window._httpDomains = domains;
+
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  document.body.appendChild(modal);
+
+  // Set initial button state
+  setTimeout(() => updateHttpSelectionCount(), 0);
+}
+
+function httpSelectAll(checked) {
+  const domains = window._httpDomains || [];
+  domains.forEach((_, i) => {
+    const chk = document.getElementById(`http-chk-${i}`);
+    if (chk) chk.checked = checked;
+  });
+  updateHttpSelectionCount();
+}
+
+function updateHttpSelectionCount() {
+  const domains = window._httpDomains || [];
+  const selected = domains.filter((_, i) => document.getElementById(`http-chk-${i}`)?.checked).length;
+  const el = document.getElementById('httpSelCount');
+  if (el) el.textContent = selected;
+  // Disable delete button when nothing selected
+  const btn = document.getElementById('httpDeleteBtn');
+  if (btn) {
+    btn.disabled = selected === 0;
+    btn.style.opacity = selected === 0 ? '0.35' : '1';
+    btn.style.cursor = selected === 0 ? 'not-allowed' : 'pointer';
+  }
+}
+
+function dismissHttpSelected() {
+  const domains = window._httpDomains || [];
+  const toRemove = new Set(
+    domains
+      .filter((_, i) => document.getElementById(`http-chk-${i}`)?.checked)
+      .map(g => g.domain)
+  );
+  window._httpRemoved = (window._httpRemoved || []).filter(b => {
+    try {
+      const d = new URL(b.url).hostname.replace('www.','').split('.').slice(-2).join('.');
+      return !toRemove.has(d);
+    } catch { return true; }
+  });
+  window._parseStats = window._parseStats || {};
+  window._parseStats.httpFiltered = window._httpRemoved.length;
+  document.getElementById('httpRemovedModal')?.remove();
+
+  // Hide the banner entirely if nothing left
+  if (window._httpRemoved.length === 0) {
+    const alert = document.getElementById('httpAlert');
+    if (alert) alert.remove();
+  }
+
+  renderGrid();
+}
+
+function addCustomCategory() {
+  const name = prompt('Category name:\nExamples: "Kids" or "Medical > My Doctors" or "Work > Client Sites"');
+  if (!name || !name.trim()) return;
+  const parts = name.split('>').map(s => s.trim());
+  const main = parts[0];
+  const sub = parts[1] || 'General';
+  const exists = _categories.find(c => c.main === main && c.sub === sub);
+  if (exists) { alert('That category already exists!'); return; }
+  _categories.push({ main, sub, name: sub === 'General' ? main : sub, fullName: `${main} > ${sub}`, items: [], _custom: true });
+  renderGrid();
+  buildExportFromState();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('categoriesGrid');
+  grid.innerHTML = '';
+
+  const totalBookmarks = _categories.reduce((s, c) => s + c.items.length, 0);
+  const totalMains = new Set(_categories.map(c => c.main)).size;
+  const stats = window._parseStats || {};
+
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat"><div class="stat-num">${totalBookmarks}</div><div class="stat-label">Bookmarks</div></div>
+    <div class="stat"><div class="stat-num">${totalMains}</div><div class="stat-label">Categories</div></div>
+    <div class="stat"><div class="stat-num">${_categories.length}</div><div class="stat-label">Subcategories</div></div>
+    ${getUserLearningStats() > 0 ? `<div class="stat"><div class="stat-num" style="color:var(--accent2)">${getUserLearningStats()}</div><div class="stat-label">Corrections learned</div></div>` : ''}
+  `;
+
+  // Build top alerts — use live _httpRemoved count, not stale stats
+  const topAlerts = document.getElementById('topAlerts');
+  topAlerts.innerHTML = '';
+
+  const httpRemaining = (window._httpRemoved || []).length;
+  const placeholderCount = stats.placeholderFiltered || 0;
+
+  if (httpRemaining > 0 || placeholderCount > 0) {
+    const alertEl = document.createElement('div');
+    alertEl.id = 'httpAlert';
+    alertEl.innerHTML = `
+      <div style="background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.3);
+                  border-radius:4px;padding:14px 20px;margin-bottom:20px;display:flex;
+                  align-items:center;gap:14px;">
+        <span style="font-size:20px;flex-shrink:0">🔓</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-family:var(--mono);font-size:13px;color:#ff8080;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px">
+            ${httpRemaining > 0 ? `${httpRemaining} insecure HTTP bookmarks need your review` : ''}${httpRemaining > 0 && placeholderCount > 0 ? ' · ' : ''}${placeholderCount > 0 ? `${placeholderCount} dead/broken template URLs removed` : ''}
+          </div>
+          <div style="font-family:var(--mono);font-size:12px;color:var(--text2)">
+            HTTP links are unencrypted. Review them — keeping them is not recommended.
+          </div>
+        </div>
+        ${httpRemaining > 0 ? `
+        <button onclick="showHttpRemovedList()"
+          style="background:rgba(255,107,107,0.12);border:1px solid rgba(255,107,107,0.4);color:#ff8080;
+                 font-family:var(--mono);font-size:13px;padding:9px 18px;border-radius:3px;cursor:pointer;white-space:nowrap;flex-shrink:0">
+          🔍 Review ${httpRemaining} HTTP Links
+        </button>` : ''}
+      </div>`;
+    topAlerts.appendChild(alertEl);
+  }
+
+  // Group by main category for display
+  const mains = {};
+  _categories.forEach((cat, ci) => {
+    if (!mains[cat.main]) mains[cat.main] = [];
+    mains[cat.main].push({ ...cat, ci });
+  });
+
+  Object.entries(mains).forEach(([main, subs], mi) => {
+    const mainColorIdx = mi % 8;
+    const emoji = CATEGORY_EMOJIS[main] || '📌';
+
+    // Main category section header
+    const section = document.createElement('div');
+    section.style.cssText = 'grid-column: 1 / -1; margin-bottom: 4px; margin-top: ' + (mi === 0 ? '0' : '12px');
+    section.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)">
+        <div class="category-icon cat-${mainColorIdx}" style="width:24px;height:24px;font-size:12px;">${emoji}</div>
+        <span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text)">${main}</span>
+        <span style="font-size:11px;color:var(--text3);font-family:var(--mono)">${subs.reduce((s,c)=>s+c.items.length,0)} bookmarks</span>
+      </div>`;
+    grid.appendChild(section);
+
+    // Subcategory cards
+    subs.forEach(({ ci, sub, items }) => {
+      if (items.length === 0) return;
+
+      const card = document.createElement('div');
+      card.className = 'category-card';
+      card.dataset.catIdx = ci;
+
+      card.innerHTML = `
+        <div class="category-header" onclick="toggleCard(this)">
+          <div class="category-name">
+            <span style="font-size:13px">${sub}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="category-count" id="count-${ci}">${items.length}</span>
+            <span class="category-toggle">▾</span>
+          </div>
+        </div>
+        <div class="bookmark-list" id="list-${ci}"></div>
+      `;
+
+      grid.appendChild(card);
+
+      const list = document.getElementById(`list-${ci}`);
+      items.forEach((b, bi) => {
+        const item = createBookmarkItem(b, ci, bi);
+        list.appendChild(item);
+      });
+
+      list.addEventListener('dragover', e => {
+        e.preventDefault();
+        list.classList.add('drag-target');
+        card.classList.add('drop-target');
+      });
+
+      list.addEventListener('dragleave', e => {
+        if (!list.contains(e.relatedTarget)) {
+          list.classList.remove('drag-target');
+          card.classList.remove('drop-target');
+        }
+      });
+
+      list.addEventListener('drop', e => {
+        e.preventDefault();
+        list.classList.remove('drag-target');
+        card.classList.remove('drop-target');
+        if (_dragItem === null) return;
+        const toIdx = parseInt(card.dataset.catIdx);
+        if (_dragFromCat === toIdx) return;
+        const item = _categories[_dragFromCat].items.splice(_dragFromIdx, 1)[0];
+        _categories[toIdx].items.push(item);
+        renderGrid();
+        buildExportFromState();
+      });
+    });
+  });
+}
+
+function createBookmarkItem(b, catIdx, bookIdx) {
+  const item = document.createElement('div');
+  item.className = 'bookmark-item';
+  item.draggable = true;
+  item.dataset.catIdx = catIdx;
+  item.dataset.bookIdx = bookIdx;
+
+  item.innerHTML = `
+    <img class="bookmark-favicon" src="${getFavicon(b.url)}" onerror="this.style.display='none'" loading="lazy">
+    <div class="bookmark-info">
+      <div class="bookmark-title" title="${b.title}">${b.title}</div>
+      <div class="bookmark-url">${getDomain(b.url)}</div>
+    </div>
+    <a href="${b.url}" target="_blank" class="bookmark-link" title="Open">↗</a>
+    <button class="move-btn" title="Move to category" onclick="showMoveModal(${catIdx}, ${bookIdx}, event)">↪</button>
+    <button class="pin-btn ${isPinned(b.url) ? 'pinned' : ''}" title="${isPinned(b.url) ? 'Unpin' : 'Pin to Quick Access'}" onclick="togglePin('${b.url.replace(/'/g,"\\'")}', '${b.title.replace(/'/g,"\\'")}', this)">◈</button>
+    <button class="bookmark-delete" title="Delete" onclick="deleteBookmark(${catIdx}, ${bookIdx})">×</button>
+  `;
+
+  item.addEventListener('dragstart', e => {
+    _dragItem = b;
+    _dragFromCat = catIdx;
+    _dragFromIdx = bookIdx;
+    item.classList.add('dragging');
+    item.id = 'drag-ghost';
+    e.dataTransfer.effectAllowed = 'move';
+  });
+
+  item.addEventListener('dragend', () => {
+    item.classList.remove('dragging');
+    item.id = '';
+    _dragItem = null;
+    document.querySelectorAll('.drag-target').forEach(el => el.classList.remove('drag-target'));
+    document.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drop-target'));
+  });
+
+  return item;
+}
+
+function getDragAfterElement(container, y) {
+  const els = [...container.querySelectorAll('.bookmark-item:not(.dragging)')];
+  return els.reduce((closest, el) => {
+    const box = el.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) return { offset, element: el };
+    return closest;
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+// ── AI LEARNING SYSTEM ───────────────────────────────────────────────────────
+// Learns from user moves: domain → { main, sub, count }
+// Stored in memory, applied during classification in future runs
+const _userCorrections = {}; // { rootDomain: { main, sub, count } }
+
+function recordUserMove(url, toMain, toSub) {
+  try {
+    const domain = getRootDomain(url);
+    if (!_userCorrections[domain]) {
+      _userCorrections[domain] = { main: toMain, sub: toSub, count: 0 };
+    }
+    _userCorrections[domain].main = toMain;
+    _userCorrections[domain].sub = toSub;
+    _userCorrections[domain].count++;
+  } catch {}
+}
+
+function applyUserLearning(domain) {
+  return _userCorrections[domain] || null;
+}
+
+function getUserLearningStats() {
+  const count = Object.keys(_userCorrections).length;
+  return count;
+}
+
+function moveBookmark(fromCatIdx, bookIdx, toCatIdx) {
+  const item = _categories[fromCatIdx]?.items[bookIdx];
+  if (!item) return;
+
+  // Record the correction for AI learning
+  const toMain = _categories[toCatIdx].main;
+  const toSub = _categories[toCatIdx].sub;
+  recordUserMove(item.url, toMain, toSub);
+
+  // Show brief learning confirmation
+  const learningCount = getUserLearningStats();
+  showLearnToast(`Moved to ${toSub} · ${learningCount} correction${learningCount !== 1 ? 's' : ''} learned`);
+
+  _categories[fromCatIdx].items.splice(bookIdx, 1);
+  _categories[toCatIdx].items.push(item);
+  document.getElementById('moveModal')?.remove();
+  renderGrid();
+  buildExportFromState();
+}
+
+function showLearnToast(msg) {
+  const existing = document.getElementById('learnToast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.id = 'learnToast';
+  toast.innerHTML = `<span style="color:var(--accent2)">✦</span> ${msg}`;
+  toast.style.cssText = `
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    background:var(--surface);border:1px solid var(--border);
+    border-left:3px solid var(--accent2);
+    color:var(--text2);font-family:var(--mono);font-size:12px;
+    padding:10px 20px;border-radius:4px;z-index:9999;
+    white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.4);
+    animation:fadeInUp 0.2s ease;
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+function showMoveModal(fromCatIdx, bookIdx, e) {
+  e.stopPropagation();
+
+  const b = _categories[fromCatIdx].items[bookIdx];
+  const existing = document.getElementById('moveModal');
+  if (existing) existing.remove();
+
+  // Build flat list of all categories for filtering
+  const allCats = _categories.map((cat, ci) => ({ ...cat, ci }));
+
+  const modal = document.createElement('div');
+  modal.className = 'move-modal-overlay';
+  modal.id = 'moveModal';
+  modal.innerHTML = `
+    <div class="move-modal">
+      <div class="move-modal-header">
+        <div class="move-modal-title">Move to category</div>
+        <button class="move-modal-close" onclick="document.getElementById('moveModal').remove()">×</button>
+      </div>
+      <div class="move-modal-subtitle" title="${b.title}">${b.title}</div>
+      <div style="padding:10px 16px;border-bottom:1px solid var(--border)">
+        <input
+          id="moveCatSearch"
+          type="text"
+          placeholder="Search categories..."
+          autocomplete="off"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:3px;
+                 color:var(--text);font-family:var(--mono);font-size:12px;padding:8px 12px;outline:none;
+                 transition:border-color 0.2s;"
+          oninput="filterMoveModal(this.value, ${fromCatIdx}, ${bookIdx})"
+          onfocus="this.style.borderColor='var(--accent)'"
+          onblur="this.style.borderColor='var(--border)'"
+        >
+      </div>
+      <div class="move-modal-list" id="moveCatList"></div>
+    </div>`;
+
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  document.body.appendChild(modal);
+
+  // Render initial list
+  renderMoveCatList('', fromCatIdx, bookIdx, allCats);
+
+  // Focus search immediately
+  setTimeout(() => document.getElementById('moveCatSearch')?.focus(), 50);
+}
+
+function renderMoveCatList(query, fromCatIdx, bookIdx, allCats) {
+  const list = document.getElementById('moveCatList');
+  if (!list) return;
+
+  const q = query.toLowerCase().trim();
+  const filtered = allCats.filter(cat =>
+    !q ||
+    cat.main.toLowerCase().includes(q) ||
+    cat.sub.toLowerCase().includes(q) ||
+    cat.fullName.toLowerCase().includes(q)
+  );
+
+  // Group filtered results by main
+  const mains = {};
+  filtered.forEach(cat => {
+    if (!mains[cat.main]) mains[cat.main] = [];
+    mains[cat.main].push(cat);
+  });
+
+  let html = '';
+
+  if (filtered.length === 0) {
+    html = `<div style="padding:20px;text-align:center;color:var(--text3);font-family:var(--mono);font-size:12px;">
+      No matching categories
+      <div style="margin-top:12px">
+        <span onclick="moveToNewCategoryFromSearch(${fromCatIdx}, ${bookIdx})"
+          style="color:var(--accent);cursor:pointer;text-decoration:underline">
+          Create "${query}"
+        </span>
+      </div>
+    </div>`;
+  } else {
+    Object.entries(mains).forEach(([main, subs]) => {
+      html += `<div class="move-modal-section"><div class="move-modal-main">${main}</div>`;
+      subs.forEach(({ sub, ci }) => {
+        const isCurrent = ci === fromCatIdx;
+        const count = _categories[ci]?.items.length || 0;
+        html += `<div class="move-modal-option ${isCurrent ? 'current' : ''}"
+          ${isCurrent ? '' : `onclick="moveBookmark(${fromCatIdx}, ${bookIdx}, ${ci})"`}>
+          <span style="flex:1">${isCurrent ? '✓ ' : ''}${sub}</span>
+          <span style="font-size:10px;color:var(--text3);margin-left:8px">${count}</span>
+          ${isCurrent ? '<span style="opacity:0.4;font-size:10px">current</span>' : ''}
+        </div>`;
+      });
+      html += `</div>`;
+    });
+  }
+
+  // Always show new category option
+  html += `<div class="move-modal-section">
+    <div class="move-modal-option" onclick="moveToNewCategoryFromSearch(${fromCatIdx}, ${bookIdx})" style="color:var(--accent)">
+      + ${q ? `Create "${query}" and move here` : 'Move to new category...'}
+    </div>
+  </div>`;
+
+  list.innerHTML = html;
+}
+
+function filterMoveModal(query, fromCatIdx, bookIdx) {
+  const allCats = _categories.map((cat, ci) => ({ ...cat, ci }));
+  renderMoveCatList(query, fromCatIdx, bookIdx, allCats);
+}
+
+function moveToNewCategoryFromSearch(fromCatIdx, bookIdx) {
+  const searchVal = document.getElementById('moveCatSearch')?.value?.trim() || '';
+  document.getElementById('moveModal')?.remove();
+
+  // If search value looks like "Main > Sub" use it directly, otherwise prompt
+  let name = searchVal;
+  if (!name) {
+    name = prompt('New category name:\nExamples: "Kids" or "Medical > My Doctors"');
+  }
+  if (!name || !name.trim()) return;
+
+  const parts = name.split('>').map(s => s.trim());
+  const main = parts[0];
+  const sub = parts[1] || 'General';
+  const exists = _categories.findIndex(c => c.main === main && c.sub === sub);
+  let toCatIdx;
+  if (exists >= 0) {
+    toCatIdx = exists;
+  } else {
+    _categories.push({ main, sub, name: sub === 'General' ? main : sub, fullName: `${main} > ${sub}`, items: [] });
+    toCatIdx = _categories.length - 1;
+  }
+  moveBookmark(fromCatIdx, bookIdx, toCatIdx);
+}
+
+function deleteBookmark(catIdx, bookIdx) {
+  _categories[catIdx].items.splice(bookIdx, 1);
+  renderGrid();
+  buildExportFromState();
+}
+
+function isPinned(url) {
+  return _pinned.some(p => p.url === url);
+}
+
+function togglePin(url, title, btn) {
+  if (isPinned(url)) {
+    _pinned = _pinned.filter(p => p.url !== url);
+    btn.classList.remove('pinned');
+    btn.title = 'Pin to Quick Access';
+  } else {
+    _pinned.push({ url, title });
+    btn.classList.add('pinned');
+    btn.title = 'Unpin';
+  }
+  renderQuickBar();
+}
+
+function renderQuickBar() {
+  const section = document.getElementById('quickAccessSection');
+  const bar = document.getElementById('quickBar');
+  const empty = document.getElementById('quickEmpty');
+
+  if (_pinned.length === 0) {
+    section.style.display = 'block';
+    empty.style.display = 'block';
+    bar.querySelectorAll('.quick-item').forEach(el => el.remove());
+    return;
+  }
+
+  section.style.display = 'block';
+  empty.style.display = 'none';
+  bar.querySelectorAll('.quick-item').forEach(el => el.remove());
+
+  _pinned.forEach(p => {
+    const item = document.createElement('a');
+    item.className = 'quick-item';
+    item.href = p.url;
+    item.target = '_blank';
+    item.innerHTML = `
+      <img src="${getFavicon(p.url)}" onerror="this.style.display='none'">
+      <span class="quick-item-title">${p.title}</span>
+      <button class="quick-unpin" title="Unpin" onclick="unpinFromBar('${p.url.replace(/'/g,"\\'")}', event)">×</button>
+    `;
+    bar.appendChild(item);
+  });
+}
+
+function unpinFromBar(url, e) {
+  e.preventDefault();
+  e.stopPropagation();
+  _pinned = _pinned.filter(p => p.url !== url);
+  // Update pin button in grid if visible
+  renderGrid();
+  renderQuickBar();
+}
+
+function buildExportFromState() {
+  // Group by main category
+  const mains = {};
+  _categories.forEach(cat => {
+    if (cat.items.length === 0) return;
+    if (!mains[cat.main]) mains[cat.main] = {};
+    mains[cat.main][cat.sub] = cat.items;
+  });
+
+  let html = `<!DOCTYPE NETSCAPE-Bookmark-file-1>\n<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">\n<TITLE>Bookmarks</TITLE>\n<H1>Bookmarks</H1>\n<DL><p>\n`;
+
+  Object.entries(mains).forEach(([main, subs]) => {
+    html += `    <DT><H3>${main}</H3>\n    <DL><p>\n`;
+    Object.entries(subs).forEach(([sub, items]) => {
+      if (sub === 'General') {
+        // Flat — no sub-folder
+        items.forEach(b => { html += `        <DT><A HREF="${b.url}">${b.title}</A>\n`; });
+      } else {
+        html += `        <DT><H3>${sub}</H3>\n        <DL><p>\n`;
+        items.forEach(b => { html += `            <DT><A HREF="${b.url}">${b.title}</A>\n`; });
+        html += `        </DL><p>\n`;
+      }
+    });
+    html += `    </DL><p>\n`;
+  });
+
+  html += `</DL>`;
+  window._exportHTML = html;
+}
+
+function exportBookmarks() {
+  if (!window._exportHTML) return;
+  const blob = new Blob([window._exportHTML], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'bookmarks-organized.html';
+  a.click();
+}
+
+function setStep(n) {
+  ['step1','step2','step3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('active','done');
+    if (i + 1 < n) el.classList.add('done');
+    else if (i + 1 === n) el.classList.add('active');
+  });
+  if (document.querySelector('.step.done .step-num')) {
+    document.querySelectorAll('.step.done .step-num').forEach(el => { el.textContent = '✓'; });
+  }
+}
+
+function reset() {
+  document.getElementById('resultsPanel').classList.remove('visible');
+  document.getElementById('inputPanel').classList.add('visible');
+  document.getElementById('categoriesGrid').innerHTML = '';
+  document.getElementById('errorBox').classList.remove('visible');
+  const zone = document.getElementById('dropZone');
+  zone.classList.remove('file-loaded');
+  document.getElementById('dropIcon').textContent = '↓';
+  document.getElementById('dropTitle').textContent = 'Drop bookmarks file here';
+  document.getElementById('dropSub').textContent = 'or click to browse';
+  document.getElementById('fileInput').value = '';
+  setStep(1);
+  document.querySelectorAll('.step .step-num').forEach((el, i) => { el.textContent = i+1; });
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
+  btn.classList.remove('ready');
+  document.getElementById('quickAccessSection').style.display = 'none';
+  document.getElementById('securityPanel').style.display = 'none';
+  document.getElementById('securityResults').innerHTML = '';
+  document.getElementById('deadLinkResult').innerHTML = '';
+  _pinned = [];
+  _fileContent = null;
+}
+
+function loadSample() {
+  _fileContent = `<!DOCTYPE NETSCAPE-Bookmark-file-1>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<TITLE>Bookmarks</TITLE>
+<H1>Bookmarks</H1>
+<DL><p>
+    <DT><A HREF="https://github.com">GitHub</A>
+    <DT><A HREF="https://stackoverflow.com">Stack Overflow</A>
+    <DT><A HREF="https://news.ycombinator.com">Hacker News</A>
+    <DT><A HREF="https://twitter.com">Twitter</A>
+    <DT><A HREF="https://linkedin.com">LinkedIn</A>
+    <DT><A HREF="https://reddit.com/r/netsec">r/netsec</A>
+    <DT><A HREF="https://tryhackme.com">TryHackMe</A>
+    <DT><A HREF="https://hackthebox.com">Hack The Box</A>
+    <DT><A HREF="https://mitre.org/attck">MITRE ATT&CK</A>
+    <DT><A HREF="https://virustotal.com">VirusTotal</A>
+    <DT><A HREF="https://shodan.io">Shodan</A>
+    <DT><A HREF="https://amazon.com">Amazon</A>
+    <DT><A HREF="https://netflix.com">Netflix</A>
+    <DT><A HREF="https://spotify.com">Spotify</A>
+    <DT><A HREF="https://figma.com">Figma</A>
+    <DT><A HREF="https://dribbble.com">Dribbble</A>
+    <DT><A HREF="https://nytimes.com">New York Times</A>
+    <DT><A HREF="https://bbc.com">BBC News</A>
+    <DT><A HREF="https://docs.python.org">Python Docs</A>
+    <DT><A HREF="https://mdn.dev">MDN Web Docs</A>
+</DL>`;
+  const zone = document.getElementById('dropZone');
+  zone.classList.add('file-loaded');
+  document.getElementById('dropIcon').textContent = '✓';
+  document.getElementById('dropTitle').textContent = 'sample-bookmarks.html';
+  document.getElementById('dropSub').textContent = 'Sample loaded — ready to analyze';
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = false;
+  btn.classList.add('ready');
+}
+
+// ─── SECURITY SCANNER ────────────────────────────────────────────────────────
+
+const THREAT_DB = [
+  // Malware
+  { domain: '17ebook.co', level: 'critical', type: 'Malware', desc: 'Known malware distribution site delivering drive-by downloads and exploit kits.' },
+  { domain: 'adf.ly', level: 'high', type: 'Malicious Redirect', desc: 'URL shortener with history of redirecting to malware and phishing pages.' },
+  { domain: 'bestpriceforu.net', level: 'critical', type: 'Malware', desc: 'Associated with browser hijacker malware campaigns.' },
+  { domain: 'clicksor.com', level: 'high', type: 'Malvertising', desc: 'Ad network with documented history of serving malicious ads.' },
+  { domain: 'coolwebsearch.com', level: 'critical', type: 'Browser Hijacker', desc: 'One of the oldest aggressive browser hijackers. Modifies DNS and redirects searches.' },
+  { domain: 'dollarrevenue.com', level: 'critical', type: 'Malware', desc: 'Pay-per-install malware distributor. Installs multiple unwanted programs simultaneously.' },
+  { domain: 'errorsafe.com', level: 'critical', type: 'Scareware', desc: 'Fake security software. Displays false alerts to extort payment from victims.' },
+  { domain: 'istartsurf.com', level: 'critical', type: 'Browser Hijacker', desc: 'Hijacks browser homepage and search engine. Very difficult to remove.' },
+  { domain: 'lop.com', level: 'critical', type: 'Adware/Spyware', desc: 'Installs browser helper objects that track browsing and hijack searches.' },
+  { domain: 'mysearchdial.com', level: 'critical', type: 'Browser Hijacker', desc: 'Bundled with freeware. Hijacks browser settings persistently.' },
+  { domain: 'sweetpacks.com', level: 'critical', type: 'Adware', desc: 'Installs browser extensions that hijack search and display intrusive ads.' },
+  { domain: 'wajam.com', level: 'high', type: 'Spyware', desc: 'Browser extension that intercepts HTTPS traffic and injects ads into search results.' },
+  { domain: 'winantivirus.com', level: 'critical', type: 'Scareware', desc: 'Fake antivirus. Displays false infection alerts to extort payment.' },
+  { domain: 'zlob.com', level: 'critical', type: 'Trojan Dropper', desc: 'Zlob trojan distribution — disguises malware as video codec downloads.' },
+  { domain: 'softonic.com', level: 'medium', type: 'PUA Bundler', desc: 'Download portal with history of bundling adware and PUAs with software downloads.' },
+  { domain: 'opencandy.com', level: 'high', type: 'PUA Bundler', desc: 'Bundles potentially unwanted applications with legitimate software installers.' },
+  // Script injection / XSS
+  { domain: 'pastebin.com', level: 'medium', type: 'Script Injection Risk', desc: 'Frequently used to host malicious scripts and C2 payloads. Bookmarked paste links may contain malicious code.' },
+  { domain: 'bit.ly', level: 'medium', type: 'Phishing Vector', desc: 'URL shortener — masked destination could lead to phishing or malware. Verify before visiting.' },
+  { domain: 'tinyurl.com', level: 'medium', type: 'Phishing Vector', desc: 'URL shortener frequently used in phishing campaigns.' },
+  { domain: 'ow.ly', level: 'medium', type: 'Phishing Vector', desc: 'URL shortener with documented use in phishing campaigns.' },
+  // Cryptominers
+  { domain: 'coinhive.com', level: 'critical', type: 'Cryptominer', desc: 'Notorious browser-based cryptomining service that hijacks CPU to mine Monero without consent.' },
+  { domain: 'cryptoloot.com', level: 'critical', type: 'Cryptominer', desc: 'Browser cryptomining service deployed via injected scripts.' },
+  { domain: 'minero.cc', level: 'critical', type: 'Cryptominer', desc: 'Browser-based Monero miner often injected into compromised websites.' },
+  { domain: 'jsecoin.com', level: 'high', type: 'Cryptominer', desc: 'JavaScript cryptomining service that runs in browser tabs.' },
+  { domain: 'webmine.pro', level: 'critical', type: 'Cryptominer', desc: 'Cryptomining-as-a-service platform injected into compromised sites.' },
+  // Phishing
+  { domain: 'apple-id-verify.com', level: 'critical', type: 'Phishing', desc: 'Apple credential phishing site. Not affiliated with Apple Inc.' },
+  { domain: 'paypal-security.com', level: 'critical', type: 'Phishing', desc: 'PayPal credential phishing. Harvests login credentials.' },
+  { domain: 'amazon-securityalert.com', level: 'critical', type: 'Phishing', desc: 'Amazon phishing site designed to steal account credentials.' },
+  { domain: 'microsoft-alert.com', level: 'critical', type: 'Phishing', desc: 'Microsoft tech support scam / credential phishing site.' },
+  { domain: 'netflix-billing.com', level: 'critical', type: 'Phishing', desc: 'Netflix billing phishing — harvests payment card data.' },
+  { domain: 'irs-refund.com', level: 'critical', type: 'Phishing', desc: 'IRS tax refund phishing scam. Harvests SSN and financial data.' },
+  // Data harvesting / trackers
+  { domain: 'scorecardresearch.com', level: 'medium', type: 'Data Harvesting', desc: 'Comscore tracking pixel embedded across thousands of sites. Tracks browsing behavior across sessions.' },
+  { domain: 'quantserve.com', level: 'medium', type: 'Data Harvesting', desc: 'Quantcast audience tracker. Collects detailed browsing profiles.' },
+  { domain: 'doubleclick.net', level: 'medium', type: 'Tracker', desc: 'Google/DoubleClick ad tracker. Tracks cross-site browsing for ad targeting.' },
+  { domain: 'addthis.com', level: 'medium', type: 'Data Harvesting', desc: 'Social sharing buttons that harvest detailed browsing data across sites.' },
+  { domain: 'zedo.com', level: 'high', type: 'Malvertising/Tracker', desc: 'Ad network with documented malvertising history and aggressive tracking.' },
+  { domain: 'yieldmanager.com', level: 'medium', type: 'Data Harvesting', desc: 'Ad targeting platform that builds detailed user profiles across sites.' },
+];
+
+// ── HOMOGLYPH / HOMOGRAPH ATTACK DETECTION ───────────────────────────────────
+// Maps confusable Unicode characters to their Latin equivalents
+// Sources: Unicode Consortium confusables.txt + known phishing campaigns
+const HOMOGLYPH_MAP = {
+  // Cyrillic → Latin (using Unicode escapes to avoid parser issues)
+  '\u0430': 'a', '\u0435': 'e', '\u043E': 'o', '\u0440': 'p',
+  '\u0441': 'c', '\u0445': 'x', '\u0456': 'i', '\u0501': 'd',
+  '\u051B': 'q', '\u0455': 's', '\u0458': 'j',
+  // Greek → Latin
+  '\u03BD': 'v', '\u03C1': 'p', '\u03B1': 'a', '\u03B2': 'b',
+  '\u03B5': 'e', '\u03B9': 'i', '\u03BF': 'o', '\u03C4': 't',
+  '\u03C5': 'u', '\u03C7': 'x', '\u03BA': 'k', '\u03BC': 'm',
+  // Latin lookalikes
+  '\u0261': 'g', '\u0269': 'i', '\u026A': 'i', '\u029F': 'l',
+  // Zero-width / invisible
+  '\u200B': '', '\u200C': '', '\u200D': '', '\u2060': '', '\uFEFF': '',
+};
+
+// High-value domains commonly targeted by homoglyph phishing
+const HIGH_VALUE_DOMAINS = [
+  'paypal','amazon','apple','google','microsoft','facebook','instagram',
+  'twitter','netflix','spotify','gmail','outlook','yahoo','chase','wellsfargo',
+  'bankofamerica','citibank','usbank','capitalone','americanexpress','discover',
+  'irs','sba','medicare','socialsecurity','venmo','cashapp','coinbase',
+  'binance','kraken','github','dropbox','adobe','linkedin','slack',
+];
+
+function detectHomoglyphs(bookmarks) {
+  const findings = [];
+
+  bookmarks.forEach(b => {
+    let hostname = '';
+    try { hostname = new URL(b.url).hostname.toLowerCase(); }
+    catch { return; }
+
+    // Check 1: Does the domain contain any non-ASCII characters?
+    const hasNonAscii = /[^\x00-\x7F]/.test(hostname);
+
+    // Check 2: Check for Punycode encoding (xn--) which indicates IDN domain
+    const hasPunycode = hostname.includes('xn--');
+
+    // Check 3: Decode any homoglyph characters and compare to known brands
+    let decoded = hostname;
+    for (const [glyph, latin] of Object.entries(HOMOGLYPH_MAP)) {
+      decoded = decoded.split(glyph).join(latin);
+    }
+
+    // Check 4: Does decoded version match a high-value domain?
+    const rootDecoded = decoded.replace(/\.[a-z.]+$/, '').replace('www.', '');
+    const matchedBrand = HIGH_VALUE_DOMAINS.find(brand => {
+      // Exact match or very close (1 char difference for long brands)
+      if (rootDecoded === brand) return true;
+      // Levenshtein-like: if decoded root differs from original and matches brand
+      if (decoded !== hostname && rootDecoded.includes(brand)) return true;
+      return false;
+    });
+
+    if (hasNonAscii || hasPunycode || (decoded !== hostname && matchedBrand)) {
+      findings.push({
+        url: b.url,
+        hostname,
+        decoded: decoded !== hostname ? decoded : null,
+        brand: matchedBrand || null,
+        hasPunycode,
+        hasNonAscii,
+      });
+    }
+  });
+
+  return findings;
+}
+
+function runSecurityScan(bookmarks) {
+  const panel = document.getElementById('securityPanel');
+  const results = document.getElementById('securityResults');
+  panel.style.display = 'block';
+  results.innerHTML = '<div style="color:var(--text3);font-size:12px;font-family:var(--mono);padding:8px 0">Scanning ' + bookmarks.length + ' domains...</div>';
+
+  setTimeout(() => {
+    const threats = [];
+    bookmarks.forEach(b => {
+      let domain;
+      try { domain = new URL(b.url).hostname.replace('www.', '').toLowerCase(); }
+      catch { return; }
+      const match = THREAT_DB.find(t => domain === t.domain || domain.endsWith('.' + t.domain));
+      if (match) {
+        const existing = threats.find(t => t.domain === match.domain);
+        if (existing) existing.urls.push(b.url);
+        else threats.push({ ...match, urls: [b.url] });
+      }
+    });
+
+    // Run homoglyph detection
+    const homoglyphs = detectHomoglyphs(bookmarks);
+    homoglyphs.forEach(h => {
+      threats.push({
+        domain: h.hostname,
+        level: 'critical',
+        type: 'Homoglyph / Homograph Attack',
+        desc: h.hasPunycode
+          ? `This domain uses Punycode encoding (xn--) which can disguise non-Latin characters. ${h.brand ? `It visually resembles "${h.brand}" but is a different domain.` : 'Verify this is a site you intentionally bookmarked.'}`
+          : h.hasNonAscii
+          ? `This domain contains non-ASCII Unicode characters that look identical to Latin letters. ${h.brand ? `It is designed to visually impersonate "${h.brand}".` : ''} The Cyrillic letter "а" and Latin "a" are indistinguishable to the human eye — this is a known phishing technique.`
+          : `This domain decodes to "${h.decoded}" and appears to visually impersonate "${h.brand}" using lookalike characters.`,
+        urls: [h.url],
+        isHomoglyph: true,
+      });
+    });
+
+    if (threats.length === 0) {
+      const httpRemaining = (window._httpRemoved || []).length;
+      const httpWarning = httpRemaining > 0
+        ? `<div style="margin-top:10px;padding:10px 14px;background:rgba(255,107,107,0.06);border:1px solid rgba(255,107,107,0.2);border-radius:3px;font-size:12px;color:var(--text2)">
+            <span style="color:#ff8080">⚠</span> ${httpRemaining} unreviewed HTTP links remain — review and delete them for a fully secure collection.
+           </div>`
+        : '';
+      results.innerHTML = `
+        <div class="scan-clear">
+          <span class="scan-clear-icon">${httpRemaining > 0 ? '⚠️' : '✓'}</span>
+          <div>
+            <div style="font-size:14px;margin-bottom:4px;color:${httpRemaining > 0 ? 'var(--text)' : 'var(--accent2)'}">${httpRemaining > 0 ? 'No malware threats — but HTTP links need review' : 'All clear — no threats detected'}</div>
+            <div style="font-size:12px;opacity:0.7">${bookmarks.length} domains scanned · threat signature matching · homoglyph/Unicode analysis · all clean</div>
+            ${httpWarning}
+          </div>
+        </div>`;
+      return;
+    }
+
+    const critical = threats.filter(t => t.level === 'critical').length;
+    const high = threats.filter(t => t.level === 'high').length;
+    const medium = threats.filter(t => t.level === 'medium').length;
+
+    // Warning banner — prominent, can't be missed
+    let html = `
+      <div style="background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.35);
+                  border-radius:4px;padding:16px 20px;margin-bottom:16px;display:flex;
+                  align-items:flex-start;gap:14px;">
+        <span style="font-size:24px;flex-shrink:0">⚠️</span>
+        <div style="flex:1">
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#ff8080;margin-bottom:6px">
+            ${threats.length} Security ${threats.length === 1 ? 'Threat' : 'Threats'} Detected
+          </div>
+          <div style="font-family:var(--mono);font-size:12px;color:var(--text2);margin-bottom:12px">
+            ${bookmarks.length} domains scanned · action required on the ${threats.length} flagged ${threats.length === 1 ? 'domain' : 'domains'} below
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            ${critical ? `<div class="threat-stat critical"><span class="threat-stat-num">${critical}</span> Critical</div>` : ''}
+            ${high ? `<div class="threat-stat high"><span class="threat-stat-num">${high}</span> High</div>` : ''}
+            ${medium ? `<div class="threat-stat medium"><span class="threat-stat-num">${medium}</span> Medium</div>` : ''}
+          </div>
+        </div>
+      </div>`;
+
+    const sorted = [...threats].sort((a,b) => ({ critical:0, high:1, medium:2 }[a.level] - { critical:0, high:1, medium:2 }[b.level]));
+    _threatList = sorted;
+
+    sorted.forEach((t, i) => {
+      const steps = getRemediation(t);
+      const isQ = _quarantine.some(q => q.urls.some(u => t.urls.includes(u)));
+      html += `
+        <div class="threat-item ${t.level}" id="threat-${i}">
+          <div class="threat-header" onclick="toggleThreat(${i})">
+            <span class="threat-badge ${t.level}">${t.level}</span>
+            <span class="threat-domain">${t.domain}</span>
+            <span class="threat-type">${t.type}</span>
+            <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+              ${isQ
+                ? `<button class="restore-btn" onclick="event.stopPropagation();restoreFromQuarantine(${i})">↩ Restore</button>`
+                : `<button class="quarantine-btn" onclick="event.stopPropagation();quarantineThreat(${i})">☣ Quarantine</button>`
+              }
+              <span class="threat-chevron">▶</span>
+            </div>
+          </div>
+          <div class="threat-body">
+            <div class="threat-desc">${t.desc}</div>
+            <div class="affected-urls">
+              <div style="font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Affected bookmarks</div>
+              ${t.urls.map(u => `<div class="affected-url">${u}</div>`).join('')}
+            </div>
+            <div style="margin-top:14px">
+              <div class="remediation-title">Recommended actions</div>
+              <div class="remediation-steps">
+                ${steps.map((step, si) => `
+                  <div class="remediation-step">
+                    <div class="step-num-badge">${si+1}</div>
+                    <div>${step}</div>
+                  </div>`).join('')}
+              </div>
+            </div>
+            <div style="margin-top:14px;display:flex;gap:8px">
+              ${isQ
+                ? `<button class="restore-btn" onclick="restoreFromQuarantine(${i})">↩ Restore from Quarantine</button>`
+                : `<button class="quarantine-btn" onclick="quarantineThreat(${i})">☣ Move to Quarantine</button>`
+              }
+              <button onclick="deleteThreatBookmarks(${i})"
+                style="background:transparent;border:1px solid var(--border);color:var(--text3);
+                       font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:3px;cursor:pointer">
+                🗑 Delete bookmark
+              </button>
+            </div>
+          </div>
+        </div>`;
+    });
+
+    results.innerHTML = html;
+  }, 300);
+}
+
+let _quarantine = []; // { threat, urls, reason, quarantinedAt }
+let _threatList = []; // cached sorted threats for quarantine functions
+
+function quarantineThreat(threatIdx) {
+  const t = _threatList[threatIdx];
+  if (!t) return;
+
+  // Add to quarantine list
+  const already = _quarantine.findIndex(q => q.domain === t.domain);
+  if (already < 0) {
+    _quarantine.push({
+      domain: t.domain,
+      urls: [...t.urls],
+      reason: `${t.level.toUpperCase()} — ${t.type}`,
+      level: t.level,
+      quarantinedAt: new Date().toLocaleDateString(),
+    });
+  }
+
+  // Mark bookmarks visually in grid
+  t.urls.forEach(url => {
+    document.querySelectorAll('.bookmark-item').forEach(el => {
+      const link = el.querySelector('.bookmark-link');
+      if (link && link.href === url) el.classList.add('quarantined');
+    });
+  });
+
+  // Show quarantine view button
+  document.getElementById('quarantineViewBtn').style.display = 'inline-flex';
+
+  // Re-render security results to update buttons
+  runSecurityScan(_bookmarks);
+  showQuarantinePanel();
+}
+
+function restoreFromQuarantine(threatIdx) {
+  const t = _threatList[threatIdx];
+  if (!t) return;
+
+  _quarantine = _quarantine.filter(q => q.domain !== t.domain);
+
+  // Remove visual marking
+  t.urls.forEach(url => {
+    document.querySelectorAll('.bookmark-item').forEach(el => {
+      const link = el.querySelector('.bookmark-link');
+      if (link && link.href === url) el.classList.remove('quarantined');
+    });
+  });
+
+  if (_quarantine.length === 0) {
+    document.getElementById('quarantineViewBtn').style.display = 'none';
+    document.getElementById('quarantinePanel').style.display = 'none';
+  }
+
+  runSecurityScan(_bookmarks);
+  showQuarantinePanel();
+}
+
+function deleteThreatBookmarks(threatIdx) {
+  const t = _threatList[threatIdx];
+  if (!t) return;
+  if (!confirm(`Delete all bookmarks for ${t.domain}?`)) return;
+
+  const urlSet = new Set(t.urls);
+  _categories.forEach(cat => { cat.items = cat.items.filter(b => !urlSet.has(b.url)); });
+  // Also remove from quarantine
+  _quarantine = _quarantine.filter(q => q.domain !== t.domain);
+
+  renderGrid();
+  buildExportFromState();
+  runSecurityScan(_bookmarks);
+}
+
+function showQuarantinePanel() {
+  const panel = document.getElementById('quarantinePanel');
+  if (_quarantine.length === 0) { panel.style.display = 'none'; return; }
+
+  panel.style.display = 'block';
+  panel.innerHTML = `
+    <div class="quarantine-panel">
+      <div class="quarantine-header" onclick="this.parentElement.querySelector('.quarantine-body').classList.toggle('hidden')" style="cursor:pointer">
+        <span style="font-size:16px">☣</span>
+        <div class="quarantine-title">Quarantine (${_quarantine.length} domain${_quarantine.length > 1 ? 's' : ''})</div>
+        <span style="font-size:10px;color:var(--text3);font-family:var(--mono)">These bookmarks are flagged but not deleted — investigate before removing</span>
+      </div>
+      <div class="quarantine-body">
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,107,107,0.1)">
+          Quarantined bookmarks remain in your collection but are visually flagged ⚠. 
+          Investigate each domain before deciding to restore or permanently delete.
+        </div>
+        ${_quarantine.map((q, qi) => `
+          <div class="quarantine-row">
+            <img src="https://www.google.com/s2/favicons?domain=${q.domain}&sz=16" 
+                 style="width:14px;height:14px;flex-shrink:0" onerror="this.style.display='none'">
+            <div class="quarantine-url">${q.domain}</div>
+            <div class="quarantine-reason">${q.reason}</div>
+            <span style="font-size:10px;color:var(--text3);font-family:var(--mono);white-space:nowrap">${q.quarantinedAt}</span>
+            <a href="https://radar.cloudflare.com/domains/domain/${q.domain}" target="_blank"
+               style="font-family:var(--mono);font-size:10px;color:var(--accent);text-decoration:none;white-space:nowrap">
+              🔍 Investigate
+            </a>
+            <button onclick="restoreQuarantineByDomain('${q.domain}')" class="restore-btn">↩ Restore</button>
+            <button onclick="deleteQuarantineByDomain('${q.domain}')" class="quarantine-btn">🗑 Delete</button>
+          </div>`).join('')}
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,107,107,0.1);display:flex;gap:8px">
+          <button onclick="deleteAllQuarantined()"
+            style="background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.3);color:#ff8080;
+                   font-family:var(--mono);font-size:11px;padding:6px 14px;border-radius:3px;cursor:pointer">
+            🗑 Delete All Quarantined
+          </button>
+          <button onclick="restoreAllQuarantined()"
+            style="background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.3);color:var(--accent2);
+                   font-family:var(--mono);font-size:11px;padding:6px 14px;border-radius:3px;cursor:pointer">
+            ↩ Restore All
+          </button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function restoreQuarantineByDomain(domain) {
+  _quarantine = _quarantine.filter(q => q.domain !== domain);
+  document.querySelectorAll('.bookmark-item').forEach(el => {
+    const link = el.querySelector('.bookmark-link');
+    if (link && link.href.includes(domain)) el.classList.remove('quarantined');
+  });
+  if (_quarantine.length === 0) document.getElementById('quarantineViewBtn').style.display = 'none';
+  runSecurityScan(_bookmarks);
+  showQuarantinePanel();
+}
+
+function deleteQuarantineByDomain(domain) {
+  if (!confirm(`Permanently delete all bookmarks for ${domain}?`)) return;
+  _categories.forEach(cat => { cat.items = cat.items.filter(b => !b.url.includes(domain)); });
+  _quarantine = _quarantine.filter(q => q.domain !== domain);
+  if (_quarantine.length === 0) document.getElementById('quarantineViewBtn').style.display = 'none';
+  renderGrid();
+  buildExportFromState();
+  runSecurityScan(_bookmarks);
+  showQuarantinePanel();
+}
+
+function deleteAllQuarantined() {
+  if (!confirm(`Permanently delete all ${_quarantine.length} quarantined domains?`)) return;
+  const domains = new Set(_quarantine.map(q => q.domain));
+  _categories.forEach(cat => {
+    cat.items = cat.items.filter(b => {
+      try { return !domains.has(new URL(b.url).hostname.replace('www.','')); }
+      catch { return true; }
+    });
+  });
+  _quarantine = [];
+  document.getElementById('quarantineViewBtn').style.display = 'none';
+  renderGrid();
+  buildExportFromState();
+  runSecurityScan(_bookmarks);
+  showQuarantinePanel();
+}
+
+function restoreAllQuarantined() {
+  _quarantine = [];
+  document.querySelectorAll('.bookmark-item.quarantined').forEach(el => el.classList.remove('quarantined'));
+  document.getElementById('quarantineViewBtn').style.display = 'none';
+  document.getElementById('quarantinePanel').style.display = 'none';
+  runSecurityScan(_bookmarks);
+}
+
+function toggleThreat(i) {
+  document.getElementById('threat-' + i).classList.toggle('open');
+}
+
+function getRemediation(threat) {
+  if (threat.isHomoglyph) {
+    return [
+      'Delete this bookmark immediately — this domain uses lookalike characters designed to deceive.',
+      `Navigate to the real site by typing the legitimate domain directly in your address bar (e.g. "paypal.com" not by clicking any link).`,
+      'If you have ever logged into this site thinking it was legitimate, change your password on the real site immediately and enable two-factor authentication.',
+      'Check your bank or payment accounts for unauthorized transactions if this domain impersonates a financial institution.',
+      'Report the phishing domain at: safebrowsing.google.com/safebrowsing/report_phish/',
+    ];
+  }
+  const base = [
+    'Delete this bookmark immediately and do not visit the site.',
+    'Clear your browser history, cookies, and cached data: Chrome → Settings → Privacy → Clear browsing data → All time.',
+  ];
+  const byType = {
+    'Malware': [...base,
+      'Run a full system scan with Malwarebytes Free (malwarebytes.com) — it specifically targets the malware type associated with this domain.',
+      'Check your browser extensions for anything unfamiliar: Chrome → Settings → Extensions. Remove anything you did not install intentionally.',
+      'Check your installed programs for software installed around the time you may have visited this site.',
+      'If you entered any passwords on or after visiting this site, change them immediately — prioritize email, banking, and social accounts.',
+    ],
+    'Browser Hijacker': [...base,
+      'Check your browser homepage and default search engine — reset both to your preferred values.',
+      'Go to Chrome → Settings → Extensions and remove any extensions you do not recognize.',
+      'Run Malwarebytes Anti-Malware to detect and remove hijacker components.',
+      'If the hijacker persists, use Chrome\'s built-in cleanup tool: Settings → Advanced → Reset and clean up → Clean up computer.',
+    ],
+    'Cryptominer': [...base,
+      'Check if your CPU usage was abnormally high when visiting this site — cryptominers can use up to 100% CPU.',
+      'Browser-based cryptominers do not persist after closing the tab — if you did not install any software, your system is likely clean.',
+      'Install uBlock Origin browser extension to block known cryptomining scripts proactively.',
+    ],
+    'Phishing': [...base,
+      'If you entered any credentials on this site: change those passwords immediately on the legitimate site.',
+      'If you entered payment card information: contact your bank immediately to report potential fraud and request a new card.',
+      'If you entered your SSN or government ID: place a fraud alert with the three credit bureaus (Equifax, Experian, TransUnion) and consider a credit freeze.',
+      'Enable two-factor authentication on all accounts where credentials may have been entered.',
+    ],
+    'Scareware': [...base,
+      'Do NOT purchase or download anything this site recommended — it is fraudulent.',
+      'If you already purchased: dispute the charge with your credit card company as fraud.',
+      'If you downloaded anything: run Malwarebytes immediately and quarantine any findings.',
+    ],
+    'Adware': [...base,
+      'Check your browser extensions and remove anything unfamiliar.',
+      'Run Malwarebytes AdwCleaner (free) — specifically targets adware components.',
+      'Check your installed programs for toolbars or search assistants you did not install.',
+    ],
+    'Spyware': [...base,
+      'Run Malwarebytes to detect and remove spyware components.',
+      'Review all installed browser extensions and remove any you did not install.',
+      'Change passwords for accounts you accessed while this extension may have been active.',
+    ],
+    'Data Harvesting': [
+      'You do not need to delete this bookmark — data harvesting is primarily a privacy concern, not a security emergency.',
+      'Install uBlock Origin or Privacy Badger to block tracking pixels and data harvesting scripts.',
+      'Consider using Firefox or Brave with Enhanced Tracking Protection enabled.',
+    ],
+    'Tracker': [
+      'Install uBlock Origin browser extension to block tracking scripts.',
+      'Enable Enhanced Tracking Protection in Firefox or use a browser with built-in ad blocking.',
+    ],
+    'Phishing Vector': [
+      'URL shorteners mask the real destination — never click them without previewing first.',
+      'Use checkshorturl.com to preview any shortened URL before visiting.',
+      'If you visited a shortened URL that led somewhere suspicious, treat it as a potential phishing incident and change relevant passwords.',
+    ],
+    'Malvertising': [...base,
+      'Run Malwarebytes to check for any drive-by malware that may have been delivered via ads.',
+      'Install uBlock Origin to block malvertising networks.',
+    ],
+    'Malicious Redirect': [...base,
+      'Check where the redirect led — if it was a suspicious site, run a Malwarebytes scan.',
+      'Never click shortened or obfuscated links from unknown sources.',
+    ],
+  };
+  return byType[threat.type] || [...base,
+    'Run Malwarebytes Free to scan for any installed threats.',
+    'Change passwords for any accounts accessed around the time of visiting this site.',
+    'Monitor your accounts for unusual activity.',
+  ];
+}
+</script>
+<footer style="background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;margin-top:2rem">
+  <span style="color:#94a3b8">Bookmark Organizer/Analyzer · Yana Ivanov · 2026</span>
+  <a href="../index.html" style="color:#4a9eff;text-decoration:none;letter-spacing:.1em;text-transform:uppercase;font-size:.65rem">← Portfolio</a>
+</footer>
+</body>
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Bookmarks Are a Security Risk — Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+.masthead{background:var(--ink);color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#4a9eff}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+.callout{padding:1.25rem 1.5rem;border-radius:4px;margin:1.75rem 0;border-left:4px solid;box-shadow:var(--shadow)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0;border-radius:4px;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:var(--ink);color:#fff}
+th{padding:.85rem 1rem;text-align:left;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;font-weight:600}
+td{padding:.75rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.blue{color:var(--blue);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+.mat-card{background:var(--paper);border-radius:6px;box-shadow:var(--shadow-md);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:1rem 1.5rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--display);font-size:2.4rem;font-weight:900;line-height:1;margin-bottom:.4rem}
+.stat-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;margin-bottom:.4rem;line-height:1.4}
+.stat-sub{font-size:.78rem;color:#94a3b8;line-height:1.5}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+
+.flow{display:flex;align-items:center;gap:0;margin:2rem 0;flex-wrap:wrap}
+.flow-step{flex:1;min-width:140px;padding:1.25rem;background:var(--paper);border:1px solid var(--rule);border-radius:4px;text-align:center;box-shadow:var(--shadow);position:relative}
+.flow-step.blue{border-top:3px solid var(--blue);background:#eff6ff}
+.flow-step.amber{border-top:3px solid var(--amber);background:#fffbeb}
+.flow-step.red{border-top:3px solid var(--red);background:#fef2f2}
+.flow-step.green{border-top:3px solid var(--green);background:#f0fdf4}
+.flow-arrow{font-size:1.4rem;color:#94a3b8;padding:0 .25rem;flex-shrink:0}
+.flow-step-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.4rem}
+.flow-step.blue .flow-step-label{color:var(--blue)}
+.flow-step.amber .flow-step-label{color:var(--amber)}
+.flow-step.red .flow-step-label{color:var(--red)}
+.flow-step.green .flow-step-label{color:var(--green)}
+.flow-step-title{font-family:var(--display-clean);font-size:.88rem;font-weight:700;color:var(--ink);margin-bottom:.3rem;line-height:1.3}
+.flow-step-body{font-size:.75rem;color:var(--ink3);line-height:1.5}
+
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);border-radius:4px;background:var(--paper);box-shadow:var(--shadow);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-high .finding-num{background:var(--blue);color:#fff}
+.fn-medium .finding-num{background:var(--amber);color:#fff}
+.fn-low .finding-num{background:var(--green);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;border-radius:3px;letter-spacing:.06em}
+.fn-high .finding-tag{background:var(--blue-dim);color:var(--blue)}
+.fn-medium .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-low .finding-tag{background:var(--green-dim);color:var(--green)}
+
+.bio{background:var(--ink);color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:4rem}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+footer{background:var(--ink2);color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+@media(max-width:700px){
+  .wrap,.mast-inner{padding:0 1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .flow{flex-direction:column}
+  .flow-arrow{transform:rotate(90deg)}
+  .bio{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Security Hygiene · Personal Analysis</div>
+    <h1 class="title">Your Bookmarks Are a Security Risk<br><span>The Forgotten Attack Surface in Your Browser</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">March 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Topic</div><div class="value">Browser Security Hygiene</div></div>
+      <div class="meta-item"><div class="label">Read Time</div><div class="value">8 minutes</div></div>
+      <div class="meta-item"><div class="label">Tool</div><div class="value">Bookmark Organizer/Analyzer</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    947 BOOKMARKS AUDITED &nbsp;·&nbsp; 737 HTTP LINKS FOUND &nbsp;·&nbsp; 78% UNENCRYPTED &nbsp;·&nbsp; DOMAIN HIJACKING RISK
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>The Problem Nobody Talks About</h2>
+  <p>Bookmarks start innocently. You save a link you'll "come back to." Then another. Six years and a few browser migrations later, you have nearly a thousand URLs — a chaotic archive of everywhere you've ever been online — and you've stopped using most of them because you can't find anything.</p>
+  <p>That was me. 947 bookmarks accumulated over a decade of browsing. When I finally sat down to deal with them, I realized the organizational problem was the least of my concerns. The security implications were far more interesting.</p>
+  <p>Bookmarks are a static snapshot of the web from the past. The web is not static. Domains expire, change ownership, get hijacked, or quietly drop HTTPS. Your browser will happily load whatever is at that URL today — no questions asked. That implicit trust is exactly what makes an old bookmark collection a security liability.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The core risk:</strong> Every bookmark represents a trust decision you made at some point in the past. That trust is permanent in your browser even as the web beneath it keeps changing — domains expire, change hands, and get weaponized.</p>
+  </div>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Figure 1 — What a Real Bookmark Audit Found</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-red">
+        <div class="stat-num">947</div>
+        <div class="stat-label">Total<br>Bookmarks</div>
+        <div class="stat-sub">Accumulated over<br>6 years of browsing</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">737</div>
+        <div class="stat-label">HTTP Links<br>Found</div>
+        <div class="stat-sub">78% of total — all<br>unencrypted</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">56</div>
+        <div class="stat-label">Duplicate<br>Domains</div>
+        <div class="stat-sub">From two Chrome<br>profile merges</div>
+      </div>
+      <div class="stat-item stat-blue">
+        <div class="stat-num">37</div>
+        <div class="stat-label">Threat<br>Signatures</div>
+        <div class="stat-sub">Checked against every<br>domain in the collection</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>The Threat Landscape in Your Bookmarks Bar</h2>
+
+  <h3>HTTP — Unencrypted Links</h3>
+  <p>Nearly 80% of my bookmarks were HTTP. These aren't just old news articles — mixed in were bookmarks for sites that, at the time I saved them, required login credentials. Financial research tools. Job boards. Professional communities. Any of those could have been re-registered by a threat actor after the original domain expired.</p>
+  <p><strong>HTTP connections are unencrypted.</strong> Any data transmitted — including session tokens — can be intercepted on the same network by anyone performing a man-in-the-middle attack. In 2026, there is no legitimate reason to bookmark an HTTP site.</p>
+
+  <h3>Domain Hijacking and Expired Domains</h3>
+  <p>Domains expire constantly. When a legitimate site lets its domain lapse, it enters an auction. A threat actor can purchase it, clone the original site's appearance, and harvest credentials from users who trust the URL they bookmarked years ago. This is a documented, active attack technique — not a theoretical risk.</p>
+
+  <h3>Unicode Homoglyph Attacks</h3>
+  <p>Cyrillic "а" and Latin "a" are visually identical. A malicious bookmark — perhaps installed by a compromised browser extension or a sync account breach — could use lookalike Unicode characters that are undetectable to the human eye but resolve to a completely different domain. The same class of attack used in supply chain compromises applies to bookmark URLs.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Figure 2 — Audit Process Flow</div>
+    <div class="flow">
+      <div class="flow-step blue">
+        <div class="flow-step-label">Step 1</div>
+        <div class="flow-step-title">Parse & Deduplicate</div>
+        <div class="flow-step-body">Extract all URLs, remove duplicates by root domain</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step red">
+        <div class="flow-step-label">Step 2</div>
+        <div class="flow-step-title">HTTP Isolation</div>
+        <div class="flow-step-body">Flag all unencrypted links for user review</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step blue">
+        <div class="flow-step-label">Step 3</div>
+        <div class="flow-step-title">AI Categorization</div>
+        <div class="flow-step-body">Sort bookmarks into meaningful categories automatically</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step amber">
+        <div class="flow-step-label">Step 4</div>
+        <div class="flow-step-title">Security Scan</div>
+        <div class="flow-step-body">Check threat signatures and homoglyph detection</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step green">
+        <div class="flow-step-label">Step 5</div>
+        <div class="flow-step-title">Dead Link Check</div>
+        <div class="flow-step-body">Verify each URL is still alive via HEAD requests</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>Key Findings</h2>
+
+  <div class="findings">
+    <div class="finding fn-high">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">78% of bookmarks used unencrypted HTTP</div>
+        <div class="finding-desc">737 of 947 bookmarks pointed to HTTP URLs — accumulated from 2010 to 2016 before HTTPS became standard. Many were for login pages, financial sites, and professional tools that no longer exist at those addresses. Any of these could now be owned by someone else.</div>
+        <div class="finding-tag">High Risk</div>
+      </div>
+    </div>
+    <div class="finding fn-medium">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">Double import created 56 duplicate domains</div>
+        <div class="finding-desc">An old Mac bookmark collection had been imported into Chrome, then re-imported during a migration — creating silent duplicates. This is a common source of stale, forgotten bookmarks that never get cleaned up because they're invisible in the noise.</div>
+        <div class="finding-tag">Medium Risk</div>
+      </div>
+    </div>
+    <div class="finding fn-low">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">No homoglyph or malware threats detected</div>
+        <div class="finding-desc">All 123 HTTPS domains passed threat signature matching and Unicode homoglyph analysis. This is the expected result for a personal collection — but the absence of threats doesn't mean the check isn't worth running. Browser sync compromises and rogue extensions can inject bookmarks silently.</div>
+        <div class="finding-tag">All Clear</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>Domain Monitoring — Staying Ahead of Ownership Changes</h2>
+  <p>Cleaning your bookmarks once is good. Knowing when a domain you trust changes hands is better. WHOIS monitoring tracks changes to a domain's registration records — when ownership transfers, the WHOIS record changes, and a monitoring tool alerts you within hours.</p>
+  <p>DNS record monitoring catches a different attack: when a domain's A record or nameserver is changed to point traffic somewhere new. The domain name looks right, but the server you're connecting to has changed entirely.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Tool</th>
+          <th>What it monitors</th>
+          <th>Free tier</th>
+          <th>Best for</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Hexowatch</strong></td>
+          <td>WHOIS changes, DNS records, domain expiry</td>
+          <td class="green">Yes</td>
+          <td>Ownership change alerts, Slack/Telegram integration</td>
+        </tr>
+        <tr>
+          <td><strong>UptimeRobot</strong></td>
+          <td>Uptime, domain expiry, SSL certificates</td>
+          <td class="green">Yes</td>
+          <td>Email/SMS/Discord alerts, easy setup</td>
+        </tr>
+        <tr>
+          <td><strong>Visualping</strong></td>
+          <td>Visual page content changes</td>
+          <td class="green">Yes</td>
+          <td>Detecting when a login page has been quietly replaced</td>
+        </tr>
+        <tr>
+          <td><strong>WhoisXML API</strong></td>
+          <td>WHOIS history, ownership, DNS connections</td>
+          <td class="amber">Limited</td>
+          <td>Building your own alerting pipeline, bulk monitoring</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>Practical recommendation:</strong> At minimum, set up WHOIS monitoring for the 10–20 domains you visit most frequently — your bank, email provider, password manager, and VPN. These are the highest-value targets for domain hijacking because attackers know users trust them implicitly.</p>
+  </div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>The Broader Lesson</h2>
+  <p>Security hygiene has well-worn categories: passwords, software updates, phishing awareness, multi-factor authentication. Bookmarks don't appear on any checklist — which is exactly why they're interesting from an adversarial perspective. The best attack surfaces are the ones defenders aren't thinking about.</p>
+  <p>Your bookmarks represent years of implicit trust decisions. Every URL in your collection is a site you decided, at some point, was worth returning to. That trust is permanent in your browser even as the web beneath it keeps changing.</p>
+  <p><strong>Periodic bookmark audits should be part of personal security hygiene.</strong> Not because bookmarks are the most dangerous thing on your threat model — they aren't. But because the habit of examining implicit trust relationships is exactly the mindset that security work requires.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Recommended cadence:</strong> Export and audit your bookmarks every 6–12 months. After any significant browser migration or profile merge. Immediately after any suspected account compromise — a breached browser sync account can inject malicious bookmarks with homoglyph URLs silently.</p>
+  </div>
+
+  <div class="callout callout-blue" style="margin-top:2rem">
+    <p><strong>Tool available:</strong> The Bookmark Organizer/Analyzer built for this analysis is available as an open-source browser tool — <a href="../tools/bookmark-organizer.html" style="color:var(--blue)">Bookmark Organizer/Analyzer →</a>. Drop in any Chrome, Firefox, or Safari bookmark export to audit HTTP links, scan for threats, check dead links, and auto-organize by category. Runs entirely in your browser — no data leaves your machine.</p>
+  </div>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">This analysis is based on a real personal bookmark audit conducted in March 2026. All findings reflect the author's own browser data. Domain monitoring tool descriptions are based on publicly available information from each vendor's documentation.</p>
+</div>
+
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; UX/UI Designer &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and UX designer based in Connecticut. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to security analysis and tooling. She is currently pursuing CompTIA Security+ certification with a focus on making security practices accessible and actionable. This analysis was produced independently as a contribution to personal security hygiene awareness.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>Bookmark Security Analysis · Yana Ivanov · March 2026</span>
+  <span>Personal analysis · For educational use · Independent research</span>
+</footer>
+
+</body>
+</html>
