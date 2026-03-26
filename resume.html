@@ -9,7 +9,6 @@
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
   --ink:#0a0f1a;
-  --ink2:#0a0f1a;
   --ink3:#374151;
   --blue:#1a4fa0;
   --red:#c0392b;
@@ -20,23 +19,35 @@
   --serif:'Source Serif 4','Georgia',serif;
   --display:'Playfair Display','Georgia',serif;
 }
-html{scroll-behavior:smooth;font-size:19px}
-body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8}
+html{scroll-behavior:smooth}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:18px}
 
 /* ── BACK NAV ── */
 .back-nav{
   background:#0a0f1a;padding:.65rem 3rem;
-  display:flex;align-items:center;
+  display:flex;align-items:center;justify-content:space-between;
   border-bottom:1px solid rgba(255,255,255,.08);
   position:sticky;top:0;z-index:999;
 }
 .back-nav a{
-  font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;
+  font-family:var(--mono);font-size:.78rem;letter-spacing:.12em;
   color:#4a9eff;text-decoration:none;text-transform:uppercase;
   display:flex;align-items:center;gap:.5rem;transition:color .2s;
 }
 .back-nav a:hover{color:#93c5fd}
 .back-nav a::before{content:'←';font-size:.75rem}
+.nav-right{display:flex;gap:1rem;align-items:center}
+
+/* ── BUTTONS ── */
+.btn-primary{
+  background:var(--red);color:#fff;border:none;
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;
+  padding:.65rem 1.75rem;cursor:pointer;text-transform:uppercase;
+  transition:background .2s;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;
+}
+.btn-primary:hover{background:#a93226}
+.btn-secondary{background:transparent;color:#4a9eff;border:1px solid rgba(255,255,255,.35);font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;padding:.65rem 1.75rem;cursor:pointer;text-transform:uppercase;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;}
+.btn-secondary:hover{border-color:#4a9eff;color:#93c5fd}
 
 /* ── MASTHEAD ── */
 .masthead{
@@ -52,21 +63,15 @@ body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:
   pointer-events:none;
 }
 .mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
-.mast-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.22em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.25rem}
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.22em;color:#4a9eff;text-transform:uppercase;margin-bottom:1rem}
 .mast-name{font-family:var(--display);font-size:clamp(2.4rem,5vw,3.6rem);font-weight:900;line-height:1.05;letter-spacing:-.02em;color:#fff;margin-bottom:.5rem}
-.mast-title{font-family:var(--serif);font-size:1rem;color:#94a3b8;font-style:italic;margin-bottom:1.75rem}
-
-.mast-links{
-  display:flex;gap:2.5rem;
-  padding-top:1.5rem;
-  border-top:1px solid rgba(255,255,255,.1);
-}
+.mast-title{font-family:var(--serif);font-size:1.1rem;color:#94a3b8;margin-bottom:1.75rem}
+.mast-links{display:flex;gap:2.5rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.1);}
+.mast-seek{font-family:var(--serif);font-size:.95rem;color:#64748b;margin-bottom:1.5rem;line-height:1.6}
 .mast-link{
-  font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;
   color:#94a3b8;text-decoration:none;text-transform:uppercase;
-  transition:color .2s;
-  padding-bottom:2px;
-  border-bottom:1px solid transparent;
+  transition:color .2s;padding-bottom:2px;border-bottom:1px solid transparent;
 }
 .mast-link:hover{color:#4a9eff;border-bottom-color:#4a9eff}
 
@@ -75,231 +80,125 @@ body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:
 .content{padding:3.5rem 0}
 
 /* ── SECTION ── */
-.section{margin-bottom:3rem;padding-bottom:3rem;border-bottom:1px solid var(--rule)}
+.section{margin-bottom:3.5rem;padding-bottom:3.5rem;border-bottom:1px solid var(--rule)}
 .section:last-child{border-bottom:none}
-.section-num{font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
-h2{font-family:var(--display);font-size:1.6rem;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:1.25rem;letter-spacing:-.01em}
-h3{font-family:var(--display);font-size:1.15rem;font-weight:700;color:var(--ink);margin:.1rem 0 .25rem}
+.section-num{font-family:var(--mono);font-size:.78rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.6rem}
+h2{font-family:var(--display);font-size:1.8rem;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:1.25rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.3rem;font-weight:700;color:var(--ink);margin:.1rem 0 .35rem}
 
 /* ── SUMMARY ── */
-.summary p{font-size:1rem;color:var(--ink3);line-height:1.85;margin-bottom:1rem}
-.callout{
-  background:var(--paper);border-left:3px solid var(--blue);
-  padding:1rem 1.25rem;margin-top:1.25rem;
-}
-.callout p{font-size:.9rem;color:var(--ink3);line-height:1.75;font-style:italic;margin:0}
-
-/* ── TWO COL LAYOUT ── */
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem}
+.summary p{font-size:1.05rem;color:var(--ink3);line-height:1.85;margin-bottom:1rem}
+.callout{background:var(--paper);border-left:3px solid var(--blue);padding:1rem 1.25rem;margin-top:1.25rem;}
+.callout p{font-size:1rem;color:var(--ink3);line-height:1.75;font-style:italic;margin:0}
 
 /* ── CERTIFICATIONS ── */
-.cert-list{list-style:none;display:grid;gap:.5rem}
+.cert-list{list-style:none;display:grid;gap:.6rem}
 .cert-list li{
-  font-family:var(--mono);font-size:.82rem;color:var(--ink);
+  font-size:1rem;color:var(--ink);
   display:flex;justify-content:space-between;align-items:baseline;
-  gap:1rem;padding-bottom:.5rem;
+  gap:1rem;padding-bottom:.6rem;
   border-bottom:1px solid var(--rule);
 }
 .cert-list li:last-child{border-bottom:none;padding-bottom:0}
-.cert-name-text{font-weight:600;color:var(--ink)}
-.cert-status-text{color:var(--blue);font-size:.72rem;white-space:nowrap}
-.cert-status-text.earned{color:#145a32;font-weight:600}
+.cert-name-text{color:var(--ink)}
+.cert-status-text{font-family:var(--mono);color:var(--blue);font-size:.75rem;white-space:nowrap}
+.cert-status-text.earned{color:#145a32}
+.cert-status-text.progress{color:var(--blue)}
 .cert-status-text.planned{color:#94a3b8}
 
 /* ── SKILLS ── */
-.skill-row{
-  display:grid;grid-template-columns:140px 1fr;
-  gap:.5rem;margin-bottom:.75rem;
-  align-items:baseline;
+.skill-block{margin-bottom:1.3rem}
+.skill-cat{
+  font-family:var(--mono);font-size:.82rem;letter-spacing:.1em;
+  color:#64748b;text-transform:uppercase;margin-bottom:.3rem;
 }
-.skill-cat{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;color:var(--blue);text-transform:uppercase}
-.skill-val{font-size:.95rem;color:var(--ink3);line-height:1.65}
+.skill-val{font-size:1.05rem;color:var(--ink3);line-height:1.75}
 
 /* ── EXPERIENCE ── */
-.exp-item{margin-bottom:1.75rem}
+.exp-item{margin-bottom:2rem}
 .exp-header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.25rem;margin-bottom:.15rem}
-.exp-dates{font-family:var(--mono);font-size:.62rem;color:#94a3b8}
-.exp-company{font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:var(--blue);text-transform:uppercase;margin-bottom:.6rem}
-.exp-bullets{list-style:none;display:grid;gap:.3rem}
+.exp-dates{font-family:var(--mono);font-size:.82rem;color:#94a3b8}
+.exp-company{font-family:var(--mono);font-size:.82rem;letter-spacing:.04em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+.exp-bullets{list-style:none;display:grid;gap:.4rem}
 .exp-bullets li{
-  font-size:.9rem;color:var(--ink3);line-height:1.7;
-  padding-left:1rem;position:relative;
+  font-size:1rem;color:var(--ink3);line-height:1.75;
+  padding-left:1.1rem;position:relative;
 }
-.exp-bullets li::before{content:'—';position:absolute;left:0;color:var(--blue);font-family:var(--mono);font-size:.75rem;top:.15rem}
+.exp-bullets li::before{content:'—';position:absolute;left:0;color:var(--blue);font-family:var(--mono);font-size:.75rem;top:.2rem}
 
 /* ── PORTFOLIO ── */
-.portfolio-list{list-style:none;display:grid;gap:.6rem}
-.portfolio-list li a{
-  font-size:.88rem;color:var(--ink);text-decoration:none;
-  display:flex;align-items:baseline;gap:.5rem;
+.portfolio-featured{display:grid;gap:1rem;margin-bottom:1.5rem}
+.portfolio-card{
+  background:var(--paper);border:1px solid var(--rule);
+  padding:1.1rem 1.25rem;
+  transition:border-color .2s;
+}
+.portfolio-card:hover{border-color:var(--blue)}
+.portfolio-card a{
+  font-size:1.05rem;font-weight:600;color:var(--ink);
+  text-decoration:none;display:block;margin-bottom:.35rem;
   transition:color .2s;
 }
-.portfolio-list li a:hover{color:var(--blue)}
-.portfolio-list li a::before{content:'→';font-family:var(--mono);font-size:.7rem;flex-shrink:0;color:var(--blue)}
-.portfolio-list li .p-desc{font-size:.8rem;color:#94a3b8;margin-top:.15rem;padding-left:1.1rem}
+.portfolio-card a:hover{color:var(--blue)}
+.portfolio-card .p-desc{font-size:.95rem;color:var(--ink3);line-height:1.65}
+
+.portfolio-cta{margin-top:1.25rem}
 
 /* ── TARGET ── */
 .target-cols{columns:2;gap:2rem;margin-bottom:.75rem}
-.target-cols p{font-size:.88rem;color:var(--ink3);margin-bottom:.35rem;break-inside:avoid}
+.target-cols p{font-size:1rem;color:var(--ink3);margin-bottom:.4rem;break-inside:avoid}
 
 /* ── FOOTER ── */
 footer{
   background:#0a0f1a;color:#64748b;
   padding:1.25rem 3rem;
-  font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;
   display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;
 }
 footer a{color:#4a9eff;text-decoration:none}
 footer a:hover{color:#93c5fd}
 
 /* ── PRINT ── */
-.print-btn{
-  font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
-  background:transparent;border:1px solid var(--rule);color:var(--ink3);
-  padding:.45rem 1rem;cursor:pointer;transition:all .2s;margin-bottom:2.5rem;
-  border-radius:2px;
-}
-.print-btn:hover{border-color:var(--blue);color:var(--blue)}
-
 @media print {
-  :root {
-    --ink: #000000 !important;
-    --ink2: #000000 !important;
-    --ink3: #333333 !important;
-    --blue: #000000 !important;
-    --red: #000000 !important;
-    --rule: #cccccc !important;
-    --bg: #ffffff !important;
-    --paper: #ffffff !important;
-  }
-
-  * {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  html { font-size: 13px !important; }
-
-  body {
-    background: #ffffff !important;
-    color: #000000 !important;
-    line-height: 1.5 !important;
-  }
-
-  .back-nav, .print-btn { display: none !important; }
-
-  .masthead {
-    background: #ffffff !important;
-    color: #000000 !important;
-    padding: 0 0 12pt 0 !important;
-    border-bottom: 2pt solid #000000 !important;
-  }
-
-  .masthead::before { display: none !important; }
-
-  .mast-label {
-    color: #000000 !important;
-    font-size: 8pt !important;
-    margin-bottom: 4pt !important;
-  }
-
-  .mast-name {
-    color: #000000 !important;
-    font-size: 22pt !important;
-  }
-
-  .mast-title {
-    color: #333333 !important;
-    font-size: 10pt !important;
-  }
-
-  .mast-links {
-    border-top: 1pt solid #cccccc !important;
-    padding-top: 6pt !important;
-    gap: 1.5rem !important;
-  }
-
-  .mast-link {
-    color: #000000 !important;
-    font-size: 8pt !important;
-  }
-
-  .wrap { padding: 0 !important; }
-  .content { padding: 12pt 0 !important; }
-
-  .section {
-    margin-bottom: 14pt !important;
-    padding-bottom: 14pt !important;
-    border-bottom: 1pt solid #cccccc !important;
-    page-break-inside: avoid !important;
-  }
-
-  .section-num {
-    color: #666666 !important;
-    font-size: 7pt !important;
-  }
-
-  h2 {
-    color: #000000 !important;
-    font-size: 14pt !important;
-    margin-bottom: 8pt !important;
-  }
-
-  h3 {
-    color: #000000 !important;
-    font-size: 11pt !important;
-  }
-
-  a {
-    color: #000000 !important;
-    text-decoration: none !important;
-  }
-
-  .callout {
-    border-left: 2pt solid #000000 !important;
-    background: none !important;
-  }
-
-  .cert-status-text,
-  .cert-status-text.earned,
-  .cert-status-text.planned {
-    color: #333333 !important;
-  }
-
-  .skill-cat { color: #000000 !important; }
-  .skill-val { color: #333333 !important; }
-
-  .exp-company { color: #333333 !important; }
-  .exp-dates { color: #333333 !important; }
-
-  .exp-bullets li::before { color: #000000 !important; }
-  .exp-bullets li { color: #333333 !important; }
-
-  .portfolio-list li a { color: #000000 !important; }
-  .portfolio-list li a::before { color: #000000 !important; }
-  .p-desc { color: #666666 !important; }
-
-  .target-cols p { color: #333333 !important; }
-
-  footer { display: none !important; }
-
-  @page {
-    margin: 0.75in;
-    size: letter portrait;
-  }
-}dia print{
-  .back-nav,.print-btn{display:none!important}
-  .section{page-break-inside:avoid}
-  body{font-size:15px}
+  :root{--ink:#000;--ink3:#333;--blue:#000;--red:#000;--rule:#ccc;--bg:#fff;--paper:#fff;}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  html{font-size:13px!important}
+  body{background:#fff!important;color:#000!important;line-height:1.5!important}
+  .back-nav,.portfolio-cta,footer{display:none!important}
+  .masthead{background:#fff!important;color:#000!important;padding:0 0 12pt!important;border-bottom:2pt solid #000!important}
+  .masthead::before{display:none!important}
+  .mast-label,.mast-name,.mast-title,.mast-seek{font-family:var(--serif);font-size:.95rem;color:#64748b;margin-bottom:1.5rem;line-height:1.6}
+.mast-link{color:#000!important}
+  .mast-links{border-top:1pt solid #ccc!important;padding-top:6pt!important}
+  .wrap{padding:0!important}
+  .content{padding:12pt 0!important}
+  .section{margin-bottom:14pt!important;padding-bottom:14pt!important;border-bottom:1pt solid #ccc!important;page-break-inside:avoid!important}
+  .section-num{color:#666!important;font-size:7pt!important}
+  h2{color:#000!important;font-size:14pt!important}
+  h3{color:#000!important;font-size:11pt!important}
+  a{color:#000!important;text-decoration:none!important}
+  .callout{border-left:2pt solid #000!important;background:none!important}
+  .cert-status-text,.cert-status-text.earned,.cert-status-text.progress,.cert-status-text.planned{color:#333!important}
+  .skill-cat{color:#000!important}
+  .skill-val{color:#333!important}
+  .exp-company,.exp-dates{color:#333!important}
+  .exp-bullets li::before{color:#000!important}
+  .exp-bullets li{color:#333!important}
+  .portfolio-card{border:1pt solid #ccc!important;background:none!important}
+  .portfolio-card a{color:#000!important}
+  .portfolio-card .p-desc{color:#333!important}
+  .target-cols p{color:#333!important}
+  @page{margin:.75in;size:letter portrait}
 }
 
 @media(max-width:660px){
   .mast-inner,.wrap{padding-left:1.5rem;padding-right:1.5rem}
-  .two-col{grid-template-columns:1fr}
+  .back-nav{padding:.65rem 1.5rem}
   .target-cols{columns:1}
-  .skill-row{grid-template-columns:1fr;gap:.15rem}
   footer{flex-direction:column;text-align:center}
   .mast-links{gap:1.5rem;flex-wrap:wrap}
+  .nav-right{gap:.5rem}
+  .btn-primary,.btn-secondary{border:1px solid rgba(255,255,255,.4);padding:.55rem 1rem;font-size:.65rem}
 }
 </style>
 </head>
@@ -311,11 +210,12 @@ footer a:hover{color:#93c5fd}
 
 <div class="masthead">
   <div class="mast-inner">
-    <div class="mast-label">Resume — Cloud Security &amp; CMMC</div>
+    <div class="mast-label">Resume — Information Assurance &amp; CMMC Compliance</div>
     <div class="mast-name">Yana Ivanov</div>
-    <div class="mast-title">Cloud Security Engineer &nbsp;·&nbsp; CMMC Consultant &nbsp;·&nbsp; Milford, CT</div>
+    <div class="mast-title">Information Assurance &amp; CMMC Compliance Analyst</div>
+    <div class="mast-seek">Seeking an IA or CMMC compliance role at a CT defense contractor with a path to security clearance sponsorship.</div>
     <div class="mast-links">
-      <a href="/cdn-cgi/l/email-protection#f188909f909887909f9e87b1969c90989ddf929e9c" class="mast-link"><span class="__cf_email__" data-cfemail="d0a9b1beb1b9a6b1bebfa690b7bdb1b9bcfeb3bfbd">[email&#160;protected]</span></a>
+      <a href="mailto:yanaivanov@gmail.com" class="mast-link">yanaivanov@gmail.com</a>
       <a href="tel:9175932690" class="mast-link">917-593-2690</a>
       <a href="https://linkedin.com/in/yanaivanov" target="_blank" class="mast-link">LinkedIn</a>
       <a href="index.html" class="mast-link">Portfolio</a>
@@ -326,15 +226,15 @@ footer a:hover{color:#93c5fd}
 <div class="wrap">
 <div class="content">
 
-  <button class="print-btn" onclick="window.print()">Print / Download PDF</button>
+  <a href="resume-print.html" class="btn-primary" style="margin-bottom:2.5rem;display:inline-flex;">⬇ Download PDF Version</a>
 
   <!-- SUMMARY -->
   <div class="section summary">
     <div class="section-num">Profile</div>
     <h2>Professional Summary</h2>
-    <p>Cloud Security and CMMC compliance professional with CompTIA Security+, CMMC Registered Practitioner certification, and 15+ years of enterprise technology experience. Specializes in defense supply chain cybersecurity for the Connecticut defense industrial base — Electric Boat, Pratt &amp; Whitney, Sikorsky, and their subcontractor networks. Combines hands-on security training with professional-grade threat analysis and the ability to make complex compliance requirements actionable for non-technical leadership. Pursuing Azure AZ-900. Seeking a team-based role at a CT defense contractor or CMMC consulting firm with a path to security clearance sponsorship.</p>
+    <p>Information Assurance and CMMC compliance professional with CMMC Registered Practitioner certification, CompTIA Security+ in progress, and 15+ years of enterprise technology experience. Specializes in defense supply chain cybersecurity — NIST 800-171, CUI handling, DFARS compliance, and FCA liability for the Connecticut defense industrial base. Combines hands-on network security lab work with published threat analysis and the ability to translate complex compliance requirements into actionable guidance for non-technical leadership.</p>
     <div class="callout">
-      <p>Most cybersecurity professionals can run tools. Few can write a threat brief a program manager will read or explain CMMC liability to a CEO in plain language. I bridge that gap — combining Security+ and CMMC-RP credentials with 15 years of translating complex systems into clear human decisions.</p>
+      <p>Most compliance professionals understand the frameworks. Few can analyze a live Lumma Stealer pcap, identify C2 beaconing, and write a threat brief a program manager will act on. I bridge that gap.</p>
     </div>
   </div>
 
@@ -343,85 +243,85 @@ footer a:hover{color:#93c5fd}
     <div class="section-num">Capabilities</div>
     <h2>Certifications &amp; Skills</h2>
 
-    <h3 style="font-size:.8rem;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--blue);font-weight:600;margin-bottom:.85rem">Certifications &amp; Education</h3>
-    <ul class="cert-list" style="margin-bottom:2rem">
+    <h3 style="font-family:var(--mono);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);font-weight:600;margin-bottom:1rem">Education</h3>
+    <ul class="cert-list" style="margin-bottom:2.5rem">
+      <li>
+        <span class="cert-name-text">CMMC-RP — Registered Practitioner</span>
+        <span class="cert-status-text earned">Earned 2026</span>
+      </li>
       <li>
         <span class="cert-name-text">CompTIA Security+ SY0-701</span>
         <span class="cert-status-text earned">Earned 2026</span>
       </li>
       <li>
-        <span class="cert-name-text">CMMC-RP (Registered Practitioner)</span>
-        <span class="cert-status-text earned">Earned 2026</span>
-      </li>
-      <li>
         <span class="cert-name-text">Azure Fundamentals AZ-900</span>
-        <span class="cert-status-text">In progress</span>
+        <span class="cert-status-text earned">Earned 2026</span>
       </li>
       <li>
         <span class="cert-name-text">Azure Security Engineer AZ-500</span>
         <span class="cert-status-text planned">Planned</span>
       </li>
       <li>
-        <span class="cert-name-text">MS Information Systems — Golden Gate University</span>
+        <span class="cert-name-text">MS Information Systems &amp; Management — Golden Gate University</span>
         <span class="cert-status-text earned">Graduate</span>
       </li>
       <li>
-        <span class="cert-name-text">BFA — Fashion Institute of Technology</span>
+        <span class="cert-name-text">BFA Visual Communication — Fashion Institute of Technology</span>
         <span class="cert-status-text earned">Graduate</span>
       </li>
     </ul>
 
-    <h3 style="font-size:.8rem;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--blue);font-weight:600;margin-bottom:.85rem">Technical Skills</h3>
-    <div class="skill-row"><span class="skill-cat">CMMC</span><span class="skill-val">CMMC 2.0 · NIST 800-171 · CUI · DFARS · SPRS · FCA liability · supply chain risk</span></div>
-    <div class="skill-row"><span class="skill-cat">Cloud</span><span class="skill-val">Azure fundamentals · FedRAMP · IAM · M365 security · cloud security concepts</span></div>
-    <div class="skill-row"><span class="skill-cat">Tools</span><span class="skill-val">Wireshark · Zeek · Nmap · tcpdump · GPG · Linux CLI · Docker · Kali Linux</span></div>
-    <div class="skill-row"><span class="skill-cat">Analysis</span><span class="skill-val">Threat intelligence · malware traffic analysis · IOC detection · executive briefing · compliance gap analysis</span></div>
-    <div class="skill-row"><span class="skill-cat">Dev</span><span class="skill-val">Python automation · AI-assisted development · pcap parsing · network log analysis · ANSI terminal tooling</span></div>
+    <h3 style="font-family:var(--mono);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);font-weight:600;margin-bottom:1rem">Technical Skills</h3>
+
+    <div class="skill-block">
+      <div class="skill-cat">Compliance &amp; Frameworks</div>
+      <div class="skill-val">CMMC 2.0 · NIST 800-171 · CUI · DFARS · SPRS · FCA liability · supply chain risk · DoD 8570/8140 · RMF awareness</div>
+    </div>
+    <div class="skill-block">
+      <div class="skill-cat">Cloud &amp; Identity</div>
+      <div class="skill-val">Azure fundamentals · FedRAMP · IAM · M365 security · cloud security concepts</div>
+    </div>
+    <div class="skill-block">
+      <div class="skill-cat">Security Tools</div>
+      <div class="skill-val">Wireshark · Zeek · Nmap · tcpdump · GPG · Linux CLI · Docker · Kali Linux</div>
+    </div>
+    <div class="skill-block">
+      <div class="skill-cat">Analysis</div>
+      <div class="skill-val">Threat intelligence · malware traffic analysis · IOC detection · executive briefing · compliance gap analysis</div>
+    </div>
+    <div class="skill-block">
+      <div class="skill-cat">Development</div>
+      <div class="skill-val">Python automation · AI-assisted development · pcap parsing · network log analysis</div>
+    </div>
   </div>
 
   <!-- PORTFOLIO -->
   <div class="section">
     <div class="section-num">Published Research</div>
-    <h2>Cybersecurity Portfolio</h2>
-    <p style="font-size:.9rem;color:var(--ink3);margin-bottom:1.25rem">Independent threat analysis, hands-on security labs, and open-source tooling published at <a href="https://yana-ivanov.github.io/cybersecurity-portfolio" style="color:var(--blue)">Portfolio</a></p>
-    <ul class="portfolio-list">
-      <li>
-        <a href="analysis/The_Cascade_Analysis.html">The Cascade — When America Goes Dark</a>
-        <div class="p-desc">Coordinated infrastructure attack scenario analysis. Reference case in CMMC training curriculum.</div>
-      </li>
-      <li>
-        <a href="analysis/CMMC_Supply_Chain.html">The Weakest Link — CMMC Supply Chain Analysis</a>
-        <div class="p-desc">MORSECORP $4.6M FCA settlement, C3PAO cost data, 50/50 cost-sharing model, mandatory training recommendation.</div>
-      </li>
-      <li>
+    <h2>Selected Work</h2>
+
+    <div class="portfolio-featured">
+      <div class="portfolio-card">
         <a href="analysis/Volt_Typhoon_Analysis.html">Volt Typhoon — Living Off the Land</a>
-        <div class="p-desc">China's APT campaign: years-long LOTL persistence inside US critical infrastructure.</div>
-      </li>
-      <li>
+        <div class="p-desc">China's APT campaign: years-long LOTL persistence inside US critical infrastructure. Attack chain analysis, detection gaps, and defensive recommendations.</div>
+      </div>
+      <div class="portfolio-card">
+        <a href="analysis/CMMC_Supply_Chain.html">The Weakest Link — CMMC Supply Chain Analysis</a>
+        <div class="p-desc">MORSECORP $4.6M FCA settlement analysis, C3PAO cost data, 50/50 cost-sharing model, mandatory training recommendation for CT defense subcontractors.</div>
+      </div>
+      <div class="portfolio-card">
+        <a href="labs/lab_log_004.html">Lab Log 004 — Lumma Stealer Malware Analysis</a>
+        <div class="p-desc">Custom Wireshark SOC profile built from scratch. Browser fingerprinting, TLS credential exfiltration to .su C2 domain. 2.27MB confirmed exfiltrated. Zeek ssl.log revealed 4 additional C2 domains invisible to Wireshark.</div>
+      </div>
+      <div class="portfolio-card">
         <a href="training/CMMC_Training.html">CMMC Cybersecurity Awareness — 14-Module Training Tool</a>
-        <div class="p-desc">Interactive employee training guide covering all CMMC awareness domains. Scenario-based quizzes, real case studies, completion certificate. Designed for defense contractor workforce onboarding.</div>
-      </li>
-      <li>
-        <a href="labs/lab_log_004.html">Lab Log 004 — Lumma Stealer Analysis</a>
-        <div class="p-desc">Custom Wireshark SOC profile built from scratch. Malware traffic analysis — browser fingerprinting, TLS credential exfiltration to .su C2 domain. 2.27MB confirmed exfiltrated.</div>
-      </li>
-      <li>
-        <a href="labs/lab_log_005.html">Lab Log 005 — Zeek Network Analysis</a>
-        <div class="p-desc">Zeek 8.1.1 deployed against Lumma Stealer pcap. ssl.log revealed 4 additional C2 domains invisible to Wireshark.</div>
-      </li>
-      <li>
-        <a href="labs/lab_log_006.html">Lab Log 006 — zeek_triage.py</a>
-        <div class="p-desc">Python automation script — defined requirements, directed logic via AI-assisted development, validated output against confirmed malware findings. Zero external dependencies.</div>
-      </li>
-      <li>
-        <a href="labs/lab_log_007.html">Lab Log 007 — IOC Detection & Severity Scoring</a>
-        <div class="p-desc">KNOWN_BAD_DOMAINS matching layer. Corrected severity scoring — confirmed C2 beacon always CRITICAL regardless of data volume.</div>
-      </li>
-      <li>
-        <a href="https://yana-ivanov.github.io/cybersecurity-portfolio">Zeek Triage — Browser pcap Analyzer</a>
-        <div class="p-desc">Interactive IOC detection tool running entirely client-side. Parses raw pcap binary, extracts HTTP/TLS/DHCP, matches IOC lists. No server, no data upload.</div>
-      </li>
-    </ul>
+        <div class="p-desc">Interactive employee training covering all CMMC 2.0 awareness domains. Scenario-based quizzes, real case studies, completion certificate. Designed for defense contractor workforce onboarding.</div>
+      </div>
+    </div>
+
+    <div class="portfolio-cta">
+      <a href="index.html" class="btn-primary">View Full Portfolio →</a>
+    </div>
   </div>
 
   <!-- EXPERIENCE -->
@@ -431,65 +331,64 @@ footer a:hover{color:#93c5fd}
 
     <div class="exp-item">
       <div class="exp-header">
-        <h3>Founder &amp; Senior Designer — CMMC Consulting</h3>
+        <h3>Founder &amp; CMMC Compliance Consultant</h3>
         <span class="exp-dates">2023 – Present</span>
       </div>
       <div class="exp-company">SiteWave Studio · Milford, CT</div>
       <ul class="exp-bullets">
-        <li>Founded boutique studio; expanded to CMMC compliance consulting for CT defense subcontractors</li>
-        <li>Produced professional-grade threat analysis reports published as independent contributions to the defense community</li>
-        <li>Developed 14-module CMMC awareness training guide demonstrating mandatory structured onboarding model for defense contractors</li>
+        <li>Developed 14-module CMMC cybersecurity awareness training covering all CMMC 2.0 domains — scenario-based quizzes, real case studies, and completion certificate designed for defense contractor workforce onboarding</li>
+        <li>Published professional-grade threat analysis reports on Volt Typhoon, CMMC supply chain FCA liability, and coordinated infrastructure attack scenarios as independent contributions to the defense community</li>
+        <li>Built open-source security tools: browser-based pcap analyzer, CVSS calculator, Glassworm detector, and zeek_triage.py automated IOC detection script with zero external dependencies</li>
+        <li>Conducted hands-on malware traffic analysis using Wireshark and Zeek — identified Lumma Stealer C2 infrastructure, confirmed 2.27MB credential exfiltration, and mapped TLS-encrypted domains invisible to standard filters</li>
+      </ul>
+    </div>
+
+    <div class="exp-item">
+      <div class="exp-header">
+        <h3>Senior UI/UX Designer</h3>
+        <span class="exp-dates">2022 – 2024</span>
+      </div>
+      <div class="exp-company">SylvanRoad Capital · Remote</div>
+      <ul class="exp-bullets">
+        <li>Rebuilt core rental application experience for national housing platform, increasing application completion rates ~30%</li>
+        <li>Led end-to-end UX design across custom web and mobile applications collaborating with product managers, developers, and C-suite stakeholders</li>
       </ul>
     </div>
 
     <div class="exp-item">
       <div class="exp-header">
         <h3>Lead UI/UX Designer</h3>
-        <span class="exp-dates">2020 – 2023</span>
+        <span class="exp-dates">2019 – 2022</span>
       </div>
       <div class="exp-company">605 · Media Analytics · Remote</div>
       <ul class="exp-bullets">
-        <li>Accelerated project delivery 30%+ by establishing a reusable design framework adopted across the full product team</li>
-        <li>Led complex B2B analytics product design from discovery through developer handoff</li>
-        <li>Translated technical constraints into user decisions — the same skill applied to making security requirements actionable for non-technical stakeholders</li>
+        <li>Accelerated project delivery 30%+ by establishing reusable design framework adopted across the full product team</li>
+        <li>Led complex B2B analytics product design from discovery through developer handoff for media measurement clients making multi-million dollar advertising decisions</li>
+        <li>Translated technical constraints into user decisions — directly transferable to making CMMC and NIST requirements actionable for non-technical stakeholders</li>
       </ul>
     </div>
 
     <div class="exp-item">
       <div class="exp-header">
-        <h3>Senior UX/UI Designer</h3>
-        <span class="exp-dates">2013 – 2020</span>
+        <h3>Senior UX/UI Designer &amp; Consultant</h3>
+        <span class="exp-dates">2013 – 2019</span>
       </div>
-      <div class="exp-company">Housing Tech, Media, SaaS Clients · New York, NY / Remote</div>
+      <div class="exp-company">Housing Tech, SaaS &amp; E-Commerce Clients · New York / Remote</div>
       <ul class="exp-bullets">
-        <li>15 years designing enterprise web and mobile applications across housing tech, media analytics, and e-commerce</li>
-        <li>Extensive C-suite and VP-level communication — presenting risk tradeoffs and strategic recommendations; directly transferable to security advisory roles</li>
+        <li>15 years designing enterprise web and mobile applications across housing tech, media analytics, and e-commerce sectors</li>
+        <li>Extensive C-suite and VP-level communication — presenting risk tradeoffs and strategic recommendations directly transferable to compliance and advisory roles</li>
       </ul>
     </div>
   </div>
 
-  <!-- TARGET -->
-  <div class="section">
-    <div class="section-num">Connecticut Defense Industrial Base</div>
-    <h2>Target Roles &amp; Employers</h2>
-    <p style="font-size:.9rem;color:var(--ink3);margin-bottom:1.25rem">Seeking roles at CT defense contractors or CMMC consulting firms offering security clearance sponsorship and team-based learning. Goal: hands-on experience first, independent consulting after 6–12 months.</p>
-    <div class="target-cols">
-      <p>Electric Boat (General Dynamics)</p>
-      <p>Pratt &amp; Whitney / RTX</p>
-      <p>Sikorsky / Lockheed Martin</p>
-      <p>Peraton / SAIC / Leidos</p>
-      <p>Curtiss-Wright</p>
-      <p>CMMC C3PAO / MSP firms (CT)</p>
-    </div>
-    <p style="font-family:var(--mono);font-size:.65rem;color:#94a3b8;font-style:italic">
-      Ideal title: Cybersecurity Analyst &nbsp;·&nbsp; GRC Analyst &nbsp;·&nbsp; CMMC Compliance Analyst &nbsp;·&nbsp; Cloud Security Associate
-    </p>
   </div>
-
 </div>
 </div>
 
 <footer>
   <span>Yana Ivanov &nbsp;·&nbsp; Milford, CT &nbsp;·&nbsp; 2026</span>
-  <span>
-    <a href="index.html">← Portfolio</
+  <a href="index.html">← Portfolio</a>
+</footer>
+
+</body>
+</html>
