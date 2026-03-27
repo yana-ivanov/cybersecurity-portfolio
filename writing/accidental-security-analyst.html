@@ -29,6 +29,10 @@ body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:
 .back-nav a:hover{color:#93c5fd}
 .back-nav a::before{content:'←';font-size:.75rem}
 
+.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav-link:hover{color:#93c5fd}
+.back-nav-link::before{content:'←';font-size:.75rem}
+
 .masthead{background:var(--ink);color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
 .masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
 .mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
@@ -108,12 +112,12 @@ footer span{color:#94a3b8}
 
 <div class="masthead">
   <div class="mast-inner">
-    <div class="mast-label">Perspective</div>
+    <div class="mast-label">Field Notes</div>
     <h1 class="title">The Accidental Security Analyst<br><span>A Career That Was Always Pointing Here</span></h1>
     <div class="mast-meta">
       <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
       <div class="meta-item"><div class="label">Published</div><div class="value">March 2026</div></div>
-      <div class="meta-item"><div class="label">Category</div><div class="value">Perspective · Career</div></div>
+      <div class="meta-item"><div class="label">Category</div><div class="value">Field Notes · Career</div></div>
       <div class="meta-item"><div class="label">Background</div><div class="value">UX/UI Design · 15 Years</div></div>
       <div class="meta-item"><div class="label">Focus</div><div class="value">Cybersecurity · National Defense</div></div>
       <div class="meta-item"><div class="label">Read Time</div><div class="value">8 minutes</div></div>
@@ -255,10 +259,6 @@ footer span{color:#94a3b8}
 
   <p>Pattern recognition across systems that are not being watched — that is the skill set. The bookmark file was a small instance of it. The CMMC supply chain is a large one. The instinct that connects them is the same.</p>
 
-  <div class="callout callout-amber">
-    <p><strong>The tools built for this analysis:</strong> The <a href="../tools/bookmark-organizer.html" style="color:var(--amber)">Bookmark Organizer/Analyzer</a> and its accompanying <a href="../writing/bookmark-security-article.html" style="color:var(--amber)">security article</a> are available in this portfolio. Both were built as working demonstrations of the analytical approach described here — starting from a simple question, following the problem wherever it leads, and building tools that make the findings actionable for others.</p>
-  </div>
-
   <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">This piece reflects the author's own professional history and analytical perspective. All security findings referenced are based on publicly available data or personal audit results.</p>
 </div>
 
@@ -268,15 +268,15 @@ footer span{color:#94a3b8}
   <div class="bio-avatar">YI</div>
   <div>
     <div class="bio-name">Yana Ivanov</div>
-    <div class="bio-title">Security Analyst &nbsp;·&nbsp; UX/UI Designer &nbsp;·&nbsp; SiteWave Studio</div>
-    <p class="bio-text">Yana Ivanov is a security analyst and UX designer based in Milford, Connecticut. With 15 years of enterprise technology experience and an MS in Information Systems, she is currently pursuing CompTIA Security+ certification with a focus on national defense contractors and CMMC compliance. This portfolio documents independent security research, analysis, and open-source tooling produced in 2025–2026.</p>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Compliance Analyst &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance. This analysis was produced independently as a contribution to the security community's understanding of active threats against US defense infrastructure.</p>
     <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
   </div>
 </div>
 
 <footer>
   <span>The Accidental Security Analyst · Yana Ivanov · March 2026</span>
-  <span>Independent perspective · For educational use</span>
+  <span>Based on public reporting · For educational use · Independent analysis</span>
 </footer>
 
 </body>

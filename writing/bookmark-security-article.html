@@ -144,7 +144,7 @@ footer span{color:#94a3b8}
 
 <div class="masthead">
   <div class="mast-inner">
-    <div class="mast-label">Security Hygiene · Personal Analysis</div>
+    <div class="mast-label">Field Notes · Security Hygiene</div>
     <h1 class="title">Your Bookmarks Are a Security Risk<br><span>The Forgotten Attack Surface in Your Browser</span></h1>
     <div class="mast-meta">
       <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
@@ -219,35 +219,56 @@ footer span{color:#94a3b8}
 
   <div class="mat-card">
     <div class="mat-card-title">Figure 2 — Audit Process Flow</div>
-    <div class="flow">
-      <div class="flow-step blue">
-        <div class="flow-step-label">Step 1</div>
-        <div class="flow-step-title">Parse & Deduplicate</div>
-        <div class="flow-step-body">Extract all URLs, remove duplicates by root domain</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date" style="color:var(--blue)">Step 1</div>
+          <div class="tl-stage">Parse</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Parse &amp; Deduplicate</div>
+          <div class="tl-body">Extract all URLs from the exported bookmark file. Deduplicate by root domain — one bookmark per domain, except content platforms like YouTube or GitHub where multiple URLs are valid.</div>
+        </div>
       </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step red">
-        <div class="flow-step-label">Step 2</div>
-        <div class="flow-step-title">HTTP Isolation</div>
-        <div class="flow-step-body">Flag all unencrypted links for user review</div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date" style="color:var(--red)">Step 2</div>
+          <div class="tl-stage">HTTP Isolation</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">HTTP Isolation</div>
+          <div class="tl-body">Flag all unencrypted HTTP links for user review. Nothing is silently deleted — the user sees the full list, receives an explanation of the risk, and makes the deletion decision themselves.</div>
+        </div>
       </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step blue">
-        <div class="flow-step-label">Step 3</div>
-        <div class="flow-step-title">AI Categorization</div>
-        <div class="flow-step-body">Sort bookmarks into meaningful categories automatically</div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date" style="color:var(--blue)">Step 3</div>
+          <div class="tl-stage">Categorize</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">AI Categorization</div>
+          <div class="tl-body">A multi-stage classifier — rule-based taxonomy, domain keyword matching, and AI fallback — automatically sorts bookmarks into meaningful categories. The system learns from user corrections and applies them as highest-priority overrides on subsequent runs.</div>
+        </div>
       </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step amber">
-        <div class="flow-step-label">Step 4</div>
-        <div class="flow-step-title">Security Scan</div>
-        <div class="flow-step-body">Check threat signatures and homoglyph detection</div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date" style="color:var(--amber)">Step 4</div>
+          <div class="tl-stage">Scan</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Security Scan</div>
+          <div class="tl-body">Each domain is checked against 37 threat signatures and analyzed for Unicode homoglyphs using character-by-character Unicode escape comparison. Suspicious domains are quarantined for investigation, not silently removed.</div>
+        </div>
       </div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step green">
-        <div class="flow-step-label">Step 5</div>
-        <div class="flow-step-title">Dead Link Check</div>
-        <div class="flow-step-body">Verify each URL is still alive via HEAD requests</div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date" style="color:var(--green)">Step 5</div>
+          <div class="tl-stage">Dead Links</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Dead Link Check</div>
+          <div class="tl-body">A proxy performs HEAD requests against each URL. Login-required domains — government portals, banking, social platforms — are intelligently skipped. HTTP 401/403 responses are treated as alive, not dead. Only genuine 404s and unreachable domains are flagged.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -289,51 +310,50 @@ footer span{color:#94a3b8}
 <!-- SECTION 04 -->
 <div class="section">
   <div class="section-num">Section 04</div>
-  <h2>Domain Monitoring — Staying Ahead of Ownership Changes</h2>
-  <p>Cleaning your bookmarks once is good. Knowing when a domain you trust changes hands is better. WHOIS monitoring tracks changes to a domain's registration records — when ownership transfers, the WHOIS record changes, and a monitoring tool alerts you within hours.</p>
-  <p>DNS record monitoring catches a different attack: when a domain's A record or nameserver is changed to point traffic somewhere new. The domain name looks right, but the server you're connecting to has changed entirely.</p>
+  <h2>Domain Monitoring — Built Into the Workflow</h2>
 
-  <div class="tbl-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Tool</th>
-          <th>What it monitors</th>
-          <th>Free tier</th>
-          <th>Best for</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Hexowatch</strong></td>
-          <td>WHOIS changes, DNS records, domain expiry</td>
-          <td class="green">Yes</td>
-          <td>Ownership change alerts, Slack/Telegram integration</td>
-        </tr>
-        <tr>
-          <td><strong>UptimeRobot</strong></td>
-          <td>Uptime, domain expiry, SSL certificates</td>
-          <td class="green">Yes</td>
-          <td>Email/SMS/Discord alerts, easy setup</td>
-        </tr>
-        <tr>
-          <td><strong>Visualping</strong></td>
-          <td>Visual page content changes</td>
-          <td class="green">Yes</td>
-          <td>Detecting when a login page has been quietly replaced</td>
-        </tr>
-        <tr>
-          <td><strong>WhoisXML API</strong></td>
-          <td>WHOIS history, ownership, DNS connections</td>
-          <td class="amber">Limited</td>
-          <td>Building your own alerting pipeline, bulk monitoring</td>
-        </tr>
-      </tbody>
-    </table>
+  <p>Third-party domain monitoring services track WHOIS record changes and DNS modifications — alerting you when a domain you follow changes ownership or nameservers. These services are useful for domains you own or actively watch. They are not practical for auditing hundreds of bookmarks accumulated over years.</p>
+
+  <p>A more direct approach is built into the audit workflow itself: re-upload your bookmark export every six months and compare against the previous run. Domains that have changed behavior — previously alive and now returning errors, or previously HTTPS and now redirecting to HTTP — surface automatically as part of the standard dead link and HTTP checks.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Figure 3 — Six-Month Re-Audit Workflow</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date" style="color:var(--blue)">Month 0</div>
+          <div class="tl-stage">Initial Audit</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">First Run — Establish Baseline</div>
+          <div class="tl-body">Export bookmarks. Run full audit. Remove HTTP links, dead links, and flagged domains. Export the clean file. This becomes the baseline for future comparison.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date" style="color:var(--amber)">Month 6</div>
+          <div class="tl-stage">Re-Audit</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Re-Upload — Surface Changes</div>
+          <div class="tl-body">Export current bookmarks and re-run the audit. Domains that have gone dead, changed to HTTP, or triggered new threat signatures since the last run are flagged automatically — no manual comparison required.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date" style="color:var(--green)">Ongoing</div>
+          <div class="tl-stage">Hygiene</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Repeat — Maintain Clean Collection</div>
+          <div class="tl-body">A bookmark collection audited every six months stays current. New bookmarks you've added get scanned. Domains that changed ownership in the intervening period show up as dead or flagged. The implicit trust record stays accurate.</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="callout callout-blue">
-    <p><strong>Practical recommendation:</strong> At minimum, set up WHOIS monitoring for the 10–20 domains you visit most frequently — your bank, email provider, password manager, and VPN. These are the highest-value targets for domain hijacking because attackers know users trust them implicitly.</p>
+    <p><strong>What to watch for between audits:</strong> Domain ownership changes typically follow expiration. A site that was alive at month 0 and returns a completely different page at month 6 is a signal worth investigating — check the WHOIS record against what you remember, and do not log in until you have confirmed the domain is still controlled by the original organization.</p>
   </div>
 </div>
 
@@ -362,15 +382,15 @@ footer span{color:#94a3b8}
   <div class="bio-avatar">YI</div>
   <div>
     <div class="bio-name">Yana Ivanov</div>
-    <div class="bio-title">Security Analyst &nbsp;·&nbsp; UX/UI Designer &nbsp;·&nbsp; SiteWave Studio</div>
-    <p class="bio-text">Yana Ivanov is a security analyst and UX designer based in Connecticut. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to security analysis and tooling. She is currently pursuing CompTIA Security+ certification with a focus on making security practices accessible and actionable. This analysis was produced independently as a contribution to personal security hygiene awareness.</p>
-    <p class="bio-text" style="margin-top:.75rem"><a href="index.html" class="back-nav-link">Portfolio</a></p>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Compliance Analyst &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance. This analysis was produced independently as a contribution to the security community's understanding of active threats against US defense infrastructure.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
   </div>
 </div>
 
 <footer>
-  <span>Bookmark Security Analysis · Yana Ivanov · March 2026</span>
-  <span>Personal analysis · For educational use · Independent research</span>
+  <span>Your Bookmarks Are a Security Risk · Yana Ivanov · March 2026</span>
+  <span>Based on public reporting · For educational use · Independent analysis</span>
 </footer>
 
 </body>
