@@ -40,6 +40,7 @@ h1.title span{color:#ef4444}
   font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;
   display:flex;align-items:center;gap:2rem}
 .mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem;white-space:nowrap;overflow:hidden}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 
 .wrap{max-width:900px;margin:0 auto;padding:0 3rem}
@@ -116,7 +117,6 @@ footer span{color:#94a3b8}
 @media(max-width:680px){
   .wrap,.mast-inner{padding:0 1.5rem}
   .mast-meta{grid-template-columns:1fr}
-  .mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
   h1.title{font-size:1.8rem}
   .bio{grid-template-columns:1fr}
   footer{flex-direction:column;text-align:center}
@@ -281,10 +281,89 @@ footer span{color:#94a3b8}
   .fig-seq-badge{flex-direction:row;padding:.6rem 1rem}
 }
 
+
+/* ── RESPONSIVE — CONTENT PAGES ─────────────────────────────────────────────
+   480px  small phones | 680px  large phones | 768px  tablet portrait
+   1024px tablet landscape → desktop layout
+   ─────────────────────────────────────────────────────────────────────────── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .split-visual{grid-template-columns:1fr}
+  .attack-flow{grid-template-columns:1fr 1fr;gap:.5rem}
+  .flow-step::after{display:none}
+  .figure-body{padding:1.25rem 1rem}
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{font-size:.78rem}
+  th,td{padding:.55rem .75rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+  .timeline{padding-left:1.5rem}
+  .step-item{grid-template-columns:2rem 1fr;gap:.75rem}
+  .perm-card{grid-template-columns:auto 1fr}
+  .verify-grid{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:1fr 1fr}
+  .kill-chain .kc-step{grid-template-columns:36px 1fr}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .attack-flow{grid-template-columns:1fr}
+  .split-visual{grid-template-columns:1fr}
+  .flow-step::after{display:none}
+  .stat-row{grid-template-columns:1fr}
+  .figure-body{padding:1rem .85rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.5rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .layer{grid-template-columns:24px 1fr;gap:.65rem}
+  .kc-step{grid-template-columns:32px 1fr;gap:.65rem}
+}
+@media(max-width:480px){
+  html{font-size:17px}
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.8rem}
+  .attack-flow{grid-template-columns:1fr}
+  .split-visual{grid-template-columns:1fr}
+  .figure-body{padding:.85rem .75rem}
+  .figure-title{padding:.55rem .85rem;font-size:.58rem}
+  table{font-size:.72rem}
+  th,td{padding:.45rem .55rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.62rem}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  h3{font-size:1rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+  .layer{grid-template-columns:20px 1fr;gap:.5rem}
+  .perm-badge{display:none}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+  .mast-meta{grid-template-columns:1fr 1fr 1fr}
+  .stat-num-grid{grid-template-columns:repeat(4,1fr)}
+  .split-visual{grid-template-columns:1fr 1fr}
+  .attack-flow{grid-template-columns:repeat(5,1fr)}
+  .flow-step::after{display:block}
+  h2{font-size:1.9rem}
+  h3{font-size:1.25rem}
+}
 </style>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
 <div class="back-nav">
   <a href="../index.html">Portfolio</a>
 </div>
