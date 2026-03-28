@@ -7,7 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
 :root{
   --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
   --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
@@ -20,31 +19,35 @@
   --display:'Playfair Display','Georgia',serif;
   --display-clean:'IBM Plex Serif','Georgia',serif;
 }
+*{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;font-size:20px}
 body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
 .back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
-.back-nav a{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;transition:color .2s}
-.back-nav a:hover{color:#93c5fd}
-.back-nav a::before{content:'←';font-size:.75rem}
-.masthead{background:var(--ink);color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
-.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);pointer-events:none}
 .mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
-.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
-.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem}
 h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:.75rem;color:#fff}
-h1.title span{color:#ef4444}
-.mast-sub{font-family:var(--serif);font-size:1rem;color:#94a3b8;line-height:1.7;margin-bottom:2rem;max-width:660px;font-style:italic}
-.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:1rem}
-.meta-item .label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
-.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600}
-.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
-.mast-bar-dot{width:6px;height:6px;border-radius:50%;background:#fff;flex-shrink:0}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-sub{font-family:var(--serif);font-size:.95rem;color:#94a3b8;line-height:1.7;margin-bottom:2rem;max-width:660px;font-style:italic}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+.mast-bar{background:#ef4444;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 .wrap{max-width:900px;margin:0 auto;padding:0 3rem}
-.content{padding:4rem 0}
-.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
-.section:last-child{border-bottom:none;padding-bottom:0}
-.section-num{font-family:var(--mono);font-size:.62rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.75rem}
-h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:var(--ink);line-height:1.2;margin-bottom:1.5rem;letter-spacing:-.01em}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:var(--ink);margin-bottom:1.5rem;line-height:1.2}
 h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
 p{margin-bottom:1.25rem;color:var(--ink3)}
 p strong{color:var(--ink);font-weight:600}
@@ -56,21 +59,22 @@ p em{font-style:italic;color:var(--ink2)}
 .callout-green{background:var(--green-dim);border-color:var(--green)}
 .callout p{margin:0;font-size:.92rem;line-height:1.7}
 .callout strong{color:var(--ink)}
-.tbl-wrap{overflow-x:auto;margin:1.75rem 0}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
 table{width:100%;border-collapse:collapse;font-size:.88rem}
-thead tr{background:var(--ink);color:#fff}
-th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;font-weight:600}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
 td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
-tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
 td strong{color:var(--ink);font-weight:600}
-td.red{color:var(--red);font-weight:700;font-family:var(--mono);font-size:.82rem}
-td.amber{color:var(--amber);font-weight:700;font-family:var(--mono);font-size:.82rem}
-td.green{color:var(--green);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
 td.code{font-family:var(--mono);font-size:.78rem;color:var(--blue);word-break:break-all}
 
-/* ── KILL CHAIN STEP ── */
+/* ── KILL CHAIN ── */
 .kill-chain{margin:1.75rem 0;display:grid;gap:0}
-.kc-step{padding:1.1rem 1.5rem;border:1px solid var(--rule);border-bottom:none;display:grid;grid-template-columns:48px 1fr;gap:1rem;align-items:start;background:var(--paper);position:relative}
+.kc-step{padding:1.1rem 1.5rem;border:1px solid var(--rule);border-bottom:none;display:grid;grid-template-columns:48px 1fr;gap:1rem;align-items:start;background:var(--paper)}
 .kc-step:last-child{border-bottom:1px solid var(--rule)}
 .kc-step.critical{border-left:3px solid var(--red)}
 .kc-step.elevated{border-left:3px solid var(--amber)}
@@ -82,9 +86,9 @@ td.code{font-family:var(--mono);font-size:.78rem;color:var(--blue);word-break:br
 .kc-title{font-family:var(--display-clean);font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.25rem}
 .kc-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
 
-/* ── ACTOR CARD ── */
+/* ── ACTOR CARDS ── */
 .actor-grid{display:grid;gap:.75rem;margin:1.75rem 0}
-.actor-card{background:var(--paper);border:1px solid var(--rule);border-radius:2px;padding:1.1rem 1.25rem;display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.actor-card{background:var(--paper);border:1px solid var(--rule);padding:1.1rem 1.25rem;display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
 .actor-flag{width:42px;height:42px;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--mono);font-size:.65rem;font-weight:700;letter-spacing:.08em}
 .actor-flag.china{background:rgba(220,38,38,.1);border:1px solid rgba(220,38,38,.2);color:#dc2626}
 .actor-flag.nk{background:rgba(180,83,9,.1);border:1px solid rgba(180,83,9,.2);color:#b45309}
@@ -94,11 +98,11 @@ td.code{font-family:var(--mono);font-size:.78rem;color:var(--blue);word-break:br
 .actor-group{font-family:var(--mono);font-size:.65rem;color:#94a3b8;margin-bottom:.4rem}
 .actor-desc{font-size:.85rem;color:var(--ink3);line-height:1.6;margin:0}
 
-/* ── VERIFICATION COMPARE ── */
-.verify-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin:1.75rem 0;background:var(--rule);border-radius:2px;overflow:hidden}
+/* ── VERIFY GRID ── */
+.verify-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin:1.75rem 0;background:var(--rule);overflow:hidden}
 .verify-col{background:var(--paper);padding:1.25rem}
-.verify-col.bad{background:#fff8f8}
-.verify-col.good{background:#f8fff9}
+.verify-col.bad{background:#fdf5f5}
+.verify-col.good{background:#f5fdf6}
 .verify-col-head{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--rule)}
 .verify-col.bad .verify-col-head{color:var(--red)}
 .verify-col.good .verify-col-head{color:var(--green)}
@@ -107,10 +111,10 @@ td.code{font-family:var(--mono);font-size:.78rem;color:var(--blue);word-break:br
 .verify-col.bad .verify-item .mdi{color:var(--red)}
 .verify-col.good .verify-item .mdi{color:var(--green)}
 
-/* ── STAT CALLOUT ── */
+/* ── STAT ROW ── */
 .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.75rem 0}
-.stat-box{background:var(--paper);border:1px solid var(--rule);border-radius:2px;padding:1.25rem;text-align:center}
-.stat-num{font-family:var(--display);font-size:2rem;font-weight:900;color:var(--red);line-height:1;margin-bottom:.35rem}
+.stat-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem;text-align:center}
+.stat-num{font-family:var(--display-clean);font-size:1.8rem;font-weight:700;color:var(--red);line-height:1;margin-bottom:.35rem}
 .stat-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;color:#64748b;line-height:1.5}
 
 /* ── LAYER STACK ── */
@@ -121,137 +125,116 @@ td.code{font-family:var(--mono);font-size:.78rem;color:var(--blue);word-break:br
 .layer-title{font-family:var(--display-clean);font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.25rem}
 .layer-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
 
-/* ── TOOL SECTION ── */
-.tool-wrap{background:var(--paper);border:1px solid var(--rule);border-radius:2px;margin:2rem 0;overflow:hidden}
-.tool-header{background:#0a0f1a;padding:1.1rem 1.5rem;display:flex;align-items:center;gap:.75rem}
-.tool-header-title{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;color:#fff;text-transform:uppercase}
-.tool-header-sub{font-family:var(--mono);font-size:.62rem;color:#64748b;margin-left:auto}
-.tool-body{padding:1.5rem}
-.search-row{display:flex;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap}
-.search-input{flex:1;min-width:200px;font-family:var(--mono);font-size:.78rem;padding:.75rem 1rem;border:1px solid var(--rule);border-radius:2px;background:#f8fafc;color:var(--ink);outline:none;transition:border-color .15s}
-.search-input:focus{border-color:var(--blue)}
-.search-select{font-family:var(--mono);font-size:.72rem;padding:.75rem 1rem;border:1px solid var(--rule);border-radius:2px;background:#f8fafc;color:var(--ink);cursor:pointer}
-.zbtn{font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;padding:.85rem 2.25rem;border-radius:2px;border:none;cursor:pointer;transition:background .2s;display:inline-flex;align-items:center;gap:.5rem}
-.zbtn-run{background:var(--blue);color:#fff}
-.zbtn-run:hover{background:#153e80}
-.zbtn-clear{background:transparent;color:#64748b;border:1px solid var(--rule);font-size:.72rem;padding:.7rem 1.75rem}
-.zbtn-clear:hover{border-color:var(--ink);color:var(--ink)}
-.output-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:#94a3b8;margin:.85rem 0 .35rem}
-#verifyOutput{background:#0a0f1a;border-radius:2px;padding:1.1rem 1.4rem;font-family:var(--mono);font-size:.75rem;line-height:1.7;color:#e2e8f0;min-height:120px;max-height:520px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
-.zt-red{color:#ef4444}.zt-orange{color:#fb923c}.zt-green{color:#4ade80}.zt-blue{color:#60a5fa}.zt-dim{color:#475569}.zt-bold{font-weight:700}.zt-white{color:#e2e8f0}
-.zstatus{font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;color:#94a3b8}
-.zstatus.ok{color:var(--green)}.zstatus.warn{color:var(--amber)}.zstatus.bad{color:var(--red)}
 
-/* ── BIO ── */
-.bio{background:var(--ink);color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:4rem}
+/* ── BIO + FOOTER ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start}
 .bio-avatar{width:64px;height:64px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
 .bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
-.bio-role{font-family:var(--mono);font-size:.65rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
 .bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
-.bio-link{color:#4a9eff;text-decoration:none;font-family:var(--mono);font-size:.65rem;display:inline-flex;align-items:center;gap:.3rem;margin-top:.75rem}
-.bio-link::before{content:'←'}
-footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
-.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
-.back-nav-link:hover{color:#93c5fd}
-.back-nav-link::before{content:'←';font-size:.75rem}
-@media(max-width:680px){
-  .wrap,.mast-inner{padding:0 1.5rem}
-  .mast-meta{grid-template-columns:1fr}
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
   .verify-grid{grid-template-columns:1fr}
   .stat-row{grid-template-columns:1fr}
-  .bio{grid-template-columns:1fr}
-  footer{flex-direction:column;text-align:center}
+  h2{font-size:1.55rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav,.mast-bar{padding:.55rem 1.1rem}
+  .mast-bar{font-size:.62rem}
+  h1.title{font-size:1.45rem}
+  footer{padding:1.25rem 1.1rem}
+}
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav,.mast-bar{padding:.5rem .9rem}
+  h1.title{font-size:1.3rem}
 }
 </style>
 </head>
 <body>
-
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
 <div class="back-nav"><a href="../index.html">Portfolio</a></div>
 
-<div class="masthead">
+<header class="masthead">
   <div class="mast-inner">
-    <div class="mast-label">Threat Intelligence Analysis</div>
-    <h1 class="title">The Open Door<br><span>LinkedIn's Verification Gap and the National Security Cost of Profit Over Trust</span></h1>
+    <div class="mast-kicker">Threat Intelligence Analysis · Nation-State Operations · Platform Accountability</div>
+    <h1 class="title">The Open Door —<br><em>LinkedIn's Verification Gap and the National Security Cost of Profit Over Trust</em></h1>
     <p class="mast-sub">A follow-on investigation to The Hiring Trap — tracing how the platform trusted most by defense professionals became the preferred recruitment surface for nation-state espionage operations, and how a fix costing less than a Shopify plugin has been available since day one.</p>
     <div class="mast-meta">
       <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
       <div class="meta-item"><div class="label">Published</div><div class="value">March 2026</div></div>
       <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
-      <div class="meta-item"><div class="label">Predecessor Report</div><div class="value">The Hiring Trap (March 2026)</div></div>
-      <div class="meta-item"><div class="label">Audience</div><div class="value">Defense Contractors · CISA · Policy Makers</div></div>
+      <div class="meta-item"><div class="label">Predecessor</div><div class="value">The Hiring Trap (March 2026)</div></div>
+      <div class="meta-item"><div class="label">Audience</div><div class="value">Defense Contractors · CISA · Policy</div></div>
       <div class="meta-item"><div class="label">Actors Covered</div><div class="value">China · North Korea · Iran · Russia</div></div>
     </div>
   </div>
   <div class="mast-bar">
     <div class="mast-bar-dot"></div>
-    NO TAX ID REQUIRED TO POST JOBS &nbsp;·&nbsp; 80.6M FAKE ACCOUNTS REMOVED IN 6 MONTHS &nbsp;·&nbsp; $501M IN JOB SCAM LOSSES 2024 &nbsp;·&nbsp; ACTIVE DOD TARGETING DOCUMENTED BY US AIR FORCE
+    No tax ID required to post jobs &nbsp;·&nbsp; 80.6M fake accounts removed in 6 months &nbsp;·&nbsp; $501M in job scam losses 2024 &nbsp;·&nbsp; Active DoD targeting documented by US Air Force
   </div>
-</div>
+</header>
 
-<div class="wrap"><div class="content">
-
-<!-- SECTION 01 -->
-<div class="section">
+<div class="section"><div class="wrap">
   <div class="section-num">Section 01</div>
   <h2>Where the Last Report Left Off</h2>
-
   <p>The Hiring Trap examined what happens once a job seeker installs a browser extension — the permissions it quietly holds, the access it grants long after the job search ends, and what that exposure means for professionals working in or adjacent to defense. That report started with a manifest.json file and a pile of suspicious messages that arrived after an aggressive job search. It answered the question: <em>what can these tools do with your data?</em></p>
-
-  <p>This report asks the upstream question: <em>how did the data get there in the first place?</em> Specifically, how does a foreign intelligence service — or a criminal operation — build the target list that a browser extension eventually harvests? The answer is LinkedIn. Not because LinkedIn is inherently malicious, but because it is the world's most detailed open-source intelligence database on cleared professionals, and because posting a fake job on it requires less verification than buying a prepaid phone.</p>
-
+  <p>This report asks the upstream question: <em>how did the data get there in the first place?</em> Specifically, how does a foreign intelligence service build the target list that a browser extension eventually harvests? The answer is LinkedIn. Not because LinkedIn is inherently malicious, but because it is the world's most detailed open-source intelligence database on cleared professionals, and because posting a fake job on it requires less verification than buying a prepaid phone.</p>
   <p>This is not a theoretical concern. It is documented, active, and ongoing. Multiple intelligence agencies, the US Air Force, the FBI, and the Department of Justice have all issued public warnings about exactly this attack surface in the past 24 months. The warnings have not changed LinkedIn's verification requirements. The attacks have continued to escalate.</p>
+  <div class="callout callout-red"><p><strong>Context from personal experience:</strong> During an active job search targeting defense contractors in Connecticut, I received a significant increase in unsolicited contact — WhatsApp messages offering implausible positions, emails from unverifiable recruiters, calls from numbers with no legitimate origin. The Hiring Trap documented this as evidence of data entering a secondary market through extension or platform data practices. This report examines the other half of that equation: the sophisticated operations that deliberately engineer these contacts as the first step in a much longer targeting chain.</p></div>
+</div></div>
 
-  <div class="callout callout-red">
-    <p><strong>Context from personal experience:</strong> During an active job search targeting defense contractors in Connecticut, I received a significant increase in unsolicited contact — WhatsApp messages offering implausible positions, emails from unverifiable recruiters, calls from numbers with no legitimate origin. The Hiring Trap documented this as evidence of data entering a secondary market through extension or platform data practices. This report examines the other half of that equation: the sophisticated operations that deliberately engineer these contacts as the first step in a much longer targeting chain.</p>
-  </div>
-</div>
-
-<!-- SECTION 02 -->
-<div class="section">
+<div class="section"><div class="wrap">
   <div class="section-num">Section 02</div>
   <h2>LinkedIn as an Intelligence Collection Platform</h2>
-
   <p>To understand why LinkedIn is the preferred attack surface for nation-state actors, you have to think like an intelligence analyst. A good analyst needs to answer four questions about any target: who are they, where do they work, what do they know, and when are they vulnerable. LinkedIn answers all four questions simultaneously, in detail, for free, about over a billion people — including the people who build nuclear submarines, design classified aircraft propulsion systems, and write software for command and control networks.</p>
-
-  <p>This is not an exaggeration or an abstraction. It is the documented assessment of the United States Air Force. Foreign adversaries, particularly China, are actively exploiting LinkedIn to conduct virtual espionage against current and former US Department of Defense members — creating fake profiles and lucrative job solicitations to entice targets into divulging sensitive information. This assessment was published by Air University, the Air Force's academic institution. It is not a blog post.</p>
-
+  <p>This is not an exaggeration. It is the documented assessment of the United States Air Force. Foreign adversaries, particularly China, are actively exploiting LinkedIn to conduct virtual espionage against current and former US Department of Defense members — creating fake profiles and lucrative job solicitations to entice targets into divulging sensitive information. This assessment was published by Air University. It is not a blog post.</p>
   <h3>What a Cleared Professional's LinkedIn Profile Actually Contains</h3>
-
-  <p>When a defense professional maintains a LinkedIn profile, they are not simply posting their resume. They are providing a continuously updated intelligence document that reveals career trajectory, clearance indicators embedded in job titles and program names, professional network of colleagues and supervisors, current employer with enough detail to assess facility and program access, periods of career transition when they are most susceptible to approach, and personal context — family situation, financial stress signals, career frustrations — surfaced through posts, likes, and activity patterns.</p>
-
-  <div class="tbl-wrap">
-  <table>
+  <p>When a defense professional maintains a LinkedIn profile, they are providing a continuously updated intelligence document that reveals career trajectory, clearance indicators embedded in job titles and program names, professional network of colleagues and supervisors, current employer with enough detail to assess program access, periods of career transition when they are most susceptible to approach, and personal context — family situation, financial stress signals, career frustrations — surfaced through posts, likes, and activity patterns.</p>
+  <div class="tbl-wrap"><table>
     <thead><tr><th>Profile Data Point</th><th>Intelligence Value</th><th>How Adversaries Use It</th></tr></thead>
     <tbody>
       <tr><td><strong>Job title at defense contractor</strong></td><td class="red">Critical</td><td>Establishes targeting priority — confirms cleared status</td></tr>
       <tr><td><strong>Program / project names in experience</strong></td><td class="red">Critical</td><td>Reveals which classified or sensitive programs accessed</td></tr>
       <tr><td><strong>Skills and certifications listed</strong></td><td class="red">Critical</td><td>Identifies value of access and knowledge to extract</td></tr>
       <tr><td><strong>Career gap or recent job change</strong></td><td class="red">Critical</td><td>Vulnerability window — target during transition stress</td></tr>
+      <tr><td><strong>Open to Work status</strong></td><td class="red">Critical</td><td>Real-time signal that person is actively vulnerable to recruitment approach</td></tr>
       <tr><td><strong>Professional connections listed</strong></td><td class="amber">High</td><td>Maps the cleared community — identifies additional targets</td></tr>
       <tr><td><strong>Activity — posts, likes, comments</strong></td><td class="amber">High</td><td>Reveals financial stress, dissatisfaction, family situation</td></tr>
       <tr><td><strong>Education and institution</strong></td><td class="amber">High</td><td>Refines clearance assessment and builds credibility for approach</td></tr>
-      <tr><td><strong>Open to Work status</strong></td><td class="red">Critical</td><td>Real-time signal that person is actively vulnerable to recruitment approach</td></tr>
     </tbody>
-  </table>
-  </div>
+  </table></div>
+  <p>The <strong>Open to Work</strong> signal deserves particular attention. For foreign intelligence services, it is a real-time alert that a cleared professional is in career transition — statistically the period of highest susceptibility to a sophisticated approach. It is, functionally, a targeting beacon that cleared professionals activate themselves.</p>
+</div></div>
 
-  <p>The <strong>Open to Work</strong> signal deserves particular attention. It is a feature LinkedIn added to help job seekers signal availability to recruiters. For foreign intelligence services, it is a real-time alert that a cleared professional is in career transition — statistically the period of highest susceptibility to a sophisticated approach. It is, functionally, a targeting beacon that cleared professionals activate themselves.</p>
-</div>
-
-<!-- SECTION 03 -->
-<div class="section">
+<div class="section"><div class="wrap">
   <div class="section-num">Section 03</div>
   <h2>The Nation-State Actors — Who Is Using This and How</h2>
-
-  <p>The LinkedIn attack surface is not exploited by one adversary. It is an active operational environment for at least four nation-state programs running parallel campaigns with different objectives and different methods. Understanding who they are and what they want is essential context for understanding why LinkedIn's verification gap is a national security failure rather than a consumer protection inconvenience.</p>
-
+  <p>The LinkedIn attack surface is not exploited by one adversary. It is an active operational environment for at least four nation-state programs running parallel campaigns with different objectives and different methods.</p>
   <div class="actor-grid">
     <div class="actor-card">
       <div class="actor-flag china">PRC</div>
       <div>
         <div class="actor-name">China — Multiple MSS-Linked Groups</div>
         <div class="actor-group">Objective: Long-term espionage and intellectual property theft</div>
-        <p class="actor-desc">The most documented LinkedIn threat against DoD personnel. Chinese intelligence services create elaborate fake recruiter profiles tied to convincing consulting and research firms, approach cleared personnel with flattering academic or business offers, and cultivate relationships over months before extracting sensitive information. Air University documented this as an active campaign against current and former DoD members specifically. The approach is patient, sophisticated, and rarely triggers the red flags that more aggressive operations do — because the goal is relationship-building, not immediate data extraction.</p>
+        <p class="actor-desc">The most documented LinkedIn threat against DoD personnel. Chinese intelligence services create elaborate fake recruiter profiles tied to convincing consulting and research firms, approach cleared personnel with flattering academic or business offers, and cultivate relationships over months before extracting sensitive information. Air University documented this as an active campaign against current and former DoD members specifically. The approach is patient, sophisticated, and rarely triggers red flags — because the goal is relationship-building, not immediate data extraction.</p>
       </div>
     </div>
     <div class="actor-card">
@@ -259,7 +242,7 @@ footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mo
       <div>
         <div class="actor-name">North Korea — Lazarus Group / Slow Pisces / DeceptiveDevelopment</div>
         <div class="actor-group">Objective: Cryptocurrency theft + defense espionage + sanctions evasion</div>
-        <p class="actor-desc">The most technically sophisticated LinkedIn operation currently active. North Korean groups run parallel campaigns: Operation Dream Job poses as recruiters from legitimate defense and technology firms to deliver malware through fake technical assessments. A separate campaign called Contagious Interview weaponizes the hiring process itself — conducting realistic multi-stage interviews that end with the candidate executing malicious code disguised as a routine installation task. A third campaign, WageMole, runs in reverse — North Korean operatives pose as qualified job seekers to get hired at Western companies and steal from the inside. The DOJ indicted four North Korean operatives in June 2025 and raided 29 laptop farms across 16 US states. The operations continued.</p>
+        <p class="actor-desc">The most technically sophisticated LinkedIn operation currently active. Operation Dream Job poses as recruiters from legitimate defense and technology firms to deliver malware through fake technical assessments. Contagious Interview weaponizes the hiring process itself — conducting realistic multi-stage interviews that end with the candidate executing malicious code disguised as a routine installation task. WageMole runs in reverse — North Korean operatives pose as qualified job seekers to get hired at Western companies and steal from the inside. The DOJ indicted four North Korean operatives in June 2025 and raided 29 laptop farms across 16 US states. The operations continued.</p>
       </div>
     </div>
     <div class="actor-card">
@@ -267,7 +250,7 @@ footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mo
       <div>
         <div class="actor-name">Iran — TA455 / Charming Kitten / APT35</div>
         <div class="actor-group">Objective: Aerospace, aviation, and defense sector penetration</div>
-        <p class="actor-desc">Iranian group TA455, a subgroup of Charming Kitten, runs a Dream Job variant specifically targeting aerospace, aviation, and defense sector professionals across Israel, the UAE, Turkey, India, Albania, and the United States. The campaign uses fake LinkedIn identities to deliver malware through fraudulent job offers, with infrastructure hidden behind legitimate services including Cloudflare, GitHub, and Microsoft Azure. The campaign has been active since at least September 2023. Mandiant published intelligence on it in February 2024. The use of legitimate cloud infrastructure to conceal command and control communications makes detection significantly harder than conventional malware campaigns.</p>
+        <p class="actor-desc">Iranian group TA455 runs a Dream Job variant specifically targeting aerospace, aviation, and defense sector professionals across Israel, the UAE, Turkey, India, Albania, and the United States. The campaign uses fake LinkedIn identities to deliver malware through fraudulent job offers, with infrastructure hidden behind legitimate services including Cloudflare, GitHub, and Microsoft Azure. The campaign has been active since at least September 2023. The use of legitimate cloud infrastructure to conceal command and control communications makes detection significantly harder than conventional malware campaigns.</p>
       </div>
     </div>
     <div class="actor-card">
@@ -275,25 +258,17 @@ footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mo
       <div>
         <div class="actor-name">Russia — SVR / GRU-linked operations</div>
         <div class="actor-group">Objective: Intelligence community and policy personnel targeting</div>
-        <p class="actor-desc">Russian intelligence services use LinkedIn primarily for human intelligence cultivation — identifying intelligence community personnel, policy analysts, and defense officials for long-term relationship development. The approach mirrors traditional tradecraft adapted for digital environments: establish contact through a plausible professional pretext, build credibility through legitimate-seeming interaction, identify vulnerabilities, and develop the contact as a witting or unwitting source. Microsoft has observed Russian operators working not only from Russia but from China and other allied nations to obscure attribution and complicate defensive responses.</p>
+        <p class="actor-desc">Russian intelligence services use LinkedIn primarily for human intelligence cultivation — identifying intelligence community personnel, policy analysts, and defense officials for long-term relationship development. The approach mirrors traditional tradecraft adapted for digital environments: establish contact through a plausible professional pretext, build credibility, identify vulnerabilities, and develop the contact as a witting or unwitting source. Microsoft has observed Russian operators working from China and other allied nations to obscure attribution and complicate defensive responses.</p>
       </div>
     </div>
   </div>
+  <div class="callout callout-amber"><p><strong>The AI acceleration problem:</strong> All four of these operations have been significantly enhanced by generative AI. A North Korean operative who would previously have been detectable through grammar errors can now generate fluent, idiomatic professional English. The Fireblocks CEO, who helped investigate Lazarus Group operations, noted that in 2017 it was easy to identify North Korean operators because of grammar mistakes — but now their communications appear to come from someone who graduated from Oxford. AI has removed the primary human tell that defenders relied on. Every fake recruiter profile, every phishing message, every fabricated job description now reads as legitimate.</p></div>
+</div></div>
 
-  <div class="callout callout-amber">
-    <p><strong>The AI acceleration problem:</strong> All four of these operations have been significantly enhanced by generative AI. A North Korean operative who would previously have been detectable through grammar errors and cultural inconsistencies can now generate fluent, idiomatic professional English. The Fireblocks CEO, who helped investigate Lazarus Group operations, noted that in 2017 it was easy to identify North Korean operators because of grammar mistakes — but now their communications appear to come from someone who graduated from Oxford. AI has removed the primary human tell that defenders relied on. Every fake recruiter profile, every phishing message, every fabricated job description now reads as legitimate because it was written by a language model that has read billions of legitimate examples.</p>
-  </div>
-</div>
-
-<!-- SECTION 04 -->
-<div class="section">
+<div class="section"><div class="wrap">
   <div class="section-num">Section 04</div>
   <h2>The Kill Chain — From Fake Company to Compromised Asset</h2>
-
-  <p>What makes this threat distinctive is that it does not begin with a technical attack. It begins with a human interaction — a job application, a connection request, a recruiter message — that feels entirely normal because it is designed to feel entirely normal. The target does not experience a hack. They experience a job opportunity. By the time the technical component arrives — malware disguised as a coding test, credentials requested for a background check — the psychological groundwork has already been laid.</p>
-
-  <p>Understanding this kill chain matters because every defensive response that focuses exclusively on the technical layer is addressing the wrong point in the sequence. The real leverage point is earlier — at the moment when a fake company is created with zero verification, and given the same access to a billion professional profiles as a legitimate employer.</p>
-
+  <p>What makes this threat distinctive is that it does not begin with a technical attack. It begins with a human interaction — a job application, a connection request, a recruiter message — that feels entirely normal because it is designed to feel entirely normal. The real leverage point is at the moment when a fake company is created with zero verification, and given the same access to a billion professional profiles as a legitimate employer.</p>
   <div class="kill-chain">
     <div class="kc-step elevated">
       <div class="kc-num info-icon"><span class="mdi mdi-database-search"></span><span>01</span></div>
@@ -306,67 +281,59 @@ footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mo
       <div class="kc-num critical-icon"><span class="mdi mdi-domain"></span><span>02</span></div>
       <div>
         <div class="kc-title">Fake Company Creation — The Unguarded Gate</div>
-        <p class="kc-desc">The adversary creates a LinkedIn company page. No tax identification number required. No EIN verification. No state business registration check. No D-U-N-S number. No proof that the company exists as a legal entity anywhere on earth. They provide a company name, optionally a logo, and self-reported fields for employee count, industry, and founding date — none of which is verified against any external source. A nation-state actor with a $50 budget can create a convincing defense consulting firm in under an hour. A wholesale dessert distributor in Connecticut requires more documentation to display wholesale pricing than LinkedIn requires to access a billion professional profiles.</p>
+        <p class="kc-desc">The adversary creates a LinkedIn company page. No tax identification number required. No EIN verification. No state business registration check. No D-U-N-S number. No proof that the company exists as a legal entity anywhere on earth. A nation-state actor with a $50 budget can create a convincing defense consulting firm in under an hour. A wholesale dessert distributor in Connecticut requires more documentation to display wholesale pricing than LinkedIn requires to access a billion professional profiles.</p>
       </div>
     </div>
     <div class="kc-step critical">
       <div class="kc-num critical-icon"><span class="mdi mdi-briefcase-search"></span><span>03</span></div>
       <div>
         <div class="kc-title">Targeted Job Posting — The Bait</div>
-        <p class="kc-desc">Fake job postings are crafted to match exactly the profile of high-value targets identified in step one. The salary is calibrated to be attractive without being implausible — the adversary knows the target's current compensation range from their LinkedIn profile and employment history. The role matches their exact skill set and career trajectory. The company appears legitimate because it has a LinkedIn page, a website registered recently, and a small number of employees whose profiles were generated by the same operation. LinkedIn's algorithm distributes the posting to the most relevant candidates automatically — including the specific cleared professionals the adversary identified in step one.</p>
+        <p class="kc-desc">Fake job postings are crafted to match exactly the profile of high-value targets identified in step one. The salary is calibrated to be attractive without being implausible. The role matches their exact skill set and career trajectory. The company appears legitimate because it has a LinkedIn page, a recently registered website, and a small number of employees whose profiles were generated by the same operation. LinkedIn's algorithm distributes the posting to the most relevant candidates automatically — including the specific cleared professionals the adversary identified in step one.</p>
       </div>
     </div>
     <div class="kc-step elevated">
       <div class="kc-num elevated-icon"><span class="mdi mdi-file-account"></span><span>04</span></div>
       <div>
         <div class="kc-title">Resume and Data Harvest</div>
-        <p class="kc-desc">Targets apply. They submit resumes containing home addresses, personal phone numbers, personal email addresses, complete employment history with program names and project descriptions, references, salary expectations, and enough context to build a comprehensive intelligence dossier. No malware has been deployed. No system has been hacked. The target voluntarily provided everything through a normal job application process. This data now exists outside any corporate security perimeter, in the hands of an unverified entity with no legal accountability in any jurisdiction that matters.</p>
+        <p class="kc-desc">Targets apply. They submit resumes containing home addresses, personal phone numbers, personal email addresses, complete employment history with program names and project descriptions, references, and salary expectations. No malware has been deployed. No system has been hacked. The target voluntarily provided everything through a normal job application process. This data now exists outside any corporate security perimeter, in the hands of an unverified entity with no legal accountability in any jurisdiction that matters.</p>
       </div>
     </div>
     <div class="kc-step elevated">
       <div class="kc-num elevated-icon"><span class="mdi mdi-account-heart"></span><span>05</span></div>
       <div>
         <div class="kc-title">Relationship Development — The Human Layer</div>
-        <p class="kc-desc">A sophisticated operation does not stop at resume collection. The fake recruiter follows up with a personalized message that references specific details from the resume. Screening calls are conducted. The target progresses through what appears to be a real hiring process. During this phase the adversary is learning things no resume reveals: financial pressures, career frustrations, family situation, security clearance scope and program access, professional vulnerabilities. China's operations are documented to cultivate these relationships over months. The target experiences validation and hope — two psychological states that significantly lower critical scrutiny.</p>
+        <p class="kc-desc">A sophisticated operation does not stop at resume collection. The fake recruiter follows up with a personalized message that references specific details from the resume. Screening calls are conducted. The target progresses through what appears to be a real hiring process. During this phase the adversary is learning things no resume reveals: financial pressures, career frustrations, clearance scope and program access. China's operations are documented to cultivate these relationships over months. The target experiences validation and hope — two psychological states that significantly lower critical scrutiny.</p>
       </div>
     </div>
     <div class="kc-step critical">
       <div class="kc-num critical-icon"><span class="mdi mdi-brain"></span><span>06</span></div>
       <div>
         <div class="kc-title">Psychological Exploitation — The Weakest Link</div>
-        <p class="kc-desc">The adversary exploits specifically the emotional state of a job seeker. Desperation makes people accept risk they would otherwise reject. Fear of missing out on a rare opportunity suspends rational evaluation. Hope — especially professionally meaningful hope during a difficult search — disarms the skepticism that would normally flag inconsistencies. The target is not a weak person. They are a human being in a psychologically vulnerable state that the adversary engineered deliberately and has specifically studied. The FBI has explicitly documented that adversaries target individuals "expressing dissatisfaction or describing financial insecurity" — the exact profile LinkedIn makes publicly visible.</p>
+        <p class="kc-desc">The adversary exploits specifically the emotional state of a job seeker. Desperation makes people accept risk they would otherwise reject. Fear of missing out on a rare opportunity suspends rational evaluation. Hope — especially professionally meaningful hope during a difficult search — disarms the skepticism that would normally flag inconsistencies. The FBI has explicitly documented that adversaries target individuals "expressing dissatisfaction or describing financial insecurity" — the exact profile LinkedIn makes publicly visible.</p>
       </div>
     </div>
     <div class="kc-step critical">
       <div class="kc-num critical-icon"><span class="mdi mdi-virus"></span><span>07</span></div>
       <div>
         <div class="kc-title">Technical Exploitation or Asset Recruitment</div>
-        <p class="kc-desc">The technical attack arrives inside an established relationship. A coding test that requires running an npm package. A background check that requests credentials. An onboarding document that installs remote access software. Or no technical attack at all — a target who has been cultivated over months and offered life-changing compensation may cooperate willingly. North Korean operations documented by the DOJ show operatives who successfully got hired at legitimate companies, worked for months, and systematically stole intellectual property and cryptocurrency while receiving a salary. The fake job was never the destination. It was the door.</p>
+        <p class="kc-desc">The technical attack arrives inside an established relationship. A coding test that requires running an npm package. A background check that requests credentials. An onboarding document that installs remote access software. Or no technical attack at all — a target who has been cultivated over months may cooperate willingly. North Korean operations documented by the DOJ show operatives who successfully got hired at legitimate companies, worked for months, and systematically stole intellectual property while receiving a salary. The fake job was never the destination. It was the door.</p>
       </div>
     </div>
   </div>
+  <div class="callout callout-red"><p><strong>The persistence problem:</strong> Unlike a phishing email that either succeeds or fails in a single interaction, this attack chain can be run in parallel against hundreds of targets simultaneously, extended over months without triggering security alerts, and leaves no technical trace during the intelligence collection phase. A defense contractor's SOC monitors network traffic, endpoint behavior, and access logs. None of those controls see a recruiter message on a personal LinkedIn account or a resume submitted from a personal device to an unverified company page.</p></div>
+</div></div>
 
-  <div class="callout callout-red">
-    <p><strong>The persistence problem:</strong> Unlike a phishing email that either succeeds or fails in a single interaction, this attack chain can be run in parallel against hundreds of targets simultaneously, extended over months without triggering security alerts, and leaves no technical trace during the intelligence collection phase. A defense contractor's security operations center monitors network traffic, endpoint behavior, and access logs. None of those controls see a recruiter message on a personal LinkedIn account or a resume submitted from a personal device to an unverified company page.</p>
-  </div>
-</div>
-
-<!-- SECTION 05 -->
-<div class="section">
+<div class="section"><div class="wrap">
   <div class="section-num">Section 05</div>
   <h2>LinkedIn's Verification Gap — The Technical Reality</h2>
-
   <p>LinkedIn's failure to implement basic business verification is not a technical problem. It is a business decision. Every technical component needed to implement it exists, works at scale, and in some cases is available for free. The gap between what LinkedIn could implement tomorrow and what it has chosen to implement is a choice — and that choice has a documented cost measured in millions of dollars of fraud losses and an undocumented cost measured in compromised cleared personnel and stolen defense secrets.</p>
-
   <h3>What LinkedIn Currently Requires to Post a Job</h3>
-
   <p>A company page that exists. A company email address for the recruiter — which can come from a domain registered this morning for twelve dollars. That is the complete verification chain. Employee count, industry, founding date, and all other company fields are self-reported with zero cross-reference against any external database.</p>
-
   <div class="verify-grid">
     <div class="verify-col bad">
       <div class="verify-col-head"><span class="mdi mdi-close-circle"></span> What LinkedIn Requires</div>
       <div class="verify-item"><span class="mdi mdi-close-circle"></span>Company name (self-reported, unverified)</div>
-      <div class="verify-item"><span class="mdi mdi-close-circle"></span>Company email address (any domain, no verification of domain age or ownership)</div>
+      <div class="verify-item"><span class="mdi mdi-close-circle"></span>Company email address (any domain, no verification)</div>
       <div class="verify-item"><span class="mdi mdi-close-circle"></span>Employee count (self-reported, no verification)</div>
       <div class="verify-item"><span class="mdi mdi-close-circle"></span>Industry (self-selected from dropdown)</div>
       <div class="verify-item"><span class="mdi mdi-close-circle"></span>Founded date (self-reported, no verification)</div>
@@ -386,13 +353,9 @@ footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mo
       <div class="verify-item"><span class="mdi mdi-check-circle"></span>B2B supply chain platforms — require tax ID at company creation globally</div>
     </div>
   </div>
-
   <h3>The Global Tax ID Framework LinkedIn Ignores</h3>
-
-  <p>LinkedIn's stated reason for not implementing business verification is the complexity of operating across 200 countries with different regulatory frameworks. This argument collapses under examination. Every country with a formal economy has a national business identifier. These are not obscure systems — they are the foundational infrastructure of commerce, taxation, and legal accountability. The formats differ. The validation mechanisms exist.</p>
-
-  <div class="tbl-wrap">
-  <table>
+  <p>LinkedIn's stated reason for not implementing business verification is the complexity of operating across 200 countries with different regulatory frameworks. This argument collapses under examination. Every country with a formal economy has a national business identifier. The formats differ. The validation mechanisms exist.</p>
+  <div class="tbl-wrap"><table>
     <thead><tr><th>Country / Region</th><th>Business Identifier</th><th>Verification Available</th></tr></thead>
     <tbody>
       <tr><td><strong>United States</strong></td><td class="code">EIN — XX-XXXXXXX</td><td>IRS TIN Matching API (free for authorized entities)</td></tr>
@@ -400,411 +363,106 @@ footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mo
       <tr><td><strong>United Kingdom</strong></td><td class="code">UTR / Companies House number</td><td>Companies House API (free)</td></tr>
       <tr><td><strong>Spain</strong></td><td class="code">NIF / CIF — letter + 8 digits</td><td>AEAT database</td></tr>
       <tr><td><strong>France</strong></td><td class="code">SIREN — 9 digits</td><td>INSEE API (free public)</td></tr>
-      <tr><td><strong>Germany</strong></td><td class="code">Steuernummer / UID</td><td>EU VIES for VAT; Handelsregister for registration</td></tr>
       <tr><td><strong>Canada</strong></td><td class="code">BN — 9 digits</td><td>CRA Business Registry</td></tr>
       <tr><td><strong>Australia</strong></td><td class="code">ABN — 11 digits</td><td>ABR Lookup API (free public)</td></tr>
       <tr><td><strong>India</strong></td><td class="code">GSTIN — 15 characters</td><td>GST Portal API</td></tr>
       <tr><td><strong>Japan</strong></td><td class="code">Hōjin Bangō — 13 digits</td><td>NTA public database</td></tr>
       <tr><td><strong>Brazil</strong></td><td class="code">CNPJ — 14 digits</td><td>Receita Federal</td></tr>
     </tbody>
-  </table>
-  </div>
-
+  </table></div>
   <p>The EU VIES system alone covers 27 countries simultaneously, is publicly accessible, and costs nothing to query. A company claiming to be based anywhere in the EU could be validated against it in a single API call. LinkedIn operates heavily across the EU. This verification is available today, requires no new infrastructure, and would eliminate a significant percentage of fake European company pages at zero cost.</p>
-
-  <div class="callout callout-blue">
-    <p><strong>The proof of concept already exists:</strong> A B2B wholesale distributor operating in Connecticut — specifically, a small Italian frozen dessert distribution business — implemented state-level tax ID validation for wholesale access pricing on Shopify. The validation handles multiple state formats, rejects invalid identifiers, and prevents unauthorized access. This was built by a single operator as a routine e-commerce requirement. The technical barrier to implementing equivalent validation at LinkedIn's scale, with LinkedIn's engineering resources, is effectively zero. The barrier is not technical. It is a business decision to prioritize the appearance of scale over the reality of quality.</p>
-  </div>
-
-  <h3>The Freelancer Objection — and Why It Fails</h3>
-
-  <p>LinkedIn's strongest counterargument is that requiring an EIN would exclude legitimate sole proprietors and freelancers who operate without a formal business entity. This objection is weaker than it appears. In the United States, sole proprietors without an EIN use their Social Security Number for tax purposes — which means they have a tax identifier. It does not need to be stored or displayed. It needs to be validated and hashed, exactly as payment processors handle SSN and EIN verification millions of times daily. Freelancers in the EU have VAT registration or national personal tax numbers. The framework is not absent for individuals. It is different from corporate identifiers — and the difference is manageable.</p>
-
-  <p>More importantly, the proposal is not to verify every personal profile on LinkedIn. It is to require verification specifically for the action of <strong>posting a job</strong> — the specific interaction that gives an unverified entity access to applicants' personal data. A job posting is the moment data changes hands. That is exactly the point where every other institution that handles data exchange requires identity verification. LinkedIn has no principled reason to be the exception.</p>
-
+  <div class="callout callout-blue"><p><strong>The proof of concept already exists:</strong> A B2B wholesale distributor operating in Connecticut — specifically, a small Italian frozen dessert distribution business — implemented state-level tax ID validation for wholesale access pricing on Shopify. The validation handles multiple state formats, rejects invalid identifiers, and prevents unauthorized access. This was built by a single operator as a routine e-commerce requirement. The technical barrier to implementing equivalent validation at LinkedIn's scale is effectively zero. The barrier is not technical. It is a business decision to prioritize the appearance of scale over the reality of quality.</p></div>
   <div class="stat-row">
-    <div class="stat-box">
-      <div class="stat-num">$16.4B</div>
-      <div class="stat-label">LinkedIn annual revenue FY2024 — earned while users lost $501M to job scams on the same platform</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-num">80.6M</div>
-      <div class="stat-label">Fake accounts removed in just six months of 2024 — the ones caught at registration alone</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-num">$0</div>
-      <div class="stat-label">Cost to query the EU VIES API — which would validate company pages across 27 countries instantly</div>
-    </div>
+    <div class="stat-box"><div class="stat-num">$16.4B</div><div class="stat-label">LinkedIn annual revenue FY2024 — earned while users lost $501M to job scams on the same platform</div></div>
+    <div class="stat-box"><div class="stat-num">80.6M</div><div class="stat-label">Fake accounts removed in just six months of 2024 — the ones caught at registration alone</div></div>
+    <div class="stat-box"><div class="stat-num">$0</div><div class="stat-label">Cost to query the EU VIES API — which would validate company pages across 27 countries instantly</div></div>
   </div>
-</div>
+</div></div>
 
-<!-- SECTION 06 -->
-<div class="section">
+<div class="section"><div class="wrap">
   <div class="section-num">Section 06</div>
   <h2>Why LinkedIn Won't Fix It — The Enshittification of Professional Trust</h2>
-
-  <p>There is a concept called enshittification, coined to describe what happens when a platform that built its value on genuine user benefit is gradually optimized for shareholder metrics at the expense of the people who made it valuable. LinkedIn was once, genuinely, a useful professional network. It was a place where the implicit trust of professional context made it meaningfully different from general social media. A connection request meant something. A recruiter message was worth reading. A job posting could be taken seriously.</p>
-
-  <p>That implicit trust is now LinkedIn's most exploited vulnerability — and also its most valuable product. The platform charges advertisers a premium specifically because its audience is "trusted professionals." It charges recruiters premium rates for access to people who treat LinkedIn messages differently from cold email. The trust that makes the platform valuable is the same trust that makes fake recruiter profiles effective. LinkedIn profits from both.</p>
-
+  <p>LinkedIn was once, genuinely, a useful professional network. A connection request meant something. A recruiter message was worth reading. A job posting could be taken seriously. That implicit trust is now LinkedIn's most exploited vulnerability — and also its most valuable product. The platform charges advertisers a premium specifically because its audience is "trusted professionals." It charges recruiters premium rates for access to people who treat LinkedIn messages differently from cold email. The trust that makes the platform valuable is the same trust that makes fake recruiter profiles effective. LinkedIn profits from both.</p>
   <h3>The Metric Problem</h3>
-
-  <p>Requiring EIN verification at company page creation would immediately and dramatically reduce LinkedIn's reported number of company pages. How many of the 67 million company pages on LinkedIn would survive a tax ID check? The answer is unknown — but LinkedIn's aggressive removal of 80.6 million fake personal accounts in a single six-month period suggests the fake company problem is at least proportionally significant. A sudden reduction in company page counts is a number that appears in Microsoft's quarterly earnings call. It is a number that requires explanation to shareholders. It is a number that LinkedIn's product and business teams are strongly incentivized to avoid creating.</p>
-
-  <p>This is not a conspiracy. It is a predictable consequence of optimizing for metrics that reward quantity over quality. The result is a platform that tells advertisers it reaches 1.2 billion professionals while simultaneously being unable to verify that the companies advertising on it are real businesses with real employees making real hiring decisions. The advertiser pays premium rates for a verified professional audience. The verification does not extend to who is recruiting from that audience.</p>
-
+  <p>Requiring EIN verification at company page creation would immediately and dramatically reduce LinkedIn's reported number of company pages. LinkedIn's aggressive removal of 80.6 million fake personal accounts in a single six-month period suggests the fake company problem is at least proportionally significant. A sudden reduction in company page counts is a number that appears in Microsoft's quarterly earnings call. It is a number that requires explanation to shareholders. It is a number that LinkedIn's product and business teams are strongly incentivized to avoid creating.</p>
   <h3>The Microsoft Conflict of Interest</h3>
+  <p>Microsoft acquired LinkedIn in 2016 for $26 billion. Microsoft also holds significant US government cloud contracts, has deep integration with DoD infrastructure through Azure and Microsoft 365, and is a trusted vendor across the defense industrial base. The same company that profits from DoD's cloud infrastructure is operating, without meaningful accountability, a platform that foreign adversaries are actively using to target DoD personnel. A defense contractor that failed to implement basic access controls on a system handling CUI would face CMMC compliance consequences. LinkedIn's status as a consumer platform appears to exempt it from the accountability frameworks that apply to every other system that touches defense information.</p>
+</div></div>
 
-  <p>Microsoft acquired LinkedIn in 2016 for $26 billion. Microsoft also holds significant US government cloud contracts, has deep integration with DoD infrastructure through Azure and Microsoft 365, and is a trusted vendor across the defense industrial base. The same company that profits from DoD's cloud infrastructure is operating, without meaningful accountability, a platform that foreign adversaries are actively using to target DoD personnel.</p>
-
-  <p>This conflict of interest has not been publicly examined in a security context. A defense contractor that failed to implement basic access controls on a system handling CUI would face CMMC compliance consequences. A technology vendor that knowingly operated an unverified platform exploited by foreign intelligence services against cleared personnel would, in any other context, face serious scrutiny. LinkedIn's status as a consumer platform appears to exempt it from the accountability frameworks that apply to every other system that touches defense information.</p>
-</div>
-
-<!-- SECTION 07 — TOOL -->
-<div class="section">
+<div class="section"><div class="wrap">
   <div class="section-num">Section 07</div>
-  <h2>Recruiter Legitimacy Checker</h2>
+  <h2>The Verification Infrastructure That Already Exists</h2>
+  <p>The most important point in this report is not that business verification is technically difficult. It is that it is technically trivial — and LinkedIn has chosen not to implement it. The infrastructure required to verify that a company posting a job is a real legal entity exists in every major economy, is publicly accessible, and in most cases costs nothing to query.</p>
+  <div class="callout callout-blue"><p><strong>In the United States</strong>, state-level business registries allow anyone to verify whether a company is registered. Connecticut's Secretary of State business lookup, Florida's Sunbiz, Virginia's SCC — all free, all public, all searchable by company name. A nation-state actor creating a fake defense consulting firm cannot easily obtain a legitimate EIN without a US-based facilitator — which itself creates prosecution exposure.</p></div>
+  <div class="callout callout-blue"><p><strong>Globally</strong>, the EU VIES system validates VAT numbers across all 27 member states simultaneously at zero cost. Companies House in the UK is free. Australia's ABR is free. Canada's Business Registries are free. Third-party services like Fonoa aggregate these into a single API covering more than 100 countries. The infrastructure is not the problem. The decision not to use it is.</p></div>
+  <div class="callout callout-red"><p><strong>LinkedIn's position</strong> is that operating across 200 countries makes verification too complex to implement. This argument does not survive examination. Payment processors, B2B platforms, and government contractor registries all implement cross-jurisdiction business verification as a standard requirement. The complexity is a solved problem. The decision not to apply the solution to job postings is a product and business choice — one with documented national security consequences.</p></div>
 
-  <p>The analysis in this report cannot be reduced to a single tool — the problem is structural, not individual. But the same analytical framework that produced this research can be applied to any specific recruiter or company you are evaluating. The checker below applies a multi-signal legitimacy scoring model to a company name or LinkedIn URL, drawing on publicly available data sources to surface the red flags that LinkedIn's own platform does not flag.</p>
+  <h3>How to Verify a Company Yourself — By Jurisdiction</h3>
+  <p>Until LinkedIn implements verification, this is the manual process. Use the correct registry for the jurisdiction where the company claims to be based. All links open free public databases.</p>
 
-  <p>All analysis runs in your browser using public data sources. No personal information is collected or transmitted. This tool does not connect to LinkedIn's systems — it uses publicly available business registry signals and domain intelligence that any analyst can access manually.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Jurisdiction</th><th>Official Registry</th><th>What You Can Verify</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Connecticut</strong></td><td><a href="https://service.ct.gov/business/s/onlinebusinesssearch" target="_blank" rel="noopener" style="color:var(--blue)">CT Secretary of State</a></td><td>Registration status, registered agent, filing date</td></tr>
+      <tr><td><strong>Virginia / DC area</strong></td><td><a href="https://cis.scc.virginia.gov/" target="_blank" rel="noopener" style="color:var(--blue)">VA State Corporation Commission</a></td><td>Entity status, directors, registered agent</td></tr>
+      <tr><td><strong>Maryland</strong></td><td><a href="https://egov.maryland.gov/BusinessExpress/EntitySearch" target="_blank" rel="noopener" style="color:var(--blue)">MD Dept. of Assessments &amp; Taxation</a></td><td>Entity status, filing history</td></tr>
+      <tr><td><strong>New York</strong></td><td><a href="https://apps.dos.ny.gov/publicInquiry/" target="_blank" rel="noopener" style="color:var(--blue)">NY DOS Corporation Database</a></td><td>Registration date, registered agent, status</td></tr>
+      <tr><td><strong>Florida</strong></td><td><a href="https://search.sunbiz.org/Inquiry/CorporationSearch/ByName" target="_blank" rel="noopener" style="color:var(--blue)">FL Sunbiz</a></td><td>Filing date, officers/directors, registered agent</td></tr>
+      <tr><td><strong>US — Any State</strong></td><td><a href="https://opencorporates.com/companies?utf8=%E2%9C%93&q=&jurisdiction_code=us" target="_blank" rel="noopener" style="color:var(--blue)">OpenCorporates (US)</a></td><td>Aggregates most state registries — good starting point</td></tr>
+      <tr><td><strong>US Govt Contractors</strong></td><td><a href="https://sam.gov" target="_blank" rel="noopener" style="color:var(--blue)">SAM.gov</a></td><td>Active government contractor registration</td></tr>
+      <tr><td><strong>European Union</strong></td><td><a href="https://ec.europa.eu/taxation_customs/vies/#/vat-validation" target="_blank" rel="noopener" style="color:var(--blue)">EU VIES</a></td><td>VAT registration across all 27 member states</td></tr>
+      <tr><td><strong>United Kingdom</strong></td><td><a href="https://find-and-update.company-information.service.gov.uk" target="_blank" rel="noopener" style="color:var(--blue)">Companies House</a></td><td>Directors, filing history, registered address</td></tr>
+      <tr><td><strong>Australia</strong></td><td><a href="https://www.abr.business.gov.au" target="_blank" rel="noopener" style="color:var(--blue)">ABR Lookup</a></td><td>ABN status, entity type, registration date</td></tr>
+      <tr><td><strong>Global</strong></td><td><a href="https://opencorporates.com" target="_blank" rel="noopener" style="color:var(--blue)">OpenCorporates</a></td><td>130+ jurisdictions — best global starting point</td></tr>
+    </tbody>
+  </table></div>
 
-  <div class="tool-wrap">
-    <div class="tool-header">
-      <span class="mdi mdi-shield-account" style="color:#60a5fa;font-size:1.1rem"></span>
-      <span class="tool-header-title">Recruiter / Company Legitimacy Checker</span>
-      <span class="tool-header-sub">Runs locally · No data transmitted · Public sources only</span>
-    </div>
-    <div class="tool-body">
+  <h3>Red Flags to Check in Any Jurisdiction</h3>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Signal</th><th>How to Check</th><th>Risk Weight</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Recruiter using free email (Gmail, Yahoo)</strong></td><td>Legitimate corporate recruiters use company domain email. Free provider = no verifiable corporate affiliation.</td><td class="red">Critical</td></tr>
+      <tr><td><strong>Company domain registered &lt; 90 days ago</strong></td><td><a href="https://lookup.icann.org" target="_blank" rel="noopener" style="color:var(--blue)">ICANN WHOIS</a> — check Creation Date</td><td class="red">Critical</td></tr>
+      <tr><td><strong>No company presence in any registry</strong></td><td>Use the registry links above. No registration = no legal entity.</td><td class="red">Critical</td></tr>
+      <tr><td><strong>Request to move off LinkedIn quickly</strong></td><td>LinkedIn warns this explicitly. Legitimate recruiters have no reason to leave the platform early.</td><td class="red">Critical</td></tr>
+      <tr><td><strong>Salary significantly above market</strong></td><td>Cross-reference with Glassdoor, LinkedIn Salary, BLS.gov for the role and location.</td><td class="amber">Elevated</td></tr>
+      <tr><td><strong>Employee count vs. job postings mismatch</strong></td><td>5 listed employees, 40 active job postings = anomalous. Check the ratio on their LinkedIn page.</td><td class="amber">Elevated</td></tr>
+      <tr><td><strong>No third-party web footprint</strong></td><td>Search: <code>"Company Name" site:glassdoor.com</code> and <code>"Company Name" site:crunchbase.com</code>. Zero results for a 50-person company is a flag.</td><td class="amber">Elevated</td></tr>
+      <tr><td><strong>Recruiter profile created recently</strong></td><td>Click three dots on their LinkedIn profile → "About this profile" → check creation date.</td><td class="amber">Elevated</td></tr>
+    </tbody>
+  </table></div>
 
-      <p style="font-size:.85rem;color:var(--ink3);margin-bottom:1.25rem;line-height:1.6">Enter a company name and country to run a manual verification checklist — the exact methodology a threat intelligence analyst would apply. This tool provides a structured framework for your own OSINT investigation, not an automated lookup.</p>
+</div></div>
 
-      <div class="search-row">
-        <input class="search-input" id="companyInput" type="text" placeholder="Company name (e.g. Apex Defense Consulting LLC)">
-        <select class="search-select" id="countrySelect">
-          <option value="US">United States</option>
-          <option value="EU">European Union</option>
-          <option value="UK">United Kingdom</option>
-          <option value="CA">Canada</option>
-          <option value="AU">Australia</option>
-          <option value="OTHER">Other</option>
-        </select>
-        <button class="zbtn zbtn-run" id="verifyBtn" onclick="runCheck()">
-          <span class="mdi mdi-magnify"></span> Run Check
-        </button>
-        <button class="zbtn zbtn-clear" onclick="clearCheck()">Clear</button>
-        <span class="zstatus" id="verifyStatus"></span>
-      </div>
-
-      <div class="output-label">Verification Framework Output</div>
-      <div id="verifyOutput"><span class="zt-dim" style="font-style:italic">Enter a company name and click Run Check to generate a structured OSINT verification checklist…</span></div>
-
-    </div>
-  </div>
-
-  <p style="font-size:.88rem;color:#94a3b8;margin-top:.5rem">This tool generates a verification methodology framework based on the analysis in this report. It does not perform automated lookups — it provides a structured checklist for your own manual investigation using the public sources documented above. For extension permission analysis, see the <a href="the_hiring_trap_analysis.html" style="color:var(--blue)">Hiring Trap Extension Scanner</a>.</p>
-</div>
-
-<!-- SECTION 08 -->
-<div class="section">
+<div class="section"><div class="wrap">
   <div class="section-num">Section 08</div>
   <h2>What Needs to Change</h2>
-
   <h3>For LinkedIn and Microsoft</h3>
-
-  <p>Require tax identification verification as a condition of posting a job. Not as a condition of creating a personal profile, not as a condition of browsing or networking — specifically as a condition of accessing applicant data through a job posting. The EU VIES API covers 27 countries for free. The IRS TIN Matching Program covers US entities. Third-party services like Fonoa cover over 100 countries as a commodity API. The infrastructure exists. The decision not to use it is a choice with documented consequences.</p>
-
-  <p>Display a clear, prominent unverified business indicator on any company page that has not completed tax ID verification — equivalent to the HTTP vs HTTPS distinction in a browser address bar. Users cannot evaluate what they cannot see. A job seeker should be able to see, at a glance, whether the company asking for their personal data has been verified as a legal entity in any jurisdiction.</p>
-
-  <p>Require domain age verification for recruiter email addresses. A company email from a domain registered within the last 90 days is a significant red flag. This is a trivially implementable check using public WHOIS data. It would not eliminate sophisticated operations with aged infrastructure, but it would eliminate the majority of low-effort campaigns that currently operate with no friction at all.</p>
-
+  <p>Require tax identification verification as a condition of posting a job. The EU VIES API covers 27 countries for free. The IRS TIN Matching Program covers US entities. Third-party services like Fonoa cover over 100 countries as a commodity API. The infrastructure exists. The decision not to use it is a choice with documented consequences.</p>
+  <p>Display a clear, prominent unverified business indicator on any company page that has not completed tax ID verification — equivalent to the HTTP vs HTTPS distinction in a browser address bar. A job seeker should be able to see, at a glance, whether the company asking for their personal data has been verified as a legal entity in any jurisdiction.</p>
   <h3>For Defense Contractors and Security Teams</h3>
-
-  <p>Personnel security programs that begin at hire are already too late. The intelligence collection described in this report happens during the job search — often years before the individual joins the organization. Security briefings that address LinkedIn specifically, that explain the Open to Work signal as a targeting beacon, and that describe the kill chain documented here are not paranoia. They are specific, technically grounded responses to documented active threats.</p>
-
-  <p>Cleared personnel should be advised to minimize program-specific detail in LinkedIn profiles — job titles and employers are unavoidable, but project names, facility names, and technology-specific skills provide intelligence value that benefits the adversary without providing meaningful benefit to the employee's career. The information asymmetry here is significant: the defense professional gains little from advertising classified program experience publicly; the adversary gains a great deal from finding it.</p>
-
-  <div class="callout callout-blue">
-    <p><strong>The data canary methodology:</strong> For professionals who want to identify which platforms are sharing their data, a technique used by researchers and journalists can be adapted for personal use. Use a unique email alias for each platform — job+linkedin@yourdomain.com, job+indeed@yourdomain.com, and so on. When unsolicited contact arrives, the address it was sent to identifies which platform the data came from. Most email providers support plus addressing natively. This does not prevent data from being shared, but it creates an audit trail that can attribute the source when the inevitable spam begins.</p>
-  </div>
-
+  <p>Personnel security programs that begin at hire are already too late. The intelligence collection described in this report happens during the job search — often years before the individual joins the organization. Security briefings that address LinkedIn specifically, that explain the Open to Work signal as a targeting beacon, and that describe the kill chain documented here are specific, technically grounded responses to documented active threats.</p>
+  <p>Cleared personnel should be advised to minimize program-specific detail in LinkedIn profiles — job titles and employers are unavoidable, but project names, facility names, and technology-specific skills provide intelligence value that benefits the adversary without providing meaningful benefit to the employee's career.</p>
+  <div class="callout callout-blue"><p><strong>The data canary methodology:</strong> For professionals who want to identify which platforms are sharing their data, use a unique email alias for each platform — yourname+linkedin@gmail.com, yourname+indeed@gmail.com, and so on. When unsolicited contact arrives, the address it was sent to identifies which platform the data came from. Most email providers support plus addressing natively. This creates an audit trail that can attribute the source when the inevitable spam begins.</p></div>
   <h3>For Regulators and Policymakers</h3>
-
   <p>The financial industry is subject to Know Your Customer requirements because the consequences of unverified identity in financial transactions are severe and well-documented. Job posting platforms are currently subject to no equivalent requirement — despite the fact that a job posting is a transaction in which an unverified entity gains access to sensitive personal and professional data from potentially millions of people, including cleared defense personnel.</p>
-
-  <p>The regulatory gap is not technically complex to address. Requiring verified business identity as a precondition for posting jobs on platforms above a certain scale — analogous to requiring a business license to open a shop — would impose minimal burden on legitimate employers and significant friction on the operations documented in this report. A nation-state actor cannot easily obtain a legitimate US EIN tied to a real legal entity without a US-based facilitator. Every facilitator is a potential point of exposure, prosecution, and deterrence.</p>
-
-  <p>The DOJ demonstrated in June 2025 that prosecution works: indictments, arrests of facilitators, seizure of laptop farms. But prosecution is reactive — it addresses operations that have already succeeded. Verification-at-posting is preventive. It raises the cost of the operation before the harm occurs, rather than after.</p>
-</div>
-
-<!-- SECTION 09 -->
-<div class="section">
-  <div class="section-num">Section 09</div>
-  <h2>The Companion Project — An Ethical Job Search Extension</h2>
-
-  <p>The research in this report and in The Hiring Trap points toward a specific gap in the tools available to job seekers: there is no extension that prioritizes their privacy, stores nothing remotely, and gives them genuine signal about the legitimacy of the companies they are considering. Every existing autofill tool either harvests data to a cloud profile or leaves the legitimacy question entirely to the user.</p>
-
-  <p>A companion extension project, currently in development, addresses both gaps simultaneously. The design principle is simple: <strong>your data lives on your computer and nowhere else.</strong> No cloud profile. No server. No account. Your resume information is stored in your browser's local storage, encrypted, and never transmitted to any third party under any circumstances. The extension functions entirely offline after installation.</p>
-
-  <div class="layer-stack">
-    <div class="layer">
-      <div class="layer-num">01</div>
-      <div>
-        <div class="layer-title">Local-Only Storage — No Cloud Profile</div>
-        <p class="layer-desc">All profile data — name, address, work history, education — is stored exclusively in Chrome's local storage on your machine. It does not leave your browser. There is no account to create, no server to breach, and no data for a company acquisition or privacy policy change to expose. The permission model is the minimum necessary: activeTab for the current page when you click the icon, storage for your local profile, and scripting to fill the form. Nothing beyond that is requested or used.</p>
-      </div>
-    </div>
-    <div class="layer">
-      <div class="layer-num">02</div>
-      <div>
-        <div class="layer-title">Company Legitimacy Signal — Inline Risk Scoring</div>
-        <p class="layer-desc">When you open a job application page, the extension surfaces publicly available signals about the posting company — domain age, presence in public business registries, consistency between employee count and job posting volume, and whether the company has a verifiable external footprint. It does not block you from applying. It gives you the information to make a considered decision. Think of it as a browser security indicator for job postings — the same concept as the padlock icon for HTTPS, applied to employer legitimacy.</p>
-      </div>
-    </div>
-    <div class="layer">
-      <div class="layer-num">03</div>
-      <div>
-        <div class="layer-title">Transparent Permission Declaration</div>
-        <p class="layer-desc">The extension's manifest is published openly alongside a plain-language explanation of every permission it holds, why it holds it, and what it does not hold and why. This is a direct response to the opacity documented in The Hiring Trap. An extension that explains its own permissions — rather than burying them in a manifest that 99% of users never read — is a different category of product than everything currently available in this space.</p>
-      </div>
-    </div>
-    <div class="layer">
-      <div class="layer-num">04</div>
-      <div>
-        <div class="layer-title">No Business Model Built on Your Data</div>
-        <p class="layer-desc">The extension does not track which jobs you apply to, does not aggregate anonymized usage data, does not integrate with any job board's API, and does not generate any revenue from your job search activity. It is a tool, not a platform. The distinction matters: a platform needs your engagement and your data to sustain its business model. A tool needs only to do the job. This extension is designed to be the latter — the kind of tool that exists to serve the person using it, not to extract value from them.</p>
-      </div>
-    </div>
-  </div>
-
-  <div class="callout callout-green">
-    <p><strong>Development status:</strong> The companion extension is in active development as part of this portfolio series. The manifest, permission declarations, and source code will be published openly on GitHub for independent review. The goal is not to compete with Simplify or Jobright on feature depth — it is to demonstrate that the category can be built differently, and that an ethical architecture is technically straightforward to implement. The hard part was never the code. It was the business decision to not monetize the user's job search data. This extension makes that decision explicitly and permanently.</p>
-  </div>
-</div>
-
+  <p>Requiring verified business identity as a precondition for posting jobs on platforms above a certain scale would impose minimal burden on legitimate employers and significant friction on the operations documented in this report. A nation-state actor cannot easily obtain a legitimate US EIN tied to a real legal entity without a US-based facilitator. Every facilitator is a potential point of exposure, prosecution, and deterrence.</p>
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">All findings in this report are based on publicly available information including reports from the FBI, CISA, US Air Force Air University, Microsoft Threat Intelligence, Mandiant, Department of Justice, Federal Trade Commission, and MITRE ATT&CK. This represents the author's independent analysis and does not reflect the views of any employer or client organization.</p>
 </div></div>
 
 <div class="bio">
   <div class="bio-avatar">YI</div>
   <div>
     <div class="bio-name">Yana Ivanov</div>
-    <div class="bio-role">Information Assurance &amp; CMMC Compliance Analyst &nbsp;·&nbsp; SiteWave Studio</div>
-    <p class="bio-text">Yana Ivanov is a security analyst and CMMC compliance consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence work. This report is the second in a series examining how the hiring process has become an active attack surface for foreign intelligence operations. She is currently pursuing CompTIA Security+, CMMC Registered Practitioner certification, and AZ-900, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance.</p>
-    <a href="../index.html" class="back-nav-link" style="margin-top:.75rem;display:inline-flex">Portfolio</a>
+    <div class="bio-title">Information Assurance &amp; CMMC Compliance Analyst &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC compliance consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence work. This report is the second in a series examining how the hiring process has become an active attack surface for foreign intelligence operations. She is currently pursuing CompTIA Security+, CMMC Registered Practitioner certification, and AZ-900.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
   </div>
 </div>
 
 <footer>
-  <span>The Open Door · Yana Ivanov · March 2026</span>
-  <span>Based on public reporting · For educational use · Independent analysis · Companion to The Hiring Trap</span>
+  <span>The Open Door &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; March 2026 &nbsp;·&nbsp; Companion to The Hiring Trap &nbsp;·&nbsp; Independent analysis</span>
 </footer>
 
-<script>
-function H(cls, txt) {
-  return `<span class="${cls}">${txt}</span>`;
-}
-
-const eq = '═'.repeat(64);
-const div = '─'.repeat(64);
-
-const COUNTRY_DATA = {
-  US: {
-    name: 'United States',
-    identifier: 'EIN (Employer Identification Number)',
-    format: 'XX-XXXXXXX (two digits, hyphen, seven digits)',
-    registry: 'IRS TIN Matching Program',
-    registry_url: 'https://www.irs.gov/tin-matching',
-    secondary: 'SAM.gov (for government contractors)',
-    secondary_url: 'https://sam.gov',
-    free: true,
-    notes: 'Foreign actors cannot easily obtain a legitimate EIN without a US SSN/ITIN, requiring a US-based facilitator — a significant operational risk and prosecution exposure.'
-  },
-  EU: {
-    name: 'European Union',
-    identifier: 'VAT Identification Number',
-    format: 'Country code (2 letters) + 8-12 digits/characters',
-    registry: 'EU VIES (VAT Information Exchange System)',
-    registry_url: 'https://ec.europa.eu/taxation_customs/vies/',
-    secondary: 'Individual national business registries',
-    secondary_url: 'https://e-justice.europa.eu/content_find_a_company-489-en.do',
-    free: true,
-    notes: 'VIES is a free public API covering all 27 EU member states simultaneously. LinkedIn could validate every EU company page against it at zero cost.'
-  },
-  UK: {
-    name: 'United Kingdom',
-    identifier: 'Companies House Registration Number',
-    format: '8 digits (or 2 letters + 6 digits for certain types)',
-    registry: 'Companies House API',
-    registry_url: 'https://find-and-update.company-information.service.gov.uk',
-    secondary: 'HMRC VAT registration',
-    secondary_url: 'https://www.gov.uk/check-uk-vat-number',
-    free: true,
-    notes: 'Companies House provides a free public API. Any UK-registered company can be verified in real time including director names, filing history, and registered address.'
-  },
-  CA: {
-    name: 'Canada',
-    identifier: 'Business Number (BN)',
-    format: '9 digits — issued by Canada Revenue Agency',
-    registry: 'CRA Business Registry',
-    registry_url: 'https://www.canada.ca/en/revenue-agency',
-    secondary: 'Provincial business registries',
-    secondary_url: 'https://beta.canadasbusinessregistries.ca',
-    free: true,
-    notes: 'Canada Business Registries provides a unified search across provincial registries.'
-  },
-  AU: {
-    name: 'Australia',
-    identifier: 'ABN (Australian Business Number)',
-    format: '11 digits — first two are a check number',
-    registry: 'ABR (Australian Business Register)',
-    registry_url: 'https://www.abr.business.gov.au',
-    secondary: 'ASIC (company registration)',
-    secondary_url: 'https://connectonline.asic.gov.au',
-    free: true,
-    notes: 'The ABR provides a free public lookup API. ABN validation includes format checksum verification and live registry status.'
-  },
-  OTHER: {
-    name: 'Other jurisdiction',
-    identifier: 'National tax/business identifier',
-    format: 'Varies by country — see OECD TIN portal',
-    registry: 'OECD Automatic Exchange of Information Portal',
-    registry_url: 'https://www.oecd.org/tax/automatic-exchange/crs-implementation-and-assistance/tax-identification-numbers/',
-    secondary: 'OpenCorporates (global company database)',
-    secondary_url: 'https://opencorporates.com',
-    free: true,
-    notes: 'Third-party services like Fonoa cover 100+ countries with a single API integration. Graphite, a B2B supply chain platform, already requires tax ID at company creation globally.'
-  }
-};
-
-const RED_FLAGS = [
-  { signal: 'Company domain registered within last 90 days', weight: 3, check: 'Check WHOIS at https://lookup.icann.org — look for Creation Date' },
-  { signal: 'No verifiable web presence beyond LinkedIn page', weight: 3, check: 'Google the company name + city + industry. Check for news, Glassdoor, Crunchbase, any third-party mention' },
-  { signal: 'Employee count vs. job posting volume mismatch', weight: 2, check: 'A company with 5 listed employees posting 40 jobs in 2 weeks is anomalous. Note the ratio.' },
-  { signal: 'Job description contains highly generic language', weight: 1, check: 'Fake postings often use the same templated language. Search a distinctive phrase in quotes to find duplicates.' },
-  { signal: 'Salary significantly above market for stated role', weight: 2, check: 'Cross-reference with Glassdoor, LinkedIn Salary, and Bureau of Labor Statistics for the role and location.' },
-  { signal: 'Company founding date very recent', weight: 2, check: 'A company founded this year with 50+ employees is implausible. Cross-reference founding date with domain registration.' },
-  { signal: 'Recruiter email from free provider (Gmail, Yahoo)', weight: 3, check: 'Legitimate corporate recruiters use company domain email. Free email = no verifiable company affiliation.' },
-  { signal: 'Recruiter LinkedIn profile created recently', weight: 2, check: 'Click "About this profile" on the recruiter\'s LinkedIn — check when the profile was created.' },
-  { signal: 'No company presence in business registry', weight: 3, check: 'Use the registry links in the verification steps below to check for registration.' },
-  { signal: 'Request to move conversation off LinkedIn quickly', weight: 3, check: 'LinkedIn explicitly warns this is a red flag. Legitimate recruiters have no reason to leave the platform early.' }
-];
-
-function runCheck() {
-  const company = document.getElementById('companyInput').value.trim();
-  const country = document.getElementById('countrySelect').value;
-  const output = document.getElementById('verifyOutput');
-  const status = document.getElementById('verifyStatus');
-
-  if (!company) {
-    output.innerHTML = H('zt-orange', 'Enter a company name to generate a verification checklist.');
-    return;
-  }
-
-  const cd = COUNTRY_DATA[country];
-  status.textContent = 'Generating checklist…';
-  status.className = 'zstatus';
-
-  setTimeout(() => {
-    let html = '';
-    html += H('zt-bold', eq) + '\n';
-    html += H('zt-blue', '[ RECRUITER / COMPANY LEGITIMACY CHECK ]') + '\n';
-    html += H('zt-dim', div) + '\n';
-    html += `  Company Under Review   : ${H('zt-white', company)}\n`;
-    html += `  Jurisdiction           : ${H('zt-white', cd.name)}\n`;
-    html += `  Business Identifier    : ${H('zt-white', cd.identifier)}\n`;
-    html += `  Expected Format        : ${H('zt-dim', cd.format)}\n`;
-    html += '\n' + H('zt-bold', eq) + '\n\n';
-
-    // Step 1 — Business Registry
-    html += H('zt-blue', '[ STEP 1 — BUSINESS REGISTRY VERIFICATION ]') + '\n';
-    html += H('zt-dim', div) + '\n';
-    html += `  ${H('zt-orange', '→ Action:')} Search the official registry:\n`;
-    html += `  ${H('zt-green', cd.registry)}\n`;
-    html += `  ${H('zt-dim', cd.registry_url)}\n\n`;
-    html += `  ${H('zt-dim', 'Search for: "' + company + '"')}\n`;
-    html += `  ${H('zt-dim', 'What to look for: company registration status, directors, registered address, filing history')}\n\n`;
-    if (cd.secondary) {
-      html += `  ${H('zt-orange', '→ Secondary check:')} ${H('zt-green', cd.secondary)}\n`;
-      html += `  ${H('zt-dim', cd.secondary_url)}\n\n`;
-    }
-    html += `  ${H('zt-dim', '⚑ Note: ' + cd.notes)}\n\n`;
-
-    // Step 2 — Domain Intelligence
-    html += H('zt-blue', '[ STEP 2 — DOMAIN INTELLIGENCE ]') + '\n';
-    html += H('zt-dim', div) + '\n';
-    html += `  ${H('zt-orange', '→ Action:')} Find the company domain and check registration age\n`;
-    html += `  ${H('zt-green', 'WHOIS lookup')} ${H('zt-dim', 'https://lookup.icann.org')}\n\n`;
-    html += `  ${H('zt-dim', 'What to check:')}\n`;
-    html += `  ${H('zt-dim', '  · Creation Date — domain registered less than 90 days ago is a significant red flag')}\n`;
-    html += `  ${H('zt-dim', '  · Registrant — is it private/redacted, or does it match the company name?')}\n`;
-    html += `  ${H('zt-dim', '  · Registrar — legitimate companies use professional registrars, not cheap bulk registrars')}\n`;
-    html += `  ${H('zt-dim', '  · Does the domain resolve to a real professional website, or a template/placeholder?')}\n\n`;
-
-    // Step 3 — External Footprint
-    html += H('zt-blue', '[ STEP 3 — EXTERNAL FOOTPRINT VERIFICATION ]') + '\n';
-    html += H('zt-dim', div) + '\n';
-    html += `  ${H('zt-orange', '→ Action:')} Search for independent third-party mentions\n\n`;
-    html += `  ${H('zt-dim', 'Google search: "' + company + '" site:glassdoor.com')}\n`;
-    html += `  ${H('zt-dim', 'Google search: "' + company + '" site:crunchbase.com')}\n`;
-    html += `  ${H('zt-dim', 'Google search: "' + company + '" review OR news OR press release')}\n`;
-    html += `  ${H('zt-dim', 'OpenCorporates: https://opencorporates.com/companies?q=' + encodeURIComponent(company))}\n\n`;
-    html += `  ${H('zt-dim', 'Legitimate companies leave traces: news mentions, LinkedIn posts from real employees,')}\n`;
-    html += `  ${H('zt-dim', 'Glassdoor reviews, conference appearances, press releases. Absence of all third-party')}\n`;
-    html += `  ${H('zt-dim', 'footprint for a company claiming to have 50+ employees is a critical red flag.')}\n\n`;
-
-    // Step 4 — Recruiter Profile
-    html += H('zt-blue', '[ STEP 4 — RECRUITER PROFILE ANALYSIS ]') + '\n';
-    html += H('zt-dim', div) + '\n';
-    html += `  ${H('zt-orange', '→ Action:')} On the recruiter's LinkedIn profile, click the three dots → "About this profile"\n\n`;
-    html += `  ${H('zt-dim', 'Check:')}\n`;
-    html += `  ${H('zt-dim', '  · When was the profile created? Recently created profiles are a red flag.')}\n`;
-    html += `  ${H('zt-dim', '  · How many connections? Fake profiles often have few or suspiciously round numbers.')}\n`;
-    html += `  ${H('zt-dim', '  · Is the profile photo a stock image? Reverse image search: images.google.com')}\n`;
-    html += `  ${H('zt-dim', '  · Does the profile appear on the company page employee list?')}\n`;
-    html += `  ${H('zt-dim', '  · Does the email domain match the company website domain?')}\n\n`;
-
-    // Step 5 — Red Flag Scoring
-    html += H('zt-blue', '[ STEP 5 — RED FLAG CHECKLIST ]') + '\n';
-    html += H('zt-dim', div) + '\n';
-    html += `  ${H('zt-dim', 'Score each signal present. Weight ×3 = critical, ×2 = elevated, ×1 = minor.')}\n\n`;
-    for (const rf of RED_FLAGS) {
-      const weight = rf.weight === 3 ? H('zt-red', '[×3 CRITICAL]') :
-                     rf.weight === 2 ? H('zt-orange', '[×2 ELEVATED]') :
-                                       H('zt-dim', '[×1 MINOR  ]');
-      html += `  ${weight} ${H('zt-white', rf.signal)}\n`;
-      html += `  ${H('zt-dim', '  → ' + rf.check)}\n\n`;
-    }
-
-    // Step 6 — Decision framework
-    html += H('zt-blue', '[ STEP 6 — DECISION FRAMEWORK ]') + '\n';
-    html += H('zt-dim', div) + '\n';
-    html += `  ${H('zt-green', 'Score 0–2')}   ${H('zt-dim', 'Proceed with normal caution. Continue standard verification.')}\n`;
-    html += `  ${H('zt-orange', 'Score 3–5')}   ${H('zt-dim', 'Elevated risk. Request verifiable company information before proceeding.')}\n`;
-    html += `  ${H('zt-red',    'Score 6–8')}   ${H('zt-dim', 'High risk. Do not submit personal data. Report the posting to LinkedIn.')}\n`;
-    html += `  ${H('zt-red',    'Score 9+'  )}   ${H('zt-dim', 'Critical. Likely fraudulent operation. Report to FBI IC3 at ic3.gov.')}\n\n`;
-    html += `  ${H('zt-dim', 'FBI Internet Crime Complaint Center: https://ic3.gov')}\n`;
-    html += `  ${H('zt-dim', 'FTC Job Scam Reporting: https://reportfraud.ftc.gov')}\n\n`;
-
-    html += H('zt-bold', eq) + '\n';
-    html += H('zt-dim', 'Framework · Yana Ivanov · The Open Door · Educational use only') + '\n';
-
-    output.innerHTML = html;
-    output.scrollTop = 0;
-    status.textContent = 'Checklist ready';
-    status.className = 'zstatus ok';
-  }, 300);
-}
-
-function clearCheck() {
-  document.getElementById('companyInput').value = '';
-  document.getElementById('verifyOutput').innerHTML = '<span class="zt-dim" style="font-style:italic">Enter a company name and click Run Check to generate a structured OSINT verification checklist…</span>';
-  document.getElementById('verifyStatus').textContent = '';
-  document.getElementById('verifyStatus').className = 'zstatus';
-}
-
-document.getElementById('companyInput').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter') runCheck();
-});
-</script>
 </body>
 </html>
