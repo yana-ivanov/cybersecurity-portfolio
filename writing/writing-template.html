@@ -111,9 +111,12 @@ td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
 
 /* ── FIGURE (for diagrams, screenshots, code blocks) ── */
 .figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
 .figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
 .figure-body{padding:1.75rem}
 .figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
 
 /* ── TIMELINE (horizontal grid — blue theme style) ── */
 .timeline{margin:0;display:grid;gap:0;border:1px solid var(--rule)}
