@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Trusted Channel — TeamPCP, WAV Steganography & the Nine-Day Credential Chain | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --ink:#0a0f1a; --ink2:#1e2d45; --ink3:#374151;
+  --red:#c0392b; --red-dim:rgba(192,57,43,0.08); --red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309; --amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0; --blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32; --green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0; --bg:#f8fafc; --paper:#ffffff;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4',Georgia,serif;
+  --display:'Playfair Display',Georgia,serif;
+  --display-clean:'IBM Plex Serif',Georgia,serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-kicker::before,.mast-kicker::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#ef4444;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:10px;height:10px;border-radius:50%;background:#fff;flex-shrink:0;margin-right:.5rem;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p:last-child{margin-bottom:0}
+.callout{padding:1.25rem 1.5rem;border-radius:4px;margin:1.75rem 0;border-left:4px solid;box-shadow:var(--shadow)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0;border-radius:4px;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:var(--ink);color:#fff}
+th{padding:.85rem 1rem;text-align:left;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;font-weight:600}
+td{padding:.75rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+.mat-card{background:var(--paper);border-radius:6px;box-shadow:var(--shadow-md);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:1rem 1.5rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.25rem 1rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.8rem;font-weight:700;line-height:1;margin-bottom:.4rem}
+.stat-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;color:var(--ink3);text-transform:uppercase;margin-bottom:.4rem;line-height:1.4}
+.stat-sub{font-size:.72rem;color:#94a3b8;line-height:1.5}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+.split-panel code{font-family:var(--mono);font-size:.78rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px}
+.timeline{margin:1.5rem 0;border-left:2px solid var(--rule);padding-left:2rem}
+.tl-item{position:relative;padding:.5rem 0 1.5rem}
+.tl-item::before{content:'';position:absolute;left:-2.4rem;top:.6rem;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tl-date{font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;color:var(--red);text-transform:uppercase;margin-bottom:.25rem}
+.tl-title{font-weight:700;color:var(--ink);margin-bottom:.35rem;font-size:.95rem}
+.tl-item p{font-size:.88rem;color:var(--ink3);margin:0;line-height:1.6}
+.findings-list{list-style:none;margin:1.5rem 0}
+.findings-list li{display:flex;gap:1rem;align-items:flex-start;padding:1rem 0;border-bottom:1px solid var(--rule)}
+.findings-list li:last-child{border-bottom:none}
+.finding-tag{font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .6rem;border-radius:2px;font-weight:600;flex-shrink:0;margin-top:.2rem}
+.finding-critical .finding-tag{background:var(--red-mid);color:var(--red)}
+.finding-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.findings-list li>div>strong{display:block;color:var(--ink);margin-bottom:.25rem}
+.findings-list li>div>p{margin:0;font-size:.88rem;color:var(--ink3)}
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;padding:1.1rem 0;border-bottom:1px solid var(--rule);align-items:start}
+.step-item:last-child{border-bottom:none}
+.step-num{font-family:var(--display);font-size:1.8rem;font-weight:900;color:var(--rule);line-height:1;text-align:right}
+.step-title{font-family:var(--mono);font-size:.78rem;letter-spacing:.04em;font-weight:600;color:var(--ink);margin-bottom:.4rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.cmmc-tag{font-family:var(--mono);font-size:.6rem;background:var(--red-dim);color:var(--red);padding:.1rem .45rem;border-radius:2px}
+.step-content p{margin:0;font-size:.88rem;color:var(--ink3)}
+.control-list{margin:1.5rem 0}
+.control-item{display:grid;grid-template-columns:1fr auto;gap:1rem;padding:.85rem 1rem;border-bottom:1px solid var(--rule);align-items:start}
+.control-item:first-child{border-top:1px solid var(--rule)}
+.control-item:last-child{border-bottom:none}
+.control-vector{font-size:.88rem;color:var(--ink);font-weight:600;margin-bottom:.2rem}
+.control-name{font-size:.78rem;color:var(--ink3);margin-bottom:.2rem}
+.control-id{font-family:var(--mono);font-size:.65rem;color:var(--red);letter-spacing:.06em}
+.control-right{text-align:right}
+.control-status{font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;padding:.25rem .6rem;border-radius:2px;font-weight:600}
+.status-red{background:var(--red-dim);color:var(--red)}
+.status-amber{background:var(--amber-dim);color:var(--amber)}
+.ioc-block{background:#0a0f1a;border-radius:4px;padding:1.25rem 1.5rem;margin:1.5rem 0;font-family:var(--mono);font-size:.78rem;line-height:1.9;color:#94a3b8}
+.ioc-block .ioc-label{color:#60a5fa;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.6rem}
+.ioc-block .ioc-val{color:#ef4444}
+.ioc-block .ioc-note{color:#64748b;font-size:.7rem}
+.xref{display:inline-flex;align-items:center;gap:.3rem;font-family:var(--mono);font-size:.72rem;color:var(--red);text-decoration:none;border-bottom:1px solid var(--red-dim);padding-bottom:1px;transition:color .2s}
+.xref:hover{color:var(--ink)}
+.xref::before{content:'↗';font-size:.7rem}
+.mobile-notice{display:none;background:#1e2d45;color:#94a3b8;font-family:var(--mono);font-size:.7rem;padding:.75rem 1.5rem;text-align:center;border-bottom:1px solid rgba(255,255,255,.08)}
+@media(max-width:1024px){.mobile-notice{display:block}}
+.bio{background:var(--ink);color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:4rem}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+footer{background:var(--ink2);color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+@media(max-width:700px){
+  .wrap,.mast-inner{padding:0 1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .split-visual{grid-template-columns:1fr}
+  .bio{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="mobile-notice">⚠ Intentionally desktop-first — best experienced on a workstation</div>
+<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Threat Analysis · Supply Chain</div>
+    <h1 class="title">The Trusted Channel —<br><em>TeamPCP, WAV Steganography, and the Nine-Day Credential Chain</em></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">March 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Threat Actor</div><div class="value">TeamPCP</div></div>
+      <div class="meta-item"><div class="label">Attack Type</div><div class="value">Supply Chain · Steganography</div></div>
+      <div class="meta-item"><div class="label">DIB Relevance</div><div class="value">High — Active Campaign</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    Active campaign · PyPI quarantined March 27, 2026 · Rotate all secrets if telnyx 4.87.1 or 4.87.2 was installed
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>The wrapper changed. The vulnerability&nbsp;didn't.</h2>
+
+  <p>If you remember the sound of a dial-up modem connecting, you remember what the early internet felt like — exciting, slightly lawless, and new enough that nobody had written the rules yet. Napster lived in that era. We knew what we were doing existed somewhere in a gray area — downloading files from strangers on the other side of the world whose names we'd never known. We justified it easily enough. We were young, we didn't have money, the music was right there, and everyone around us was doing the same thing. Nobody stopped to ask what else might be riding along in those files. The trust was in the platform, the familiarity, the sheer volume of other people doing it. That felt like enough.</p>
+
+  <p>Twenty-five years later, a threat actor called TeamPCP hid malware inside an audio file and delivered it through one of the most trusted software repositories in the world. The file was called <em>ringtone.wav</em>. The platform served over 300 billion downloads a year. Millions of developers used it daily without a second thought — because everyone around them was doing the same thing.</p>
+
+  <p>The wrapper changed. The vulnerability didn't.</p>
+
+  <p>This report examines how TeamPCP executed a nine-day credential-chaining campaign ending with the Telnyx Python package being poisoned on March 27, 2026 — and what it reveals about a structural trust problem that runs from open-source repositories straight through to the defense contractors building America's next generation of weapons systems.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Figure 1 — Full Campaign Scale</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-red">
+        <div class="stat-num">500K+</div>
+        <div class="stat-label">Corporate identities stolen</div>
+        <div class="stat-sub">Across Trivy · LiteLLM · Telnyx campaign</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">95M</div>
+        <div class="stat-label">Monthly downloads</div>
+        <div class="stat-sub">LiteLLM alone — AI infrastructure blast radius</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">9</div>
+        <div class="stat-label">Days — full chain</div>
+        <div class="stat-sub">Trivy backdoor to Telnyx poisoning</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">6h</div>
+        <div class="stat-label">Telnyx exposure window</div>
+        <div class="stat-sub">Publish to PyPI quarantine, March 27</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>What Telnyx is — and why that&nbsp;matters</h2>
+
+  <p>Telnyx is not a consumer product. Most people have never heard of it and that is by design — it is invisible infrastructure. It is a software development kit that developers drop into their applications to add phone call, SMS, and voice features without building that plumbing from scratch. You use an app that lets you call customer support with one tap or receive a verification code by text — something like Telnyx is probably behind it.</p>
+
+  <p>That invisibility is precisely what made it a target. Telnyx gets installed once and forgotten. It sits in a project's dependency list alongside dozens of other libraries, all trusted implicitly, none audited individually. A developer at a medical device company, a defense contractor, a financial institution does not install it because they evaluated it against alternatives. They install it because it has good documentation, a million downloads a month, and the team lead used it at the last job. Familiarity is the entire credential check.</p>
+
+  <p>PyPI — the Python Package Index — is where it lives. Think of it as an app store for developers, except it hosts over 500,000 packages and serves more than 300 billion downloads a year. It is critical infrastructure for essentially all modern software development, relied upon by defense contractors, hospitals, intelligence agencies, and financial institutions. It is also built almost entirely on trust. Anyone with a valid account and a publishing credential can push a new version of a package. The platform authenticates the sender. It does not inspect what was sent.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Who depends on PyPI:</strong> Python is the primary language for AI development, data analysis, and automation tooling across the defense industrial base. Electric Boat, Raytheon, Leidos, Pratt &amp; Whitney — their software teams pull from PyPI daily. So do developers at every medical device company, every hospital system, every intelligence contractor. The supply chain for American defense software runs through a nonprofit repository maintained largely by volunteers.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>Nine days. Three dominoes. One credential&nbsp;chain.</h2>
+
+  <p>The Telnyx compromise did not begin with Telnyx. It was the final link in a nine-day campaign where each successful attack handed TeamPCP the credentials to execute the next one. To understand how that chain worked, it helps to understand what CI/CD pipelines are — because that is where the credentials lived.</p>
+
+  <p>CI/CD stands for Continuous Integration / Continuous Deployment. It is the automated system that runs whenever a developer pushes new code: it tests the software, builds it, and publishes new versions to places like PyPI. These pipelines run automatically and to do their job they store credentials — publishing tokens, API keys, access secrets — as environment variables. Whoever holds those credentials can publish packages as if they were the legitimate author. TeamPCP's strategy was built entirely around that single fact.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-date">March 19, 2026</div>
+      <div class="tl-title">Stage 1 — Trivy backdoored · CVE-2026-33634 · CVSS 9.4</div>
+      <p>Trivy is an open-source vulnerability scanner by Aqua Security, used in thousands of CI/CD pipelines to check for security flaws before code ships to production. TeamPCP force-pushed malicious binaries to 75 of 77 Trivy GitHub Action tags. Every pipeline running Trivy without a pinned version silently downloaded the backdoor and executed it with full pipeline access. npm tokens, Docker credentials, and PyPI publishing tokens were swept from every victim. By end of day, 44 Aqua Security GitHub repositories had been renamed with the prefix <em>tpcp-docs-</em> — a taunt, and a calling card.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">March 20, 2026</div>
+      <div class="tl-title">Stage 2 — CanisterWorm deployed across 46+ npm packages</div>
+      <p>Using npm tokens stolen from Trivy victims, TeamPCP deployed CanisterWorm — a self-propagating backdoor that automated the next wave entirely. Given one stolen publishing token, it enumerated every package that token could publish to, bumped version numbers to appear as routine updates, and pushed malicious releases across entire package scopes. The full sweep completed in under 60 seconds. Every developer who ran a standard install command received the backdoor as part of what looked like a legitimate update.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">March 24, 2026</div>
+      <div class="tl-title">Stage 3 — LiteLLM PyPI package compromised</div>
+      <p>LiteLLM is a widely used Python library for developers building applications on top of AI models. TeamPCP poisoned it using PyPI tokens from Trivy victims. The harvester swept environment variables, .env files, and shell history from every system that imported it. Any developer or CI/CD pipeline with both LiteLLM installed and access to a Telnyx publishing token had already handed it over — without knowing. Researchers at Endor Labs: "the three-day gap fits the time needed to sift through stolen credentials and pick the next target."</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">March 27, 2026 · 03:51 UTC</div>
+      <div class="tl-title">Stage 4 — Telnyx poisoned with WAV steganography</div>
+      <p>Using the Telnyx PyPI token harvested from LiteLLM victims, TeamPCP published versions 4.87.1 and 4.87.2. The first had a typo that broke the payload — corrected 16 minutes later. Both packages carried a delivery mechanism that had not appeared in this campaign before: the payload was not embedded in the package at all. It was hidden inside WAV audio files fetched live from a command-and-control server, extracted in memory, and executed silently. By 10:13 UTC, PyPI had quarantined both versions. The window was six hours.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-red">
+    <p><strong>The pattern:</strong> TeamPCP never needed to breach Telnyx directly. No vulnerability in Telnyx's code was exploited. They held a valid publishing credential — stolen three steps back from a security scanner that thousands of pipelines trusted. The attack required no sophistication at the final stage because all the work had already been done upstream.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>Hiding malware in sound</h2>
+
+  <p>The first question most people ask when they hear about this attack is the same one I had: who still uses WAV files? The format feels dated — large, uncompressed, something from a recording studio or an old system alert. The answer is that WAV is used extensively in professional audio, broadcast, game development, medical equipment, and defense systems. But more to the point: a developer tool playing a notification tone uses WAV. It is unremarkable. Expected. Nobody questions a software package that fetches an audio file.</p>
+
+  <p>That is exactly why TeamPCP chose it.</p>
+
+  <h3>What steganography means in plain terms</h3>
+
+  <p>Steganography is hiding information inside something that does not look like it contains information. It is different from encryption — encryption scrambles data so it cannot be read; steganography conceals it so no one knows it exists at all. A WAV file is made of audio frames — data blocks that represent sound. TeamPCP packed executable malware into those frame bytes. The file still had a valid WAV header. Any tool checking whether it was a legitimate WAV confirmed it was. The malware sat where the audio samples should have been.</p>
+
+  <div class="split-visual">
+    <div class="split-panel left">
+      <div class="split-panel-title">✓ What security tools saw</div>
+      <p>An outbound HTTP request for a file called <code>ringtone.wav</code> from a package that had just been imported.</p>
+      <p>A valid WAV file returned — correct headers, correct structure, no executable content, no known malware signature.</p>
+      <p>Network monitoring logged an audio download and moved on.</p>
+    </div>
+    <div class="split-panel right">
+      <div class="split-panel-title">✗ What was actually happening</div>
+      <p>The WAV frames contained no audio. The bytes were an XOR-obfuscated payload extracted in memory using Python's built-in <code>wave</code> module.</p>
+      <p>On Windows: a persistent dropper placed in the Startup folder, executing on every reboot. On Linux/macOS: credentials swept and exfiltrated encrypted to the attacker's server.</p>
+      <p>No executable written to disk. No recognizable file. Minimal forensic trace.</p>
+    </div>
+  </div>
+
+  <h3>Why fetching the payload live changes everything</h3>
+
+  <p>TeamPCP's earlier attacks embedded payloads directly inside packages — static code that scanners eventually learned to flag. This version fetched the payload at runtime from a live server. The package itself contained almost nothing suspicious. Static analysis found little to flag. And because the payload lived on the attacker's server, TeamPCP retained full control after publication: they could update it, swap it, serve different malware based on operating system, or go silent without touching the package at all.</p>
+
+  <p>The weapon lived on the server. The package was just the trigger.</p>
+
+  <p>This is a direct iteration on how the previous generation of attacks got caught. In my earlier analysis of the Glassworm campaign — <a href="glassworm_analysis.html" class="xref">The Invisible Threat</a> — the payload was embedded directly in source code using invisible Unicode characters. Scanners eventually learned to detect that pattern. TeamPCP's response was to remove the payload from the package entirely. The detection gap that caught the previous technique was studied and engineered around. The attackers are reading the same security disclosures as the defenders.</p>
+
+</div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>The question everyone asks — and why it misses the&nbsp;point</h2>
+
+  <p>The instinctive response to this attack is reasonable: wouldn't developers be smart enough to catch it? They are technical people who read code and understand how systems work. Targeting them seems risky.</p>
+
+  <p>It is a reasonable instinct. It is also based on a false assumption — that developers had the opportunity to look.</p>
+
+  <p>When a developer wants to verify a package before installing it, they go to GitHub — the source code repository where the human-readable version lives. The GitHub source for Telnyx was completely clean. The poisoning existed only in the compiled artifact uploaded to PyPI: the thing developers actually downloaded, not the thing they could inspect. The one place a cautious developer would look showed them nothing wrong.</p>
+
+  <ul class="findings-list">
+    <li class="finding-critical">
+      <span class="finding-tag">Critical</span>
+      <div>
+        <strong>The source was clean — only the artifact was poisoned</strong>
+        <p>Neither version 4.87.1 nor 4.87.2 had a corresponding GitHub release tag — the one technical tell — but most automated dependency managers do not check for this. Developers who did the right thing found nothing wrong because the compromise happened at the delivery layer, not the source layer.</p>
+      </div>
+    </li>
+    <li class="finding-critical">
+      <span class="finding-tag">Critical</span>
+      <div>
+        <strong>The malware ran the instant the library was imported</strong>
+        <p>The malicious code was injected into <em>telnyx/_client.py</em> — the core file that loads when any Python application imports the library. No install hook to block, no suspicious script to review. Simply having <em>import telnyx</em> in an application was enough. In production environments, this means the malware activated on every server restart, every CI/CD build, every test run — potentially across dozens of machines in parallel during the six-hour window.</p>
+      </div>
+    </li>
+    <li class="finding-high">
+      <span class="finding-tag">High</span>
+      <div>
+        <strong>Professional environments train people to trust the channel</strong>
+        <p>In practice, developers trust their tools the same way anyone trusts a professional environment. A designer installs a plugin because it solves a problem. A developer imports a library because the team has used it for two years. In my own experience across enterprise environments, I was never once asked to verify what a third-party tool had access to before using it. No process existed for it. That is not negligence — it is how professional software development actually works at most organizations, including the ones that should know better.</p>
+      </div>
+    </li>
+  </ul>
+
+  <p><strong>The developer was not the target. The developer was the door.</strong> TeamPCP was not after personal files. They wanted what lives on a developer's machine at a defense contractor or medical company: cloud credentials, database tokens, GitHub access to internal repositories, API keys for production systems. The developer's workstation is the path to the infrastructure behind them — and it is typically the least monitored machine on the network, sitting in a gray zone between user endpoints and production servers.</p>
+
+</div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>The defense contractor gap — what CMMC doesn't&nbsp;cover</h2>
+
+  <p>Defense contractors handle this class of risk every day. The question of whether they adequately restrict what developers can install is one most organizations would prefer not to answer in writing.</p>
+
+  <p>On paper, the framework exists. CMMC Level 2 — now contractually mandatory for the 220,000+ contractors handling Controlled Unclassified Information — requires compliance with NIST SP 800-171 supply chain controls. Updated NIST guidance has introduced requirements for centralized component inventories, which amounts to a software bill of materials mandate. Lockheed Martin and Boeing are already requiring suppliers to document their compliance posture. The language is clear and the enforcement is real.</p>
+
+  <p>The reality on the ground is more complicated. In my analysis of the CMMC compliance landscape — <a href="CMMC_Supply_Chain.html" class="xref">The Weakest Link</a> — I documented that only 1% of defense contractors are currently audit-ready, a figure that has been declining as enforcement has increased. The barriers are structural: cost, understaffed IT teams, a compliance culture that treats certification as a checkbox rather than an actual security posture. A 50-person precision machining subcontractor handling technical drawings for an Electric Boat submarine program is not running a private PyPI mirror with vetted, approved packages. Their developers are pulling from the public registry the same way everyone else does.</p>
+
+  <p>More specifically: CMMC tells contractors what to protect. It does not tell developers which packages they are allowed to use. There is no approved library list. No package firewall. No process that intercepts a <em>pip install telnyx</em> command and asks whether this version has been verified against the GitHub source. The controls focus on protecting CUI after it enters the environment — not on what happens on a developer's workstation during an automated build at 3:51 in the morning.</p>
+
+  <p>That gap — between "you must protect your supply chain" and "your developer just imported malware during an automated build" — is exactly where TeamPCP operated.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The scenario:</strong> A developer at a Connecticut defense subcontractor is building an application using Telnyx for voice features. Their CI/CD pipeline runs a build at 4am. It imports the Telnyx library. The malware activates silently, harvests every credential on that machine — including a GitHub token with access to the repository where the program's source code lives — and exfiltrates it encrypted to a server in Eastern Europe. The developer starts work at 9am and notices nothing. The CMMC audit is scheduled for November.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 07 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 07</div>
+  <h2>What should have been in place</h2>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <div class="step-title">Version pinning on every dependency <span class="cmmc-tag">CM.2.061</span></div>
+        <p>Writing <em>telnyx</em> without a version number means the package manager downloads whatever is currently listed as latest — including any malicious update pushed with valid credentials. Pinning to an exact version is a one-line change that blocks silent updates. It is standard practice in security-conscious organizations and absent in most others.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <div class="step-title">Security tooling is not exempt from supply chain scrutiny</div>
+        <p>This attack began by compromising Trivy — a security scanner built to protect CI/CD pipelines from supply chain attacks. Organizations running Trivy without pinning its version were trusting a backdoored tool. The assumption that security tools are inherently trustworthy is exactly what TeamPCP exploited first. Every tool in a development environment, including the security tooling, must be version-pinned and verified.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <div class="step-title">CI/CD secrets require scoped, time-limited management <span class="cmmc-tag">IA.3.083</span></div>
+        <p>The Trivy backdoor harvested credentials by reading environment variables — the standard location for publishing tokens in CI/CD pipelines. A dedicated secrets vault with scoped, time-limited tokens means a single compromised tool cannot access credentials for unrelated systems. Most development teams store all credentials as plain environment variables readable by any process in the pipeline.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">04</div>
+      <div class="step-content">
+        <div class="step-title">Software bill of materials for every project <span class="cmmc-tag">SR.3.169</span></div>
+        <p>Without an SBOM, organizations cannot quickly determine whether a compromised package version exists anywhere in their environment when a supply chain attack is disclosed. Incident response that should take minutes takes hours of manual searching across projects. CMMC and updated NIST 800-172 guidance push toward SBOM requirements. This attack is the practical illustration of why that matters.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">05</div>
+      <div class="step-content">
+        <div class="step-title">Behavioral monitoring on build pipelines, not just production servers</div>
+        <p>The malware made an outbound HTTP request to a raw IP address on a non-standard port to fetch its audio payload. That connection is anomalous — a legitimate package import does not call home to 83.142.209.203:8080. Most organizations monitor production servers closely and build pipelines loosely. The pipelines hold the credentials. They deserve the same level of scrutiny.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 08 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 08</div>
+  <h2>MITRE ATT&CK mapping</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Technique ID</th>
+          <th>Technique</th>
+          <th>Severity</th>
+          <th>How it appeared in this attack</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="code"><strong>T1195.001</strong></td>
+          <td><strong>Supply Chain Compromise — Software Dependencies</strong></td>
+          <td class="red">Critical</td>
+          <td>Core technique. Legitimate packages poisoned by publishing malicious versions under valid stolen credentials. Downstream developers unknowingly installed malware as part of a routine dependency update.</td>
+        </tr>
+        <tr>
+          <td class="code"><strong>T1001.002</strong></td>
+          <td><strong>Data Obfuscation — Steganography</strong></td>
+          <td class="red">Critical</td>
+          <td>Malware payload encoded inside WAV audio frame data using XOR obfuscation, disguised as audio to bypass network inspection and endpoint security tools that do not flag audio file downloads as suspicious.</td>
+        </tr>
+        <tr>
+          <td class="code"><strong>T1552.001</strong></td>
+          <td><strong>Unsecured Credentials — Credentials in Files</strong></td>
+          <td class="red">Critical</td>
+          <td>Harvester specifically targeted .env files and shell history — standard locations where developers store API keys, database passwords, and service tokens in plaintext without additional protection.</td>
+        </tr>
+        <tr>
+          <td class="code"><strong>T1027</strong></td>
+          <td><strong>Obfuscated Files or Information</strong></td>
+          <td class="amber">High</td>
+          <td>Second-stage payload XOR-encoded inside WAV frames and executed in memory without being written to disk as a recognizable executable, evading static file scanning and complicating forensic recovery.</td>
+        </tr>
+        <tr>
+          <td class="code"><strong>T1041</strong></td>
+          <td><strong>Exfiltration Over C2 Channel</strong></td>
+          <td class="amber">High</td>
+          <td>Stolen credentials encrypted with AES-256-CBC and RSA-4096 then sent via HTTP POST to 83.142.209.203:8080 — the same server used to deliver the initial payload, doubling as both delivery and exfiltration infrastructure.</td>
+        </tr>
+        <tr>
+          <td class="code"><strong>T1547.001</strong></td>
+          <td><strong>Boot Autostart — Startup Folder</strong></td>
+          <td class="amber">High</td>
+          <td>On Windows, malware dropped as msbuild.exe into the Startup folder, executing automatically on every system restart and establishing persistent access beyond the initial six-hour exposure window.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 09 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 09</div>
+  <h2>Indicators of compromise and immediate&nbsp;actions</h2>
+
+  <p>Any environment that imported telnyx between 03:51 and 10:13 UTC on March 27, 2026 should be treated as fully compromised. The malware executed at import time — meaning it ran on every system start, every build, every test run during that window, potentially across dozens of machines simultaneously.</p>
+
+  <div class="ioc-block">
+    <div class="ioc-label">Malicious package versions</div>
+    <span class="ioc-val">telnyx==4.87.1</span> &nbsp; <span class="ioc-val">telnyx==4.87.2</span><br>
+    <span class="ioc-note">// Published 03:51–04:07 UTC March 27, 2026. Quarantined by PyPI. Last clean version: 4.87.0</span><br><br>
+
+    <div class="ioc-label">Command-and-control server</div>
+    <span class="ioc-val">83.142.209.203:8080</span><br>
+    <span class="ioc-note">// Block immediately. Any historical connection to this IP confirms active compromise.</span><br><br>
+
+    <div class="ioc-label">Payload filenames requested from C2</div>
+    <span class="ioc-val">hangup.wav</span> &nbsp;<span class="ioc-note">// Windows dropper</span><br>
+    <span class="ioc-val">ringtone.wav</span> &nbsp;<span class="ioc-note">// Linux/macOS credential harvester</span><br><br>
+
+    <div class="ioc-label">Windows persistence artifact</div>
+    <span class="ioc-val">%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\msbuild.exe</span><br>
+    <span class="ioc-note">// Delete if found. Check for accompanying .lock file in same directory.</span><br><br>
+
+    <div class="ioc-label">Exfiltration signature</div>
+    <span class="ioc-val">tpcp.tar.gz</span> &nbsp;·&nbsp; <span class="ioc-val">X-Filename: tpcp.tar.gz</span><br>
+    <span class="ioc-note">// TeamPCP signature in HTTP POST headers. Search proxy and network logs.</span>
+  </div>
+
+  <div class="control-list">
+    <div class="control-item">
+      <div>
+        <div class="control-vector">Remove malicious versions and pin to clean release</div>
+        <div class="control-name">Audit all requirements.txt, pyproject.toml, and Pipfile.lock files across every project. Replace telnyx==4.87.1 or 4.87.2 with telnyx==4.87.0. Pin to exact version going forward.</div>
+        <div class="control-id">Immediate · All affected environments</div>
+      </div>
+      <div class="control-right"><span class="control-status status-red">Immediate</span></div>
+    </div>
+    <div class="control-item">
+      <div>
+        <div class="control-vector">Rotate every credential in affected environments</div>
+        <div class="control-name">Treat all secrets accessible from any machine that imported the malicious package as stolen. API keys, SSH keys, database credentials, cloud tokens, GitHub tokens — rotate without exception.</div>
+        <div class="control-id">Immediate · Assume full environment compromise</div>
+      </div>
+      <div class="control-right"><span class="control-status status-red">Immediate</span></div>
+    </div>
+    <div class="control-item">
+      <div>
+        <div class="control-vector">Check Windows Startup folder for msbuild.exe</div>
+        <div class="control-name">On any Windows machine in the affected environment, check %APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\ for msbuild.exe and any .lock file. Delete both if found.</div>
+        <div class="control-id">Immediate · Windows systems only</div>
+      </div>
+      <div class="control-right"><span class="control-status status-red">Immediate</span></div>
+    </div>
+    <div class="control-item">
+      <div>
+        <div class="control-vector">Audit CI/CD pipelines for cascading exposure</div>
+        <div class="control-name">Review whether any affected pipeline also held credentials for other packages or platforms. TeamPCP's documented behavior is to use each compromise to enable the next. A pipeline with broad token access may have already funded a subsequent attack.</div>
+        <div class="control-id">Near-term · DevOps and security teams</div>
+      </div>
+      <div class="control-right"><span class="control-status status-amber">Near-term</span></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 10 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 10</div>
+  <h2>How it was caught, what was taken, and what comes&nbsp;next</h2>
+
+  <h3>Who discovered it — and how</h3>
+
+  <p>The compromise was not caught by PyPI's own systems, nor by Telnyx, nor by any developer who inspected the package. It was caught by private application security firms — specifically Socket and Endor Labs, who published their findings on March 27, with Aikido Security and Wiz (now part of Google Cloud) independently reaching the same conclusion within hours.</p>
+
+  <p>The detection method is worth understanding because it is replicable. The tell was a version mismatch between two places: the PyPI registry showed versions 4.87.1 and 4.87.2 as the latest releases, but the GitHub source repository had no corresponding release tags for either version. Version 4.87.0 had a tag. These two did not. That gap — a package that exists in the distribution channel but not in the source repository — is the fingerprint of a compromised publishing credential. Someone pushed to PyPI using a stolen token, not through a normal development and release process. Automated monitoring tools that compare PyPI publication history against GitHub release tags flagged the anomaly within hours.</p>
+
+  <p>This is a detection method that requires no advanced tooling. It requires only the discipline to check that what is published matches what was built.</p>
+
+  <h3>What TeamPCP actually has</h3>
+
+  <p>The scope of what the harvester collected goes significantly beyond "some credentials." On any Linux or macOS machine that imported the malicious package, the malware collected: SSH private keys and configurations, cloud provider credentials for AWS, Azure, and GCP, authentication tokens for Docker, npm, Git, and Vault, database connection strings, all environment variables and .env files containing embedded API keys and tokens, full shell and database command history, and cryptocurrency wallet data.</p>
+
+  <p>The worst-case scenario was Kubernetes. If a service account token existed anywhere on the compromised machine, the malware escalated beyond the workstation entirely — enumerating cluster secrets and deploying privileged pods to every node in kube-system, each mounting the host root filesystem. A developer's compromised laptop becomes a foothold inside the entire container infrastructure of the organization they work for.</p>
+
+  <p>On Windows the impact is different but persistent. The dropped executable in the Startup folder means those machines continue beaconing to TeamPCP's infrastructure on every reboot — even after the malicious package is removed. Removing the package does not remove the persistence implant. These are two separate remediation steps.</p>
+
+  <div class="callout callout-red">
+    <p><strong>This is no longer just a credential theft operation.</strong> TeamPCP has formally partnered with two other criminal groups to scale exploitation of the stolen credentials before victims complete remediation.</p>
+    <p style="margin-top:.75rem"><strong>Vect</strong> is an emerging ransomware-as-a-service operation — a model where a core criminal group builds the ransomware tool and then distributes it to a network of affiliates who carry out the actual attacks in exchange for a cut of the ransom. TeamPCP and Vect announced on BreachForums that all 300,000 registered forum users would receive personal Vect affiliate keys. The ransomware ecosystem will remember this for its scale: LockBit, the previous benchmark for ransomware operations, had only ever opened 73 affiliate accounts. TeamPCP just handed keys to 300,000 people.</p>
+    <p style="margin-top:.75rem"><strong>LAPSUS$</strong> is an international extortion group that became notorious between 2021 and 2022 for breaching Microsoft, Nvidia, Samsung, Okta, and Uber — not through sophisticated malware, but through social engineering, SIM swapping, and insider recruitment. What made them infamous is who they turned out to be: teenagers. At least two core members were under 18. One founding member was sentenced indefinitely to a secure psychiatric facility in the UK. Despite this, they successfully compromised some of the most defended organizations in the world. LAPSUS$ has already publicly claimed a 3GB breach of AstraZeneca using credentials from the TeamPCP campaign — internal code repositories, cloud infrastructure configurations, GitHub Enterprise data, and employee records.</p>
+    <p style="margin-top:.75rem">The credentials stolen from Telnyx victims are not sitting dormant. They are being actively distributed across a criminal network of unprecedented scale — right now.</p>
+  </div>
+
+  <h3>Should affected companies disclose — and to whom</h3>
+
+  <p>This is not only an ethical question. In most jurisdictions it is a legal obligation with specific timelines, and missing those timelines carries regulatory consequences that can dwarf the cost of the breach itself.</p>
+
+  <p>The answer depends on what data was accessible from the compromised environment. If harvested credentials provided access to systems containing personal data — customer records, employee information, healthcare data, financial data — breach notification laws almost certainly apply. For organizations in or serving customers across key jurisdictions:</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Jurisdiction / Framework</th>
+          <th>Applies to</th>
+          <th>Deadline</th>
+          <th>Notify</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Connecticut</strong></td>
+          <td class="code">Orgs with CT residents' data</td>
+          <td class="amber">60 days</td>
+          <td>Affected individuals + Attorney General</td>
+        </tr>
+        <tr>
+          <td><strong>New York / California</strong></td>
+          <td class="code">Orgs with NY/CA residents' data</td>
+          <td class="red">30 days</td>
+          <td>Affected individuals + state AG</td>
+        </tr>
+        <tr>
+          <td><strong>GDPR</strong></td>
+          <td class="code">Any org processing EU personal data</td>
+          <td class="red">72 hours</td>
+          <td>Supervisory authority; individuals if high risk</td>
+        </tr>
+        <tr>
+          <td><strong>SEC</strong></td>
+          <td class="code">US public companies</td>
+          <td class="red">4 business days</td>
+          <td>SEC Form 8-K if incident is material</td>
+        </tr>
+        <tr>
+          <td><strong>HIPAA</strong></td>
+          <td class="code">Healthcare organizations</td>
+          <td class="amber">60 days</td>
+          <td>HHS + affected individuals</td>
+        </tr>
+        <tr>
+          <td><strong>CIRCIA / DoD</strong></td>
+          <td class="code">Critical infrastructure + defense contractors</td>
+          <td class="red">72 hours</td>
+          <td>CISA + DoD Cyber Crime Center (DFARS 252.204-7012)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>A common misconception is that these obligations only apply if personal data was directly stolen. That is too narrow. If credentials were harvested that provided access to systems containing personal data, and those credentials have now been distributed to a ransomware affiliate network, the breach of downstream systems may already have occurred or may be imminent. The notification clock does not start when the ransomware deploys. It starts when you have reason to believe unauthorized access to personal data was made possible.</p>
+
+  <p>For defense contractors specifically: a compromised developer machine that held credentials for systems containing Controlled Unclassified Information triggers a reporting obligation to the DoD Cyber Crime Center within 72 hours of discovery under DFARS 252.204-7012. This is separate from, and in addition to, any state breach notification requirements.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The practical answer:</strong> If your organization imported telnyx 4.87.1 or 4.87.2, do not wait for a ransomware deployment to trigger your incident response plan. Engage legal counsel immediately. The question is not whether you need to disclose — it is which obligations apply, in which sequence, on which timeline. That determination needs to happen now, not after the next breach disclosure in your environment confirms the stolen credentials were used.</p>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>This report is Part 1 of a two-part analysis.</strong> The full scale of the TeamPCP campaign — 500,000+ stolen corporate identities, the ransomware payment paradox, the AI infrastructure problem, and who bears responsibility — is examined in <strong>Part 2: The Blast Radius</strong>. The questions of whether companies should pay ransoms, how criminal groups like Vect and LAPSUS$ form and collaborate, and what it means that the tools building AI are now actively compromised are addressed there in full.</p>
+  </div>
+
+</div>
+</div>
+
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Compliance Analyst &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance. This analysis was produced independently as a contribution to the security community's understanding of active threats against US defense infrastructure.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>The Trusted Channel · Yana Ivanov · 2026</span>
+  <span>Based on public reporting · For educational use · Independent analysis</span>
+</footer>
+
+</body>
+</html>

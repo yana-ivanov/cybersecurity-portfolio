@@ -87,6 +87,7 @@ body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:
 .card-featured-badge{font-family:var(--mono);font-size:.55rem;letter-spacing:.15em;color:#fff;background:var(--red);padding:.2rem .6rem;text-transform:uppercase;display:inline-block;margin-bottom:.75rem}
 .card-soon{opacity:.55;cursor:default;pointer-events:none}
 .card-soon-badge{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;color:#94a3b8;border:1px dashed #cbd5e1;padding:.2rem .5rem;display:inline-block;margin-bottom:.5rem}
+.card-series{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;color:var(--red);text-transform:uppercase;margin-bottom:.4rem;opacity:.8}
 .empty-state{text-align:center;padding:4rem 2rem;display:none}
 .empty-state.visible{display:block}
 .empty-icon{font-size:2.5rem;margin-bottom:1rem;opacity:.3}
@@ -165,14 +166,64 @@ footer a:hover{color:#60a5fa}
     </div>
     <div class="card-grid">
 
-      <!-- newest → oldest: Mar 25, Mar 17, Mar 16, Mar 15 (x2), Mar 14 (x2), Mar 2026 (x2), then policy -->
+      <!-- newest → oldest -->
 
-      <a href="analysis/data-breach-exposure-analysis.html" class="card card-featured portfolio-item" id="latest-report-card"
-         data-tags="threat-analysis identity"
-         data-title="data breach exposure analysis credential stuffing mitre attack cloud identity sso google azure entra id 38 breaches haveibeenpwned">
+      <!-- TEAMPCP SERIES — Part 1 (featured), Part 2, Part 3 -->
+
+      <a href="analysis/telnyx_supply_chain_analysis.html" class="card card-featured portfolio-item" id="latest-report-card"
+         data-tags="threat-analysis supply-chain"
+         data-title="telnyx supply chain teampcp wav steganography credential chain trivy litellm pypi nine days lapsus vect defense contractor cmmc">
         <div class="card-accent red" style="width:4px;height:auto;min-height:100%"></div>
         <div class="card-body">
           <div class="card-featured-badge">Latest Report</div>
+          <div class="card-category red">Threat Analysis · Supply Chain</div>
+          <div class="card-series">Series · Part 1 of 3</div>
+          <div class="card-title">The Trusted Channel — TeamPCP's Nine-Day Credential Chain and the WAV Steganography Attack</div>
+          <div class="card-desc">How TeamPCP poisoned the Telnyx Python package using WAV audio steganography — the final link in a nine-day credential chain running Trivy → LiteLLM → Telnyx. 500,000+ corporate identities stolen, 6-hour exposure window, direct implications for defense contractors on PyPI. Part 1 of a 3-part series. Continues in <em>The Blast Radius</em> and <em>The New Recruit</em>.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">TeamPCP</span><span class="card-tag">Steganography</span><span class="card-tag">Supply Chain</span><span class="card-tag">CMMC</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/telnyx_blast_radius.html" class="card portfolio-item"
+         data-tags="threat-analysis supply-chain"
+         data-title="telnyx blast radius teampcp vect lapsus ransomware insurance ai infrastructure litellm youth cybercrime criminal ecosystem">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Supply Chain</div>
+          <div class="card-series">Series · Part 2 of 3</div>
+          <div class="card-title">The Blast Radius — Criminal Ecosystems, AI Infrastructure, and the Cost of Looking Away</div>
+          <div class="card-desc">What the TeamPCP campaign reveals about the ransomware payment paradox, the insurance industry's role in funding criminal networks, the AI infrastructure single point of failure, and why a financially motivated criminal group is more alarming than a nation-state actor. Part 2 of 3 — continues in <em>The New Recruit</em>.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">TeamPCP</span><span class="card-tag">Ransomware</span><span class="card-tag">AI Infrastructure</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/telnyx_new_recruit.html" class="card portfolio-item"
+         data-tags="threat-analysis supply-chain"
+         data-title="new recruit gaming cybercrime pipeline youth recruitment roblox discord vr lapsus scattered spider home network defense contractor social engineering">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Supply Chain</div>
+          <div class="card-series">Series · Part 3 of 3</div>
+          <div class="card-title">The New Recruit — How Criminal Networks Build Their Next Generation of Attackers in Plain&nbsp;Sight</div>
+          <div class="card-desc">How criminal and state-sponsored groups use gaming platforms, influencer impersonation, and challenge-based talent scouting as deliberate recruitment infrastructure — and how that pipeline creates a direct attack surface against defense contractor home networks. Part 3 of 3.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Social Engineering</span><span class="card-tag">Youth Pipeline</span><span class="card-tag">Home Network</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/data-breach-exposure-analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis identity"
+         data-title="data breach exposure analysis credential stuffing mitre attack cloud identity sso google azure entra id 38 breaches haveibeenpwned">
+        <div class="card-accent red"></div>
+        <div class="card-body">
           <div class="card-category red">Threat Analysis · Identity & Credentials</div>
           <div class="card-title">38 Breaches, One Email Address — Anatomy of a Credential Attack Surface</div>
           <div class="card-desc">A SOC analyst case study mapping 13 years of personal data breach exposure to attacker methodology, threat actor profiles, and cloud identity risk. Covers credential stuffing attack chains, Everest ransomware, infostealer operators, MITRE ATT&CK mapping, and the SSO single-point-of-failure risk that mirrors Azure Entra ID vulnerabilities at enterprise scale. Includes live pwned password checker.</div>

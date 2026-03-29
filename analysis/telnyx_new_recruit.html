@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The New Recruit — How Criminal Networks Build Their Next Generation of Attackers | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --ink:#0a0f1a; --ink2:#1e2d45; --ink3:#374151;
+  --red:#c0392b; --red-dim:rgba(192,57,43,0.08); --red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309; --amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0; --blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32; --green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0; --bg:#f8fafc; --paper:#ffffff;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4',Georgia,serif;
+  --display:'Playfair Display',Georgia,serif;
+  --display-clean:'IBM Plex Serif',Georgia,serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-kicker::before,.mast-kicker::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#ef4444;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:10px;height:10px;border-radius:50%;background:#fff;flex-shrink:0;margin-right:.5rem;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p:last-child{margin-bottom:0}
+.callout{padding:1.25rem 1.5rem;border-radius:4px;margin:1.75rem 0;border-left:4px solid;box-shadow:var(--shadow)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout p+p{margin-top:.75rem}
+.callout strong{color:var(--ink)}
+.mat-card{background:var(--paper);border-radius:6px;box-shadow:var(--shadow-md);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:1rem 1.5rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.25rem 1rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.8rem;font-weight:700;line-height:1;margin-bottom:.4rem}
+.stat-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;color:var(--ink3);text-transform:uppercase;margin-bottom:.4rem;line-height:1.4}
+.stat-sub{font-size:.72rem;color:#94a3b8;line-height:1.5}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+.findings-list{list-style:none;margin:1.5rem 0}
+.findings-list li{display:flex;gap:1rem;align-items:flex-start;padding:1rem 0;border-bottom:1px solid var(--rule)}
+.findings-list li:last-child{border-bottom:none}
+.finding-tag{font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .6rem;border-radius:2px;font-weight:600;flex-shrink:0;margin-top:.2rem}
+.finding-critical .finding-tag{background:var(--red-mid);color:var(--red)}
+.finding-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.finding-medium .finding-tag{background:var(--blue-dim);color:var(--blue)}
+.findings-list li>div>strong{display:block;color:var(--ink);margin-bottom:.25rem}
+.findings-list li>div>p{margin:0;font-size:.88rem;color:var(--ink3)}
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;padding:1.1rem 0;border-bottom:1px solid var(--rule);align-items:start}
+.step-item:last-child{border-bottom:none}
+.step-num{font-family:var(--display);font-size:1.8rem;font-weight:900;color:var(--rule);line-height:1;text-align:right}
+.step-title{font-family:var(--mono);font-size:.78rem;letter-spacing:.04em;font-weight:600;color:var(--ink);margin-bottom:.4rem}
+.step-content p{margin:0;font-size:.88rem;color:var(--ink3)}
+.timeline{margin:1.5rem 0;border-left:2px solid var(--rule);padding-left:2rem}
+.tl-item{position:relative;padding:.5rem 0 1.5rem}
+.tl-item::before{content:'';position:absolute;left:-2.4rem;top:.6rem;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tl-date{font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;color:var(--red);text-transform:uppercase;margin-bottom:.25rem}
+.tl-title{font-weight:700;color:var(--ink);margin-bottom:.35rem;font-size:.95rem}
+.tl-item p{font-size:.88rem;color:var(--ink3);margin:0;line-height:1.6}
+.pull-quote{border-left:4px solid var(--red);padding:1.25rem 1.5rem;margin:2rem 0;background:var(--paper);box-shadow:var(--shadow)}
+.pull-quote p{font-family:var(--display);font-size:1.15rem;font-style:italic;color:var(--ink2);margin:0;line-height:1.6}
+.pull-quote cite{display:block;font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;color:#94a3b8;margin-top:.6rem;font-style:normal}
+.xref{display:inline-flex;align-items:center;gap:.3rem;font-family:var(--mono);font-size:.72rem;color:var(--red);text-decoration:none;border-bottom:1px solid var(--red-dim);padding-bottom:1px;transition:color .2s}
+.xref:hover{color:var(--ink)}
+.xref::before{content:'↗';font-size:.7rem}
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+.mobile-notice{display:none;background:#1e2d45;color:#94a3b8;font-family:var(--mono);font-size:.7rem;padding:.75rem 1.5rem;text-align:center;border-bottom:1px solid rgba(255,255,255,.08)}
+@media(max-width:1024px){.mobile-notice{display:block}}
+.bio{background:var(--ink);color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:4rem}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+footer{background:var(--ink2);color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+@media(max-width:700px){
+  .wrap,.mast-inner{padding:0 1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .split-visual{grid-template-columns:1fr}
+  .bio{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="mobile-notice">⚠ Intentionally desktop-first — best experienced on a workstation</div>
+<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Threat Analysis · Social Engineering · Youth Pipeline</div>
+    <h1 class="title">The New Recruit —<br><em>How Criminal Networks Build Their Next Generation of Attackers in Plain Sight</em></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">March 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Related Reports</div><div class="value">The Trusted Channel · The Blast Radius</div></div>
+      <div class="meta-item"><div class="label">Threat Vector</div><div class="value">Social Engineering · Youth Recruitment</div></div>
+      <div class="meta-item"><div class="label">DIB Relevance</div><div class="value">High — Home Network Attack Surface</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    Active threat · Gaming platforms as recruitment infrastructure · Home network as corporate perimeter gap
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>The attacker in the next room</h2>
+
+  <p>I have 8-year-old sons. They play Roblox. They put on VR headsets and talk to strangers in games. They watch YouTube and know the names, voices, and catchphrases of creators they have never met as well as they know their own classmates. I have adult conversations with them about online dangers — not rules without reasons, but explanations of why those rules exist. They know not to share their names, their school, where they live.</p>
+
+  <p>What they do not know — what almost no child knows, and what most adults have not thought through — is that the information an attacker actually needs to compromise a corporate network is not their name or address. It is a file download, a Wi-Fi password, a credential entered into the wrong form, a router number read off a sticker. None of those feel dangerous. None of them are covered by any version of stranger-danger education that currently exists.</p>
+
+  <p>This report is a cybersecurity analysis of how criminal and state-sponsored groups deliberately use gaming platforms, influencer culture, and challenge-based talent scouting as recruitment infrastructure — and how that infrastructure creates a direct attack surface against the defense contractors, hospitals, and financial institutions whose employees work from home. The parent perspective is the analytical lens, not the subject. It provides visibility into this attack surface that a researcher without children in these environments simply does not have.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Figure 1 — The Youth Cybercrime Profile</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-red">
+        <div class="stat-num">19</div>
+        <div class="stat-label">Average arrest age</div>
+        <div class="stat-sub">For cybercrime — vs. 37 for any other crime. FBI data.</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">61%</div>
+        <div class="stat-label">Start before 16</div>
+        <div class="stat-sub">Of convicted hackers began hacking before age 16</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">13</div>
+        <div class="stat-label">Youngest documented</div>
+        <div class="stat-sub">Age at which some Scattered Spider members began offending</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">11</div>
+        <div class="stat-label">Started hacking at</div>
+        <div class="stat-sub">Arion Kurtaj — LAPSUS$ — breached Microsoft, Nvidia, Uber</div>
+      </div>
+    </div>
+  </div>
+
+  <p>These are not outliers. They are the demographic profile of modern cybercrime. The FBI's own data makes the age disparity unambiguous — cybercrime arrests skew younger than any other criminal category by nearly two decades. Understanding why requires understanding what criminal networks have figured out about where young talent lives, how it thinks, and how easily it can be reached.</p>
+
+</div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>Why young people are the attacker's competitive&nbsp;advantage</h2>
+
+  <p>Criminal recruitment of young people is not opportunistic. It is deliberate, systematic, and built on a genuine understanding of adolescent psychology that most security awareness programs have not caught up with.</p>
+
+  <p>The qualities that make a young person an exceptional attacker are the same qualities that make them exceptional at competitive gaming, mathematics, and systems thinking — pattern recognition under pressure, rapid iteration, comfort with failure and retry, the drive to prove capability, and an appetite for recognition among peers. These are not vulnerabilities. They are strengths being exploited by people who understand them better than most educators or parents do.</p>
+
+  <p>The neuroscience matters here. The prefrontal cortex — the brain region governing consequence assessment, long-term planning, and impulse control — does not fully develop until the mid-twenties. Adolescent brains are structurally predisposed toward risk-taking, novelty-seeking, and peer validation. The thrill of compromising a system, the status of being recognized as skilled by a community, the sense of capability that comes from doing something a Fortune 500 company's security team couldn't prevent — these rewards are neurologically more compelling to a teenager than the abstract future consequences of a federal crime they don't fully believe will materialize.</p>
+
+  <p>There is also the sentencing calculation — and criminal networks are explicitly aware of it. Juvenile criminal records are sealed. Sentences for minors are dramatically lighter than adult equivalents for comparable harm. Recruiting minors for the riskiest operational roles — making social engineering calls, establishing initial access, acting as money mules — provides plausible deniability for the adults running the operation and limits criminal exposure at the point of highest risk. The system designed to protect young people from the consequences of immaturity is being systematically exploited by criminal organizations that understand it better than most prosecutors.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>LAPSUS$ as the documented case study:</strong> At least two core members were teenagers when they breached Microsoft, Nvidia, Samsung, Okta, and Uber. The most prominent member, Arion Kurtaj, started hacking at age 11 and was sentenced to indefinite detention in a secure psychiatric facility at 18 — not prison, because he was found unfit to stand trial. The LAPSUS$ group is now partnered with TeamPCP and involved in active exploitation of credentials stolen in the supply chain campaign documented in <a href="telnyx_blast_radius.html" class="xref">The Blast Radius</a>. The teenagers who breached the most defended organizations in the world are now part of the infrastructure targeting defense contractors in 2026.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>The pipeline — from gaming to&nbsp;crime</h2>
+
+  <p>The path from competitive gaming to criminal activity is not a sudden leap. It is a gradual progression through environments that look entirely normal — gaming communities, Discord servers, online forums — where the boundary between legitimate skill development and criminal application is crossed incrementally, often without the participant registering the transition.</p>
+
+  <p>The progression is documented and consistent across cases. It begins in gaming spaces because that is where the talent is and where recruitment is invisible. A young person who develops high-level gaming skills is already building the cognitive toolkit that makes a capable attacker. Criminal groups have learned to identify and recruit from these communities deliberately — fake job postings promising easy money and training, Discord servers that move recruits from casual channels into restricted ones, escalating task assignments that feel like game challenges until they don't.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-date">Stage 1 — Contact</div>
+      <div class="tl-title">Gaming platform — initial relationship building</div>
+      <p>Contact is made in a game environment. Roblox, Fortnite, Minecraft, VR platforms. The recruiter presents as a peer — another player, a helpful older kid, someone with more experience and status in the game. The relationship builds over days or weeks through normal gameplay. Nothing is asked yet. Trust is being constructed.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">Stage 2 — Migration</div>
+      <div class="tl-title">Discord — moving off the monitored platform</div>
+      <p>The relationship migrates to Discord — a platform with no meaningful age verification, direct messaging outside parental visibility, and private servers where access is controlled by the recruiter. Discord serves as the transition point between the public gaming environment and the private operational channel. Nearly every documented case of gaming-platform-initiated exploitation follows this exact progression: meet on Roblox, move to Discord.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">Stage 3 — Testing</div>
+      <div class="tl-title">Escalating challenges — talent identification</div>
+      <p>The recruit is given puzzles, tasks, and challenges that feel like games. The framing is entirely benign — prove your skills, unlock the next level, show what you can do. The recruit thinks they are playing. They are being evaluated. The tasks escalate in complexity and gradually in legal exposure. By the time an assignment is recognizably criminal, the recruit is invested in the community, the identity, and the recognition — and has often already committed crimes without understanding that is what happened.</p>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">Stage 4 — Activation</div>
+      <div class="tl-title">Real tasks with real consequences</div>
+      <p>The recruit is now an operational asset. Tasks include social engineering calls, money mule transactions, initial access operations, credential harvesting. The criminal organization retains plausible deniability because the recruit is a minor. The recruit often does not understand the full scope of what they are participating in until law enforcement involvement makes it undeniable.</p>
+    </div>
+  </div>
+
+  <h3>The influencer impersonation vector</h3>
+
+  <p>Gaming culture has produced a class of YouTube and streaming creators who occupy a unique psychological space in young people's lives. A child who has watched the same creator daily for years develops what psychologists call a parasocial relationship — a one-sided bond that feels mutual and genuine to the child even though the creator has no awareness of their existence. The child knows this person's voice, their humor, their values, their catchphrases. They do not experience them as a stranger.</p>
+
+  <p>When a bad actor impersonates that creator in a game environment — "I'm doing a special video, I need a skilled player to help me with something" — the child's normal social filters do not activate. This is not a stranger. This is someone they know and trust. The request that follows does not need to seem suspicious. It just needs to be framed as an opportunity: to be on a video, to join a private server, to help with something that will be seen by millions.</p>
+
+  <p>The cybercrime recruitment application is specific: impersonating a respected technical creator or game developer to identify and approach skilled young players with what appears to be a career or recognition opportunity. "I want to show you something, I want you on my team, don't post about this yet." The secrecy framing is the tell — real creators do not ask their audience to keep contact secret. But a child who has been offered what feels like the most exciting thing that has ever happened to them is not applying critical analysis to the request.</p>
+
+</div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>The home as the corporate perimeter&nbsp;gap</h2>
+
+  <p>The scenarios described above are concerning as child safety issues. They become national security issues when the child in question lives in a household where a parent works at a defense contractor, hospital, or financial institution and accesses corporate systems remotely from home.</p>
+
+  <p>Corporate security teams secure the office. They do not secure the home. The VPN connection that bridges the gap between a defense contractor's network and an employee's living room passes through a home router that was installed by an ISP technician, has never been audited, and whose credentials are known to everyone in the household including the children. That router is the perimeter — and it is defended by nothing except the assumption that no one is trying to reach it.</p>
+
+  <h3>What a child can be guided to provide</h3>
+
+  <p>A sophisticated attacker targeting a defense contractor employee through their child does not need the child to understand what they are doing. They need the child to perform one small action that feels completely harmless. Consider the following scenarios — each one documented as a real attack class, each one achievable through a conversation in a game:</p>
+
+  <ul class="findings-list">
+    <li class="finding-critical">
+      <span class="finding-tag">Critical</span>
+      <div>
+        <strong>Download a file — "I made a special mod/skin/game for you"</strong>
+        <p>The child downloads and runs a file that is a remote access trojan. It installs silently and gives the attacker persistent access to that device. Every password typed on a family computer — including VPN credentials — is captured and transmitted. The child installed what they believed was a free game enhancement. They have no awareness anything happened.</p>
+      </div>
+    </li>
+    <li class="finding-critical">
+      <span class="finding-tag">Critical</span>
+      <div>
+        <strong>Enter a parent's credentials — "Log in as your parent to unlock this"</strong>
+        <p>The child is told a feature requires a parent account. They enter their parent's email and password. The attacker now has those credentials — and potentially access to every service that uses that email for password recovery, including VPN clients, corporate email forwarded to personal accounts, and two-factor authentication if the phone number is linked.</p>
+      </div>
+    </li>
+    <li class="finding-high">
+      <span class="finding-tag">High</span>
+      <div>
+        <strong>Share the Wi-Fi password — "I need to check your connection"</strong>
+        <p>Most children know the Wi-Fi password. It is on a note, they've typed it themselves, it is saved visibly in device settings. Children are taught not to share their address. They have almost never been told that the Wi-Fi password is sensitive information. An attacker with the network name and password — and the home address that can often be inferred from school, sports team, or social media context — has network access.</p>
+      </div>
+    </li>
+    <li class="finding-high">
+      <span class="finding-tag">High</span>
+      <div>
+        <strong>Install a browser extension — "This gives you extra features"</strong>
+        <p>Browser extensions have access to everything in the browser — all tabs, all form data, all passwords as they are typed, all session cookies including active corporate logins. A malicious extension installed on a family computer is one of the most comprehensive credential-harvesting tools available. A child installing one at the direction of someone in a game has no way to recognize what it does.</p>
+      </div>
+    </li>
+    <li class="finding-medium">
+      <span class="finding-tag">Medium</span>
+      <div>
+        <strong>Change a network setting — "This will fix your lag"</strong>
+        <p>The attacker walks the child through disabling the firewall, opening a port, or modifying a security setting — framed as a technical gaming fix. The child follows instructions from someone they trust, does not understand what the instructions mean, and has removed a security layer protecting every device on the network.</p>
+      </div>
+    </li>
+  </ul>
+
+  <p>The common thread across all of these is the same: none require the child to understand what they are doing, none feel dangerous in the moment, and none are covered by any version of online safety education that currently exists. Stranger danger was designed for physical encounters with unknown adults. It has almost no operational relevance to the actual attack surface a child represents in 2026.</p>
+
+  <h3>AI-assisted targeting changes the scale</h3>
+
+  <p>A bad actor in 2026 does not randomly approach children in games hoping to find one whose parent works at a defense contractor. They research first. LinkedIn identifies the parent's employer and role. A school directory or sports team social media post establishes which platform the child uses and often their username. A few minutes of open-source reconnaissance before any contact is made establishes whether this child's household represents a worthwhile target. The conversation in the game is the last step of a process that started elsewhere. By the time a recruiter approaches a child, the targeting has already been done.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The defense contractor scenario:</strong> A parent works at Electric Boat in Groton. Their child plays Roblox after school. A bad actor identifies the parent on LinkedIn, finds the child's gaming profile through a school's social media post, establishes contact in a game over two weeks, and asks the child to download a file that "fixes connection lag." The child does. A remote access trojan installs on the family computer. When the parent VPNs into Electric Boat's network that evening, the attacker has a foothold inside a program building nuclear submarines for the US Navy. No phishing email. No corporate network intrusion. One conversation with a child who thought they were getting help with a game.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>Why the attacker side wins the talent&nbsp;war</h2>
+
+  <p>The cybersecurity industry has a documented talent shortage measured in millions of unfilled positions globally. It responds to that shortage with certification programs, degree requirements, structured career pathways, and hiring processes that can take months. Meanwhile the criminal ecosystem recruits continuously, in the exact environments where young talent is already spending its time, with immediate rewards in the currency young people value — recognition, access, status, and eventually money — and zero bureaucratic friction.</p>
+
+  <p>The competitive asymmetry is stark. Criminal recruitment finds talent where it lives. Legitimate cybersecurity recruitment waits for talent to find it.</p>
+
+  <div class="split-visual">
+    <div class="split-panel left">
+      <div class="split-panel-title">✓ Defender talent pipeline</div>
+      <p>Certification programs with prerequisites. College degrees taking four years. Hiring processes requiring background checks and clearances. Job postings that require experience for entry-level roles. Industry conferences that cost thousands of dollars to attend. Career pathways that are largely invisible to someone who has not already found their way in.</p>
+    </div>
+    <div class="split-panel right">
+      <div class="split-panel-title">✗ Attacker talent pipeline</div>
+      <p>Present in gaming communities, Discord servers, and online forums where talent already is. Immediate recognition and rewards. Escalating challenges that feel like games. No credentials required. No waiting. Active recruitment of exactly the competitive, pattern-recognition-driven profile that the defender side also wants — reached years before the defender side tries.</p>
+    </div>
+  </div>
+
+  <p>The gaming-to-cybercrime pipeline documented throughout this analysis is not a side effect of online gaming culture. It is a deliberate talent acquisition strategy that criminal organizations have been executing systematically while the cybersecurity industry has been focused on its certification pipeline. The talent being recruited is real. The skills being developed are genuine. The only question is who reaches it first — and right now that question has a consistent answer.</p>
+
+  <p>Organizations like <a href="https://www.affinityesports.gg/" target="_blank" class="xref">Affinity Esports</a> represent the kind of competitive environment where the next generation of security analysts is already developing the pattern recognition, systems thinking, and competitive drive the field needs. The gap is not in the talent. It is in who is present where that talent develops, offering visible pathways before criminal networks do.</p>
+
+  <p>Programs like CyberPatriot — the Air Force Association's national youth cyber education program — and CISA's K-12 cybersecurity education initiatives exist and are producing results. They are reaching a fraction of the young people who need to be reached. The criminal ecosystem has no equivalent budget constraint. It recruits wherever talent exists because there is no cost to reaching one more child in one more game.</p>
+
+</div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>What changes&nbsp;this</h2>
+
+  <p>The technical controls — parental controls, router-level filtering, platform safety features — address some of the attack surface some of the time. They do not address voice communication, which is the most intimate channel children use and the least monitored. They do not address social engineering, which operates through conversation rather than technology. And they are systematically bypassed by motivated young people in ways that are well documented and easy to find online.</p>
+
+  <p>Three structural changes actually move the needle.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <div class="step-title">Update the threat model children are given</div>
+        <p>Stranger danger covers physical encounters with unknown adults. It was designed for a world that no longer exists as the primary risk environment for children. The specific information that creates attack surface in 2026 — Wi-Fi passwords, router credentials, parent account logins, downloaded files, browser extensions — is not covered in any version of online safety education currently in wide use. Children need to know not just "don't talk to strangers" but "this specific category of information is what an attacker actually needs, and here is why it matters even though it doesn't feel sensitive." That requires adults who understand the threat well enough to explain it — which is currently rare.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <div class="step-title">Build the defender pipeline where the attackers recruit</div>
+        <p>The cybersecurity industry cannot solve its talent shortage by waiting for talent to find it. It needs to be present in gaming communities, esports organizations, and online technical spaces with the same visibility and immediacy that criminal recruiters have. Not to monitor those spaces — to offer something better than what criminal networks are offering. Mentorship, visible career pathways, and the straightforward message that the skills being developed in these environments are genuinely valuable and genuinely needed on the defense side of this fight. The talent is there. The recruiters are there. The defenders are not.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <div class="step-title">Treat the home network as part of the corporate security perimeter</div>
+        <p>Defense contractors and other organizations with classified or sensitive programs provide security training about phishing, password hygiene, and device security. Almost none of them address the home network as a corporate attack surface — which it functionally is the moment an employee connects a VPN. Extending security awareness to cover the specific home network vulnerabilities that can be exploited through a child in a game is not a parenting program. It is a corporate security requirement that has not yet been recognized as one. The weakest point in a defense contractor's security posture may currently be an 8-year-old with a headset on.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>This report is part of a three-part analysis of the TeamPCP supply chain campaign and its broader implications.</strong> The technical attack is documented in <a href="telnyx_supply_chain_analysis.html" class="xref">The Trusted Channel</a>. The criminal ecosystem, ransomware economy, and AI infrastructure problem are examined in <a href="telnyx_blast_radius.html" class="xref">The Blast Radius</a>. The scenario documented in Section 04 of this report — a child as the unwitting entry point to a corporate network — is the human layer of the same attack surface those reports describe at the technical level. The firewall does not protect against a child who has been asked to turn it off.</p>
+  </div>
+
+</div>
+</div>
+
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Compliance Analyst &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance. This analysis was produced independently as a contribution to the security community's understanding of active threats against US defense infrastructure.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>The New Recruit · Yana Ivanov · 2026</span>
+  <span>Based on public reporting · For educational use · Independent analysis</span>
+</footer>
+
+</body>
+</html>

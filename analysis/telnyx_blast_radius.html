@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Blast Radius — Part 2 | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4',Georgia,serif;
+  --display:'Playfair Display',Georgia,serif;
+  --display-clean:'IBM Plex Serif',Georgia,serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-kicker::before,.mast-kicker::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#ef4444;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:10px;height:10px;border-radius:50%;background:#fff;flex-shrink:0;margin-right:.5rem;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p:last-child{margin-bottom:0}
+.callout{padding:1.25rem 1.5rem;border-radius:4px;margin:1.75rem 0;border-left:4px solid;box-shadow:var(--shadow)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+.mat-card{background:var(--paper);border-radius:6px;box-shadow:var(--shadow-md);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:1rem 1.5rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.25rem 1rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.8rem;font-weight:700;line-height:1;margin-bottom:.4rem}
+.stat-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.06em;color:var(--ink3);text-transform:uppercase;margin-bottom:.4rem;line-height:1.4}
+.stat-sub{font-size:.72rem;color:#94a3b8;line-height:1.5}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;padding:1.1rem 0;border-bottom:1px solid var(--rule);align-items:start}
+.step-item:last-child{border-bottom:none}
+.step-num{font-family:var(--display);font-size:1.8rem;font-weight:900;color:var(--rule);line-height:1;text-align:right}
+.step-title{font-family:var(--mono);font-size:.78rem;letter-spacing:.04em;font-weight:600;color:var(--ink);margin-bottom:.4rem}
+.step-content p{margin:0;font-size:.88rem;color:var(--ink3)}
+.pull-quote{border-left:4px solid var(--red);padding:1.25rem 1.75rem;margin:2rem 0;background:var(--paper);box-shadow:var(--shadow)}
+.pull-quote p{font-family:var(--display);font-size:1.15rem;font-style:italic;color:var(--ink2);line-height:1.6;margin:0}
+.pull-quote .attribution{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;color:var(--red);text-transform:uppercase;margin-top:.75rem;font-style:normal;display:block}
+.xref{display:inline-flex;align-items:center;gap:.3rem;font-family:var(--mono);font-size:.72rem;color:var(--red);text-decoration:none;border-bottom:1px solid var(--red-dim);padding-bottom:1px;transition:color .2s}
+.xref:hover{color:var(--ink)}
+.xref::before{content:'↗';font-size:.7rem}
+.part-link{display:inline-flex;align-items:center;gap:.3rem;font-family:var(--mono);font-size:.72rem;color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(26,79,160,.2);padding-bottom:1px;transition:color .2s}
+.part-link:hover{color:var(--ink)}
+.part-link::before{content:'↗';font-size:.7rem}
+.mobile-notice{display:none;background:#1e2d45;color:#94a3b8;font-family:var(--mono);font-size:.7rem;padding:.75rem 1.5rem;text-align:center;border-bottom:1px solid rgba(255,255,255,.08)}
+@media(max-width:1024px){.mobile-notice{display:block}}
+.bio{background:var(--ink);color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:4rem}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+footer{background:var(--ink2);color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+@media(max-width:700px){
+  .wrap,.mast-inner{padding:0 1.5rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .bio{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="mobile-notice">&#9888; Intentionally desktop-first &#8212; best experienced on a workstation</div>
+<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Threat Analysis &middot; Supply Chain &middot; Part 2 of 2</div>
+    <h1 class="title">The Blast Radius &#8212;<br><em>Criminal Ecosystems, the Ransom Economy, and the Cost of Looking Away</em></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">March 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public &#8212; Educational</div></div>
+      <div class="meta-item"><div class="label">Follows</div><div class="value">The Trusted Channel &middot; Part 1</div></div>
+      <div class="meta-item"><div class="label">Threat Actor</div><div class="value">TeamPCP &middot; Vect &middot; LAPSUS$</div></div>
+      <div class="meta-item"><div class="label">Scope</div><div class="value">Global &middot; Active Campaign</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    Continues from Part 1 &middot; 500,000+ corporate identities stolen &middot; Ransomware affiliate network now active
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>The numbers nobody put on the&nbsp;front&nbsp;page</h2>
+
+  <p>This report is Part 2 of a two-part analysis. <a href="telnyx_supply_chain_analysis.html" class="part-link">Part 1 &#8212; The Trusted Channel</a> covered how TeamPCP executed the nine-day credential-chaining campaign that ended with the Telnyx Python package being poisoned on March 27, 2026. This report examines what it means.</p>
+
+  <p>Most coverage of the TeamPCP campaign focused on the technical mechanics &#8212; the WAV steganography, the version mismatch that gave it away, the immediate remediation steps. Those things matter. But they are not the story. The story is the scale, who is behind it, what they are doing with what they took, and what it exposes about the systems we have built to defend ourselves.</p>
+
+  <p>Start with the numbers.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Figure 1 &#8212; The Full Campaign Scale</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-red">
+        <div class="stat-num">500K+</div>
+        <div class="stat-label">Corporate identities stolen</div>
+        <div class="stat-sub">Across the full Trivy &middot; LiteLLM &middot; Telnyx chain</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">300GB</div>
+        <div class="stat-label">Compressed credentials</div>
+        <div class="stat-sub">Exfiltrated &#8212; actively being distributed now</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">95M</div>
+        <div class="stat-label">LiteLLM monthly downloads</div>
+        <div class="stat-sub">AI infrastructure blast radius &#8212; every major LLM provider in scope</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">300K</div>
+        <div class="stat-label">Ransomware affiliate keys</div>
+        <div class="stat-sub">Distributed to BreachForums users &#8212; largest affiliate program ever documented</div>
+      </div>
+    </div>
+  </div>
+
+  <p>To put those numbers in context: LockBit &#8212; the ransomware operation that dominated headlines for three years and caused billions in damage &#8212; operated with 73 affiliate accounts. TeamPCP and Vect just handed ransomware keys to 300,000 people. That is not a ransomware group. That is a ransomware economy.</p>
+
+  <p>The 500,000 corporate identities figure comes from TeamPCP's own communications, so treat it with appropriate skepticism &#8212; criminal groups routinely exaggerate. But even if the real number is half that, this campaign represents the largest documented credential theft operation from the open-source software supply chain in history. The credentials stolen from LiteLLM alone &#8212; 95 million monthly downloads, direct dependency of CrewAI, DSPy, Mem0, and five other major AI frameworks &#8212; include API keys for OpenAI, Anthropic, Google Vertex, and AWS Bedrock from thousands of enterprise environments.</p>
+
+  <p>These are not sitting in a database waiting to be used someday. The FBI Assistant Director of Cyber Division stated publicly: <em>"Given the volume of stolen credentials across likely thousands of downstream environments, expect an increase in breach disclosures, follow-on intrusions, and extortion attempts in the coming weeks."</em> That statement was made on March 24. The Telnyx compromise happened three days later. The campaign was still running when he said it.</p>
+
+</div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>The ransom economy &#8212; and why paying is bad for&nbsp;everyone</h2>
+
+  <p>The official guidance from every major cybersecurity body &#8212; CISA, the FBI, the UK's NCSC &#8212; is clear and consistent: do not pay ransoms. The reasoning is straightforward. Payment funds future attacks, does not guarantee data return or deletion, and signals that the target is willing to pay again. Nearly 80% of organizations that paid a ransom were targeted by another attack, often by the same group.</p>
+
+  <p>And yet in 2025, roughly 37% of ransomware victims paid anyway. When the data is filtered to specific sectors &#8212; financial services, healthcare, manufacturing &#8212; the payment rates are higher. Some of the largest organizations in the world, with full knowledge of the official advice, with cybersecurity teams and legal counsel and incident response plans, write the check.</p>
+
+  <p>The reason paying ransom is counterproductive goes beyond the individual company making the decision. It rewards bad actions not just for bad actors but for the insurance companies that profit from covering those payments. It is the same dynamic as giving a child candy every time they throw a tantrum. The behavior does not stop. It escalates. Every payment teaches the attacker that the tactic works, sets a new price floor for the next demand, and funds the infrastructure for the next campaign against the next victim.</p>
+
+  <div class="pull-quote">
+    <p>"The $75 million Dark Angels payment in 2024 did not just fund one group. It sent a signal to every criminal operation watching: if you find the right target and apply enough pressure, nine figures is achievable. Every group that raised its demands after that is reading from that playbook."</p>
+    <span class="attribution">Yana Ivanov &middot; Security Analyst &middot; SiteWave Studio</span>
+  </div>
+
+  <h3>The insurance industry's role in the problem</h3>
+
+  <p>There is a less-discussed participant in the ransom economy who benefits from every payment: the cyber insurance industry. The global cyber insurance market reached $15 billion in 2024 and is projected to hit $29 billion by 2027. A significant driver of that growth is ransomware coverage &#8212; policies that reimburse ransom payments and related costs. The industry is, structurally, a funding mechanism for criminal enterprises.</p>
+
+  <p>This is not an accusation of bad intent. Insurance companies are pricing risk and covering losses as they are designed to do. But the consequence of making ransom payment the economically rational choice &#8212; because insurance covers it &#8212; is that payment rates stayed elevated for years after official guidance said stop paying. The actuarial tables made criminals more money than those criminals could have extracted without them.</p>
+
+  <p>It gets more specific than that. In at least two confirmed recent cases, attackers stole their victims' cyber insurance policies before making their ransom demand. They read what the coverage limit was and set the demand just below it. The company pays because insurance covers it exactly. The attacker receives the maximum the policy will pay. The insurer pays out. Premiums rise the following year for all policyholders. The cycle repeats. The only question your instinct raises &#8212; whether some of this involves deliberate insider collusion &#8212; is not paranoia. The FBI has investigated cases where insiders tipped off ransomware groups about a company's vulnerabilities and insurance coverage. It is a documented threat vector, not a conspiracy theory.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The structural problem:</strong> No federal government has banned ransomware payments outright. The UK launched a consultation in January 2025 on banning payments for public sector bodies and critical national infrastructure &#8212; specifically to make those entities unattractive targets. The US has mandatory reporting requirements coming through CIRCIA but no payment prohibition. The insurance industry, which has the most direct leverage to change company behavior through coverage terms, has largely treated ransom payments as a covered loss. Until the financial incentive to pay is removed, the behavior will continue &#8212; and the criminal ecosystem it funds will continue to grow.</p>
+  </div>
+
+  <h3>The shift that makes backups insufficient</h3>
+
+  <p>Companies heard the advice about backups. Many implemented it. The criminal ecosystem noticed and adapted. Data theft-only attacks &#8212; where criminals steal data and threaten to publish it without encrypting anything &#8212; rose from 49% of extortion cases in the first half of 2025 to 65% in the second half. Backups restore your systems. They do not unring the bell of a data leak. When the threat is reputational, regulatory, and legal exposure from stolen customer records, the backup that took three years to implement does not help. The game changed specifically because defenders got better at one part of it. The Vect partnership is designed precisely to exploit this: the threat is publication, not encryption, and the only remedy is payment.</p>
+
+</div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>Who TeamPCP is &#8212; and why "just criminals" is the alarming&nbsp;part</h2>
+
+  <p>When most people hear about a sophisticated multi-ecosystem supply chain attack that compromised 500,000 corporate identities in nine days, they assume nation-state resources. A government with intelligence assets, years of planning, and unlimited technical capability. The assumption is that only a major adversary could pull this off.</p>
+
+  <p>TeamPCP has no confirmed nation-state affiliation. They are, as best as researchers can determine, a financially motivated criminal platform active since approximately July 2025 &#8212; less than a year old at the time of the Telnyx attack. Their strength does not come from novel exploits or original tradecraft. It comes from automation. They industrialized known techniques, known misconfigurations, and recycled tooling into a self-propagating criminal infrastructure. The innovation was operational, not technical.</p>
+
+  <p>That should be more alarming than a nation-state actor, not less. Nation-state attacks require political authorization, operational security, and geopolitical calculation. A criminal platform running for money has none of those constraints. They move faster, take more risks, adapt more quickly, and have no reason to hold back. And they have demonstrated they do not need sophisticated resources to cause sophisticated damage.</p>
+
+  <h3>The age of the threat</h3>
+
+  <p>The FBI reports that the average age of someone arrested for cybercrime is 19 &#8212; compared to 37 for any other crime. That is not a statistical anomaly. It is a structural feature of how this threat is developing. 61% of hackers start hacking before the age of 16.</p>
+
+  <p>LAPSUS$ &#8212; the extortion group now partnered with TeamPCP through the Vect ransomware operation &#8212; had at least two teenage members and was led in significant part by an 18-year-old from Oxford who started hacking at age 11. He breached Microsoft, Nvidia, Samsung, Okta, and Uber before he was old enough to rent a car. He was eventually sentenced to an indefinite secure psychiatric facility in the UK. Scattered Spider, which caused hundreds of millions in damage to UK retailers in 2025 and continues operating, was largely composed of teenagers. A 20-year-old in Florida received a ten-year federal sentence and was ordered to pay $13 million in restitution. Some co-conspirators in these cases began offending at 13 or 14.</p>
+
+  <p>Your instinct about why young people are drawn to this is supported by the research. The adolescent brain processes risk differently &#8212; the prefrontal cortex responsible for long-term consequence evaluation is not fully developed until the mid-twenties. Young people are not making irrational decisions by their own calculus. The thrill of breaking a system is immediate and real. The federal prosecution feels abstract and distant. The UK's National Crime Agency found that financial gain is not even the primary motivator for many young offenders &#8212; notoriety, peer recognition, and the intellectual satisfaction of defeating a defended system drive more recruitment than money does.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The recruitment pipeline:</strong> Children as young as seven are being pulled into cybercrime in the UK through gaming communities, Discord servers, and online tutorials. Recruitment starts with gaming or shared interests &#8212; familiar, social, and low-suspicion. Private servers move young users from casual chats into restricted channels where tools and tasks are shared. Many young recruits do not understand they are breaking the law. Early tasks feel small and low-risk. The path from gaming community to federal crime has no natural warning signs &#8212; no moment where an adult catches them and redirects them &#8212; because it all happens online, invisibly, in spaces that most parents and schools do not monitor.</p>
+  </div>
+
+  <h3>The geopolitical wild card</h3>
+
+  <p>TeamPCP's motivations appear primarily financial. But one element does not fit the pure criminal profile: their wiper payload. While deploying credential-harvesting persistence tools everywhere else, they deployed destructive wiper malware specifically against Iranian infrastructure. Destruction generates no revenue. It serves a geopolitical purpose.</p>
+
+  <p>Whether TeamPCP operates under any form of state direction, accepts state-aligned commissions, or made independent targeting decisions cannot be determined from publicly available information. But the pattern &#8212; financially motivated criminal infrastructure with selective state-aligned destructive capability &#8212; is consistent with a model that several intelligence agencies have documented: criminal groups operating as plausible-deniability proxies for nation-state objectives. The line between mercenary and asset is deliberately blurred. It serves both parties.</p>
+
+</div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>The AI infrastructure problem &#8212; when the tools building AI are&nbsp;compromised</h2>
+
+  <p>LiteLLM is not just a popular library. It is the routing layer that sits between enterprise applications and every major AI provider &#8212; OpenAI, Anthropic, Google, AWS Bedrock. When a company builds an AI-powered product, LiteLLM is often what manages the credentials for all of those connections in one place. Compromising it yields API keys for an organization's entire AI stack simultaneously. One package. Every provider. All credentials. That is why 95 million monthly downloads makes it a more strategically valuable target than Telnyx's one million.</p>
+
+  <h3>The confirmation nobody wanted to hear</h3>
+
+  <p>TeamPCP confirmed they used AI &#8212; specifically Claude &#8212; to write malware components including lateral movement scripts and credential harvesting tools. This compressed their development timeline significantly, allowing them to move from initial compromise to mass distribution faster than traditional attack timelines would permit.</p>
+
+  <p>This is not a failure of Claude specifically. It is a demonstration of a structural problem: the same capabilities that make defenders faster make attackers faster. The same tools that generate security testing scripts generate malware. AI platforms do implement content filters &#8212; the same filters that block a request to generate a politically charged image will attempt to block malicious code generation. But determined adversaries work around those filters through incremental requests, role-play framing, and decomposition of complex attacks into innocent-looking components that individually clear the filter and collectively constitute the weapon.</p>
+
+  <p>Your instinct about behavioral pattern detection is the right direction. A single session asking for a script that reads environment variables looks benign. A pattern of sessions across time &#8212; reading environment variables, sending HTTP POST requests, XOR-encoding data, modifying startup folders &#8212; is a different picture entirely. The challenge is that AI sessions are mostly stateless. Each conversation starts fresh. The pattern only becomes visible across sessions over time, which requires storing and analyzing conversation history at scale, which raises privacy concerns that the same companies are simultaneously being pressured to minimize. The arms race runs through the privacy debate as well as the technical one.</p>
+
+  <h3>The recommendation loop</h3>
+
+  <p>There is a second AI problem that received less attention. AI coding assistants &#8212; tools like GitHub Copilot and Cursor that suggest code as developers write &#8212; are trained on public code repositories. When a developer asks an AI assistant to help integrate multiple LLM providers, the most common recommendation is LiteLLM, because that is what the training data reflects. The package was the most popular solution when the training data was collected. The AI continues recommending it because popularity is a proxy for quality in its training signal.</p>
+
+  <p>This creates a feedback loop that serves attackers. Compromise a popular package. AI assistants trained on code using that package continue recommending it. Developers trust the recommendation. The blast radius extends beyond the direct download window into every project where an AI assistant suggests the compromised dependency. The attack spreads not through developer decision-making but through algorithmic recommendation &#8212; and the recommendation persists until training data is updated, which happens on a cycle measured in months, not hours.</p>
+
+</div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>The gap between TeamPCP and the professionals &#8212; and why we are not&nbsp;prepared</h2>
+
+  <p>Everything documented in this report and in <a href="telnyx_supply_chain_analysis.html" class="part-link">Part 1</a> was accomplished by a financially motivated criminal group with no confirmed nation-state resources, no embedded infrastructure access, and no geopolitical backing. They have been active for less than a year. They operate primarily through automation and credential chaining. Their innovation was not technical &#8212; it was operational discipline applied to known weaknesses that the industry has been warned about for years.</p>
+
+  <p>The amateur version of this attack harvested 500,000 corporate identities in nine days. The professional version has been sitting inside the American power grid since 2021.</p>
+
+  <p>In my earlier analysis &#8212; <a href="The_Cascade_Analysis.html" class="xref">The Cascade &#8212; When America Goes Dark</a> &#8212; I documented that Volt Typhoon, the Chinese state-sponsored threat actor, has maintained persistent access inside US power grid infrastructure, water systems, communications networks, and transportation systems since at least 2021, with the FBI confirming some footholds will never be found. Russia's Sandworm has demonstrated the ability to destroy power grid infrastructure on demand &#8212; in Ukraine in 2015, 2016, and 2022. Iranian-linked actors executed a simultaneous wipe of 200,000 devices across a US medical technology company in a single coordinated operation in March 2026, as documented in my analysis of <a href="stryker_threat_analysis.html" class="xref">The Stryker Wiper Attack</a>.</p>
+
+  <p>TeamPCP demonstrated that the supply chain technique &#8212; poison a trusted tool, harvest credentials silently, wait &#8212; works at scale against a global developer ecosystem. Nation-state actors have the same capability, years of embedded access, and geopolitical triggers that could activate all of it simultaneously. The question is not whether they could execute a supply chain attack against US critical infrastructure. The question is whether they already have and are waiting for the right moment to use it.</p>
+
+  <div class="pull-quote">
+    <p>"Every foreign policy decision creates a new threat surface. The organizations that will be asked to defend that surface are not in the room when those decisions are made."</p>
+    <span class="attribution">Yana Ivanov &middot; Security Analyst &middot; SiteWave Studio</span>
+  </div>
+
+  <p>This is not a partisan observation. It is an operational fact with documented consequences. When intelligence-sharing relationships weaken, defenders lose visibility into threats being tracked by allied agencies. When geopolitical relationships deteriorate, adversaries who previously had diplomatic reasons to restrain their cyber operations lose those reasons. The cybersecurity professionals who will be asked to defend the resulting new attack surface are not consulted on the decisions that created it. They inherit the consequences.</p>
+
+  <p>My water infrastructure analysis &#8212; <a href="water_infrastructure_analysis.html" class="xref">The Open Tap &#8212; When Water Becomes a Weapon</a> &#8212; documented that the EPA has no statutory authority to mandate cybersecurity for water utilities, that 70% of utilities failed basic security standards, and that New York City's 9-million-person water system runs on infrastructure with no mandatory cybersecurity requirements. The attack method has been demonstrated in Florida. The regulatory gap is confirmed and current. What has not happened yet is a sophisticated actor targeting a major system with the intent to cause mass casualties. A criminal group running for money has no incentive for that. A nation-state actor positioning for strategic leverage has every incentive.</p>
+
+  <p>TeamPCP showed us the technique. The professionals have had years to apply it to targets that matter far more than developer credentials. The question we should be asking is not whether we are ready for the next TeamPCP. It is whether we are ready for the version of this attack that does not announce itself on Telegram.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The preparedness gap:</strong> The United States has more documented, confirmed nation-state pre-positioning inside its critical infrastructure than any other country in the world &#8212; and a compliance framework still in Phase 1 rollout, a cyber insurance industry that structurally funds criminal behavior, a regulatory environment that leaves water utilities unprotected by law, and a developer ecosystem whose security depends on volunteers and nonprofit infrastructure. TeamPCP is not the threat that should keep us up at night. TeamPCP is the demonstration of what the real threats are capable of.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>What actually changes the playing&nbsp;field</h2>
+
+  <p>The standard conclusion to a threat analysis is a list of technical controls. Those controls are documented in Part 1 and they matter. This section is about the structural changes that technical controls cannot address on their own &#8212; the systemic problems that create the environment in which these attacks succeed.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <div class="step-title">Remove the financial incentive to pay ransoms</div>
+        <p>The UK's proposal to ban ransomware payments for public sector bodies and critical infrastructure is the right model. If the target will not pay, the target becomes less valuable. Insurance coverage for ransom payments sustains the criminal economy. Insurers have the leverage to require that payment only happen as a documented last resort after all recovery options are exhausted &#8212; and to price policies that reward organizations demonstrating recovery capability without payment. That leverage has not been used. It should be. In the absence of voluntary change, regulatory requirements are the correct response.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <div class="step-title">Build the defender talent pipeline where the attackers are building theirs</div>
+        <p>The average cybercriminal is 19 years old. 61% start before 16. They are recruited through gaming communities, Discord servers, and online tutorials &#8212; spaces where the skills that make great attackers are already being developed, with no ethical framework. The cybersecurity defender community has a talent crisis and a pipeline problem simultaneously. The solution is not more university degree programs aimed at 22-year-olds. It is meeting young people in the spaces where they are already developing these skills and offering a legitimate, rewarding path before the criminal ecosystem finds them first. Competitive gaming communities and esports organizations represent exactly this talent pool &#8212; young people with systems thinking, pattern recognition, and the obsessive iteration mindset that makes a great analyst or red teamer. The pipeline cuts both ways. The question is which direction it flows.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <div class="step-title">Treat open-source critical infrastructure as what it is</div>
+        <p>PyPI is critical infrastructure for American defense software. It is maintained largely by volunteers and a nonprofit. The same is true for npm, for dozens of security tools, for the entire open-source ecosystem that underlies modern software development. The defense contractors, financial institutions, and intelligence agencies that depend on this infrastructure have a direct interest in its security that they have not acted on proportionally. Government-funded security audits, mandatory software bill of materials requirements, and private sector investment in open-source security maintenance are not charity. They are self-interest at scale.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">04</div>
+      <div class="step-content">
+        <div class="step-title">Integrate cybersecurity consequence modeling into geopolitical decision-making</div>
+        <p>Every foreign policy decision that creates a new adversary creates a new attack surface. The cybersecurity professionals who will be asked to defend that surface are not in the room when those decisions are made. This is not an argument about which foreign policy decisions are correct. It is an argument that cyber threat consequence modeling should be a standard component of strategic decision-making &#8212; the same rigor applied to military and economic consequences applied to the cyber threat environment those decisions create. That requires cybersecurity expertise at the policy level, not just the operational level.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">05</div>
+      <div class="step-content">
+        <div class="step-title">Accept that AI is a dual-use weapon and invest accordingly in behavioral detection</div>
+        <p>TeamPCP used AI to write malware. Defenders should use AI to detect the behavioral patterns that malware generation and deployment produce across sessions over time. The challenge is building cross-session behavioral analysis without creating a surveillance architecture that violates the privacy expectations users have. The arms race runs through the privacy debate as well as the technical one. Getting the balance right is harder than the technical implementation. It is also necessary, because the alternative &#8212; treating every session in isolation &#8212; means the pattern that would identify the attack is never visible until after the damage is done.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>This is Part 2 of a two-part analysis.</strong> <a href="telnyx_supply_chain_analysis.html" class="part-link">Part 1 &#8212; The Trusted Channel</a> covers the Telnyx attack technically: the nine-day credential chain, WAV steganography, defense contractor exposure, IOCs, and remediation. A third analysis examining the talent pipeline from gaming culture to cybercrime &#8212; and what closing that gap genuinely requires &#8212; is forthcoming.</p>
+  </div>
+
+</div>
+</div>
+
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;&middot;&nbsp; CMMC Compliance Analyst &nbsp;&middot;&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine &#8212; not checkbox &#8212; security compliance. This analysis was produced independently as a contribution to the security community's understanding of active threats against US defense infrastructure.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>The Blast Radius &middot; Part 2 &middot; Yana Ivanov &middot; 2026</span>
+  <span>Based on public reporting &middot; For educational use &middot; Independent analysis</span>
+</footer>
+
+</body>
+</html>
