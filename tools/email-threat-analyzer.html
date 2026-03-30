@@ -1326,7 +1326,7 @@ footer a:hover { color: var(--accent); }
 .vt-key-note a { color: var(--blue); }
 </style>
 </head>
-<body>
+<body class="light">
 
 <nav class="nav">
   <span class="nav-brand">// email threat analyzer</span>
@@ -2875,7 +2875,11 @@ function saveApiKey() {}
 
 // Restore theme preference on load
 (function initSettings() {
-  if (localStorage.getItem('eta-theme') === 'light') {
+  const saved = localStorage.getItem('eta-theme');
+  if (saved === 'dark') {
+    document.body.classList.remove('light');
+    document.getElementById('themeLabel').textContent = 'DARK';
+  } else {
     document.body.classList.add('light');
     document.getElementById('themeLabel').textContent = 'LIGHT';
     const poly = document.querySelector('.cipher-btn polygon');
