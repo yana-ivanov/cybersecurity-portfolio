@@ -160,8 +160,8 @@ body:not(.light) .training-card li { font-size: 14px; }
 body:not(.light) .email-body-raw   { font-size: 13px; }
 body:not(.light) .progress-label   { font-size: 14px; }
 body:not(.light) .progress-log     { font-size: 13px; }
-body:not(.light) .how-to-title     { font-size: 13px; }
-body:not(.light) .how-to-steps     { font-size: 12px; }
+body:not(.light) .how-to-title     { font-size: 14px; }
+body:not(.light) .how-to-steps     { font-size: 13px; }
 body:not(.light) .demo-card-title  { font-size: 13px; }
 body:not(.light) .demo-card-desc   { font-size: 12px; }
 body:not(.light) .cipher-msg       { font-size: 13px; }
@@ -206,8 +206,8 @@ body.light .email-body-raw   { font-size: 13px; }
 body.light .progress-label   { font-size: 14px; }
 body.light .progress-log     { font-size: 13px; }
 body.light .state-msg        { font-size: 14px; }
-body.light .how-to-title     { font-size: 13px; }
-body.light .how-to-steps     { font-size: 12px; }
+body.light .how-to-title     { font-size: 14px; }
+body.light .how-to-steps     { font-size: 13px; }
 body.light .safety-banner    { font-size: 14px; }
 body.light .safety-banner > div > div:first-child { font-size: 15px; }
 body.light .provider-badge   { font-size: 13px; }
@@ -979,15 +979,15 @@ footer a:hover { color: var(--accent); }
   padding: 10px 12px;
 }
 .how-to-title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 .how-to-steps {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
-  line-height: 1.7;
+  line-height: 1.8;
 }
 
 /* UPLOAD DROP ZONE */
@@ -2619,11 +2619,35 @@ async function analyzeUploaded() {
 
   setProgress(50,'Running AI analysis…'); addLog(`Analyzing ${parsed.length} email(s)`);
   let analyzed = [];
-  for (let i=0; i<parsed.length; i+=5) {
-    const batch = parsed.slice(i,i+5);
-    setProgress(50+Math.round((i/parsed.length)*45),`Analyzing ${i+1}–${Math.min(i+5,parsed.length)} of ${parsed.length}…`);
-    analyzed = analyzed.concat(await analyzeBatchPaste(batch));
-    addLog(`Analyzed ${Math.min(i+5,parsed.length)} / ${parsed.length}`);
+  try {
+    for (let i=0; i<parsed.length; i+=5) {
+      const batch = parsed.slice(i,i+5);
+      setProgress(50+Math.round((i/parsed.length)*45),`Analyzing ${i+1}–${Math.min(i+5,parsed.length)} of ${parsed.length}…`);
+      try {
+        const result = await analyzeBatchPaste(batch);
+        analyzed = analyzed.concat(result);
+        addLog(`Analyzed ${Math.min(i+5,parsed.length)} / ${parsed.length}`);
+      } catch(batchErr) {
+        addLog(`⚠ Batch ${i+1} failed: ${batchErr.message}`);
+        // Add placeholder results for failed batch so we don't lose progress
+        batch.forEach(e => analyzed.push({
+          ...e,
+          analysis: { risk:'clean', threatType:'Analysis Failed', summary:`Could not analyze: ${batchErr.message}`, iocs:[], mitre:[], training:{}, bodyHighlights:'' }
+        }));
+      }
+    }
+  } catch(err) {
+    setProgress(0, `Error: ${err.message}`);
+    addLog(`⚠ Analysis failed: ${err.message}`);
+    addLog(`Make sure you are running from https://yana-ivanov.github.io — not from a local file`);
+    document.getElementById('fetchBtn').disabled = false;
+    document.getElementById('progressWrap').classList.remove('show');
+    return;
+  }
+
+  if (!analyzed.length) {
+    setProgress(0, 'No results — check error log above');
+    return;
   }
   setProgress(100,'Upload analysis complete');
   allResults = [...allResults, ...analyzed];
