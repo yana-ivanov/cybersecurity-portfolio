@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy · Yana Ivanov Cybersecurity Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #f7f8fa;
+  color: #1a1a2e;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
+  min-height: 100vh;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 40px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e4ea;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.nav-brand {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #9094a6;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.back-link {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: #6b7290;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.back-link:hover { color: #c8202f; }
+
+.wrap {
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 56px 24px 100px;
+}
+
+.page-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: #c8202f;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 600;
+  color: #1a1a2e;
+  letter-spacing: -0.3px;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.meta {
+  font-size: 13px;
+  color: #9094a6;
+  font-family: 'DM Mono', monospace;
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #e2e4ea;
+}
+
+.toc {
+  background: #ffffff;
+  border: 1px solid #e2e4ea;
+  border-left: 3px solid #c8202f;
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin-bottom: 48px;
+}
+
+.toc-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: #9094a6;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 12px;
+}
+
+.toc ol { padding-left: 18px; display: flex; flex-direction: column; gap: 5px; }
+.toc li { font-size: 14px; color: #4a4a6a; }
+.toc a { color: #1a6fd4; text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+
+section {
+  margin-bottom: 48px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid #e8eaf0;
+}
+section:last-of-type { border-bottom: none; }
+
+h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 16px;
+  scroll-margin-top: 80px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.num {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: #c8202f;
+  background: rgba(200,32,47,0.06);
+  border: 1px solid rgba(200,32,47,0.15);
+  padding: 2px 8px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+p { font-size: 15px; color: #4a4a6a; margin-bottom: 14px; }
+p:last-child { margin-bottom: 0; }
+p strong { color: #1a1a2e; font-weight: 500; }
+
+ul, ol { padding-left: 20px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+li { font-size: 15px; color: #4a4a6a; }
+li strong { color: #1a1a2e; font-weight: 500; }
+
+.callout {
+  background: #f0faf6;
+  border: 1px solid #b8e8d4;
+  border-left: 3px solid #0f9e6e;
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin: 16px 0;
+}
+.callout p { color: #1a4a3a; margin: 0; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 14px;
+  background: #ffffff;
+  border: 1px solid #e2e4ea;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+th {
+  text-align: left;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: #9094a6;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 10px 14px;
+  background: #f4f5f8;
+  border-bottom: 1px solid #e2e4ea;
+}
+
+td { padding: 12px 14px; color: #4a4a6a; border-bottom: 1px solid #f0f1f5; vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+td:first-child { font-family: 'DM Mono', monospace; font-size: 12px; color: #1a6fd4; white-space: nowrap; }
+td strong { color: #1a1a2e; font-weight: 500; }
+
+.contact-box {
+  background: #ffffff;
+  border: 1px solid #e2e4ea;
+  border-radius: 6px;
+  padding: 20px 24px;
+  margin-top: 16px;
+}
+.contact-box p { color: #4a4a6a; margin: 0; line-height: 1.8; }
+
+a { color: #1a6fd4; }
+a:hover { text-decoration: underline; }
+
+footer {
+  text-align: center;
+  padding: 24px;
+  border-top: 1px solid #e2e4ea;
+  background: #ffffff;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #9094a6;
+  letter-spacing: 0.08em;
+}
+footer a { color: #9094a6; text-decoration: none; }
+footer a:hover { color: #c8202f; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div style="display:flex;align-items:center;gap:20px;">
+    <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/index.html" class="back-link">← Portfolio</a>
+    <span class="nav-brand">// privacy policy</span>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <div class="page-label">Legal · Data Protection</div>
+  <h1>Privacy Policy</h1>
+  <p class="meta">Effective: March 30, 2026 &nbsp;·&nbsp; Applies to: Email Threat Analyzer and all tools at yana-ivanov.github.io/cybersecurity-portfolio</p>
+
+  <div class="toc">
+    <div class="toc-label">Contents</div>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#google-data">Google User Data — What We Access</a></li>
+      <li><a href="#how-used">How We Use Google User Data</a></li>
+      <li><a href="#storage">Data Storage and Retention</a></li>
+      <li><a href="#sharing">Data Sharing and Disclosure</a></li>
+      <li><a href="#security">Security</a></li>
+      <li><a href="#your-rights">Your Rights and Controls</a></li>
+      <li><a href="#children">Children's Privacy (COPPA)</a></li>
+      <li><a href="#california">California Privacy Rights (CCPA)</a></li>
+      <li><a href="#gdpr">European Users (GDPR)</a></li>
+      <li><a href="#changes">Changes to This Policy</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ol>
+  </div>
+
+  <section id="overview">
+    <h2><span class="num">01</span> Overview</h2>
+    <p>This Privacy Policy describes how Yana Ivanov ("we," "our," or "the developer") handles information when you use the tools hosted at <strong>yana-ivanov.github.io/cybersecurity-portfolio</strong>, including the Email Threat Analyzer.</p>
+    <p>These tools are open-source cybersecurity portfolio projects created for educational and demonstration purposes. They are not commercial products.</p>
+    <div class="callout">
+      <p><strong>Short version:</strong> We do not collect, store, sell, or share your personal data or your Gmail content. Email analysis happens in your browser and through a secure proxy. Nothing is retained after your session ends.</p>
+    </div>
+  </section>
+
+  <section id="google-data">
+    <h2><span class="num">02</span> Google User Data — What We Access</h2>
+    <p>The Email Threat Analyzer optionally connects to your Gmail account using Google OAuth 2.0. When you choose to connect Gmail, the application requests the following scope:</p>
+    <table>
+      <thead>
+        <tr><th>Scope</th><th>What it allows</th><th>Why we need it</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>gmail.readonly</td>
+          <td><strong>Read-only access</strong> to your Gmail messages and metadata</td>
+          <td>To fetch email headers, subjects, senders, and body snippets for AI-powered threat analysis</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>We access the following data from your Gmail account:</p>
+    <ul>
+      <li>Email metadata: sender name, sender email address, recipient, subject line, date</li>
+      <li>Email body snippet: the first 500 characters of the body for threat analysis</li>
+      <li>Email headers: technical routing headers used to detect spoofing and anomalies</li>
+      <li>Attachment presence: whether an email has attachments (not attachment contents)</li>
+    </ul>
+    <p>We do <strong>not</strong> access: attachment contents, contacts, calendar data, Google Drive, or any other Google services. Gmail connection is entirely <strong>optional</strong> — all features work without it.</p>
+  </section>
+
+  <section id="how-used">
+    <h2><span class="num">03</span> How We Use Google User Data</h2>
+    <p>Google user data is used <strong>solely</strong> to provide the Email Threat Analyzer's core functionality:</p>
+    <ul>
+      <li><strong>Threat analysis:</strong> Email content is sent to the Anthropic Claude API to identify phishing indicators, suspicious domains, social engineering patterns, and malware delivery attempts</li>
+      <li><strong>On-screen display:</strong> Analysis results are displayed to you in the tool interface</li>
+      <li><strong>CSV export:</strong> If you choose to export results, data is written to a file on your own device only</li>
+    </ul>
+    <p>We do <strong>not</strong> use Google user data for advertising, building user profiles, training AI models, or any purpose beyond providing the analysis you requested. Our use complies with the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Google API Services User Data Policy</a>, including Limited Use requirements.</p>
+  </section>
+
+  <section id="storage">
+    <h2><span class="num">04</span> Data Storage and Retention</h2>
+    <p><strong>We do not store your Gmail data or email content on any server.</strong></p>
+    <ul>
+      <li><strong>Gmail access token:</strong> Stored in browser memory only for the duration of your session. Never written to a database or persistent storage. Discarded when you close the tab.</li>
+      <li><strong>Email content:</strong> Held in browser memory, sent to the Anthropic API for analysis, displayed in your browser. Never written to any server-side storage.</li>
+      <li><strong>Analysis results:</strong> Displayed in your browser. CSV exports are saved to your device only.</li>
+      <li><strong>Cloudflare Worker logs:</strong> Our API proxy may retain request metadata (IP address, timestamp, response code) for up to 24 hours as part of standard infrastructure logging. Email content is not logged.</li>
+      <li><strong>Rate limit counter:</strong> A daily request count (no personal data) is stored in Cloudflare KV and automatically deleted after 24 hours.</li>
+    </ul>
+    <p><strong>Retention:</strong> No Google user data is retained beyond your active browser session.</p>
+  </section>
+
+  <section id="sharing">
+    <h2><span class="num">05</span> Data Sharing and Disclosure</h2>
+    <p>We do <strong>not</strong> sell, trade, or transfer your personal information or Google user data to third parties. Email content is transmitted to the following services solely to provide analysis:</p>
+    <ul>
+      <li><strong>Anthropic, Inc.</strong> — Email snippets and headers are sent to the Claude API for AI threat analysis. <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener">Anthropic's Privacy Policy</a> applies.</li>
+      <li><strong>Cloudflare, Inc.</strong> — All API requests are routed through a Cloudflare Worker proxy. <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare's Privacy Policy</a> applies.</li>
+      <li><strong>VirusTotal (optional):</strong> If you scan a URL, it is submitted to VirusTotal's API using your own API key. <a href="https://support.virustotal.com/hc/en-us/articles/115002168385-Privacy-Policy" target="_blank" rel="noopener">VirusTotal's Privacy Policy</a> applies.</li>
+    </ul>
+    <p>We may disclose information if required by law or valid legal process, and would notify you to the extent permitted by law.</p>
+  </section>
+
+  <section id="security">
+    <h2><span class="num">06</span> Security</h2>
+    <ul>
+      <li><strong>HTTPS only:</strong> All data transmission uses TLS encryption via GitHub Pages and Cloudflare</li>
+      <li><strong>Token security:</strong> Gmail access tokens are stored in browser memory only and never logged server-side</li>
+      <li><strong>API key protection:</strong> The Anthropic API key is stored as an encrypted Cloudflare secret, never exposed in browser code</li>
+      <li><strong>Read-only scope:</strong> The application cannot send, delete, or modify any emails</li>
+      <li><strong>No persistent storage:</strong> Email content is never written to any database or file system we control</li>
+    </ul>
+  </section>
+
+  <section id="your-rights">
+    <h2><span class="num">07</span> Your Rights and Controls</h2>
+    <ul>
+      <li><strong>Revoke access anytime:</strong> Visit <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">myaccount.google.com/permissions</a> to revoke Gmail access</li>
+      <li><strong>No account required:</strong> Use Upload File, Paste Raw, or Demo Samples modes without connecting Gmail</li>
+      <li><strong>Data deletion:</strong> We hold no persistent data. Closing your browser tab discards all in-memory session data.</li>
+      <li><strong>Access requests:</strong> Contact us at the address below for any data-related requests</li>
+    </ul>
+  </section>
+
+  <section id="children">
+    <h2><span class="num">08</span> Children's Privacy (COPPA)</h2>
+    <p>These tools are not directed at children under 13. We do not knowingly collect personal information from children under 13. This application requires a Google account, which requires users to be at least 13 under Google's Terms of Service. If you believe a child under 13 has provided personal information through this tool, contact us immediately.</p>
+  </section>
+
+  <section id="california">
+    <h2><span class="num">09</span> California Privacy Rights (CCPA / CPRA)</h2>
+    <p>California residents have the right to know what personal information we collect, request deletion, opt out of the sale of personal information, and be free from discrimination for exercising privacy rights.</p>
+    <p><strong>We do not sell personal information.</strong> Because we do not retain personal information beyond your browser session, most CCPA requests can be satisfied by confirming we hold no data about you. Contact us below to exercise your rights.</p>
+  </section>
+
+  <section id="gdpr">
+    <h2><span class="num">10</span> European Users (GDPR)</h2>
+    <p>If you are in the EEA, UK, or Switzerland, we process Google user data on the basis of your explicit consent given when you authorize Gmail access. You may withdraw consent at any time by revoking access in your Google account settings.</p>
+    <p>Email content is processed by Anthropic (US-based) and Cloudflare (US-based). By using the Gmail integration, you consent to this transfer. You have the right to access, rectify, erase, restrict, port, and object to processing of your data, and to lodge a complaint with your local data protection authority.</p>
+  </section>
+
+  <section id="changes">
+    <h2><span class="num">11</span> Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time. The "Effective" date at the top reflects the most recent revision. Material changes to how we handle Google user data will be posted before they take effect. Continued use of the tool constitutes acceptance of the revised policy.</p>
+  </section>
+
+  <section id="contact">
+    <h2><span class="num">12</span> Contact</h2>
+    <p>For questions about this Privacy Policy or to exercise your data rights:</p>
+    <div class="contact-box">
+      <p>
+        <strong>Yana Ivanov</strong><br>
+        Portfolio: <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/" target="_blank">yana-ivanov.github.io/cybersecurity-portfolio</a><br>
+        GitHub: <a href="https://github.com/yana-ivanov" target="_blank">github.com/yana-ivanov</a>
+      </p>
+    </div>
+    <p style="margin-top:14px;">We will respond to privacy requests within 30 days.</p>
+  </section>
+
+</div>
+
+<footer>
+  Privacy Policy &nbsp;·&nbsp; <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/index.html">Yana Ivanov Cybersecurity Portfolio</a> &nbsp;·&nbsp; Last updated March 30, 2026
+</footer>
+
+</body>
+</html>
