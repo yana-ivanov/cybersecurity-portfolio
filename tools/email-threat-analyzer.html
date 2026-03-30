@@ -1814,7 +1814,8 @@ async function connectGmail() {
     } else if (resp.status === 403) {
       throw new Error('no-gmail-scope');
     } else {
-      throw new Error('api-error');
+      const errDetail = data.error?.message || data.error?.type || JSON.stringify(data).slice(0, 120);
+      throw new Error(errDetail);
     }
   } catch (e) {
     dot.classList.add('error');
@@ -1829,11 +1830,10 @@ function showConnectError(reason) {
   const aiStatus = document.getElementById('aiStatus');
   aiStatus.style.color = 'var(--orange)';
   const msgs = {
-    'invalid-key':    '⚠ API key issue — check the Worker has ANTHROPIC_API_KEY set.',
+    'invalid-key':    '⚠ Invalid API key — check it at console.anthropic.com.',
     'no-gmail-scope': '⚠ Gmail not authorized. Enable it at console.anthropic.com → Integrations.',
-    'api-error':      '⚠ Proxy error — check your Cloudflare Worker is deployed.',
   };
-  aiStatus.innerHTML = msgs[reason] || `⚠ Connection failed — check Worker deployment.`;
+  aiStatus.innerHTML = msgs[reason] || `⚠ Gmail connect failed: ${reason}`;
 }
 
 // ─── FETCH + ANALYZE ──────────────────────────────────
