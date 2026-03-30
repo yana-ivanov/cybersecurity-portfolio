@@ -613,19 +613,25 @@ input[type="number"] {
 .drawer-bg {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(3px);
+  background: transparent;
   z-index: 200;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s;
 }
-.drawer-bg.open { opacity: 1; pointer-events: all; }
+.drawer-bg.open {
+  opacity: 1;
+  pointer-events: none;
+}
+.drawer-bg.open .drawer {
+  pointer-events: all;
+}
 
 .drawer {
   position: fixed;
   top: 0; right: 0; bottom: 0;
-  width: 520px;
+  width: min(600px, 50vw);
+  min-width: 340px;
   background: var(--surface);
   border-left: 1px solid var(--border2);
   z-index: 201;
@@ -636,6 +642,37 @@ input[type="number"] {
   overflow: hidden;
 }
 .drawer-bg.open .drawer { transform: translateX(0); }
+
+/* Toggle tab on left edge of drawer */
+.drawer-toggle-tab {
+  position: absolute;
+  left: -32px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 64px;
+  background: var(--accent);
+  border-radius: 8px 0 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  font-size: 14px;
+  writing-mode: vertical-rl;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  box-shadow: -3px 0 12px rgba(0,0,0,0.15);
+  transition: background 0.15s, width 0.15s;
+  z-index: 202;
+}
+.drawer-toggle-tab:hover { background: #ff3f54; width: 36px; }
+
+@media (max-width: 768px) {
+  .drawer { width: 100%; min-width: unset; }
+  .drawer-toggle-tab { display: none; }
+}
 
 .drawer-header {
   padding: 20px 24px;
@@ -697,13 +734,16 @@ input[type="number"] {
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: break-word;
   padding-top: 2px;
   min-width: 80px;
+  max-width: 120px;
+  flex-shrink: 0;
 }
 
 .ioc-desc { font-size: 13px; color: var(--text); line-height: 1.5; flex: 1; }
-.ioc-example { font-family: var(--mono); font-size: 12px; color: var(--yellow); margin-top: 3px; word-break: break-all; }
+.ioc-example { font-family: var(--mono); font-size: 12px; color: var(--yellow); margin-top: 3px; word-break: break-all; overflow-wrap: anywhere; }
 
 /* MITRE */
 .mitre-tags { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -1621,13 +1661,14 @@ footer a:hover { color: var(--accent); }
 <!-- DETAIL DRAWER -->
 <div class="drawer-bg" id="drawerBg" onclick="closeDrawer(event)">
   <div class="drawer" id="drawer">
+    <div class="drawer-toggle-tab" onclick="closeDrawerDirect()" title="Close panel">✕</div>
     <div class="drawer-header">
-      <div>
+      <div style="flex:1;min-width:0;">
         <div id="drRiskBadge" style="margin-bottom:6px"></div>
-        <div id="drSender" style="font-size:15px;font-weight:700;"></div>
-        <div id="drSubject" style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px;"></div>
+        <div id="drSender" style="font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+        <div id="drSubject" style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
       </div>
-      <button class="close-btn" onclick="closeDrawerDirect()">✕</button>
+      <button class="close-btn" onclick="closeDrawerDirect()" title="Close">✕</button>
     </div>
     <div class="drawer-body">
 
@@ -2714,10 +2755,17 @@ User question: ${msg}`
     });
 
     const data = await resp.json();
+
+    if (!resp.ok) {
+      const errMsg = data.error?.message || data.error?.type || `HTTP ${resp.status}`;
+      addCipherMsg(`⚠ Error: ${errMsg}`, 'bot');
+      return;
+    }
+
     const text = data.content?.filter(b => b.type === 'text').map(b => b.text).join('') || 'No response received.';
     addCipherMsg(text, 'bot');
   } catch(err) {
-    addCipherMsg('Connection error — ' + err.message, 'bot');
+    addCipherMsg(`⚠ Could not reach proxy — ${err.message}`, 'bot');
   }
 }
 
