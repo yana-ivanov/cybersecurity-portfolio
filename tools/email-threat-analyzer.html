@@ -255,6 +255,20 @@ select, input, textarea, footer {
 }
 .nav-link:hover { color: var(--text); }
 
+.back-nav-link {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-decoration: none;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.2s;
+}
+.back-nav-link:hover { color: var(--text); }
+
 .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
 
 /* HEADER */
@@ -1369,7 +1383,10 @@ footer a:hover { color: var(--accent); }
 <body class="light">
 
 <nav class="nav">
-  <span class="nav-brand">// email threat analyzer</span>
+  <div style="display:flex;align-items:center;gap:20px;">
+    <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/index.html" class="back-nav-link">← Portfolio</a>
+    <span class="nav-brand">// email threat analyzer</span>
+  </div>
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
     <input type="password" id="vtApiKey" placeholder="VirusTotal key (optional)"
       style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:6px 11px;border-radius:5px;font-family:var(--mono);font-size:11px;outline:none;width:185px;transition:border-color 0.2s;"
@@ -1379,7 +1396,6 @@ footer a:hover { color: var(--accent); }
       <div class="toggle-track"><div class="toggle-thumb"></div></div>
       <span id="themeLabel">DARK</span>
     </button>
-    <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/index.html" class="nav-link">← Portfolio</a>
   </div>
 </nav>
 
@@ -1470,24 +1486,32 @@ footer a:hover { color: var(--accent); }
             <div class="how-to-steps">Open email → ⋯ → Download → saves as .eml</div>
           </div>
           <div class="how-to-card">
-            <div class="how-to-title">📨 Gmail</div>
+            <div class="how-to-title">📨 Gmail (single email)</div>
             <div class="how-to-steps">Open email → ⋮ → Download message → saves as .eml</div>
+          </div>
+          <div class="how-to-card">
+            <div class="how-to-title">📦 Gmail (full inbox export)</div>
+            <div class="how-to-steps">Go to takeout.google.com → deselect all → select Gmail → Inbox only → export → upload the .mbox file here</div>
           </div>
           <div class="how-to-card">
             <div class="how-to-title">🍎 Apple Mail</div>
             <div class="how-to-steps">Select email → File → Save As → Raw Message Source (.eml)</div>
           </div>
+          <div class="how-to-card">
+            <div class="how-to-title">⚠ Large mailboxes</div>
+            <div class="how-to-steps">Tool analyzes up to 100 emails per upload — for large mbox files it automatically picks the 100 most recent</div>
+          </div>
         </div>
 
-        <div class="upload-drop-zone" id="uploadDropZone"
+          <div class="upload-drop-zone" id="uploadDropZone"
              onclick="document.getElementById('fileInput').click()"
              ondragover="event.preventDefault();this.classList.add('drag-over')"
              ondragleave="this.classList.remove('drag-over')"
              ondrop="handleFileDrop(event)">
           <div class="upload-icon">⬆</div>
-          <div class="upload-label">Drop .eml or .msg files here</div>
-          <div class="upload-sub">or click to browse · multiple files supported</div>
-          <input type="file" id="fileInput" accept=".eml,.msg,.txt,message/rfc822" multiple style="display:none" onchange="handleFileSelect(event)">
+          <div class="upload-label">Drop .eml, .msg, or .mbox files here</div>
+          <div class="upload-sub">or click to browse · multiple files supported · mbox = full inbox export</div>
+          <input type="file" id="fileInput" accept=".eml,.msg,.txt,.mbox,.mbx,*" multiple style="display:none" onchange="handleFileSelect(event)">
         </div>
 
         <div id="uploadedFiles" style="display:flex;flex-direction:column;gap:6px;"></div>
@@ -2476,8 +2500,8 @@ let uploadedFiles = [];
 function handleFileDrop(event) {
   event.preventDefault();
   document.getElementById('uploadDropZone').classList.remove('drag-over');
-  const files = Array.from(event.dataTransfer.files).filter(f => f.name.match(/\.(eml|msg|txt)$/i));
-  if (!files.length) { alert('Please drop .eml or .msg files only.'); return; }
+  const files = Array.from(event.dataTransfer.files);
+  if (!files.length) return;
   addUploadedFiles(files);
 }
 function handleFileSelect(event) { addUploadedFiles(Array.from(event.target.files)); event.target.value=''; }
@@ -2504,27 +2528,53 @@ function clearUpload() { uploadedFiles=[]; renderUploadedFiles(); }
 
 async function analyzeUploaded() {
   if (!uploadedFiles.length) return;
+
   document.getElementById('fetchPanel').style.display = 'block';
   document.getElementById('progressWrap').classList.add('show');
   setStep(3); setProgress(10,`Reading ${uploadedFiles.length} file(s)…`);
+
   const rawEmails = [];
   for (const file of uploadedFiles) {
-    try { const text = await file.text(); rawEmails.push({name:file.name,raw:text}); addLog(`Read: ${file.name}`); }
-    catch(e) { addLog(`Could not read: ${file.name}`); }
+    try {
+      const text = await file.text();
+      if (file.name.match(/\.mbox$/i) || text.startsWith('From ')) {
+        // Parse mbox — split on "From " envelope lines
+        const messages = text.split(/^From .+/m).filter(m => m.trim().length > 50);
+        addLog(`Parsed mbox: ${messages.length} emails found in ${file.name}`);
+        messages.forEach((m, i) => rawEmails.push({ name: `${file.name} [${i+1}]`, raw: m.trim() }));
+      } else {
+        rawEmails.push({ name: file.name, raw: text });
+        addLog(`Read: ${file.name}`);
+      }
+    } catch(e) { addLog(`Could not read: ${file.name}`); }
   }
-  setProgress(30,'Parsing headers…');
-  const parsed = rawEmails.map((e,i) => {
+
+  if (!rawEmails.length) {
+    setProgress(100, 'No emails found');
+    document.getElementById('progressWrap').classList.remove('show');
+    return;
+  }
+
+  // Cap at 100 emails to avoid excessive API costs — analyze most recent
+  const cappedEmails = rawEmails.slice(-100);
+  if (rawEmails.length > 100) {
+    addLog(`Large mailbox — analyzing most recent 100 of ${rawEmails.length} emails`);
+  }
+
+  setProgress(30,'Parsing email headers…');
+  const parsed = cappedEmails.map((e, i) => {
     const lines = e.raw.split('\n');
-    const get = k => { const l = lines.find(l=>l.toLowerCase().startsWith(k.toLowerCase()+':')); return l?l.slice(k.length+1).trim():''; };
+    const get = k => { const l = lines.find(l => l.toLowerCase().startsWith(k.toLowerCase()+':')); return l ? l.slice(k.length+1).trim() : ''; };
     const fromRaw = get('From'); const fm = fromRaw.match(/^(.*?)\s*<(.+?)>$/) || [];
-    const bi = lines.findIndex(l=>l.trim()==='');
-    const body = bi>-1?lines.slice(bi+1).join('\n').trim():e.raw;
+    const bi = lines.findIndex(l => l.trim() === '');
+    const body = bi > -1 ? lines.slice(bi+1).join('\n').trim() : e.raw;
     return { id:'upload-'+Date.now()+'-'+i, from:fm[1]?.trim()||fromRaw, fromAddress:fm[2]||fromRaw,
       to:get('To'), subject:get('Subject')||e.name, date:get('Date'), snippet:body.slice(0,500),
       hasAttachment:e.raw.toLowerCase().includes('content-disposition: attachment'),
       rawHeaders:lines.slice(0,bi>-1?bi:30).join('\n'), source:'upload' };
   });
-  setProgress(50,'Running AI analysis…'); addLog(`Analyzing ${parsed.length} file(s)`);
+
+  setProgress(50,'Running AI analysis…'); addLog(`Analyzing ${parsed.length} email(s)`);
   let analyzed = [];
   for (let i=0; i<parsed.length; i+=5) {
     const batch = parsed.slice(i,i+5);
