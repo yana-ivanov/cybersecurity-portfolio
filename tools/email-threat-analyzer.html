@@ -1124,7 +1124,7 @@ footer a:hover { color: var(--accent); }
   border: 1px solid var(--border2);
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(232,55,74,0.1);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.25), 0 0 0 1px var(--border2);
 }
 .cipher-panel.open { display: flex; flex-direction: column; }
 
@@ -2464,7 +2464,7 @@ async function analyzeDemoSelected() {
   document.getElementById('resultsPanel').style.display = 'block';
   document.getElementById('progressWrap').classList.remove('show');
   setStep(4);
-  if (!cipherOpen) toggleCipher();
+  if (!window.cipherOpen) toggleCipher();
   setTimeout(() => addCipherMsg(`🎓 Training mode active — analyzed ${parsed.length} phishing scenario(s). Click any flagged email to get a full walkthrough. I'll explain what red flags to look for and why each technique is dangerous.`, 'bot'), 400);
 }
 
@@ -2644,9 +2644,10 @@ function applyGlasswormToResult(emailObj, rawText) {
 let cipherEmailContext = null;
 
 function toggleCipher() {
-  cipherOpen = !cipherOpen;
-  document.getElementById('cipherPanel').classList.toggle('open', cipherOpen);
-  if (cipherOpen) document.getElementById('cipherInput').focus();
+  if (typeof cipherOpen === 'undefined') window.cipherOpen = false;
+  window.cipherOpen = !window.cipherOpen;
+  document.getElementById('cipherPanel').classList.toggle('open', window.cipherOpen);
+  if (window.cipherOpen) document.getElementById('cipherInput').focus();
 }
 
 function setCipherContext(email) {
