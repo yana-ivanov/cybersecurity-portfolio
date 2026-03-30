@@ -1331,13 +1331,8 @@ footer a:hover { color: var(--accent); }
 <nav class="nav">
   <span class="nav-brand">// email threat analyzer</span>
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-    <input type="password" id="anthropicApiKey" placeholder="sk-ant-… Anthropic API key"
-      style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:6px 11px;border-radius:5px;font-family:var(--mono);font-size:11px;outline:none;width:220px;transition:border-color 0.2s;"
-      onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'"
-      oninput="saveApiKey(this.value)"
-      title="Required for all AI features. Get one at console.anthropic.com/keys">
     <input type="password" id="vtApiKey" placeholder="VirusTotal key (optional)"
-      style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:6px 11px;border-radius:5px;font-family:var(--mono);font-size:11px;outline:none;width:175px;transition:border-color 0.2s;"
+      style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:6px 11px;border-radius:5px;font-family:var(--mono);font-size:11px;outline:none;width:185px;transition:border-color 0.2s;"
       onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'"
       title="Optional — enables live URL scanning. Free at virustotal.com">
     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark theme">
@@ -1399,16 +1394,15 @@ footer a:hover { color: var(--accent); }
             <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
               <button class="btn" id="connectBtn" onclick="connectGmail()">Connect Gmail</button>
               <div style="font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.8;">
-                Requires your <strong style="color:var(--text)">Anthropic API key</strong> in the nav bar above.<br>
-                Get one free at <a href="https://console.anthropic.com/keys" target="_blank" style="color:var(--blue)">console.anthropic.com/keys</a><br>
-                Gmail must also be authorized in your Anthropic account.
+                Gmail must be authorized in your Anthropic account.<br>
+                Go to <a href="https://console.anthropic.com" target="_blank" style="color:var(--blue)">console.anthropic.com</a> → Integrations → Gmail ✓
               </div>
             </div>
           </div>
           <div class="connect-card">
             <div class="connect-card-title"><div class="status-dot connected" id="aiDot"></div>AI Analysis Engine</div>
-            <div class="connect-card-desc">All analysis — email threat scoring, IOC extraction, MITRE mapping, CIPHER guidance — runs via the Anthropic API using your key. No data is stored anywhere.</div>
-            <div style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--green);" id="aiStatus">● Enter API key above to get started</div>
+            <div class="connect-card-desc">All analysis runs via a secure proxy — your API key is stored server-side in Cloudflare, never exposed in the browser.</div>
+            <div style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--green);" id="aiStatus">● Ready — API key secured in proxy</div>
           </div>
         </div>
       </div>
@@ -1744,24 +1738,15 @@ function setStep(n) {
 async function connectGmail() {
   const btn = document.getElementById('connectBtn');
   const dot = document.getElementById('gmailDot');
-  const apiKey = getApiKey();
-
-  if (!apiKey) {
-    showConnectError('no-key');
-    return;
-  }
 
   btn.disabled = true;
   btn.textContent = 'Connecting…';
 
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch('https://anthropic-proxy.yanaivanov.workers.dev', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'interop-20250514'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
@@ -1798,21 +1783,15 @@ async function connectGmail() {
   }
 }
 
-function getApiKey() {
-  return document.getElementById('anthropicApiKey')?.value?.trim() || '';
-}
-
 function showConnectError(reason) {
   const aiStatus = document.getElementById('aiStatus');
   aiStatus.style.color = 'var(--orange)';
-
   const msgs = {
-    'no-key':         '⚠ Enter your Anthropic API key above to connect Gmail.',
-    'invalid-key':    '⚠ Invalid API key — check it at console.anthropic.com.',
+    'invalid-key':    '⚠ API key issue — check the Worker has ANTHROPIC_API_KEY set.',
     'no-gmail-scope': '⚠ Gmail not authorized. Enable it at console.anthropic.com → Integrations.',
-    'api-error':      '⚠ API error — check your key and try again.',
+    'api-error':      '⚠ Proxy error — check your Cloudflare Worker is deployed.',
   };
-  aiStatus.innerHTML = msgs[reason] || `⚠ ${reason}`;
+  aiStatus.innerHTML = msgs[reason] || `⚠ Connection failed — check Worker deployment.`;
 }
 
 // ─── FETCH + ANALYZE ──────────────────────────────────
@@ -1904,13 +1883,10 @@ async function fetchEmails() {
 }
 
 async function callGmailAI(prompt) {
-  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+  const resp = await fetch('https://anthropic-proxy.yanaivanov.workers.dev', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': getApiKey(),
-      'anthropic-version': '2023-06-01',
-      'anthropic-beta': 'interop-20250514'
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
@@ -1928,12 +1904,10 @@ async function analyzeBatch(emails) {
     `EMAIL ${i+1}:\nFrom: ${e.from || ''} <${e.fromAddress || ''}>\nSubject: ${e.subject || ''}\nDate: ${e.date || ''}\nSnippet: ${e.snippet || ''}\nHas Attachment: ${e.hasAttachment || false}`
   ).join('\n\n---\n\n');
 
-  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+  const resp = await fetch('https://anthropic-proxy.yanaivanov.workers.dev', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': getApiKey(),
-      'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
@@ -2318,12 +2292,10 @@ async function analyzeBatchPaste(emails) {
     `EMAIL ${i+1}:\nFrom: ${e.from} <${e.fromAddress}>\nTo: ${e.to}\nSubject: ${e.subject}\nDate: ${e.date}\nHas Attachment: ${e.hasAttachment}\n\nHEADERS:\n${e.rawHeaders}\n\nBODY:\n${e.snippet}`
   ).join('\n\n---\n\n');
 
-  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+  const resp = await fetch('https://anthropic-proxy.yanaivanov.workers.dev', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': getApiKey(),
-      'anthropic-version': '2023-06-01'
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
@@ -2719,12 +2691,10 @@ CURRENT EMAIL UNDER REVIEW:
     : 'No scan completed yet.';
 
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    const resp = await fetch('https://anthropic-proxy.yanaivanov.workers.dev', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': getApiKey(),
-        'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
@@ -2898,14 +2868,10 @@ async function vtScanManual() {
 }
 
 // ─── API KEY MANAGEMENT ──────────────────────────────
-function getApiKey() {
-  return document.getElementById('anthropicApiKey')?.value?.trim() || '';
-}
-
-function saveApiKey(val) {
-  // Session only — never persisted to localStorage for security
-  // Key lives only in memory for the duration of this page session
-}
+// API key is stored in Cloudflare Worker env — never in the browser.
+// All fetch calls go to the Worker proxy which injects the key server-side.
+function getApiKey() { return ''; } // unused — kept for safety
+function saveApiKey() {}
 
 // Restore theme preference on load
 (function initSettings() {
