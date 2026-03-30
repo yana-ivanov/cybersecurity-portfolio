@@ -599,13 +599,15 @@ input[type="number"] {
   align-items: center;
   gap: 6px;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .threat-count .num {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   font-family: var(--sans);
+  line-height: 1;
 }
 
 /* EMAIL LIST */
@@ -643,8 +645,8 @@ input[type="number"] {
 .risk-clean    { background: var(--surface3);        border: 1px solid var(--border); }
 
 .email-meta { min-width: 0; }
-.email-sender { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.email-subject { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; font-family: var(--mono); }
+.email-sender { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); letter-spacing: -0.1px; }
+.email-subject { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; font-family: var(--mono); font-weight: 400; }
 
 .badge {
   display: inline-flex;
@@ -2412,17 +2414,31 @@ async function analyzeBatchPaste(emails) {
       max_tokens: 1000,
       messages: [{
         role: 'user',
-        content: `You are a cybersecurity analyst with deep expertise in email forensics and supply chain threats including Glassworm. Analyze each email thoroughly — pay special attention to header anomalies (mismatched From/Reply-To, suspicious received chains, SPF/DKIM hints), domain spoofing, typosquatting, urgency language, credential harvesting patterns, social engineering, and any references to blockchain/crypto infrastructure (Glassworm C2 indicator). Return ONLY a JSON array, no markdown.
+        content: `You are a strict cybersecurity analyst. Analyze each email and assign risk accurately — do NOT default to medium when unsure. Most legitimate emails from known companies (Amazon, Netflix, Glassdoor, Nintendo, banks sending receipts) should be LOW or CLEAN. Only flag MEDIUM or above when there are real, specific indicators.
+
+STRICT RISK RULES:
+- clean: legitimate email from a real company domain, no suspicious indicators whatsoever
+- low: minor anomaly but almost certainly benign (marketing email, newsletter, bulk sender)
+- medium: at least 2 concrete red flags (e.g. urgency + external link, or generic greeting + credential request)
+- high: strong phishing indicators — domain spoof, typosquatting, Reply-To mismatch, fake login link, impersonation of IT/HR/bank
+- critical: clear attack — credential harvesting page, malware attachment, wire transfer fraud, known phishing pattern
+
+KEY RULES:
+- A legitimate Amazon/Netflix/Glassdoor/Nintendo email from their real domain = CLEAN
+- Marketing/promotional email = LOW or CLEAN, never medium unless spoofed
+- "Unknown" sender with no red flags = LOW, not medium
+- Only use medium+ when you can name the specific threat
+- Return ONLY a JSON array, no markdown.
 
 Schema per email:
 {
   "risk": "critical|high|medium|low|clean",
-  "threatType": "Phishing|BEC|Malware Delivery|Social Engineering|Spam|Suspicious|Clean",
-  "summary": "1-2 sentence threat summary",
+  "threatType": "Phishing|BEC|Malware Delivery|Social Engineering|Spam|Newsletter|Clean",
+  "summary": "1-2 sentence summary. If clean, say why it is legitimate.",
   "iocs": [{"type": "Header Anomaly|Domain Spoof|Typosquatting|Urgency|Attachment|Link|Impersonation|Data Request|Reply-To Mismatch|Other", "description": "what was found", "example": "exact value from email", "severity": "high|medium|low"}],
   "mitre": ["T1566.001 Spearphishing Attachment"],
-  "training": {"title": "Training tip title", "explanation": "2-3 sentences for employees", "redFlags": ["specific flag 1", "specific flag 2", "specific flag 3"]},
-  "bodyHighlights": "suspicious phrases comma-separated"
+  "training": {"title": "Training tip", "explanation": "2-3 sentences for employees", "redFlags": ["flag 1", "flag 2"]},
+  "bodyHighlights": "suspicious phrases only, comma-separated, empty string if clean"
 }
 
 Emails:
