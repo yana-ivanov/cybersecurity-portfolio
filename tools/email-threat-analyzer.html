@@ -127,7 +127,48 @@ body.light .toggle-thumb { transform: translateX(12px); }
 
 /* ── LIGHT THEME FONT OVERRIDES ──
    Scale up all small text for light mode readability.
-   Dark mode keeps dense sizing; light mode is more airy and legible. */
+   Both themes now share the same readable font sizes. */
+
+/* Dark theme font sizes — match light theme */
+body:not(.light) { font-size: 15px; }
+body:not(.light) .page-tag         { font-size: 13px; }
+body:not(.light) .page-desc        { font-size: 16px; }
+body:not(.light) .step-label       { font-size: 15px; }
+body:not(.light) .step-sub         { font-size: 13px; }
+body:not(.light) .panel-title      { font-size: 14px; }
+body:not(.light) .connect-card-title { font-size: 15px; }
+body:not(.light) .connect-card-desc  { font-size: 14px; }
+body:not(.light) .field label      { font-size: 12px; }
+body:not(.light) select,
+body:not(.light) input[type="number"] { font-size: 14px; }
+body:not(.light) .btn              { font-size: 14px; }
+body:not(.light) .btn-ghost        { font-size: 14px; }
+body:not(.light) .mode-tab         { font-size: 13px; }
+body:not(.light) .filter-chip      { font-size: 13px; }
+body:not(.light) .email-sender     { font-size: 15px; }
+body:not(.light) .email-subject    { font-size: 13px; }
+body:not(.light) .date-mono        { font-size: 13px; }
+body:not(.light) .badge            { font-size: 12px; padding: 4px 10px; }
+body:not(.light) .section-head     { font-size: 13px; }
+body:not(.light) .ioc-type         { font-size: 12px; min-width: 100px; }
+body:not(.light) .ioc-desc         { font-size: 14px; }
+body:not(.light) .ioc-example      { font-size: 13px; }
+body:not(.light) .mitre-tag        { font-size: 13px; }
+body:not(.light) .training-card-title { font-size: 15px; }
+body:not(.light) .training-card p  { font-size: 14px; }
+body:not(.light) .training-card li { font-size: 14px; }
+body:not(.light) .email-body-raw   { font-size: 13px; }
+body:not(.light) .progress-label   { font-size: 14px; }
+body:not(.light) .progress-log     { font-size: 13px; }
+body:not(.light) .how-to-title     { font-size: 13px; }
+body:not(.light) .how-to-steps     { font-size: 12px; }
+body:not(.light) .demo-card-title  { font-size: 13px; }
+body:not(.light) .demo-card-desc   { font-size: 12px; }
+body:not(.light) .cipher-msg       { font-size: 13px; }
+body:not(.light) .cipher-chip      { font-size: 11px; }
+body:not(.light) #drSender         { font-size: 17px !important; }
+body:not(.light) #drSubject        { font-size: 13px !important; }
+body:not(.light) #drSummary        { font-size: 14px !important; }
 body.light {
   font-size: 15px;
 }
@@ -259,7 +300,7 @@ select, input, textarea, footer {
   font-family: 'DM Mono', 'Share Tech Mono', monospace;
   font-size: 13px;
   letter-spacing: 0.12em;
-  color: var(--muted);
+  color: #4a9eff;
   text-decoration: none;
   text-transform: uppercase;
   display: inline-flex;
@@ -267,7 +308,9 @@ select, input, textarea, footer {
   gap: 0.5rem;
   transition: color 0.2s;
 }
-.back-nav-link:hover { color: var(--text); }
+.back-nav-link:hover { color: #93c5fd; }
+body.light .back-nav-link { color: var(--muted); }
+body.light .back-nav-link:hover { color: var(--text); }
 
 .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; }
 
