@@ -1788,6 +1788,7 @@ async function connectGmail() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'X-Anthropic-Beta': 'interop-20250514',
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
@@ -1928,6 +1929,7 @@ async function callGmailAI(prompt) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'X-Anthropic-Beta': 'interop-20250514',
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
