@@ -1430,19 +1430,19 @@ footer a:hover { color: var(--accent); }
         <div class="connect-grid">
           <div class="connect-card">
             <div class="connect-card-title"><div class="status-dot" id="gmailDot"></div>Gmail Live Connection</div>
-            <div class="connect-card-desc">Pulls your inbox live via the Gmail MCP integration. Best for bulk historical analysis — fetches full headers and metadata automatically.</div>
+            <div class="connect-card-desc">Gmail Live requires Claude.ai's MCP integration and is only available when running this tool inside the Claude.ai interface — not from GitHub Pages.</div>
             <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
-              <button class="btn" id="connectBtn" onclick="connectGmail()">Connect Gmail</button>
+              <button class="btn" style="opacity:0.4;cursor:not-allowed;" disabled>Gmail Live — Claude.ai only</button>
               <div style="font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.8;">
-                Gmail must be authorized in your Anthropic account.<br>
-                Go to <a href="https://console.anthropic.com" target="_blank" style="color:var(--blue)">console.anthropic.com</a> → Integrations → Gmail ✓
+                To analyze your Gmail inbox, use the <strong style="color:var(--text)">📁 Upload File</strong> tab instead —<br>
+                Gmail → open email → ⋮ → Download message → upload the .eml file here.
               </div>
             </div>
           </div>
           <div class="connect-card">
             <div class="connect-card-title"><div class="status-dot connected" id="aiDot"></div>AI Analysis Engine</div>
-            <div class="connect-card-desc">All analysis runs via a secure proxy — your API key is stored server-side in Cloudflare, never exposed in the browser.</div>
-            <div style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--green);" id="aiStatus">● Ready — API key secured in proxy</div>
+            <div class="connect-card-desc">All analysis runs via a secure Cloudflare proxy — your API key is stored server-side, never exposed in the browser. Upload, Paste, and Demo modes all work fully.</div>
+            <div style="margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--green);" id="aiStatus">● Ready — use Upload, Paste Raw, or Demo Samples</div>
           </div>
         </div>
       </div>
