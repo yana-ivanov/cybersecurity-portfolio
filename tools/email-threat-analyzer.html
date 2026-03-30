@@ -145,7 +145,7 @@ body:not(.light) .btn              { font-size: 14px; }
 body:not(.light) .btn-ghost        { font-size: 14px; }
 body:not(.light) .mode-tab         { font-size: 13px; }
 body:not(.light) .filter-chip      { font-size: 13px; }
-body:not(.light) .email-sender     { font-size: 15px; }
+body:not(.light) .email-sender     { font-size: 14px; }
 body:not(.light) .email-subject    { font-size: 13px; }
 body:not(.light) .date-mono        { font-size: 13px; }
 body:not(.light) .badge            { font-size: 12px; padding: 4px 10px; }
@@ -188,7 +188,7 @@ body.light .btn-ghost        { font-size: 14px; }
 body.light .mode-tab         { font-size: 13px; }
 body.light .filter-chip      { font-size: 13px; }
 body.light .search-input-wrap input { font-size: 14px; }
-body.light .email-sender     { font-size: 15px; }
+body.light .email-sender     { font-size: 14px; }
 body.light .email-subject    { font-size: 13px; }
 body.light .date-mono        { font-size: 13px; }
 body.light .badge            { font-size: 12px; padding: 4px 10px; }
@@ -615,11 +615,11 @@ input[type="number"] {
 
 .email-row {
   display: grid;
-  grid-template-columns: 36px 1fr 120px 80px 80px;
+  grid-template-columns: 36px 1fr 130px 90px;
   align-items: center;
-  padding: 12px 20px;
+  padding: 13px 20px;
   border-bottom: 1px solid var(--border);
-  gap: 12px;
+  gap: 14px;
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -645,8 +645,8 @@ input[type="number"] {
 .risk-clean    { background: var(--surface3);        border: 1px solid var(--border); }
 
 .email-meta { min-width: 0; }
-.email-sender { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); letter-spacing: -0.1px; }
-.email-subject { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; font-family: var(--mono); font-weight: 400; }
+.email-sender { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+.email-subject { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 3px; font-weight: 400; }
 
 .badge {
   display: inline-flex;
@@ -1775,9 +1775,9 @@ footer a:hover { color: var(--accent); }
             <button class="vt-btn" onclick="vtScanManual()">⬡ Scan URL</button>
           </div>
           <div id="vtResults"></div>
-          <div class="vt-key-note" id="vtKeyNote">
-            Add your free VirusTotal API key in the nav bar to enable live scanning.
-            Get one at <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener">virustotal.com</a> — free tier allows 4 lookups/min.
+          <div class="vt-key-note" id="vtKeyNote" style="display:none;">
+            Optional for analysts: add a free VirusTotal API key in the nav bar to enable live URL scanning.
+            <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener">virustotal.com</a> — free tier, 4 lookups/min.
           </div>
         </div>
       </div>
@@ -2067,6 +2067,51 @@ ${emailsStr}`
   });
 }
 
+function decodeEmailBody(raw) {
+  // Check if body is base64 encoded
+  const b64Match = raw.match(/Content-Transfer-Encoding:\s*base64[\r\n]+[\r\n]+([\s\S]+?)(?=--|\Z|$)/i);
+  if (b64Match) {
+    try {
+      const b64 = b64Match[1].replace(/\s+/g, '');
+      const padded = b64 + '='.repeat((4 - b64.length % 4) % 4);
+      return atob(padded);
+    } catch(e) {}
+  }
+  // Check quoted-printable
+  const qpMatch = raw.match(/Content-Transfer-Encoding:\s*quoted-printable[\r\n]+([\s\S]+?)(?=--|$)/i);
+  if (qpMatch) {
+    return qpMatch[1]
+      .replace(/=\r?\n/g, '')
+      .replace(/=([0-9A-F]{2})/gi, (m, h) => String.fromCharCode(parseInt(h, 16)));
+  }
+  return raw;
+}
+
+// ─── DECODE ENCODED EMAIL SUBJECTS ───────────────────
+function decodeEmailSubject(subject) {
+  if (!subject) return '';
+  try {
+    // Handle =?UTF-8?B?base64?= encoded words
+    subject = subject.replace(/=\?([^?]+)\?B\?([^?]+)\?=/gi, (match, charset, b64) => {
+      try {
+        const bytes = atob(b64.replace(/-/g,'+').replace(/_/g,'/'));
+        return decodeURIComponent(bytes.split('').map(c => '%' + c.charCodeAt(0).toString(16).padStart(2,'0')).join(''));
+      } catch(e) { return match; }
+    });
+    // Handle =?UTF-8?Q?quoted-printable?= encoded words
+    subject = subject.replace(/=\?([^?]+)\?Q\?([^?]+)\?=/gi, (match, charset, qp) => {
+      try {
+        return decodeURIComponent(qp.replace(/_/g,' ').replace(/=([0-9A-F]{2})/gi, '%$1'));
+      } catch(e) { return match; }
+    });
+    // Handle ISO-8859 variants
+    subject = subject.replace(/=\?ISO-8859-[^?]+\?B\?([^?]+)\?=/gi, (match, b64) => {
+      try { return atob(b64); } catch(e) { return match; }
+    });
+  } catch(e) {}
+  return subject.trim();
+}
+
 // ─── RENDER RESULTS ───────────────────────────────────
 function renderResults() {
   const counts = { total: allResults.length, critical: 0, high: 0, medium: 0, low: 0, clean: 0 };
@@ -2112,14 +2157,14 @@ function renderList() {
     const icon = riskIcons[r] || '?';
     const dateStr = e.date ? new Date(e.date).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '—';
     const type = e.analysis?.threatType || '';
+    const subject = decodeEmailSubject(e.subject || '(no subject)');
     return `<div class="email-row ${selectedEmail?.id === e.id ? 'selected' : ''}" onclick="openDrawer('${esc(e.id)}')">
       <div class="risk-icon risk-${r}">${icon}</div>
       <div class="email-meta">
         <div class="email-sender">${esc(e.from || e.fromAddress || 'Unknown Sender')}</div>
-        <div class="email-subject">${esc(e.subject || '(no subject)')}</div>
+        <div class="email-subject">${esc(subject)}</div>
       </div>
       <div><span class="badge badge-${r}">${riskLabels[r]}</span></div>
-      <div style="font-family:var(--mono);font-size:10px;color:var(--muted)">${esc(type)}</div>
       <div class="date-mono">${dateStr}</div>
     </div>`;
   }).join('');
@@ -2424,7 +2469,9 @@ STRICT RISK RULES:
 - critical: clear attack — credential harvesting page, malware attachment, wire transfer fraud, known phishing pattern
 
 KEY RULES:
-- A legitimate Amazon/Netflix/Glassdoor/Nintendo email from their real domain = CLEAN
+- A legitimate Amazon/Netflix/Glassdoor/Nintendo/Google/Microsoft email from their real domain = CLEAN
+- Google security alerts from accounts.google.com links = CLEAN — these are legitimate
+- Base64 encoded body alone is NOT a red flag — it is standard for Google, Apple, and major senders
 - Marketing/promotional email = LOW or CLEAN, never medium unless spoofed
 - "Unknown" sender with no red flags = LOW, not medium
 - Only use medium+ when you can name the specific threat
@@ -2626,11 +2673,18 @@ async function analyzeUploaded() {
     const get = k => { const l = lines.find(l => l.toLowerCase().startsWith(k.toLowerCase()+':')); return l ? l.slice(k.length+1).trim() : ''; };
     const fromRaw = get('From'); const fm = fromRaw.match(/^(.*?)\s*<(.+?)>$/) || [];
     const bi = lines.findIndex(l => l.trim() === '');
-    const body = bi > -1 ? lines.slice(bi+1).join('\n').trim() : e.raw;
+    const rawBody = bi > -1 ? lines.slice(bi+1).join('\n').trim() : e.raw;
+    const body = decodeEmailBody(rawBody);
+    // Strip base64/encoded content blocks from headers before sending to AI
+    const cleanHeaders = lines.slice(0, bi > -1 ? bi : 30)
+      .filter(l => !l.match(/^[A-Za-z0-9+/]{40,}={0,2}$/)) // remove base64 lines
+      .join('\n');
+
     return { id:'upload-'+Date.now()+'-'+i, from:fm[1]?.trim()||fromRaw, fromAddress:fm[2]||fromRaw,
-      to:get('To'), subject:get('Subject')||e.name, date:get('Date'), snippet:body.slice(0,500),
+      to:get('To'), subject:decodeEmailSubject(get('Subject')||e.name), date:get('Date'),
+      snippet:body.slice(0,500),
       hasAttachment:e.raw.toLowerCase().includes('content-disposition: attachment'),
-      rawHeaders:lines.slice(0,bi>-1?bi:30).join('\n'), source:'upload' };
+      rawHeaders: cleanHeaders, source:'upload' };
   });
 
   setProgress(50,'Running AI analysis…'); addLog(`Analyzing ${parsed.length} email(s)`);
