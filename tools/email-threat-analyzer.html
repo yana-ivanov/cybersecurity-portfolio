@@ -2158,7 +2158,7 @@ function renderList() {
 
   // Sort: most severe first
   const riskOrder = { critical:0, high:1, medium:2, low:3, clean:4 };
-  filtered.sort((a,b) => (riskOrder[a.analysis?.risk]||4) - (riskOrder[b.analysis?.risk]||4));
+  filtered.sort((a,b) => (riskOrder[a.analysis?.risk] ?? 4) - (riskOrder[b.analysis?.risk] ?? 4));
 
   if (!filtered.length) {
     list.innerHTML = '<div class="state-msg"><div class="big">📭</div>No emails match this filter.</div>';
