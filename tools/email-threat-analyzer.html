@@ -2181,7 +2181,7 @@ function renderList() {
         <div class="email-subject">${esc(subject)}</div>
       </div>
       <div><span class="badge badge-${r}">${riskLabels[r]}</span></div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(type)}</div>
+      ${type ? `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:2px 7px;white-space:nowrap;">${esc(type.toLowerCase())}</div>` : '<div></div>'}
       <div class="date-mono">${dateStr}</div>
     </div>`;
   }).join('');
