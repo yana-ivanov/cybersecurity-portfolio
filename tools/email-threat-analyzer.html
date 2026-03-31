@@ -1367,19 +1367,21 @@ body.drawer-open .cipher-wrap {
 }
 .vt-auto-link-item .vt-url { flex: 1; color: var(--muted); }
 .vt-scan-btn {
-  background: none;
-  border: 1px solid var(--border2);
-  color: var(--blue);
+  background: var(--blue);
+  border: 1px solid var(--blue);
+  color: #fff;
   font-family: var(--mono);
-  font-size: 9px;
-  padding: 3px 8px;
+  font-size: 11px;
+  padding: 5px 14px;
   border-radius: 4px;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
   transition: all 0.15s;
+  letter-spacing: .05em;
 }
-.vt-scan-btn:hover { background: var(--blue-bg); border-color: var(--blue); }
+.vt-scan-btn:hover { background: #1a3d8a; border-color: #1a3d8a; }
+.vt-scan-btn:disabled { opacity: .5; cursor: default; }
 
 .vt-result-row {
   display: flex;
@@ -1774,23 +1776,32 @@ body.drawer-open .cipher-wrap {
       <div>
         <div class="section-head">Link Scanner — VirusTotal</div>
         <div class="vt-section">
-          <div id="vtAutoLinks" class="vt-auto-links"></div>
-          <div class="vt-input-row">
-            <input class="vt-input" id="vtManualUrl" placeholder="Or paste any URL to scan…">
-            <button class="vt-btn" onclick="vtScanManual()">⬡ Scan URL</button>
+
+          <div id="vtKeySetup" style="display:none;margin-bottom:12px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:14px;">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Step 1 — Add your free VirusTotal API key</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:10px;">
+              VirusTotal checks each URL against 70+ security engines for free.<br>
+              To get your key: <strong style="color:var(--text);">1.</strong> Go to <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener" style="color:var(--blue);">virustotal.com</a> and create a free account &nbsp;
+              <strong style="color:var(--text);">2.</strong> Click your profile icon → API Key &nbsp;
+              <strong style="color:var(--text);">3.</strong> Copy and paste it below
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="password" id="vtApiKey" placeholder="Paste your VirusTotal API key here…"
+                style="flex:1;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:9px 12px;border-radius:5px;font-family:var(--mono);font-size:12px;outline:none;transition:border-color 0.2s;"
+                onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'"
+                oninput="onVtKeyInput()">
+              <button onclick="onVtKeyInput()" style="background:var(--blue);color:#fff;border:none;padding:9px 16px;border-radius:5px;font-family:var(--mono);font-size:11px;cursor:pointer;white-space:nowrap;">Save Key</button>
+            </div>
           </div>
+
+          <div id="vtUrlList" style="display:none;">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Step 2 — Scan extracted URLs</div>
+            <div id="vtAutoLinks" class="vt-auto-links"></div>
+          </div>
+
+          <div id="vtNoUrls" style="display:none;font-family:var(--mono);font-size:11px;color:var(--muted);padding:8px 0;">No external URLs detected in this email.</div>
           <div id="vtResults"></div>
-          <div class="vt-key-note" id="vtKeyNote" style="display:none;">
-            <details>
-              <summary style="cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--blue);letter-spacing:0.05em;">⚙ Enable live URL scanning with VirusTotal</summary>
-              <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">
-                <div style="font-size:13px;color:var(--muted);line-height:1.6;">Checks URLs against 70+ security engines. Free key at <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener" style="color:var(--blue)">virustotal.com</a> — 4 scans/min on free tier.</div>
-                <input type="password" id="vtApiKey" placeholder="Paste your VirusTotal API key…"
-                  style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:9px 12px;border-radius:5px;font-family:var(--mono);font-size:12px;outline:none;width:100%;transition:border-color 0.2s;"
-                  onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
-              </div>
-            </details>
-          </div>
+
         </div>
       </div>
 
@@ -3138,33 +3149,45 @@ function extractUrlsFromEmail(email) {
     .slice(0, 6);
 }
 
+function onVtKeyInput() {
+  const key = document.getElementById('vtApiKey')?.value?.trim();
+  if (key) {
+    localStorage.setItem('vtApiKey', key);
+    document.getElementById('vtKeySetup').style.display = 'none';
+    document.getElementById('vtUrlList').style.display = '';
+  }
+}
+
 function populateVtLinks(email) {
   const urls = extractUrlsFromEmail(email);
-  const container = document.getElementById('vtAutoLinks');
-  const keyNote = document.getElementById('vtKeyNote');
-  const vtKey = document.getElementById('vtApiKey').value.trim();
-
-  if (!urls.length) {
-    container.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);">No external URLs detected in this email.</div>';
-    keyNote.style.display = 'none';
-  } else {
-    container.innerHTML = urls.map((u, i) => `
-      <div class="vt-auto-link-item" id="vtlink-${i}">
-        <span class="vt-url">${defang(u)}</span>
-        <button class="vt-scan-btn" onclick="vtScanUrl('${encodeURIComponent(u)}', 'vtlink-${i}')">⬡ Scan</button>
-      </div>`).join('');
-    // Only show VT note to analysts who have URLs to scan but no key
-    keyNote.style.display = vtKey ? 'none' : '';
-  }
+  const storedKey = localStorage.getItem('vtApiKey') || '';
+  const keyInput = document.getElementById('vtApiKey');
+  if (keyInput && storedKey) keyInput.value = storedKey;
 
   document.getElementById('vtResults').innerHTML = '';
+  document.getElementById('vtKeySetup').style.display = storedKey ? 'none' : '';
+  document.getElementById('vtNoUrls').style.display = 'none';
+
+  if (!urls.length) {
+    document.getElementById('vtUrlList').style.display = 'none';
+    document.getElementById('vtNoUrls').style.display = '';
+    return;
+  }
+
+  const container = document.getElementById('vtAutoLinks');
+  container.innerHTML = urls.map((u, i) => `
+    <div class="vt-auto-link-item" id="vtlink-${i}">
+      <span class="vt-url">${defang(u)}</span>
+      <button class="vt-scan-btn" onclick="vtScanUrl('${encodeURIComponent(u)}', 'vtlink-${i}')">Scan</button>
+    </div>`).join('');
+
+  document.getElementById('vtUrlList').style.display = storedKey ? '' : 'none';
 }
 
 async function vtScanUrl(encodedUrl, containerId) {
-  const vtKey = document.getElementById('vtApiKey').value.trim();
+  const vtKey = document.getElementById('vtApiKey')?.value?.trim() || localStorage.getItem('vtApiKey') || '';
   if (!vtKey) {
-    document.getElementById('vtResults').innerHTML =
-      '<div class="vt-key-note" style="display:block;">To scan URLs live, add a free VirusTotal API key below. <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener">Get one here</a>.</div>';
+    document.getElementById('vtKeySetup').style.display = '';
     return;
   }
 
