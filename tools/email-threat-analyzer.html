@@ -1683,14 +1683,16 @@ footer a:hover { color: var(--accent); }
         <button class="btn" id="fetchBtn" onclick="fetchEmails()">⬇ Fetch &amp; Analyze</button>
       </div>
     </div>
-    <div class="progress-wrap" id="progressWrap">
-      <div class="progress-label">
-        <span id="progressText">Initializing...</span>
-        <span id="progressPct">0%</span>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-      <div class="progress-log" id="progressLog"></div>
+  </div>
+
+  <!-- PROGRESS (shared across all modes) -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-label">
+      <span id="progressText">Initializing...</span>
+      <span id="progressPct">0%</span>
     </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-log" id="progressLog"></div>
   </div>
 
   <!-- RESULTS PANEL -->
@@ -2315,7 +2317,6 @@ function switchMode(mode) {
   });
 
   if (mode === 'gmail') {
-    // Restore fetch panel if Gmail is already connected
     if (gmailConnected) {
       document.getElementById('fetchPanel').style.display = 'block';
       setStep(2);
@@ -2325,6 +2326,8 @@ function switchMode(mode) {
     }
   } else {
     document.getElementById('fetchPanel').style.display = 'none';
+    document.getElementById('resultsPanel').style.display = 'none';
+    document.getElementById('progressWrap').classList.remove('show');
   }
 
   if (mode === 'paste' && pasteSlotCount === 0) { addPasteSlot(); setStep(2); }
@@ -2386,7 +2389,6 @@ async function analyzePasted() {
 
   // Show progress panel inline
   document.getElementById('progressWrap').classList.add('show');
-  document.getElementById('fetchPanel').style.display = 'block';
   setStep(3);
   setProgress(10, `Parsing ${emails.length} pasted email(s)…`);
   addLog(`Received ${emails.length} email(s) for analysis`);
@@ -2582,7 +2584,6 @@ function clearDemoSelection() { selectedDemos.clear(); renderDemoGrid(); }
 async function analyzeDemoSelected() {
   const chosen = DEMO_SAMPLES.filter(s => selectedDemos.has(s.id));
   if (!chosen.length) { alert('Select at least one demo scenario.'); return; }
-  document.getElementById('fetchPanel').style.display = 'block';
   document.getElementById('progressWrap').classList.add('show');
   setStep(3); setProgress(10, `Loading ${chosen.length} demo scenario(s)…`);
   const parsed = chosen.map(s => {
@@ -2643,7 +2644,6 @@ function clearUpload() { uploadedFiles=[]; renderUploadedFiles(); }
 async function analyzeUploaded() {
   if (!uploadedFiles.length) return;
 
-  document.getElementById('fetchPanel').style.display = 'block';
   document.getElementById('progressWrap').classList.add('show');
   setStep(3); setProgress(10,`Reading ${uploadedFiles.length} file(s)…`);
 
