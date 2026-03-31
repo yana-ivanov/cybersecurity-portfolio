@@ -1145,7 +1145,11 @@ footer a:hover { color: var(--accent); }
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 300;
+  z-index: 200;
+  transition: right 0.25s ease;
+}
+body.drawer-open .cipher-wrap {
+  right: calc(min(720px, 50vw) + 24px);
 }
 
 .cipher-btn {
@@ -1362,19 +1366,22 @@ footer a:hover { color: var(--accent); }
 }
 .vt-auto-link-item .vt-url { flex: 1; color: var(--muted); }
 .vt-scan-btn {
-  background: none;
-  border: 1px solid var(--border2);
-  color: var(--blue);
+  background: var(--accent);
+  border: none;
+  color: #fff;
   font-family: var(--mono);
-  font-size: 9px;
-  padding: 3px 8px;
+  font-size: 11px;
+  padding: 6px 16px;
   border-radius: 4px;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
-  transition: all 0.15s;
+  transition: opacity 0.15s;
+  letter-spacing: .05em;
+  font-weight: 600;
 }
-.vt-scan-btn:hover { background: var(--blue-bg); border-color: var(--blue); }
+.vt-scan-btn:hover { opacity: .85; }
+.vt-scan-btn:disabled { opacity: .4; cursor: default; }
 
 .vt-result-row {
   display: flex;
@@ -1771,23 +1778,31 @@ footer a:hover { color: var(--accent); }
       <div>
         <div class="section-head">Link Scanner — VirusTotal</div>
         <div class="vt-section">
-          <div id="vtAutoLinks" class="vt-auto-links"></div>
-          <div class="vt-input-row">
-            <input class="vt-input" id="vtManualUrl" placeholder="Or paste any URL to scan…">
-            <button class="vt-btn" onclick="vtScanManual()">⬡ Scan URL</button>
+
+          <div id="vtKeySetup" style="background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:14px;margin-bottom:12px;">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;">Add your free VirusTotal API key to scan URLs</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:12px;">
+              <strong style="color:var(--text);">Step 1.</strong> Go to <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener" style="color:var(--blue);">virustotal.com</a> and create a free account<br>
+              <strong style="color:var(--text);">Step 2.</strong> Click your profile icon → <strong style="color:var(--text);">API Key</strong><br>
+              <strong style="color:var(--text);">Step 3.</strong> Copy and paste your key below — free tier allows 4 scans/min
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="password" id="vtApiKey" placeholder="Paste your VirusTotal API key here…"
+                style="flex:1;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:9px 12px;border-radius:5px;font-family:var(--mono);font-size:12px;outline:none;transition:border-color 0.2s;"
+                onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'"
+                oninput="vtKeySaved=false">
+              <button onclick="saveVtKey()" style="background:var(--blue);color:#fff;border:none;padding:9px 16px;border-radius:5px;font-family:var(--mono);font-size:11px;cursor:pointer;white-space:nowrap;letter-spacing:.05em;">Save Key</button>
+            </div>
           </div>
+
+          <div id="vtUrlList" style="display:none;">
+            <div style="font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Extracted URLs — click Scan to check each one</div>
+            <div id="vtAutoLinks" class="vt-auto-links"></div>
+          </div>
+
+          <div id="vtNoUrls" style="display:none;font-family:var(--mono);font-size:11px;color:var(--muted);padding:6px 0;">No external URLs detected in this email.</div>
           <div id="vtResults"></div>
-          <div class="vt-key-note" id="vtKeyNote" style="display:none;">
-            <details>
-              <summary style="cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--blue);letter-spacing:0.05em;">⚙ Enable live URL scanning with VirusTotal</summary>
-              <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">
-                <div style="font-size:13px;color:var(--muted);line-height:1.6;">Checks URLs against 70+ security engines. Free key at <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener" style="color:var(--blue)">virustotal.com</a> — 4 scans/min on free tier.</div>
-                <input type="password" id="vtApiKey" placeholder="Paste your VirusTotal API key…"
-                  style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:9px 12px;border-radius:5px;font-family:var(--mono);font-size:12px;outline:none;width:100%;transition:border-color 0.2s;"
-                  onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
-              </div>
-            </details>
-          </div>
+
         </div>
       </div>
 
@@ -2249,11 +2264,13 @@ function openDrawer(id) {
   `;
 
   document.getElementById('drawerBg').classList.add('open');
+  document.body.classList.add('drawer-open');
 }
 
 function closeDrawer(e) { if (e.target === document.getElementById('drawerBg')) closeDrawerDirect(); }
 function closeDrawerDirect() {
   document.getElementById('drawerBg').classList.remove('open');
+  document.body.classList.remove('drawer-open');
   selectedEmail = null;
   renderList();
 }
@@ -3126,33 +3143,50 @@ function extractUrlsFromEmail(email) {
     .slice(0, 6);
 }
 
+function saveVtKey() {
+  const key = document.getElementById('vtApiKey')?.value?.trim();
+  if (!key) return;
+  localStorage.setItem('vtApiKey', key);
+  const setup = document.getElementById('vtKeySetup');
+  if (setup) setup.style.borderColor = 'var(--green)';
+  repopulateVtLinks();
+}
+
+function repopulateVtLinks() {
+  if (window._currentVtEmail) populateVtLinks(window._currentVtEmail);
+}
+
 function populateVtLinks(email) {
+  window._currentVtEmail = email;
+  const storedKey = localStorage.getItem('vtApiKey') || '';
+  const keyInput = document.getElementById('vtApiKey');
+  if (keyInput && storedKey && !keyInput.value) keyInput.value = storedKey;
+
   const urls = extractUrlsFromEmail(email);
-  const container = document.getElementById('vtAutoLinks');
-  const keyNote = document.getElementById('vtKeyNote');
-  const vtKey = document.getElementById('vtApiKey').value.trim();
+  document.getElementById('vtResults').innerHTML = '';
+  document.getElementById('vtKeySetup').style.display = storedKey ? 'none' : '';
+  document.getElementById('vtNoUrls').style.display = 'none';
+  document.getElementById('vtUrlList').style.display = 'none';
 
   if (!urls.length) {
-    container.innerHTML = '<div style="font-family:var(--mono);font-size:11px;color:var(--muted);">No external URLs detected in this email.</div>';
-    keyNote.style.display = 'none';
-  } else {
-    container.innerHTML = urls.map((u, i) => `
-      <div class="vt-auto-link-item" id="vtlink-${i}">
-        <span class="vt-url">${defang(u)}</span>
-        <button class="vt-scan-btn" onclick="vtScanUrl('${encodeURIComponent(u)}', 'vtlink-${i}')">⬡ Scan</button>
-      </div>`).join('');
-    // Only show VT note to analysts who have URLs to scan but no key
-    keyNote.style.display = vtKey ? 'none' : '';
+    document.getElementById('vtNoUrls').style.display = '';
+    return;
   }
 
-  document.getElementById('vtResults').innerHTML = '';
+  const container = document.getElementById('vtAutoLinks');
+  container.innerHTML = urls.map((u, i) => `
+    <div class="vt-auto-link-item" id="vtlink-${i}">
+      <span class="vt-url">${defang(u)}</span>
+      <button class="vt-scan-btn" onclick="vtScanUrl('${encodeURIComponent(u)}', 'vtlink-${i}')">Scan</button>
+    </div>`).join('');
+
+  document.getElementById('vtUrlList').style.display = storedKey ? '' : 'none';
 }
 
 async function vtScanUrl(encodedUrl, containerId) {
-  const vtKey = document.getElementById('vtApiKey').value.trim();
+  const vtKey = localStorage.getItem('vtApiKey') || document.getElementById('vtApiKey')?.value?.trim() || '';
   if (!vtKey) {
-    document.getElementById('vtResults').innerHTML =
-      '<div class="vt-key-note" style="display:block;">To scan URLs live, add a free VirusTotal API key in the nav bar. <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener">Get one here</a>.</div>';
+    document.getElementById('vtKeySetup').style.display = '';
     return;
   }
 
@@ -3160,29 +3194,48 @@ async function vtScanUrl(encodedUrl, containerId) {
   const btn = document.querySelector(`#${containerId} .vt-scan-btn`);
   if (btn) { btn.textContent = '…'; btn.disabled = true; }
 
+  const proxyBase = 'https://anthropic-proxy.yanaivanov.workers.dev/vt';
+
   try {
-    // VirusTotal URL scan: submit then retrieve
     const urlId = btoa(url).replace(/=+$/, '');
-    const resp = await fetch(`https://www.virustotal.com/api/v3/urls/${urlId}`, {
-      headers: { 'x-apikey': vtKey }
-    });
+    const resp = await fetch(`${proxyBase}?endpoint=${encodeURIComponent('https://www.virustotal.com/api/v3/urls/' + urlId)}&apikey=${encodeURIComponent(vtKey)}`);
 
     if (resp.status === 404) {
-      // Not in cache — submit for scan
-      const submitResp = await fetch('https://www.virustotal.com/api/v3/urls', {
+      showVtResult(url, null, 'scanning', containerId);
+      await fetch(proxyBase, {
         method: 'POST',
-        headers: { 'x-apikey': vtKey, 'content-type': 'application/x-www-form-urlencoded' },
-        body: 'url=' + encodeURIComponent(url)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpoint: 'https://www.virustotal.com/api/v3/urls', apikey: vtKey, body: 'url=' + encodeURIComponent(url) })
       });
-      const submitData = await submitResp.json();
-      showVtResult(url, null, 'submitted', containerId);
+      let attempts = 0;
+      const poll = async () => {
+        attempts++;
+        try {
+          const pr = await fetch(`${proxyBase}?endpoint=${encodeURIComponent('https://www.virustotal.com/api/v3/urls/' + urlId)}&apikey=${encodeURIComponent(vtKey)}`);
+          if (pr.status === 200) {
+            const pd = await pr.json();
+            const stats = pd.data?.attributes?.last_analysis_stats || {};
+            if (Object.values(stats).reduce((a,b)=>a+b,0) > 0) {
+              const malicious = (stats.malicious||0)+(stats.suspicious||0);
+              const total = Object.values(stats).reduce((a,b)=>a+b,0);
+              const categories = pd.data?.attributes?.categories || {};
+              showVtResult(url, { malicious, total, stats, categories }, 'result', containerId);
+              if (btn) { btn.textContent = '✓'; btn.disabled = false; }
+              return;
+            }
+          }
+        } catch(e) {}
+        if (attempts < 6) setTimeout(poll, 8000);
+        else { showVtResult(url, null, 'timeout', containerId); if (btn) { btn.textContent = 'Scan'; btn.disabled = false; } }
+      };
+      setTimeout(poll, 8000);
       return;
     }
 
     const data = await resp.json();
     const stats = data.data?.attributes?.last_analysis_stats || {};
-    const malicious = (stats.malicious || 0) + (stats.suspicious || 0);
-    const total = Object.values(stats).reduce((a, b) => a + b, 0);
+    const malicious = (stats.malicious||0)+(stats.suspicious||0);
+    const total = Object.values(stats).reduce((a,b)=>a+b,0);
     const categories = data.data?.attributes?.categories || {};
     showVtResult(url, { malicious, total, stats, categories }, 'result', containerId);
 
@@ -3190,26 +3243,33 @@ async function vtScanUrl(encodedUrl, containerId) {
     showVtResult(url, null, 'error', containerId);
   }
 
-  if (btn) { btn.textContent = '✓'; }
+  if (btn) { btn.textContent = '✓'; btn.disabled = false; }
 }
 
 function showVtResult(url, data, type, containerId) {
   const results = document.getElementById('vtResults');
-
   if (type === 'error') {
     results.innerHTML += `<div class="vt-result-row"><div class="vt-result-url">${defang(url)}</div><div style="color:var(--muted);font-size:11px;">Scan failed — check your API key or try again.</div></div>`;
     return;
   }
-  if (type === 'submitted') {
-    results.innerHTML += `<div class="vt-result-row"><div class="vt-result-url">${defang(url)}</div><div style="color:var(--yellow);font-size:11px;">Submitted for scanning — check VirusTotal in ~60s for results.</div></div>`;
+  if (type === 'scanning') {
+    results.innerHTML += `<div class="vt-result-row" id="vts-${containerId}"><div class="vt-result-url">${defang(url)}</div><div style="color:var(--blue);font-size:11px;">⟳ Scanning… results in ~30s</div></div>`;
     return;
+  }
+  if (type === 'timeout') {
+    const row = document.getElementById(`vts-${containerId}`);
+    if (row) row.querySelector('div:last-child').textContent = 'Scan timed out — URL may be new. Try again in 60s.';
+    return;
+  }
+  if (type === 'result') {
+    const row = document.getElementById(`vts-${containerId}`);
+    if (row) row.remove();
   }
 
   const { malicious, total, stats, categories } = data;
   const scoreClass = malicious === 0 ? 'vt-clean' : malicious <= 3 ? 'vt-suspicious' : 'vt-malicious';
   const scoreLabel = malicious === 0 ? 'Clean' : malicious <= 3 ? 'Suspicious' : 'Malicious';
   const cats = Object.values(categories).slice(0, 4);
-
   results.innerHTML += `
     <div class="vt-result-row">
       <div class="vt-defanged">${defang(url)}</div>
@@ -3221,14 +3281,6 @@ function showVtResult(url, data, type, containerId) {
         </div>
       </div>
     </div>`;
-}
-
-async function vtScanManual() {
-  const input = document.getElementById('vtManualUrl');
-  const url = input.value.trim();
-  if (!url) return;
-  input.value = '';
-  await vtScanUrl(encodeURIComponent(url), 'vtManualInput');
 }
 
 // ─── API KEY MANAGEMENT ──────────────────────────────
