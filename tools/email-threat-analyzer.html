@@ -2684,19 +2684,26 @@ async function analyzeDemoSelected() {
   if (!chosen.length) { alert('Select at least one demo scenario.'); return; }
   document.getElementById('progressWrap').classList.add('show');
   setStep(3); setProgress(10, `Loading ${chosen.length} demo scenario(s)…`);
-  const parsed = chosen.map(s => {
+
+  const result = chosen.map(s => {
     const lines = s.raw.split('\n');
     const get = k => { const l = lines.find(l => l.toLowerCase().startsWith(k.toLowerCase()+':')); return l ? l.slice(k.length+1).trim() : ''; };
     const fromRaw = get('From'); const fm = fromRaw.match(/^(.*?)\s*<(.+?)>$/) || [];
     const bi = lines.findIndex(l => l.trim() === '');
     const body = bi > -1 ? lines.slice(bi+1).join('\n').trim() : s.raw;
-    return { id:'demo-'+s.id+'-'+Date.now(), from:fm[1]?.trim()||fromRaw, fromAddress:fm[2]||fromRaw,
-      to:get('To'), subject:get('Subject'), date:get('Date'), snippet:body.slice(0,400),
-      hasAttachment:s.raw.toLowerCase().includes('attachment')||s.raw.includes('.zip')||s.raw.includes('.exe'),
-      rawHeaders:lines.slice(0,bi>-1?bi:15).join('\n'), source:'demo' };
+    return {
+      id: 'demo-'+s.id+'-'+Date.now(),
+      from: fm[1]?.trim()||fromRaw,
+      fromAddress: fm[2]||fromRaw,
+      to: get('To'), subject: get('Subject'), date: get('Date'),
+      snippet: body.slice(0,400),
+      hasAttachment: s.raw.toLowerCase().includes('attachment')||s.raw.includes('.zip')||s.raw.includes('.exe'),
+      rawHeaders: lines.slice(0,bi>-1?bi:15).join('\n'),
+      source: 'demo',
+      analysis: s.analysis
+    };
   });
-  addLog(`Loaded ${parsed.length} demo email(s)`); setProgress(35,'Analyzing…');
-  const result = await analyzeBatchPaste(parsed);
+
   setProgress(100,'Demo analysis complete');
   allResults = [...allResults, ...result];
   renderResults();
@@ -2704,7 +2711,7 @@ async function analyzeDemoSelected() {
   document.getElementById('progressWrap').classList.remove('show');
   setStep(4);
   if (!window.cipherOpen) toggleCipher();
-  setTimeout(() => addCipherMsg(`🎓 Training mode active — analyzed ${parsed.length} phishing scenario(s). Click any flagged email to get a full walkthrough. I'll explain what red flags to look for and why each technique is dangerous.`, 'bot'), 400);
+  setTimeout(() => addCipherMsg(`🎓 Training mode active — analyzed ${result.length} phishing scenario(s) from the Meridian Defense Solutions simulation. Click any flagged email to get a full walkthrough of what makes it dangerous and what to look for.`, 'bot'), 400);
 }
 
 // ─── FILE UPLOAD ──────────────────────────────────────
