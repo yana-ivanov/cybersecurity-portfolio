@@ -3197,15 +3197,14 @@ async function vtScanUrl(encodedUrl, containerId) {
 
   try {
     const urlId = btoa(url).replace(/=+$/, '');
-
-    // Route through Cloudflare Worker to avoid CORS
     const proxyBase = 'https://anthropic-proxy.yanaivanov.workers.dev/vt';
 
     const resp = await fetch(`${proxyBase}?endpoint=${encodeURIComponent('https://www.virustotal.com/api/v3/urls/' + urlId)}&apikey=${encodeURIComponent(vtKey)}`);
 
     if (resp.status === 404) {
-      // Not in cache — submit for scan
-      const submitResp = await fetch(`${proxyBase}`, {
+      // Not in cache — submit then poll for results
+      showVtResult(url, null, 'scanning', containerId);
+      await fetch(`${proxyBase}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -3214,7 +3213,32 @@ async function vtScanUrl(encodedUrl, containerId) {
           body: 'url=' + encodeURIComponent(url)
         })
       });
-      showVtResult(url, null, 'submitted', containerId);
+
+      // Poll up to 6 times (every 8 seconds = ~48s max)
+      let attempts = 0;
+      const poll = async () => {
+        attempts++;
+        const pollResp = await fetch(`${proxyBase}?endpoint=${encodeURIComponent('https://www.virustotal.com/api/v3/urls/' + urlId)}&apikey=${encodeURIComponent(vtKey)}`);
+        if (pollResp.status === 200) {
+          const pollData = await pollResp.json();
+          const stats = pollData.data?.attributes?.last_analysis_stats || {};
+          if (Object.values(stats).reduce((a,b) => a+b, 0) > 0) {
+            const malicious = (stats.malicious || 0) + (stats.suspicious || 0);
+            const total = Object.values(stats).reduce((a, b) => a + b, 0);
+            const categories = pollData.data?.attributes?.categories || {};
+            showVtResult(url, { malicious, total, stats, categories }, 'result', containerId);
+            if (btn) { btn.textContent = '✓'; btn.disabled = false; }
+            return;
+          }
+        }
+        if (attempts < 6) {
+          setTimeout(poll, 8000);
+        } else {
+          showVtResult(url, null, 'timeout', containerId);
+          if (btn) { btn.textContent = 'Scan'; btn.disabled = false; }
+        }
+      };
+      setTimeout(poll, 8000);
       return;
     }
 
@@ -3229,8 +3253,7 @@ async function vtScanUrl(encodedUrl, containerId) {
     showVtResult(url, null, 'error', containerId);
   }
 
-  if (btn) { btn.textContent = '✓'; }
-}
+  if (btn) { btn.textContent = '✓'; btn.disabled = false; }
 
 function showVtResult(url, data, type, containerId) {
   const results = document.getElementById('vtResults');
@@ -3239,9 +3262,18 @@ function showVtResult(url, data, type, containerId) {
     results.innerHTML += `<div class="vt-result-row"><div class="vt-result-url">${defang(url)}</div><div style="color:var(--muted);font-size:11px;">Scan failed — check your API key or try again.</div></div>`;
     return;
   }
-  if (type === 'submitted') {
-    results.innerHTML += `<div class="vt-result-row"><div class="vt-result-url">${defang(url)}</div><div style="color:var(--yellow);font-size:11px;">Submitted for scanning — check VirusTotal in ~60s for results.</div></div>`;
+  if (type === 'scanning') {
+    results.innerHTML += `<div class="vt-result-row" id="vt-scanning-${containerId}"><div class="vt-result-url">${defang(url)}</div><div style="color:var(--blue);font-size:11px;">⟳ Scanning… checking results in a moment</div></div>`;
     return;
+  }
+  if (type === 'timeout') {
+    const row = document.getElementById(`vt-scanning-${containerId}`);
+    if (row) row.querySelector('div:last-child').innerHTML = '<span style="color:var(--muted);font-size:11px;">Scan timed out — URL may be too new. Try again in 60s.</span>';
+    return;
+  }
+  if (type === 'result') {
+    const row = document.getElementById(`vt-scanning-${containerId}`);
+    if (row) row.remove();
   }
 
   const { malicious, total, stats, categories } = data;
