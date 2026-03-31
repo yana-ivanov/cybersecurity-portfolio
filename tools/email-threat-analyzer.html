@@ -1364,7 +1364,7 @@ body.drawer-open .cipher-wrap {
   border-radius: 5px;
   word-break: break-all;
 }
-.vt-auto-link-item .vt-url { flex: 1; color: var(--muted); font-size: 12px; }
+.vt-auto-link-item .vt-url { flex: 1; color: var(--muted); }
 .vt-scan-btn {
   background: var(--accent);
   border: none;
@@ -1629,8 +1629,8 @@ body.drawer-open .cipher-wrap {
         <div class="safety-banner green">
           <div class="safety-banner-icon">🎓</div>
           <div>
-            <div style="font-weight:700;margin-bottom:3px;">Training mode — Meridian Defense Solutions scenario</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.6;">You are an employee at Meridian Defense Solutions, a Connecticut defense subcontractor supplying precision components for submarine and aerospace programs. Your company handles Controlled Unclassified Information (CUI) and must comply with CMMC Level 2. Select one or more emails below and analyze them — CIPHER will walk you through each threat.</div>
+            <div style="font-weight:700;margin-bottom:3px;">Training mode — built-in phishing samples</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6;">These are realistic but fictional phishing email samples for classroom training. No real email accounts needed. Select one or more scenarios and run analysis — CIPHER will guide students through what to look for in each.</div>
           </div>
         </div>
 
@@ -2039,7 +2039,7 @@ async function analyzeBatch(emails) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
+      max_tokens: 2000,
       messages: [{
         role: 'user',
         content: `You are a cybersecurity analyst. Analyze each email for threats. Return ONLY a JSON array with one object per email. No markdown, no preamble.
@@ -2079,9 +2079,7 @@ ${emailsStr}`
 
   return emails.map((email, i) => {
     const base = { ...email, analysis: analyses[i] || { risk: 'clean', threatType: 'Unknown', summary: 'Analysis unavailable', iocs: [], mitre: [], training: {}, bodyHighlights: '' } };
-    if (email.source === 'gmail') return base;
-    const rawText = (email.rawHeaders || '') + '\n' + (email.snippet || '');
-    return applyGlasswormToResult(base, rawText);
+    return applyGlasswormToResult(base, email.snippet);
   });
 }
 
@@ -2492,42 +2490,32 @@ async function analyzeBatchPaste(emails) {
       max_tokens: 2000,
       messages: [{
         role: 'user',
-        content: `You are a strict cybersecurity analyst. Analyze each email and assign risk accurately.
+        content: `You are a strict cybersecurity analyst. Analyze each email and assign risk accurately — do NOT default to medium when unsure. Most legitimate emails from known companies (Amazon, Netflix, Glassdoor, Nintendo, banks sending receipts) should be LOW or CLEAN. Only flag MEDIUM or above when there are real, specific indicators.
 
 STRICT RISK RULES:
-- clean: legitimate email from a verified internal domain, no suspicious indicators
-- low: minor anomaly but almost certainly benign (marketing, newsletter)
-- medium: 2+ concrete red flags
-- high: domain spoof, typosquatting, Reply-To mismatch, fake login link, impersonation
-- critical: credential harvesting, malware attachment (.exe/.zip with executables), wire transfer fraud, fake IT/HR/DoD impersonation requesting credentials or money
-
-ALWAYS FLAG AS CRITICAL:
-- Any email requesting wire transfers with Reply-To pointing to gmail/personal email
-- Any ZIP attachment containing .exe or .docm files disguised as documents
-- Any email impersonating IT helpdesk with a link to reset VPN/AD credentials on an external domain
-- Any email claiming to be from DoD/government with an executable attachment requiring admin privileges
-
-ALWAYS FLAG AS HIGH:
-- Any email with a link to a domain that doesn't match the sender's claimed organization
-- Any vendor email requesting banking detail changes
-- Any domain with character substitution (supp1iers, micros0ft, etc.)
+- clean: legitimate email from a real company domain, no suspicious indicators whatsoever
+- low: minor anomaly but almost certainly benign (marketing email, newsletter, bulk sender)
+- medium: at least 2 concrete red flags (e.g. urgency + external link, or generic greeting + credential request)
+- high: strong phishing indicators — domain spoof, typosquatting, Reply-To mismatch, fake login link, impersonation of IT/HR/bank
+- critical: clear attack — credential harvesting page, malware attachment, wire transfer fraud, known phishing pattern
 
 KEY RULES:
-- Reply-To mismatch to gmail = critical BEC indicator
-- External domain in link that doesn't match sender = malicious link
-- .exe or .pdf.exe in attachment = ransomware/malware delivery
-- Sender domain doesn't match company name = domain spoof
-- Legitimate internal email from matching domain with no links or attachments = CLEAN
-- Return ONLY a valid JSON array. You MUST return one object per email. Do not truncate.
+- A legitimate Amazon/Netflix/Glassdoor/Nintendo/Google/Microsoft email from their real domain = CLEAN
+- Google security alerts from accounts.google.com links = CLEAN — these are legitimate
+- Base64 encoded body alone is NOT a red flag — it is standard for Google, Apple, and major senders
+- Marketing/promotional email = LOW or CLEAN, never medium unless spoofed
+- "Unknown" sender with no red flags = LOW, not medium
+- Only use medium+ when you can name the specific threat
+- Return ONLY a JSON array, no markdown.
 
 Schema per email:
 {
   "risk": "critical|high|medium|low|clean",
-  "threatType": "Phishing|BEC|Malware Delivery|Social Engineering|Spam|Newsletter|Clean|Zero-Day",
-  "summary": "1-2 sentence summary.",
+  "threatType": "Phishing|BEC|Malware Delivery|Social Engineering|Spam|Newsletter|Clean",
+  "summary": "1-2 sentence summary. If clean, say why it is legitimate.",
   "iocs": [{"type": "Header Anomaly|Domain Spoof|Typosquatting|Urgency|Attachment|Link|Impersonation|Data Request|Reply-To Mismatch|Other", "description": "what was found", "example": "exact value from email", "severity": "high|medium|low"}],
   "mitre": ["T1566.001 Spearphishing Attachment"],
-  "training": {"title": "Training tip title", "explanation": "2-3 sentences for employees", "redFlags": ["flag 1", "flag 2"]},
+  "training": {"title": "Training tip", "explanation": "2-3 sentences for employees", "redFlags": ["flag 1", "flag 2"]},
   "bodyHighlights": "suspicious phrases only, comma-separated, empty string if clean"
 }
 
@@ -2557,37 +2545,109 @@ const DEMO_SAMPLES = [
   {
     id: 'demo1', label: 'CRITICAL', risk: 'critical',
     title: 'BEC — CEO Wire Fraud',
-    desc: 'Business Email Compromise. Fake CEO email to AP coordinator requesting urgent wire transfer referencing a real submarine contract. Reply-To routes to a personal Gmail.',
-    raw: `From: Thomas Beckett <t.beckett@meridian-defense-grp.com>\nTo: linda.kowalski@meridiandefense.com\nSubject: URGENT — Wire Transfer Required Before EOD\nDate: Mon, 30 Mar 2026 07:18:44 -0500\nReply-To: thomas.beckett.ceo@gmail.com\nX-Originating-IP: 185.234.218.47\n\nLinda,\n\nI'm in a classified briefing at Electric Boat all day and can't take calls. I need you to process a wire transfer before close of business today — this is related to the VA-class hull component contract and must stay confidential until the contract amendment is signed.\n\nAmount: $94,500.00\nBeneficiary: Coastal Precision Components LLC\nAccount Number: 7743021856\nRouting Number: 021000021\nBank: JP Morgan Chase, New York\n\nPlease process immediately and confirm by text — do NOT reply to this email as I won't have access. My personal cell is 203-555-0147.\n\nThank you,\nThomas Beckett\nCEO, Meridian Defense Solutions`
+    desc: 'Business Email Compromise. Fake CEO email requesting urgent wire transfer. Reply-To routes to a personal Gmail — a classic BEC red flag.',
+    analysis: {
+      risk: 'critical', threatType: 'BEC',
+      summary: 'Classic Business Email Compromise impersonating the CEO of Meridian Defense Solutions. The email requests a $94,500 wire transfer referencing a real submarine contract, with a Reply-To pointing to a personal Gmail — meaning any reply goes to the attacker, not the real CEO.',
+      iocs: [
+        {type:'Reply-To Mismatch', description:'Reply-To points to personal Gmail, not company domain', example:'Reply-To: thomas.beckett.ceo@gmail.com', severity:'high'},
+        {type:'Domain Spoof', description:'Sender domain meridian-defense-grp.com does not match meridiandefense.com', example:'t.beckett@meridian-defense-grp.com', severity:'high'},
+        {type:'Urgency', description:'References classified briefing to prevent verification', example:"I'm in a classified briefing at Electric Boat all day and can't take calls", severity:'high'},
+        {type:'Data Request', description:'Requests wire transfer with instruction to keep it secret', example:'must stay confidential — do NOT reply to this email', severity:'high'}
+      ],
+      mitre: ['T1566.002 Spearphishing Link', 'T1534 Internal Spearphishing'],
+      training: {title:'How to spot CEO wire fraud', explanation:'Always verify wire transfer requests through a second channel — call the CEO directly on a known number, never one provided in the email. Check the actual sending domain, not the display name. No legitimate executive will ask you to keep a financial transaction secret from colleagues.', redFlags:['Reply-To is a Gmail address','Sender domain does not match your company','Requests secrecy and urgency simultaneously','Never allows time to verify through normal channels']},
+      bodyHighlights: 'confidential, IMMEDIATELY, do NOT reply, text me on my personal number'
+    },
+    raw: `From: Thomas Beckett <t.beckett@meridian-defense-grp.com>\nTo: linda.kowalski@meridiandefense.com\nSubject: URGENT — Wire Transfer Required Before EOD\nDate: Mon, 30 Mar 2026 07:18:44 -0500\nReply-To: thomas.beckett.ceo@gmail.com\nX-Originating-IP: 185.234.218.47\n\nLinda,\n\nI'm in a classified briefing at Electric Boat all day and can't take calls. I need you to process a wire transfer before close of business today — this is related to the VA-class hull component contract and must stay confidential until the contract amendment is signed.\n\nAmount: $94,500.00\nBeneficiary: Coastal Precision Components LLC\nAccount Number: 7743021856\nRouting Number: 021000021\nBank: JP Morgan Chase, New York\n\nPlease process immediately and confirm by text — do NOT reply to this email as I won't have access. My personal cell is 203-555-0147.\n\nThomas Beckett\nCEO, Meridian Defense Solutions`
   },
   {
     id: 'demo2', label: 'CRITICAL', risk: 'critical',
     title: 'Spearphishing — VPN Credential Theft',
-    desc: 'Targeted spearphishing using Meridian company context. Spoofed IT helpdesk with fake VPN reset portal designed to steal Active Directory credentials and access CUI systems.',
+    desc: 'Spoofed IT helpdesk email with a fake VPN reset portal. Entering credentials gives the attacker full network access including CUI systems.',
+    analysis: {
+      risk: 'critical', threatType: 'Phishing',
+      summary: 'Spearphishing attack impersonating Meridian IT Helpdesk. Creates urgency around VPN expiration and links to an external domain to steal Active Directory credentials, giving the attacker access to all company systems including ITAR document repositories.',
+      iocs: [
+        {type:'Domain Spoof', description:'Sender domain meridian-defense.support-desk.net is not the real company domain', example:'helpdesk@meridian-defense.support-desk.net', severity:'high'},
+        {type:'Reply-To Mismatch', description:'Reply-To points to outlook-helpdesk-portal.com, not Meridian', example:'Reply-To: it-noreply@outlook-helpdesk-portal.com', severity:'high'},
+        {type:'Link', description:'VPN reset link points to external domain, not Meridian IT systems', example:'https://meridian-vpn.active-directory-reset.xyz', severity:'high'},
+        {type:'Urgency', description:'2-hour deadline designed to prevent careful review', example:'expires at 1:00 PM EST today', severity:'medium'}
+      ],
+      mitre: ['T1566.002 Spearphishing Link', 'T1078 Valid Accounts'],
+      training: {title:'How to spot fake IT helpdesk emails', explanation:"Your real IT helpdesk will never ask you to enter your current password to reset it. Always verify IT requests by calling the help desk directly using a number from the company directory — not from the email. Real Meridian IT links go to meridiandefense.com, not external domains like active-directory-reset.xyz.", redFlags:['Sending domain does not match company domain','Link goes to external domain not controlled by your company','Requires current password to verify identity','Threatens long lockout to create panic']},
+      bodyHighlights: 'expires at 1:00 PM, locked out, ITAR-controlled, SPRS compliance portal'
+    },
     raw: `From: Meridian IT Helpdesk <helpdesk@meridian-defense.support-desk.net>\nTo: employee@meridiandefense.com\nSubject: [URGENT] Your VPN and network access expires in 2 hours\nDate: Mon, 30 Mar 2026 10:44:11 -0500\nReply-To: it-noreply@outlook-helpdesk-portal.com\nX-Mailer: PHPMailer 6.5.0\n\nHello,\n\nOur systems have detected that your VPN credentials are scheduled to expire at 1:00 PM EST today. Failure to reset before expiration will lock you out of all Meridian network resources including shared drives, ITAR-controlled document repositories, and the SPRS compliance portal for up to 72 hours.\n\nReset your credentials here:\nhttps://meridian-vpn.active-directory-reset.xyz/auth?emp=reset\n\nYou will need your current username and Windows password to verify your identity.\n\nIT Support\nMeridian Defense Solutions\nTicket Reference: ITH-20260330-9921`
   },
   {
     id: 'demo3', label: 'CRITICAL', risk: 'critical',
     title: 'Ransomware — Malicious ZIP in HR Email',
-    desc: 'Ransomware delivery disguised as a CMMC compliance update. ZIP attachment contains a disguised executable that would encrypt all CUI files on the network.',
+    desc: 'Ransomware delivery disguised as a CMMC policy update. The ZIP contains a .pdf.exe file — opening it encrypts all CUI files on the network.',
+    analysis: {
+      risk: 'critical', threatType: 'Malware Delivery',
+      summary: 'Ransomware delivery disguised as a mandatory CMMC compliance document. The ZIP attachment contains CUI_Handling_Procedures_v3.pdf.exe — a double extension trick where the file looks like a PDF but is an executable that would encrypt all files on the network and connected drives.',
+      iocs: [
+        {type:'Domain Spoof', description:'Sender domain meridian-defense-hr.org is not the real company HR domain', example:'hr-compliance@meridian-defense-hr.org', severity:'high'},
+        {type:'Attachment', description:'ZIP contains a .pdf.exe file — double extension disguises executable as a document', example:'CUI_Handling_Procedures_v3.pdf.exe', severity:'high'},
+        {type:'Attachment', description:'Macro-enabled Word document that could execute additional payloads', example:'Acknowledgment_Form.docm', severity:'high'},
+        {type:'Urgency', description:'Compliance deadline and access suspension threat to force quick action', example:'Employees who do not complete this by the deadline will have CUI system access suspended', severity:'medium'}
+      ],
+      mitre: ['T1566.001 Spearphishing Attachment', 'T1204.002 Malicious File', 'T1486 Data Encrypted for Impact'],
+      training: {title:'How to spot ransomware delivered by email', explanation:'Never open ZIP attachments from HR or compliance teams without verifying directly with HR by phone. A file ending in .pdf.exe is an executable, not a PDF — Windows often hides the .exe part by default. Real HR policy documents come from your actual company domain and are shared through internal systems, not email attachments.', redFlags:['Sender domain does not match real company HR domain','.pdf.exe double extension hides executable as document','.docm files can run macros automatically','Compliance threat creates pressure to open without thinking']},
+      bodyHighlights: 'mandatory, suspended, CUI system access, deadline'
+    },
     raw: `From: HR Department <hr-compliance@meridian-defense-hr.org>\nTo: all-staff@meridiandefense.com\nSubject: Action Required — Updated CUI Handling Policy 2026\nDate: Mon, 30 Mar 2026 09:00:00 -0500\nX-Originating-IP: 77.88.21.145\n\nDear Meridian Team,\n\nAs part of our CMMC Level 2 compliance preparation, all employees who handle Controlled Unclassified Information are required to review and acknowledge the updated CUI Handling Policy effective April 1, 2026.\n\nPlease open the attached document, read the updated procedures, and complete the acknowledgment form by Friday, April 4th. Employees who do not complete this by the deadline will have CUI system access suspended.\n\nAttachment: CUI_Policy_Update_2026.zip\nContents: CUI_Handling_Procedures_v3.pdf.exe, Acknowledgment_Form.docm\n\nHR & Compliance Team\nMeridian Defense Solutions`
   },
   {
     id: 'demo4', label: 'HIGH', risk: 'high',
     title: 'Malicious Link — Fake Supplier Portal',
-    desc: 'Email with a malicious link disguised as a vendor portal migration. Clicking silently installs a credential harvester before showing a legitimate-looking login page.',
+    desc: 'Lookalike vendor domain with malicious link. Uses number 1 instead of letter l in domain name. Clicking harvests credentials silently.',
+    analysis: {
+      risk: 'high', threatType: 'Phishing',
+      summary: 'Malicious link attack using a lookalike vendor domain with character substitution. The domain acme-supp1iers.com uses the number 1 instead of the letter l — almost invisible at a glance. The link leads to a credential harvesting site disguised as a supplier portal.',
+      iocs: [
+        {type:'Typosquatting', description:'Domain uses number 1 in place of letter l to impersonate the real vendor', example:'acme-supp1iers.com (1 not l)', severity:'high'},
+        {type:'Link', description:'Registration link points to vendor-migration.net, not the vendor real domain', example:'https://acme-suppliers-portal.vendor-migration.net', severity:'high'},
+        {type:'Data Request', description:'Requests company credentials and DUNS number through an external site', example:'You will need your current Acme account credentials and your company DUNS number', severity:'medium'}
+      ],
+      mitre: ['T1566.002 Spearphishing Link', 'T1598.003 Spearphishing Link for Credential Access'],
+      training: {title:'How to spot lookalike domains and malicious links', explanation:"Always check the exact spelling of a sender email domain — attackers swap numbers for letters (1 for l, 0 for o) to create domains that look identical at a glance. Before clicking any link, hover over it and check the domain. For any vendor requesting credential or banking changes, call them directly using a number from your own records.", redFlags:['Domain contains number 1 in place of letter l','Link goes to vendor-migration.net — not the vendor real domain','Requests credentials through an external site','Threatens PO holds to create urgency']},
+      bodyHighlights: 'must re-register, avoid disruption, POs will be placed on hold'
+    },
     raw: `From: James Whitfield <j.whitfield@acme-supp1iers.com>\nTo: ap@meridiandefense.com\nSubject: RE: Supplier Portal Migration — Action Required by April 4\nDate: Mon, 30 Mar 2026 13:10:22 -0500\n\nHi,\n\nAcme Suppliers is migrating to a new supplier portal for invoice management and purchase order tracking. All vendor contacts must re-register before April 4 to avoid disruption to existing purchase orders.\n\nRegister here:\nhttps://acme-suppliers-portal.vendor-migration.net/register?ref=meridian\n\nYou will need your current Acme account credentials and your company DUNS number. The process takes about 3 minutes.\n\nIf you do not register by April 4, your existing POs will be placed on hold.\n\nJames Whitfield\nVendor Relations, Acme Suppliers Inc.`
   },
   {
     id: 'demo5', label: 'HIGH', risk: 'high',
     title: 'Zero-Day — Fake DoD Compliance Tool',
-    desc: 'Zero-day attack disguised as an official DoD CMMC scanner. The executable exploits an unpatched vulnerability — no antivirus signatures exist for it yet. Requires admin privileges to maximize damage.',
+    desc: 'Impersonates the Department of Defense. The .exe exploits an unpatched vulnerability — no antivirus can detect it yet. Your judgment is the only defense.',
+    analysis: {
+      risk: 'high', threatType: 'Zero-Day',
+      summary: 'Zero-day attack impersonating the Department of Defense. The email targets compliance officers with a fake CMMC pre-assessment tool. Because zero-day attacks use unknown vulnerabilities, standard antivirus will not catch it — making the human ability to recognize suspicious emails the only line of defense.',
+      iocs: [
+        {type:'Domain Spoof', description:'Sender uses .org domain — all real DoD emails come from .mil addresses', example:'cmmc-notices@dod-compliance-portal.org', severity:'high'},
+        {type:'Attachment', description:'Executable disguised as a compliance tool requiring admin privileges', example:'CMMC_PreAssessment_Tool_v2.1.exe', severity:'high'},
+        {type:'Impersonation', description:'Impersonates a real DoD office to appear authoritative', example:'Office of the Under Secretary of Defense for Acquisition and Sustainment', severity:'high'},
+        {type:'Link', description:'Download link goes to compliance-scanner.net, not a .mil or .gov domain', example:'https://dod-cmmc-tools.compliance-scanner.net', severity:'high'}
+      ],
+      mitre: ['T1566.001 Spearphishing Attachment', 'T1204.002 Malicious File', 'T1068 Exploitation for Privilege Escalation'],
+      training: {title:'How to spot fake government emails', explanation:'All legitimate DoD communications come from .mil email addresses — never .org, .com, or .net. The DoD will never send compliance tools as email attachments. If you receive a government email asking you to run an executable, do not open it and report it to your security team immediately. Zero-day attacks are designed to bypass antivirus — your skepticism is the last defense.', redFlags:['DoD sender using .org instead of .mil','Executable attachment requiring administrator privileges','Download link goes to .net, not .mil or .gov','Combines authority with compliance urgency to override caution']},
+      bodyHighlights: 'mandatory, administrator privileges, SPRS affirmations, pre-assessment'
+    },
     raw: `From: DoD Cybersecurity Compliance <cmmc-notices@dod-compliance-portal.org>\nTo: compliance@meridiandefense.com\nSubject: Required: CMMC Pre-Assessment Scan Tool — Install Before April 10\nDate: Mon, 30 Mar 2026 14:30:00 -0500\n\nDear Compliance Officer,\n\nThe Office of the Under Secretary of Defense for Acquisition and Sustainment is issuing a pre-assessment diagnostic tool to all Level 2 contractors ahead of the November 2026 C3PAO assessment window.\n\nThis tool scans your environment against all 110 NIST SP 800-171 controls and generates a pre-assessment gap report. Installation is mandatory for contractors with active SPRS affirmations.\n\nDownload and run the scan tool:\nhttps://dod-cmmc-tools.compliance-scanner.net/download?contractor=meridian\n\nAttachment: CMMC_PreAssessment_Tool_v2.1.exe\n\nThis tool must be run with administrator privileges to access all required system areas.\n\nOffice of the CDAO\nDepartment of Defense`
   },
   {
     id: 'demo6', label: 'CLEAN', risk: 'clean',
     title: 'Clean — Legitimate HR Training Notice',
-    desc: 'A real internal HR email about mandatory CMMC training. Included for comparison — shows employees what a legitimate company email looks like vs. the threats above.',
+    desc: 'A real internal HR email about mandatory CMMC training. Included for comparison — shows what a safe company email looks like.',
+    analysis: {
+      risk: 'clean', threatType: 'Clean',
+      summary: 'Legitimate internal HR email from a verified Meridian Defense Solutions address. The sender domain matches the company, there are no external links, no attachments, no urgency tactics, and no requests for credentials or financial information.',
+      iocs: [],
+      mitre: [],
+      training: {title:'What a legitimate company email looks like', explanation:'This email comes from the real company domain (meridiandefense.com), contains no external links or suspicious attachments, uses a calm professional tone without artificial urgency, and provides a direct contact for questions. Compare the sender domain, tone, and requests here to the phishing emails above — the differences are clear once you know what to look for.', redFlags:[]},
+      bodyHighlights: ''
+    },
     raw: `From: Sarah Chen <s.chen@meridiandefense.com>\nTo: all-staff@meridiandefense.com\nSubject: Mandatory CMMC Security Awareness Training — Complete by April 15\nDate: Mon, 30 Mar 2026 08:30:00 -0500\n\nHi everyone,\n\nAs part of our CMMC Level 2 compliance requirements under NIST SP 800-171 Control 3.2.1, all employees must complete the annual cybersecurity awareness training by April 15, 2026.\n\nThe training covers phishing recognition, CUI handling procedures, incident reporting, and password hygiene. It takes approximately 45 minutes and is available at training.meridiandefense.com.\n\nEmployees who do not complete by April 15 will have CUI system access suspended until completion.\n\nSarah Chen\nHR & Compliance Coordinator\nMeridian Defense Solutions\ns.chen@meridiandefense.com | (203) 555-0182`
   }
 ]
@@ -2619,25 +2679,19 @@ async function analyzeDemoSelected() {
   if (!chosen.length) { alert('Select at least one demo scenario.'); return; }
   document.getElementById('progressWrap').classList.add('show');
   setStep(3); setProgress(10, `Loading ${chosen.length} demo scenario(s)…`);
-
-  const result = chosen.map(s => {
+  const parsed = chosen.map(s => {
     const lines = s.raw.split('\n');
     const get = k => { const l = lines.find(l => l.toLowerCase().startsWith(k.toLowerCase()+':')); return l ? l.slice(k.length+1).trim() : ''; };
     const fromRaw = get('From'); const fm = fromRaw.match(/^(.*?)\s*<(.+?)>$/) || [];
     const bi = lines.findIndex(l => l.trim() === '');
     const body = bi > -1 ? lines.slice(bi+1).join('\n').trim() : s.raw;
-    const email = {
-      id: 'demo-'+s.id+'-'+Date.now(),
-      from: fm[1]?.trim()||fromRaw, fromAddress: fm[2]||fromRaw,
-      to: get('To'), subject: get('Subject'), date: get('Date'),
-      snippet: body.slice(0,400),
-      hasAttachment: s.raw.toLowerCase().includes('attachment')||s.raw.includes('.zip')||s.raw.includes('.exe'),
-      rawHeaders: lines.slice(0,bi>-1?bi:15).join('\n'), source: 'demo',
-      analysis: s.analysis
-    };
-    return email;
+    return { id:'demo-'+s.id+'-'+Date.now(), from:fm[1]?.trim()||fromRaw, fromAddress:fm[2]||fromRaw,
+      to:get('To'), subject:get('Subject'), date:get('Date'), snippet:body.slice(0,400),
+      hasAttachment:s.raw.toLowerCase().includes('attachment')||s.raw.includes('.zip')||s.raw.includes('.exe'),
+      rawHeaders:lines.slice(0,bi>-1?bi:15).join('\n'), source:'demo' };
   });
-
+  addLog(`Loaded ${parsed.length} demo email(s)`); setProgress(35,'Analyzing…');
+  const result = await analyzeBatchPaste(parsed);
   setProgress(100,'Demo analysis complete');
   allResults = [...allResults, ...result];
   renderResults();
@@ -2645,7 +2699,7 @@ async function analyzeDemoSelected() {
   document.getElementById('progressWrap').classList.remove('show');
   setStep(4);
   if (!window.cipherOpen) toggleCipher();
-  setTimeout(() => addCipherMsg(`🎓 Training mode active — analyzed ${result.length} scenario(s) from the Meridian Defense Solutions phishing simulation. Click any flagged email to get a full walkthrough of what makes it dangerous and what to look for.`, 'bot'), 400);
+  setTimeout(() => addCipherMsg(`🎓 Training mode active — analyzed ${parsed.length} phishing scenario(s). Click any flagged email to get a full walkthrough. I'll explain what red flags to look for and why each technique is dangerous.`, 'bot'), 400);
 }
 
 // ─── FILE UPLOAD ──────────────────────────────────────
@@ -3170,7 +3224,7 @@ function toggleVtKeySetup() {
   const btn = document.getElementById('vtKeyToggle');
   const collapsed = body.style.display === 'none';
   body.style.display = collapsed ? '' : 'none';
-  btn.textContent = collapsed ? 'hide ▲' : 'show ▼';
+  btn.textContent = collapsed ? 'hide ▲' : 'change key ▼';
 }
 
 function saveVtKey() {
@@ -3179,10 +3233,12 @@ function saveVtKey() {
   localStorage.setItem('vtApiKey', key);
   const setup = document.getElementById('vtKeySetup');
   if (setup) setup.style.borderColor = 'var(--green)';
-  // Collapse setup after saving
-  document.getElementById('vtKeySetupBody').style.display = 'none';
-  document.getElementById('vtKeyToggle').textContent = 'change key ▼';
-  document.getElementById('vtKeySetupTitle').textContent = '✓ VirusTotal key saved';
+  const body = document.getElementById('vtKeySetupBody');
+  const btn = document.getElementById('vtKeyToggle');
+  const title = document.getElementById('vtKeySetupTitle');
+  if (body) body.style.display = 'none';
+  if (btn) btn.textContent = 'change key ▼';
+  if (title) title.textContent = '✓ VirusTotal key saved';
   repopulateVtLinks();
 }
 
@@ -3196,13 +3252,12 @@ function populateVtLinks(email) {
   const keyInput = document.getElementById('vtApiKey');
   if (keyInput && storedKey && !keyInput.value) keyInput.value = storedKey;
 
-  // Always show setup box — collapsed if key exists
   const setup = document.getElementById('vtKeySetup');
   const setupBody = document.getElementById('vtKeySetupBody');
   const toggleBtn = document.getElementById('vtKeyToggle');
   const titleEl = document.getElementById('vtKeySetupTitle');
   if (setup) setup.style.display = '';
-  if (storedKey && setupBody && setupBody.style.display !== 'none') {
+  if (storedKey && setupBody) {
     setupBody.style.display = 'none';
     if (toggleBtn) toggleBtn.textContent = 'change key ▼';
     if (titleEl) titleEl.textContent = '✓ VirusTotal key saved';
@@ -3315,29 +3370,14 @@ function showVtResult(url, data, type, containerId) {
   const scoreClass = malicious === 0 ? 'vt-clean' : malicious <= 3 ? 'vt-suspicious' : 'vt-malicious';
   const scoreLabel = malicious === 0 ? 'Clean' : malicious <= 3 ? 'Suspicious' : 'Malicious';
   const cats = Object.values(categories).slice(0, 4);
-
-  // Detect character substitution in defanged URL
-  const looksLikeSpoofed = /micros0ft|paypa1|g00gle|arnazon|1inkedin|faceb00k|app1e/.test(url.toLowerCase());
-  const flagNote = looksLikeSpoofed
-    ? `<div style="font-size:12px;color:var(--red);margin-top:6px;font-weight:600;">⚠ Character substitution detected — this domain uses a zero or number in place of a letter to impersonate a trusted brand. This is a confirmed phishing technique regardless of engine count.</div>`
-    : '';
-
-  const catExplain = cats.length ? `<div style="font-size:12px;color:var(--muted);margin-top:6px;">
-    Categories reported by security vendors: <strong style="color:var(--text);">${cats.join(', ')}</strong>
-    ${cats.some(c => c.toLowerCase().includes('phish')) ? ' — URL matches known phishing patterns.' : ''}
-    ${cats.some(c => c.toLowerCase().includes('malware')) ? ' — URL associated with malware distribution.' : ''}
-    ${cats.some(c => c.toLowerCase().includes('exposure') || c.toLowerCase().includes('suspicious')) ? ' — URL flagged as potentially dangerous but not yet confirmed malicious by all engines. Low engine count may mean this URL is newly registered.' : ''}
-  </div>` : '';
-
   results.innerHTML += `
     <div class="vt-result-row">
-      <div class="vt-defanged" style="font-size:13px;margin-bottom:10px;">${defang(url)}</div>
+      <div class="vt-defanged">${defang(url)}</div>
       <div class="vt-result-bar">
-        <div class="vt-result-score ${scoreClass}" style="font-size:20px;min-width:52px;font-weight:700;">${malicious}/${total}</div>
-        <div style="flex:1;">
-          <div class="vt-result-label" style="font-size:13px;">security engines flagged this URL · <strong class="${scoreClass}" style="font-size:14px;">${scoreLabel}</strong></div>
-          ${catExplain}
-          ${flagNote}
+        <div class="vt-result-score ${scoreClass}">${malicious}/${total}</div>
+        <div>
+          <div class="vt-result-label">engines flagged · <strong class="${scoreClass}">${scoreLabel}</strong></div>
+          ${cats.length ? `<div class="vt-result-pills">${cats.map(c=>`<span class="vt-pill ${malicious>0?'malicious':'clean'}">${c}</span>`).join('')}</div>` : ''}
         </div>
       </div>
     </div>`;
