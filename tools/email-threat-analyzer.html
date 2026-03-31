@@ -2313,7 +2313,19 @@ function switchMode(mode) {
     const el = document.getElementById('mode' + m.charAt(0).toUpperCase() + m.slice(1));
     if (el) el.style.display = m === mode ? '' : 'none';
   });
-  document.getElementById('fetchPanel').style.display = 'none';
+
+  if (mode === 'gmail') {
+    // Restore fetch panel if Gmail is already connected
+    if (gmailConnected) {
+      document.getElementById('fetchPanel').style.display = 'block';
+      setStep(2);
+    } else {
+      document.getElementById('fetchPanel').style.display = 'none';
+      setStep(1);
+    }
+  } else {
+    document.getElementById('fetchPanel').style.display = 'none';
+  }
 
   if (mode === 'paste' && pasteSlotCount === 0) { addPasteSlot(); setStep(2); }
   if (mode === 'upload') setStep(2);
