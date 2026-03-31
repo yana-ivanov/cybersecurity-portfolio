@@ -1666,7 +1666,7 @@ body.drawer-open .cipher-wrap {
         </div>
         <div class="field">
           <label>Max emails</label>
-          <input type="number" id="maxEmails" value="30" min="5" max="100">
+          <input type="number" id="maxEmails" value="20" min="5" max="25">
         </div>
         <div class="field">
           <label>Date range</label>
@@ -2489,7 +2489,7 @@ async function analyzeBatchPaste(emails) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 4000,
+      max_tokens: 2000,
       messages: [{
         role: 'user',
         content: `You are a strict cybersecurity analyst. Analyze each email and assign risk accurately.
