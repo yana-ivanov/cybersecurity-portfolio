@@ -1869,7 +1869,7 @@ let gmailAccessToken = null;
       const msg = document.getElementById('gmailStatusMsg');
       if (dot) dot.classList.add('connected');
       if (btn) { btn.innerHTML = '✓ Gmail Connected'; btn.style.background = '#e8f5e9'; btn.style.color = '#2e7d32'; btn.style.borderColor = '#a5d6a7'; btn.disabled = true; }
-      if (msg) msg.style.display = 'none';
+      if (msg) { msg.innerHTML = '● Gmail connected — read-only access active · <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/privacy.html" target="_blank" style="color:var(--muted);text-decoration:underline;">Privacy Policy</a>'; msg.style.color = 'var(--green)'; }
       document.getElementById('fetchPanel').style.display = 'block';
       setStep(2);
     }
