@@ -271,12 +271,19 @@ footer span{color:#94a3b8}
 
   <div class="tool-preview">
     <div class="tool-preview-header">
-      <span>Email Threat Analyzer — live tool</span>
+      <span>Email Threat Analyzer — Live Tool</span>
       <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/tools/email-threat-analyzer.html" target="_blank">Launch Tool →</a>
     </div>
     <div class="figure-body" style="background:#f1f5f9;padding:2rem;text-align:center;">
       <div style="background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:2rem;max-width:600px;margin:0 auto;">
-        <div style="font-family:var(--mono);font-size:.7rem;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;">Tool Interface</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.25rem;text-align:left;">
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink3);display:flex;align-items:center;gap:.4rem;"><span style="color:var(--blue)">✓</span> AI Risk Classification</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink3);display:flex;align-items:center;gap:.4rem;"><span style="color:var(--blue)">✓</span> MITRE ATT&CK Mapping</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink3);display:flex;align-items:center;gap:.4rem;"><span style="color:var(--blue)">✓</span> CIPHER AI Analyst</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink3);display:flex;align-items:center;gap:.4rem;"><span style="color:var(--blue)">✓</span> VirusTotal URL Scanner</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink3);display:flex;align-items:center;gap:.4rem;"><span style="color:var(--blue)">✓</span> Glassworm Unicode Detection</div>
+          <div style="font-family:var(--mono);font-size:.65rem;color:var(--ink3);display:flex;align-items:center;gap:.4rem;"><span style="color:var(--blue)">✓</span> CSV Export for CMMC Docs</div>
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.5rem;margin-bottom:1.5rem;">
           <div style="background:#1a4fa0;color:#fff;padding:.5rem;font-family:var(--mono);font-size:.65rem;text-align:center;border-radius:2px;">Gmail Live</div>
           <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:.5rem;font-family:var(--mono);font-size:.65rem;text-align:center;border-radius:2px;color:#374151;">Upload File</div>
@@ -305,7 +312,6 @@ footer span{color:#94a3b8}
         </div>
       </div>
     </div>
-    <div class="tool-preview-caption">The Email Threat Analyzer classifies each email by risk level, maps to MITRE ATT&CK techniques, and provides plain-language training explanations. Four input modes: Gmail Live, file upload, paste raw headers, and built-in demo samples.</div>
   </div>
 
   <p>There are four ways to use it. You can connect your Gmail account directly via Google OAuth. You can upload an exported email file. You can paste raw email headers. Or you can run through six built-in demo samples designed to cover the most common attack patterns — Business Email Compromise, credential phishing, malware delivery, social engineering, and more.</p>
@@ -364,7 +370,7 @@ footer span{color:#94a3b8}
     </div>
     <div class="cipher-dialogue">
       <div class="q">You: This email says it's from Microsoft but it flagged as phishing. How can I tell?</div>
-      <div class="a">Look at the actual sending domain — not the display name. Display names can say anything. The real test is the domain in the From address: <em>no-reply@microsofft-security.com</em> has an extra 't' in Microsoft. That's a typosquatted domain designed to look legitimate at a glance. Microsoft would always send from @microsoft.com. This email is also requesting urgent action with a 24-hour deadline — that urgency is manufactured to stop you from thinking clearly before you click.</div>
+      <div class="a">Look at the actual sending domain — not the display name. Display names can say anything. The real test is the domain in the From address: <em style="background:#fff3f3;color:#991b1b;padding:2px 8px;border-radius:3px;font-style:normal;font-family:var(--mono);font-size:.85em;border:1px solid rgba(192,57,43,0.3);">no-reply@micros<strong style="text-decoration:underline;color:#991b1b;">o</strong>fft-security.com</em> — two issues: an extra 't' in Microsoft, and a generic 'security.com' domain. That's a typosquatted domain designed to look legitimate at a glance. Microsoft would always send from @microsoft.com. This email is also requesting urgent action with a 24-hour deadline — that urgency is manufactured to stop you from thinking clearly before you click.</div>
       <div class="q">You: So what should I do if I get something like this at work?</div>
       <div class="a">Don't click anything in the email. Don't reply. Forward it to your IT security team and let them investigate. If you're genuinely concerned about your Microsoft account, go directly to microsoft.com by typing it in your browser — never follow a link in a suspicious email to verify your account.</div>
     </div>
@@ -384,10 +390,14 @@ footer span{color:#94a3b8}
   <p>Turns out, email marketing platforms do this legitimately for recipient fingerprinting — making each email unique so they can track who clicked what. The technique is identical to the attack. The intent is different. That required me to build detection logic that can tell the difference between a marketing platform's tracking fingerprint and an actual invisible Unicode payload attack.</p>
 
   <div class="callout callout-blue">
-    <p><strong>The Glassworm detection:</strong> The tool includes custom detection rules for Glassworm-style invisible Unicode payloads — a March 2026 supply chain attack confirmed across 151+ GitHub repositories, npm packages, and VS Code extensions. These rules were also submitted as open-source detection rules to Sublime Security's community rule feed (PR #4267). Real-world testing revealed that legitimate email tracking uses the same technique, requiring threshold-based detection rather than zero-tolerance matching.</p>
+    <p><strong>The Glassworm detection:</strong> The tool includes custom detection rules for Glassworm-style invisible Unicode payloads — a March 2026 supply chain attack confirmed across 151+ GitHub repositories, npm packages, and VS Code extensions. These rules were also submitted as open-source detection rules to Sublime Security's community rule feed (PR #4267). Real-world testing revealed that legitimate email tracking uses the same technique, requiring threshold-based detection rather than zero-tolerance matching. <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/analysis/glassworm_analysis.html" target="_blank" rel="noopener">Read the full Glassworm analysis →</a> · <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/tools/glassworm_detector.html" target="_blank" rel="noopener">Try the standalone detector →</a></p>
   </div>
 
   <p>This kind of finding — discovering that a legitimate technology and a malicious technique are nearly indistinguishable at the byte level — is exactly the kind of nuance that makes security hard. It's also exactly the kind of thing a good security analyst needs to be able to recognize and explain.</p>
+
+  <div class="callout callout-green">
+    <p><strong>A practical side benefit — filtering marketing noise:</strong> Running your inbox through the analyzer surfaces just how many marketing emails you're getting every day. If you're like me and receive hundreds of promotional emails that you end up bulk-deleting anyway, you can use Gmail's built-in filters to automatically archive or delete them before they hit your inbox. In Gmail, go to <strong>Settings → Filters and Blocked Addresses → Create a new filter</strong>. Filter by sender domain (e.g. <em>from:@glassdoor.com</em>), or use the "Unsubscribe" label Gmail automatically adds to bulk senders. A cleaner inbox also means fewer emails to scan — and fewer opportunities to accidentally click something you shouldn't.</p>
+  </div>
 
   <div class="mat-card">
     <div class="mat-card-title">Validation results — 70-email real inbox test, March 2026</div>
@@ -600,9 +610,5 @@ footer span{color:#94a3b8}
 </div>
 
 <footer>
-  <span>The Email That Could Cost a Defense Contract &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; March 2026</span>
-  <span>Based on original tool development · For educational use · Independent analysis</span>
+  <span>The Email That Could Cost a Defense Contract &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; For educational use · Independent analysis</span>
 </footer>
-
-</body>
-</html>
