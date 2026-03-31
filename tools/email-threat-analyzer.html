@@ -1779,12 +1779,12 @@ body.drawer-open .cipher-wrap {
         <div class="section-head">Link Scanner — VirusTotal</div>
         <div class="vt-section">
 
-          <div id="vtKeySetup" style="background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:14px;margin-bottom:12px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div id="vtKeySetup" style="background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:8px 14px;margin-bottom:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;" id="vtKeySetupHeader">
               <div style="font-family:var(--mono);font-size:11px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;" id="vtKeySetupTitle">Add your free VirusTotal API key to scan URLs</div>
-              <button id="vtKeyToggle" onclick="toggleVtKeySetup()" style="background:none;border:none;font-family:var(--mono);font-size:10px;color:var(--muted);cursor:pointer;padding:0;">hide ▲</button>
+              <button id="vtKeyToggle" onclick="toggleVtKeySetup()" style="background:none;border:none;font-family:var(--mono);font-size:12px;color:var(--blue);cursor:pointer;padding:0;text-decoration:underline;">hide ▲</button>
             </div>
-            <div id="vtKeySetupBody">
+            <div id="vtKeySetupBody" style="margin-top:10px;">
               <div style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:12px;">
                 <strong style="color:var(--text);">Step 1.</strong> Go to <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener" style="color:var(--blue);">virustotal.com</a> and create a free account<br>
                 <strong style="color:var(--text);">Step 2.</strong> Click your profile icon → <strong style="color:var(--text);">API Key</strong><br>
@@ -2181,7 +2181,7 @@ function renderList() {
         <div class="email-subject">${esc(subject)}</div>
       </div>
       <div><span class="badge badge-${r}">${riskLabels[r]}</span></div>
-      ${type ? `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:2px 7px;white-space:nowrap;">${esc(type.toLowerCase())}</div>` : '<div></div>'}
+      ${type ? `<div style="display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:3px 8px;white-space:nowrap;width:fit-content;">${esc(type.toLowerCase())}</div>` : '<div></div>'}
       <div class="date-mono">${dateStr}</div>
     </div>`;
   }).join('');
@@ -2263,7 +2263,7 @@ function openDrawer(id) {
     <p>${esc(t.explanation || 'No training note available.')}</p>
     ${(t.redFlags||[]).length ? `
       <ul>
-        ${(t.redFlags||[]).map(f => `<li><strong>Red flag:</strong> ${esc(f)}</li>`).join('')}
+        ${(t.redFlags||[]).map(f => `<li><span style="color:var(--red);margin-right:4px;">⚠</span> ${esc(f)}</li>`).join('')}
       </ul>` : ''}
   `;
 
