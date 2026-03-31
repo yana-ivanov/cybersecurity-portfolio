@@ -1496,7 +1496,7 @@ footer a:hover { color: var(--accent); }
                 Sign in with Google
               </button>
               <div style="font-family:var(--mono);font-size:12px;color:var(--muted);line-height:1.8;" id="gmailStatusMsg">
-                Read-only access · No data stored · Revoke anytime in your Google account
+                Read-only access · No data stored · Revoke anytime in your Google account · <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/privacy.html" target="_blank" style="color:var(--muted);text-decoration:underline;">Privacy Policy</a>
               </div>
             </div>
           </div>
@@ -2151,7 +2151,7 @@ function renderList() {
     const r = e.analysis?.risk || 'clean';
     const icon = riskIcons[r] || '?';
     const dateStr = e.date ? new Date(e.date).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '—';
-    const type = e.analysis?.threatType || '';
+    const type = e.analysis?.threatType && e.analysis.threatType !== 'Unknown' ? e.analysis.threatType : '';
     const subject = decodeEmailSubject(e.subject || '(no subject)');
     return `<div class="email-row ${selectedEmail?.id === e.id ? 'selected' : ''}" onclick="openDrawer('${esc(e.id)}')">
       <div class="risk-icon risk-${r}">${icon}</div>
