@@ -1576,33 +1576,33 @@ footer a:hover { color: var(--accent); }
         <div class="safety-banner warning">
           <div class="safety-banner-icon">⚠</div>
           <div>
-            <div style="font-weight:700;margin-bottom:3px;">Analyst mode — read the warning before pasting</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.6;"><strong style="color:var(--yellow)">Do NOT open the original email to copy from it.</strong> Use your client's View Source / Show Original feature to get the raw text without rendering any HTML or activating any links. Pasted content is rendered as plain text only — no links are clickable here.</div>
+            <div style="font-weight:700;margin-bottom:3px;">Important — get the raw source, not the visible email</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.7;"><strong style="color:var(--yellow)">Do NOT open the email and copy the text you see.</strong> Use your email client's "Show Original" or "View Source" feature to copy the full raw message — this includes hidden headers that reveal the true sender and routing path. The raw source is what makes analysis accurate.</div>
           </div>
         </div>
 
         <div class="how-to-grid">
           <div class="how-to-card">
+            <div class="how-to-title">📧 Gmail</div>
+            <div class="how-to-steps">Open the email → click ⋮ (three dots, top right) → <strong>Show original</strong> → <strong>Copy to clipboard</strong></div>
+          </div>
+          <div class="how-to-card">
+            <div class="how-to-title">🌐 Outlook Web (OWA)</div>
+            <div class="how-to-steps">Open the email → click ⋯ → <strong>View</strong> → <strong>View message source</strong> → select all → copy</div>
+          </div>
+          <div class="how-to-card">
             <div class="how-to-title">📧 Outlook Desktop</div>
-            <div class="how-to-steps">File → Properties → Internet headers (copy that) + forward as plain text for body</div>
-          </div>
-          <div class="how-to-card">
-            <div class="how-to-title">🌐 Outlook Web</div>
-            <div class="how-to-steps">⋯ → View → View message source (Ctrl+U style view)</div>
-          </div>
-          <div class="how-to-card">
-            <div class="how-to-title">📨 Gmail</div>
-            <div class="how-to-steps">⋮ → Show original → Copy to clipboard (full raw source)</div>
+            <div class="how-to-steps">Open the email → <strong>File → Properties</strong> → copy Internet headers. Forward as plain text for the body.</div>
           </div>
           <div class="how-to-card">
             <div class="how-to-title">🍎 Apple Mail</div>
-            <div class="how-to-steps">View menu → Message → Raw Source — then select all and copy</div>
+            <div class="how-to-steps"><strong>View menu → Message → Raw Source</strong> → select all → copy</div>
           </div>
         </div>
 
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
           <button class="btn-ghost" onclick="addPasteSlot()" style="font-size:11px;padding:6px 14px;">+ Add another email</button>
-          <div style="font-family:var(--mono);font-size:10px;color:var(--muted);" id="pasteCount">1 email queued</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--muted);" id="pasteCount">1 email queued</div>
         </div>
 
         <div id="pasteSlots" style="display:flex;flex-direction:column;gap:12px;"></div>
@@ -1777,11 +1777,14 @@ footer a:hover { color: var(--accent); }
           <div id="vtResults"></div>
           <div class="vt-key-note" id="vtKeyNote" style="display:none;">
             <details>
-              <summary style="cursor:pointer;font-family:var(--mono);font-size:11px;color:var(--muted);">⚙ Analyst option — enable live URL scanning</summary>
-              <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
-                <div style="font-size:12px;color:var(--muted);line-height:1.6;">VirusTotal checks URLs against 70+ security engines. Free API key available at <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener" style="color:var(--blue)">virustotal.com</a> — no credit card needed.</div>
+              <summary style="cursor:pointer;font-family:var(--mono);font-size:12px;color:var(--blue);letter-spacing:0.05em;">⚙ Enable live URL scanning with VirusTotal</summary>
+              <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px;">
+                <div style="font-size:13px;color:var(--muted);line-height:1.7;">
+                  <strong style="color:var(--text);">What this does:</strong> Submits the URLs found in this email to VirusTotal — a free service that checks links against 70+ antivirus and security engines simultaneously. If any engine has flagged the URL as malicious, you'll see it here.<br><br>
+                  <strong style="color:var(--text);">How to get a free key:</strong> Go to <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener" style="color:var(--blue)">virustotal.com</a> → create a free account → click your profile icon → API Key → copy and paste below. No credit card needed. Free tier allows 4 scans per minute.
+                </div>
                 <input type="password" id="vtApiKey" placeholder="Paste your VirusTotal API key here…"
-                  style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:8px 12px;border-radius:5px;font-family:var(--mono);font-size:11px;outline:none;width:100%;transition:border-color 0.2s;"
+                  style="background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:9px 12px;border-radius:5px;font-family:var(--mono);font-size:12px;outline:none;width:100%;transition:border-color 0.2s;"
                   onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
               </div>
             </details>
