@@ -2058,6 +2058,9 @@ ${emailsStr}`
 
   return emails.map((email, i) => {
     const base = { ...email, analysis: analyses[i] || { risk: 'clean', threatType: 'Unknown', summary: 'Analysis unavailable', iocs: [], mitre: [], training: {}, bodyHighlights: '' } };
+    // Skip Glassworm scan for Gmail Live — only snippet available, not full body
+    // Glassworm detection requires full raw email source to be meaningful
+    if (email.source === 'gmail') return base;
     return applyGlasswormToResult(base, email.snippet);
   });
 }
