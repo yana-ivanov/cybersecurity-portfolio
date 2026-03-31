@@ -124,10 +124,17 @@ tactics_and_techniques:
 
 false_positives:
   - "U+200C (Zero-Width Non-Joiner) appears 5-10x naturally in Gmail HTML
-     formatting. Validated against 50 real inbox emails March 2026. Threshold
-     of 15+ occurrences eliminates this false positive class entirely."
+     formatting. Threshold of 30+ occurrences eliminates this false positive."
   - "U+FE00–U+FE0F (Variation Selectors 1-16) appear in emoji rendering
-     sequences from major mail providers. Threshold of 15+ required."
-  - "U+202E (RLO), Tag block (U+E0000–U+E007F), and Variation Selectors
-     Supplement (U+E0100–U+E01EF) remain zero-threshold — no legitimate
-     email use case exists for these ranges regardless of sender."
+     sequences from major mail providers. Threshold of 30+ required."
+  - "Email tracking fingerprinting: marketing platforms (Glassdoor, etc.) inject
+     zero-width characters between letters of recipient email addresses in
+     tracking URLs for fingerprinting. Pattern: alphanumeric → ZW char →
+     alphanumeric. When 70%+ of zero-width chars follow this pattern, the email
+     is using tracking not steganography. Tune by checking ZW char context."
+  - "U+FEFF (BOM) appears legitimately at the start of HTML emails as a standard
+     encoding marker. Exclude from body scanning entirely."
+  - "U+202E (RLO) and Tag block (U+E0000–U+E007F) remain zero-threshold."
+  - "U+E0100–U+E01EF (VS Supplement) zero-threshold retained. Theoretical
+     false positive possible in specialized CJK typography. Operators serving
+     large East Asian user bases may apply threshold of 3+ if noise observed."
