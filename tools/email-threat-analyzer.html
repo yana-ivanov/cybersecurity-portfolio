@@ -2637,18 +2637,23 @@ const DEMO_SAMPLES = [
     raw: `From: DoD Cybersecurity Compliance <cmmc-notices@dod-compliance-portal.org>\nTo: compliance@meridiandefense.com\nSubject: Required: CMMC Pre-Assessment Scan Tool — Install Before April 10\nDate: Mon, 30 Mar 2026 14:30:00 -0500\n\nDear Compliance Officer,\n\nThe Office of the Under Secretary of Defense for Acquisition and Sustainment is issuing a pre-assessment diagnostic tool to all Level 2 contractors ahead of the November 2026 C3PAO assessment window.\n\nThis tool scans your environment against all 110 NIST SP 800-171 controls and generates a pre-assessment gap report. Installation is mandatory for contractors with active SPRS affirmations.\n\nDownload and run the scan tool:\nhttps://dod-cmmc-tools.compliance-scanner.net/download?contractor=meridian\n\nAttachment: CMMC_PreAssessment_Tool_v2.1.exe\n\nThis tool must be run with administrator privileges to access all required system areas.\n\nOffice of the CDAO\nDepartment of Defense`
   },
   {
-    id: 'demo6', label: 'CLEAN', risk: 'clean',
-    title: 'Clean — Legitimate HR Training Notice',
-    desc: 'A real internal HR email about mandatory CMMC training. Included for comparison — shows what a safe company email looks like.',
+    id: 'demo6', label: 'MEDIUM', risk: 'medium',
+    title: 'Spam — Defense Newsletter with Hidden Malware',
+    desc: 'Bulk spam disguised as a defense industry newsletter. Contains a hidden tracking pixel and a link to a drive-by download. Spam is not just annoying — it can carry malware.',
     analysis: {
-      risk: 'clean', threatType: 'Clean',
-      summary: 'Legitimate internal HR email from a verified Meridian Defense Solutions address. The sender domain matches the company, there are no external links, no attachments, no urgency tactics, and no requests for credentials or financial information.',
-      iocs: [],
-      mitre: [],
-      training: {title:'What a legitimate company email looks like', explanation:'This email comes from the real company domain (meridiandefense.com), contains no external links or suspicious attachments, uses a calm professional tone without artificial urgency, and provides a direct contact for questions. Compare the sender domain, tone, and requests here to the phishing emails above — the differences are clear once you know what to look for.', redFlags:[]},
-      bodyHighlights: ''
+      risk: 'medium', threatType: 'Spam',
+      summary: 'Spam email disguised as a legitimate defense industry newsletter. While it looks like routine bulk mail, it contains a hidden tracking pixel that confirms your email is active to spammers, and a Read More link that leads to a drive-by download page where malware can install silently without any further action.',
+      iocs: [
+        {type:'Link', description:'Read More link leads to an external domain unrelated to any real defense publication', example:'https://defense-weekly-digest.info/read?id=meridian-4821', severity:'medium'},
+        {type:'Other', description:'Hidden tracking pixel confirms your email address is active to spammers', example:'1x1 tracking pixel embedded in HTML body', severity:'low'},
+        {type:'Domain Spoof', description:'Sender domain has no connection to any real defense publication', example:'newsletter@defense-weekly-digest.info', severity:'medium'},
+        {type:'Impersonation', description:'Uses defense industry language and company names to appear credible', example:'Electric Boat awards $2.1B submarine component contracts', severity:'low'}
+      ],
+      mitre: ['T1566.002 Spearphishing Link', 'T1189 Drive-by Compromise'],
+      training: {title:'Why spam is more dangerous than it looks', explanation:'Most people treat spam as harmless junk. But spam emails often contain hidden tracking pixels that tell attackers your email is active, and links that trigger automatic malware downloads the moment the page loads — no clicking required beyond the link itself. Never click links in unsolicited newsletters. If you want to unsubscribe, only do so from senders you recognize and trust.', redFlags:['Unsolicited newsletter from unknown publisher','Sender domain does not match any known defense publication','Links go to .info domains — commonly used in spam campaigns','Mentions real companies like Electric Boat to appear legitimate']},
+      bodyHighlights: 'Read More, unsubscribe, limited time, exclusive briefing'
     },
-    raw: `From: Sarah Chen <s.chen@meridiandefense.com>\nTo: all-staff@meridiandefense.com\nSubject: Mandatory CMMC Security Awareness Training — Complete by April 15\nDate: Mon, 30 Mar 2026 08:30:00 -0500\n\nHi everyone,\n\nAs part of our CMMC Level 2 compliance requirements under NIST SP 800-171 Control 3.2.1, all employees must complete the annual cybersecurity awareness training by April 15, 2026.\n\nThe training covers phishing recognition, CUI handling procedures, incident reporting, and password hygiene. It takes approximately 45 minutes and is available at training.meridiandefense.com.\n\nEmployees who do not complete by April 15 will have CUI system access suspended until completion.\n\nSarah Chen\nHR & Compliance Coordinator\nMeridian Defense Solutions\ns.chen@meridiandefense.com | (203) 555-0182`
+    raw: `From: Defense Procurement Weekly <newsletter@defense-weekly-digest.info>\nTo: employee@meridiandefense.com\nSubject: Defense Procurement Weekly — Your Industry Briefing — April 2026\nDate: Mon, 30 Mar 2026 06:00:00 -0500\nX-Mailer: BulkMailer Pro 9.2\nList-Unsubscribe: <mailto:unsub@defense-weekly-digest.info>\n\nDEFENSE PROCUREMENT WEEKLY\nYour trusted source for defense industry news\n\nTHIS WEEK: CMMC enforcement updates — what contractors must do now\nElectric Boat awards $2.1B submarine component contracts\nPratt & Whitney engine program update: F135 sustainment changes\n\n[ READ FULL BRIEFING ] → https://defense-weekly-digest.info/read?id=meridian-4821\n\nYou are receiving this because your email was registered at a defense industry event.\nTo unsubscribe: https://defense-weekly-digest.info/unsub?id=meridian\n\nDefense Procurement Weekly © 2026`
   }
 ]
 
