@@ -2079,7 +2079,9 @@ ${emailsStr}`
 
   return emails.map((email, i) => {
     const base = { ...email, analysis: analyses[i] || { risk: 'clean', threatType: 'Unknown', summary: 'Analysis unavailable', iocs: [], mitre: [], training: {}, bodyHighlights: '' } };
-    return applyGlasswormToResult(base, email.snippet);
+    if (email.source === 'gmail') return base;
+    const rawText = (email.rawHeaders || '') + '\n' + (email.snippet || '');
+    return applyGlasswormToResult(base, rawText);
   });
 }
 
@@ -2487,35 +2489,45 @@ async function analyzeBatchPaste(emails) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
+      max_tokens: 4000,
       messages: [{
         role: 'user',
-        content: `You are a strict cybersecurity analyst. Analyze each email and assign risk accurately — do NOT default to medium when unsure. Most legitimate emails from known companies (Amazon, Netflix, Glassdoor, Nintendo, banks sending receipts) should be LOW or CLEAN. Only flag MEDIUM or above when there are real, specific indicators.
+        content: `You are a strict cybersecurity analyst. Analyze each email and assign risk accurately.
 
 STRICT RISK RULES:
-- clean: legitimate email from a real company domain, no suspicious indicators whatsoever
-- low: minor anomaly but almost certainly benign (marketing email, newsletter, bulk sender)
-- medium: at least 2 concrete red flags (e.g. urgency + external link, or generic greeting + credential request)
-- high: strong phishing indicators — domain spoof, typosquatting, Reply-To mismatch, fake login link, impersonation of IT/HR/bank
-- critical: clear attack — credential harvesting page, malware attachment, wire transfer fraud, known phishing pattern
+- clean: legitimate email from a verified internal domain, no suspicious indicators
+- low: minor anomaly but almost certainly benign (marketing, newsletter)
+- medium: 2+ concrete red flags
+- high: domain spoof, typosquatting, Reply-To mismatch, fake login link, impersonation
+- critical: credential harvesting, malware attachment (.exe/.zip with executables), wire transfer fraud, fake IT/HR/DoD impersonation requesting credentials or money
+
+ALWAYS FLAG AS CRITICAL:
+- Any email requesting wire transfers with Reply-To pointing to gmail/personal email
+- Any ZIP attachment containing .exe or .docm files disguised as documents
+- Any email impersonating IT helpdesk with a link to reset VPN/AD credentials on an external domain
+- Any email claiming to be from DoD/government with an executable attachment requiring admin privileges
+
+ALWAYS FLAG AS HIGH:
+- Any email with a link to a domain that doesn't match the sender's claimed organization
+- Any vendor email requesting banking detail changes
+- Any domain with character substitution (supp1iers, micros0ft, etc.)
 
 KEY RULES:
-- A legitimate Amazon/Netflix/Glassdoor/Nintendo/Google/Microsoft email from their real domain = CLEAN
-- Google security alerts from accounts.google.com links = CLEAN — these are legitimate
-- Base64 encoded body alone is NOT a red flag — it is standard for Google, Apple, and major senders
-- Marketing/promotional email = LOW or CLEAN, never medium unless spoofed
-- "Unknown" sender with no red flags = LOW, not medium
-- Only use medium+ when you can name the specific threat
-- Return ONLY a JSON array, no markdown.
+- Reply-To mismatch to gmail = critical BEC indicator
+- External domain in link that doesn't match sender = malicious link
+- .exe or .pdf.exe in attachment = ransomware/malware delivery
+- Sender domain doesn't match company name = domain spoof
+- Legitimate internal email from matching domain with no links or attachments = CLEAN
+- Return ONLY a valid JSON array. You MUST return one object per email. Do not truncate.
 
 Schema per email:
 {
   "risk": "critical|high|medium|low|clean",
-  "threatType": "Phishing|BEC|Malware Delivery|Social Engineering|Spam|Newsletter|Clean",
-  "summary": "1-2 sentence summary. If clean, say why it is legitimate.",
+  "threatType": "Phishing|BEC|Malware Delivery|Social Engineering|Spam|Newsletter|Clean|Zero-Day",
+  "summary": "1-2 sentence summary.",
   "iocs": [{"type": "Header Anomaly|Domain Spoof|Typosquatting|Urgency|Attachment|Link|Impersonation|Data Request|Reply-To Mismatch|Other", "description": "what was found", "example": "exact value from email", "severity": "high|medium|low"}],
   "mitre": ["T1566.001 Spearphishing Attachment"],
-  "training": {"title": "Training tip", "explanation": "2-3 sentences for employees", "redFlags": ["flag 1", "flag 2"]},
+  "training": {"title": "Training tip title", "explanation": "2-3 sentences for employees", "redFlags": ["flag 1", "flag 2"]},
   "bodyHighlights": "suspicious phrases only, comma-separated, empty string if clean"
 }
 
@@ -2607,19 +2619,25 @@ async function analyzeDemoSelected() {
   if (!chosen.length) { alert('Select at least one demo scenario.'); return; }
   document.getElementById('progressWrap').classList.add('show');
   setStep(3); setProgress(10, `Loading ${chosen.length} demo scenario(s)…`);
-  const parsed = chosen.map(s => {
+
+  const result = chosen.map(s => {
     const lines = s.raw.split('\n');
     const get = k => { const l = lines.find(l => l.toLowerCase().startsWith(k.toLowerCase()+':')); return l ? l.slice(k.length+1).trim() : ''; };
     const fromRaw = get('From'); const fm = fromRaw.match(/^(.*?)\s*<(.+?)>$/) || [];
     const bi = lines.findIndex(l => l.trim() === '');
     const body = bi > -1 ? lines.slice(bi+1).join('\n').trim() : s.raw;
-    return { id:'demo-'+s.id+'-'+Date.now(), from:fm[1]?.trim()||fromRaw, fromAddress:fm[2]||fromRaw,
-      to:get('To'), subject:get('Subject'), date:get('Date'), snippet:body.slice(0,400),
-      hasAttachment:s.raw.toLowerCase().includes('attachment')||s.raw.includes('.zip')||s.raw.includes('.exe'),
-      rawHeaders:lines.slice(0,bi>-1?bi:15).join('\n'), source:'demo' };
+    const email = {
+      id: 'demo-'+s.id+'-'+Date.now(),
+      from: fm[1]?.trim()||fromRaw, fromAddress: fm[2]||fromRaw,
+      to: get('To'), subject: get('Subject'), date: get('Date'),
+      snippet: body.slice(0,400),
+      hasAttachment: s.raw.toLowerCase().includes('attachment')||s.raw.includes('.zip')||s.raw.includes('.exe'),
+      rawHeaders: lines.slice(0,bi>-1?bi:15).join('\n'), source: 'demo',
+      analysis: s.analysis
+    };
+    return email;
   });
-  addLog(`Loaded ${parsed.length} demo email(s)`); setProgress(35,'Analyzing…');
-  const result = await analyzeBatchPaste(parsed);
+
   setProgress(100,'Demo analysis complete');
   allResults = [...allResults, ...result];
   renderResults();
@@ -2627,7 +2645,7 @@ async function analyzeDemoSelected() {
   document.getElementById('progressWrap').classList.remove('show');
   setStep(4);
   if (!window.cipherOpen) toggleCipher();
-  setTimeout(() => addCipherMsg(`🎓 Training mode active — analyzed ${parsed.length} phishing scenario(s). Click any flagged email to get a full walkthrough. I'll explain what red flags to look for and why each technique is dangerous.`, 'bot'), 400);
+  setTimeout(() => addCipherMsg(`🎓 Training mode active — analyzed ${result.length} scenario(s) from the Meridian Defense Solutions phishing simulation. Click any flagged email to get a full walkthrough of what makes it dangerous and what to look for.`, 'bot'), 400);
 }
 
 // ─── FILE UPLOAD ──────────────────────────────────────
