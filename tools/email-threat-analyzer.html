@@ -1146,6 +1146,11 @@ footer a:hover { color: var(--accent); }
   bottom: 24px;
   right: 24px;
   z-index: 300;
+  transition: right 0.25s ease;
+}
+.drawer-bg.open ~ .cipher-wrap,
+body.drawer-open .cipher-wrap {
+  right: calc(min(720px, 50vw) + 24px);
 }
 
 .cipher-btn {
@@ -2250,11 +2255,13 @@ function openDrawer(id) {
   `;
 
   document.getElementById('drawerBg').classList.add('open');
+  document.body.classList.add('drawer-open');
 }
 
 function closeDrawer(e) { if (e.target === document.getElementById('drawerBg')) closeDrawerDirect(); }
 function closeDrawerDirect() {
   document.getElementById('drawerBg').classList.remove('open');
+  document.body.classList.remove('drawer-open');
   selectedEmail = null;
   renderList();
 }
@@ -2318,7 +2325,6 @@ function switchMode(mode) {
   });
 
   if (mode === 'gmail') {
-    // Restore fetch panel if Gmail is already connected
     if (gmailConnected) {
       document.getElementById('fetchPanel').style.display = 'block';
       setStep(2);
@@ -2327,7 +2333,10 @@ function switchMode(mode) {
       setStep(1);
     }
   } else {
+    // Hide fetch panel and clear results when switching away from Gmail
     document.getElementById('fetchPanel').style.display = 'none';
+    document.getElementById('resultsPanel').style.display = 'none';
+    document.getElementById('progressWrap').classList.remove('show');
   }
 
   if (mode === 'paste' && pasteSlotCount === 0) { addPasteSlot(); setStep(2); }
@@ -3155,7 +3164,7 @@ async function vtScanUrl(encodedUrl, containerId) {
   const vtKey = document.getElementById('vtApiKey').value.trim();
   if (!vtKey) {
     document.getElementById('vtResults').innerHTML =
-      '<div class="vt-key-note" style="display:block;">To scan URLs live, add a free VirusTotal API key in the nav bar. <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener">Get one here</a>.</div>';
+      '<div class="vt-key-note" style="display:block;">To scan URLs live, add a free VirusTotal API key below. <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener">Get one here</a>.</div>';
     return;
   }
 
@@ -3164,20 +3173,24 @@ async function vtScanUrl(encodedUrl, containerId) {
   if (btn) { btn.textContent = '…'; btn.disabled = true; }
 
   try {
-    // VirusTotal URL scan: submit then retrieve
     const urlId = btoa(url).replace(/=+$/, '');
-    const resp = await fetch(`https://www.virustotal.com/api/v3/urls/${urlId}`, {
-      headers: { 'x-apikey': vtKey }
-    });
+
+    // Route through Cloudflare Worker to avoid CORS
+    const proxyBase = 'https://anthropic-proxy.yanaivanov.workers.dev/vt';
+
+    const resp = await fetch(`${proxyBase}?endpoint=${encodeURIComponent('https://www.virustotal.com/api/v3/urls/' + urlId)}&apikey=${encodeURIComponent(vtKey)}`);
 
     if (resp.status === 404) {
       // Not in cache — submit for scan
-      const submitResp = await fetch('https://www.virustotal.com/api/v3/urls', {
+      const submitResp = await fetch(`${proxyBase}`, {
         method: 'POST',
-        headers: { 'x-apikey': vtKey, 'content-type': 'application/x-www-form-urlencoded' },
-        body: 'url=' + encodeURIComponent(url)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          endpoint: 'https://www.virustotal.com/api/v3/urls',
+          apikey: vtKey,
+          body: 'url=' + encodeURIComponent(url)
+        })
       });
-      const submitData = await submitResp.json();
       showVtResult(url, null, 'submitted', containerId);
       return;
     }
