@@ -113,7 +113,15 @@ footer a:hover{color:#60a5fa}
   .card-featured{flex-direction:column}
   .card-featured .card-accent{width:100%;height:3px}
   footer{flex-direction:column;text-align:center}
+  .filter-chips{display:none}
+  .mobile-filter-select{display:block}
+  .results-count{margin-left:0}
+  .filter-chips-row{flex-wrap:wrap}
 }
+.mobile-filter-select{display:none;width:100%;padding:.5rem .75rem;font-family:var(--mono);font-size:.75rem;border:1px solid var(--rule);border-radius:2px;background:#fff;color:var(--ink);outline:none;cursor:pointer}
+.scroll-top-btn{position:fixed;bottom:1.5rem;right:1.5rem;width:42px;height:42px;background:#0a0f1a;color:#fff;border:none;border-radius:2px;font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:200;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:opacity .2s}
+.scroll-top-btn.visible{display:flex}
+.scroll-top-btn:hover{background:#1a4fa0}
 </style>
 </head>
 <body>
@@ -151,6 +159,19 @@ footer a:hover{color:#60a5fa}
         <button class="chip" data-filter="lab" onclick="setFilter('lab',this)">Lab Logs</button>
         <button class="chip" data-filter="fieldnotes" onclick="setFilter('fieldnotes',this)">Field Notes</button>
       </div>
+      <select class="mobile-filter-select" onchange="setFilter(this.value, null)">
+        <option value="all">All</option>
+        <option value="threat-analysis">Threat Analysis</option>
+        <option value="nation-state">Nation-State</option>
+        <option value="infrastructure">Infrastructure</option>
+        <option value="supply-chain">Supply Chain</option>
+        <option value="cmmc">CMMC</option>
+        <option value="training">Training</option>
+        <option value="identity">Identity & Credentials</option>
+        <option value="tools">Tools</option>
+        <option value="lab">Lab Logs</option>
+        <option value="fieldnotes">Field Notes</option>
+      </select>
       <div class="results-count" id="resultsCount">loading...</div>
     </div>
   </div>
@@ -533,10 +554,48 @@ footer a:hover{color:#60a5fa}
         </div>
       </a>
 
+      <a href="tools/email-threat-analyzer.html" class="card portfolio-item"
+         data-tags="tools security cmmc phishing"
+         data-title="email threat analyzer phishing detection ai gmail oauth mitre attck glassworm cmmc security awareness training defense contractor">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Interactive Tool · Email Security · CMMC</div>
+          <div class="card-title">Email Threat Analyzer</div>
+          <div class="card-desc">AI-powered phishing detection tool for security awareness training. Connects to Gmail via OAuth, analyzes emails for BEC, credential phishing, ransomware delivery, and Glassworm Unicode payloads. Maps findings to MITRE ATT&CK. Includes 6 defense contractor phishing scenarios for live workshops. Built for CMMC AT.2.056 training documentation.</div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag">Phishing Detection</span>
+              <span class="card-tag">MITRE ATT&CK</span>
+              <span class="card-tag">CMMC</span>
+              <span class="card-tag">Gmail OAuth</span>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="tools/youtube-cleanup.html" class="card portfolio-item"
+         data-tags="tools automation security privacy"
+         data-title="youtube subscription cleaner channel audit bulk unsubscribe privacy cleanup browser tool oauth">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Interactive Tool · Privacy & Hygiene</div>
+          <div class="card-title">YouTube Subscription Cleaner</div>
+          <div class="card-desc">Audit and bulk-manage your YouTube subscriptions via the YouTube Data API. Filter by activity, subscriber count, and upload frequency. Identify dormant channels and unsubscribe in bulk. Reduces your digital footprint and cleans up your recommendation algorithm. Runs in your browser via OAuth.</div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag">YouTube API</span>
+              <span class="card-tag">OAuth</span>
+              <span class="card-tag">Privacy</span>
+              <span class="card-tag">Automation</span>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
     </div>
   </div>
-
-  <!-- LAB LOGS -->
   <div class="section-group" id="group-labs">
     <div class="section-header">
       <div class="section-label">Hands-On Security Work</div>
@@ -675,21 +734,6 @@ footer a:hover{color:#60a5fa}
     </div>
     <div class="card-grid">
 
-      <a href="writing/email-threat-analyzer-field-notes.html" class="card portfolio-item"
-         data-tags="fieldnotes tools"
-         data-title="email threat analyzer phishing cmmc defense contractor gmail ai security awareness training glassworm">
-        <div class="card-accent blue"></div>
-        <div class="card-body">
-          <div class="card-category blue">Field Notes · Tools · CMMC</div>
-          <div class="card-title">The Email That Could Cost a Defense Contract</div>
-          <div class="card-desc">How I built an AI-powered phishing detection tool, ran it against my real inbox, and discovered that marketing platforms use the same invisible Unicode technique as Glassworm malware. Includes CMMC AT.2.056 mapping and a phishing simulation use case for defense contractors.</div>
-          <div class="card-footer">
-            <div class="card-tags"><span class="card-tag">Phishing</span><span class="card-tag">CMMC</span><span class="card-tag">Glassworm</span><span class="card-tag">AI</span></div>
-            <div class="card-arrow">→</div>
-          </div>
-        </div>
-      </a>
-
       <a href="writing/bookmark-security-article.html" class="card portfolio-item"
          data-tags="fieldnotes threat-analysis"
          data-title="bookmarks security risk http https homoglyph domain hijacking browser audit expired domains">
@@ -735,8 +779,15 @@ footer a:hover{color:#60a5fa}
   <span>Independent analysis · For educational use</span>
 </footer>
 
+<button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
+
 <script>
 let activeFilter = 'all';
+const GRID_TOP = document.querySelector('.main');
+
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTopBtn').classList.toggle('visible', window.scrollY > 400);
+});
 
 function setFilter(filter, el) {
   activeFilter = filter;
@@ -744,8 +795,12 @@ function setFilter(filter, el) {
     c.className = 'chip';
     if (c.dataset.filter === filter) c.className = 'chip active';
   });
+  const sel = document.querySelector('.mobile-filter-select');
+  if (sel) sel.value = filter;
   updateLatestReportCard();
   filterPortfolio();
+  // Scroll to top of content grid
+  if (GRID_TOP) GRID_TOP.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 function updateLatestReportCard() {
@@ -771,7 +826,6 @@ function filterPortfolio() {
   const groups = document.querySelectorAll('.section-group');
   let visible = 0;
 
-  // When filtering (not "all" or search), hide section headers
   const isFiltering = activeFilter !== 'all' || query.length > 0;
 
   items.forEach(item => {
@@ -779,14 +833,10 @@ function filterPortfolio() {
     const title = (item.dataset.title || '').toLowerCase();
     const cardText = item.textContent.toLowerCase();
     const isSoon = item.classList.contains('card-soon');
-
     const matchesFilter = activeFilter === 'all' || tags.includes(activeFilter);
     const matchesSearch = !query || title.includes(query) || tags.includes(query) || cardText.includes(query);
 
     if (isSoon) {
-      // Show soon cards only when their tag matches the active filter or viewing all with no search
-      const matchesFilter = activeFilter === 'all' || tags.includes(activeFilter);
-      const matchesSearch = !query || title.includes(query) || tags.includes(query) || cardText.includes(query);
       item.classList.toggle('hidden', !(matchesFilter && matchesSearch && !query) && !(activeFilter === 'all' && !query));
     } else if (matchesFilter && matchesSearch) {
       item.classList.remove('hidden');
@@ -796,7 +846,6 @@ function filterPortfolio() {
     }
   });
 
-  // Show/hide section groups — show header whenever any card in group is visible
   groups.forEach(group => {
     const anyVisible = Array.from(group.querySelectorAll('.portfolio-item')).some(
       item => !item.classList.contains('hidden')
@@ -804,10 +853,11 @@ function filterPortfolio() {
     const header = group.querySelector('.section-header');
     if (anyVisible) {
       group.classList.remove('hidden-group');
-      header.style.display = '';
+      if (isFiltering) { if (header) header.style.display = 'none'; }
+      else { if (header) header.style.display = ''; }
     } else {
       group.classList.add('hidden-group');
-      header.style.display = 'none';
+      if (header) header.style.display = 'none';
     }
   });
 
