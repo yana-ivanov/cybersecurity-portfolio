@@ -1364,7 +1364,7 @@ body.drawer-open .cipher-wrap {
   border-radius: 5px;
   word-break: break-all;
 }
-.vt-auto-link-item .vt-url { flex: 1; color: var(--muted); }
+.vt-auto-link-item .vt-url { flex: 1; color: var(--muted); font-size: 12px; }
 .vt-scan-btn {
   background: var(--accent);
   border: none;
@@ -1780,18 +1780,22 @@ body.drawer-open .cipher-wrap {
         <div class="vt-section">
 
           <div id="vtKeySetup" style="background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:14px;margin-bottom:12px;">
-            <div style="font-family:var(--mono);font-size:11px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;">Add your free VirusTotal API key to scan URLs</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:12px;">
-              <strong style="color:var(--text);">Step 1.</strong> Go to <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener" style="color:var(--blue);">virustotal.com</a> and create a free account<br>
-              <strong style="color:var(--text);">Step 2.</strong> Click your profile icon → <strong style="color:var(--text);">API Key</strong><br>
-              <strong style="color:var(--text);">Step 3.</strong> Copy and paste your key below — free tier allows 4 scans/min
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="font-family:var(--mono);font-size:11px;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;" id="vtKeySetupTitle">Add your free VirusTotal API key to scan URLs</div>
+              <button id="vtKeyToggle" onclick="toggleVtKeySetup()" style="background:none;border:none;font-family:var(--mono);font-size:10px;color:var(--muted);cursor:pointer;padding:0;">hide ▲</button>
             </div>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <input type="password" id="vtApiKey" placeholder="Paste your VirusTotal API key here…"
-                style="flex:1;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:9px 12px;border-radius:5px;font-family:var(--mono);font-size:12px;outline:none;transition:border-color 0.2s;"
-                onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'"
-                oninput="vtKeySaved=false">
-              <button onclick="saveVtKey()" style="background:var(--blue);color:#fff;border:none;padding:9px 16px;border-radius:5px;font-family:var(--mono);font-size:11px;cursor:pointer;white-space:nowrap;letter-spacing:.05em;">Save Key</button>
+            <div id="vtKeySetupBody">
+              <div style="font-size:12px;color:var(--muted);line-height:1.8;margin-bottom:12px;">
+                <strong style="color:var(--text);">Step 1.</strong> Go to <a href="https://www.virustotal.com/gui/join-us" target="_blank" rel="noopener" style="color:var(--blue);">virustotal.com</a> and create a free account<br>
+                <strong style="color:var(--text);">Step 2.</strong> Click your profile icon → <strong style="color:var(--text);">API Key</strong><br>
+                <strong style="color:var(--text);">Step 3.</strong> Copy and paste your key below — free tier allows 4 scans/min
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="password" id="vtApiKey" placeholder="Paste your VirusTotal API key here…"
+                  style="flex:1;background:var(--bg);border:1px solid var(--border2);color:var(--text);padding:9px 12px;border-radius:5px;font-family:var(--mono);font-size:12px;outline:none;transition:border-color 0.2s;"
+                  onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border2)'">
+                <button onclick="saveVtKey()" style="background:var(--blue);color:#fff;border:none;padding:9px 16px;border-radius:5px;font-family:var(--mono);font-size:11px;cursor:pointer;white-space:nowrap;letter-spacing:.05em;">Save Key</button>
+              </div>
             </div>
           </div>
 
@@ -3143,12 +3147,24 @@ function extractUrlsFromEmail(email) {
     .slice(0, 6);
 }
 
+function toggleVtKeySetup() {
+  const body = document.getElementById('vtKeySetupBody');
+  const btn = document.getElementById('vtKeyToggle');
+  const collapsed = body.style.display === 'none';
+  body.style.display = collapsed ? '' : 'none';
+  btn.textContent = collapsed ? 'hide ▲' : 'show ▼';
+}
+
 function saveVtKey() {
   const key = document.getElementById('vtApiKey')?.value?.trim();
   if (!key) return;
   localStorage.setItem('vtApiKey', key);
   const setup = document.getElementById('vtKeySetup');
   if (setup) setup.style.borderColor = 'var(--green)';
+  // Collapse setup after saving
+  document.getElementById('vtKeySetupBody').style.display = 'none';
+  document.getElementById('vtKeyToggle').textContent = 'change key ▼';
+  document.getElementById('vtKeySetupTitle').textContent = '✓ VirusTotal key saved';
   repopulateVtLinks();
 }
 
@@ -3162,9 +3178,20 @@ function populateVtLinks(email) {
   const keyInput = document.getElementById('vtApiKey');
   if (keyInput && storedKey && !keyInput.value) keyInput.value = storedKey;
 
+  // Always show setup box — collapsed if key exists
+  const setup = document.getElementById('vtKeySetup');
+  const setupBody = document.getElementById('vtKeySetupBody');
+  const toggleBtn = document.getElementById('vtKeyToggle');
+  const titleEl = document.getElementById('vtKeySetupTitle');
+  if (setup) setup.style.display = '';
+  if (storedKey && setupBody && setupBody.style.display !== 'none') {
+    setupBody.style.display = 'none';
+    if (toggleBtn) toggleBtn.textContent = 'change key ▼';
+    if (titleEl) titleEl.textContent = '✓ VirusTotal key saved';
+  }
+
   const urls = extractUrlsFromEmail(email);
   document.getElementById('vtResults').innerHTML = '';
-  document.getElementById('vtKeySetup').style.display = storedKey ? 'none' : '';
   document.getElementById('vtNoUrls').style.display = 'none';
   document.getElementById('vtUrlList').style.display = 'none';
 
@@ -3270,14 +3297,20 @@ function showVtResult(url, data, type, containerId) {
   const scoreClass = malicious === 0 ? 'vt-clean' : malicious <= 3 ? 'vt-suspicious' : 'vt-malicious';
   const scoreLabel = malicious === 0 ? 'Clean' : malicious <= 3 ? 'Suspicious' : 'Malicious';
   const cats = Object.values(categories).slice(0, 4);
+  const catExplain = cats.length ? `<div style="font-size:11px;color:var(--muted);margin-top:4px;">
+    Categories reported by security vendors: <strong style="color:var(--text);">${cats.join(', ')}</strong>
+    ${cats.some(c => c.toLowerCase().includes('phish')) ? ' — URL matches known phishing patterns.' : ''}
+    ${cats.some(c => c.toLowerCase().includes('malware')) ? ' — URL associated with malware distribution.' : ''}
+    ${cats.some(c => c.toLowerCase().includes('exposure') || c.toLowerCase().includes('suspicious')) ? ' — URL flagged as potentially dangerous but not yet confirmed malicious.' : ''}
+  </div>` : '';
   results.innerHTML += `
     <div class="vt-result-row">
-      <div class="vt-defanged">${defang(url)}</div>
+      <div class="vt-defanged" style="font-size:12px;margin-bottom:8px;">${defang(url)}</div>
       <div class="vt-result-bar">
-        <div class="vt-result-score ${scoreClass}">${malicious}/${total}</div>
-        <div>
-          <div class="vt-result-label">engines flagged · <strong class="${scoreClass}">${scoreLabel}</strong></div>
-          ${cats.length ? `<div class="vt-result-pills">${cats.map(c=>`<span class="vt-pill ${malicious>0?'malicious':'clean'}">${c}</span>`).join('')}</div>` : ''}
+        <div class="vt-result-score ${scoreClass}" style="font-size:18px;min-width:48px;">${malicious}/${total}</div>
+        <div style="flex:1;">
+          <div class="vt-result-label" style="font-size:12px;">security engines flagged this URL · <strong class="${scoreClass}" style="font-size:13px;">${scoreLabel}</strong></div>
+          ${catExplain}
         </div>
       </div>
     </div>`;
