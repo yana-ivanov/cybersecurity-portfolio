@@ -615,11 +615,11 @@ input[type="number"] {
 
 .email-row {
   display: grid;
-  grid-template-columns: 36px 1fr 130px 90px;
+  grid-template-columns: 36px 1fr 110px 110px 72px;
   align-items: center;
   padding: 13px 20px;
   border-bottom: 1px solid var(--border);
-  gap: 14px;
+  gap: 12px;
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -2159,6 +2159,7 @@ function renderList() {
         <div class="email-subject">${esc(subject)}</div>
       </div>
       <div><span class="badge badge-${r}">${riskLabels[r]}</span></div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(type)}</div>
       <div class="date-mono">${dateStr}</div>
     </div>`;
   }).join('');
@@ -2728,9 +2729,10 @@ const PUA_RANGES = [
   [0xE0100,0xE01EF, 'Variation Selectors Supplement',  'Glassworm secondary payload range'],
   [0x200B, 0x200F,  'Zero-Width Characters',           'Text steganography / prompt injection'],
   [0x2060, 0x2060,  'Word Joiner',                     'Invisible separator injection'],
-  [0xFEFF, 0xFEFF,  'BOM / Zero-Width No-Break Space', 'Hidden BOM payload'],
   [0x00AD, 0x00AD,  'Soft Hyphen',                     'Invisible soft hyphen injection'],
   [0x3164, 0x3164,  'Hangul Filler',                   'Hangul filler steganography'],
+  // U+FEFF (BOM) excluded — appears legitimately at start of HTML emails
+  // U+202E (RLO) handled separately in INSECURE_CHECKS via typosquatting regex
 ];
 
 const CRYPTO_C2_DOMAINS_SET = new Set([
@@ -2762,8 +2764,50 @@ function runGlasswormScan(text) {
   const findings = { glassworm: [], insecure: [], cryptoDomains: [] };
   if (!text) return findings;
 
+  // Strip email fingerprinting patterns before scanning.
+  // Marketing platforms (Glassdoor, etc.) inject zero-width chars between
+  // letters of email addresses in tracking URLs for recipient fingerprinting.
+  // Pattern: alphanumeric char → zero-width char → alphanumeric char
+  // This is NOT steganography — it's tracking. Remove these before counting.
+  const ZW_CHARS = /[\u200b-\u200f\u2060-\u2064\ufe00-\ufe0f]/g;
+  const TRACKING_PATTERN = /[a-zA-Z0-9]([\u200b-\u200f\u2060-\u2064\ufe00-\ufe0f])[a-zA-Z0-9@._-]/g;
+
+  // Count how many zero-width chars are embedded between alphanumeric chars
+  // (fingerprinting pattern) vs standalone (potential steganography)
+  let trackingCount = 0;
+  let match;
+  const trackingRegex = /[a-zA-Z0-9@._-][\u200b-\u200f\u2060-\u2064\ufe00-\ufe0f][a-zA-Z0-9@._-]/g;
+  while ((match = trackingRegex.exec(text)) !== null) trackingCount++;
+
+  // If more than 80% of zero-width chars are in tracking pattern context,
+  // this is almost certainly email fingerprinting — skip Glassworm scan
+  const totalZW = (text.match(ZW_CHARS) || []).length;
+  if (totalZW > 0 && trackingCount / totalZW > 0.7) {
+    // Still scan for zero-threshold indicators (Tag block, RLO, VS Supplement)
+    // as these are never used in legitimate tracking
+    const highConfidenceOnly = text;
+    if (/\u202e/.test(highConfidenceOnly)) {
+      findings.glassworm.push({ codepoint: 'U+202E', range: 'BiDi Override', attack: 'Filename reversal / text direction manipulation', context: '', count: 1 });
+    }
+    const tagBlockMatch = /[\u{E0000}-\u{E007F}]/u.test(highConfidenceOnly);
+    const vsSupplementMatch = /[\u{E0100}-\u{E01EF}]/u.test(highConfidenceOnly);
+    if (tagBlockMatch) findings.glassworm.push({ codepoint: 'U+E0000–E007F', range: 'Tag Block', attack: 'Glassworm tag character payload', context: '', count: 1 });
+    if (vsSupplementMatch) findings.glassworm.push({ codepoint: 'U+E0100–E01EF', range: 'VS Supplement', attack: 'Glassworm secondary payload range', context: '', count: 1 });
+
+    // Run insecure checks and crypto domain checks still
+    const lower = text.toLowerCase();
+    for (const d of CRYPTO_C2_DOMAINS_SET) { if (lower.includes(d)) findings.cryptoDomains.push(d); }
+    const seen = new Set();
+    for (const chk of INSECURE_CHECKS) {
+      for (const m of text.matchAll(chk.re)) {
+        const key = chk.label + ':' + m[0].slice(0,40);
+        if (!seen.has(key)) { seen.add(key); findings.insecure.push({ label: chk.label, example: m[0].slice(0,80), severity: chk.severity, desc: chk.desc }); }
+      }
+    }
+    return findings;
+  }
+
   // PUA Unicode scan — only flag if multiple instances clustered (real steganography)
-  // Single U+200C/200B etc. are common in legitimate HTML emails from major providers
   const cpCounts = {};
   const cpContexts = {};
   for (let i = 0; i < text.length; i++) {
@@ -2781,20 +2825,20 @@ function runGlasswormScan(text) {
     }
   }
 
-  // Only flag if 5+ occurrences of the same codepoint (threshold for real steganography)
-  // or if it's in Variation Selectors Supplement (always suspicious)
+  // Threshold tuning based on real inbox testing (70 Gmail emails, March 2026):
+  // - U+200C appears 20-30x in standard marketing HTML emails — threshold 30+
+  // - U+FEFF (BOM) appears legitimately at start of HTML emails — excluded
+  // - Tag block and VS Supplement remain zero-threshold — no legitimate use
   for (const [key, count] of Object.entries(cpCounts)) {
     const cp = parseInt(key, 16);
     const { rangeName, attack, ctx } = cpContexts[key];
     const isVariationSupplement = cp >= 0xE0100 && cp <= 0xE01EF;
-    if (count >= 5 || isVariationSupplement) {
-      findings.glassworm.push({
-        codepoint: 'U+' + key,
-        range: rangeName,
-        attack,
-        context: ctx,
-        count
-      });
+    const isTagBlock = cp >= 0xE0000 && cp <= 0xE007F;
+    const isBOM = cp === 0xFEFF;
+    if (isBOM) continue;
+    const threshold = (isVariationSupplement || isTagBlock) ? 1 : 30;
+    if (count >= threshold) {
+      findings.glassworm.push({ codepoint: 'U+' + key, range: rangeName, attack, context: ctx, count });
     }
   }
 
