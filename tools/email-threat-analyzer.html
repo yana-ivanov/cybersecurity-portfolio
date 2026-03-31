@@ -1432,9 +1432,16 @@ body.drawer-open .cipher-wrap {
   padding: 8px 10px;
 }
 .vt-key-note a { color: var(--blue); }
+.mobile-only-notice{display:none;background:#1e2d45;border-bottom:2px solid #1a4fa0;padding:.65rem 1.5rem;font-family:var(--mono);font-size:13px;color:#94a3b8;text-align:center;line-height:1.5}
+.mobile-only-notice strong{color:#4a9eff}
+@media(max-width:1024px){.mobile-only-notice{display:block}}
 </style>
 </head>
 <body class="light">
+
+<div class="mobile-only-notice">
+  <strong>Best experienced on desktop</strong> — this tool is optimized for screens 1024px and wider. Some features may not display correctly on mobile.
+</div>
 
 <nav class="nav">
   <div style="display:flex;align-items:center;gap:20px;">
