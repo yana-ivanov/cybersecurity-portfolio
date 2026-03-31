@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Email That Could Cost a Defense Contract | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.blue{color:var(--blue);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-red .stat-num{color:var(--red)}
+.stat-green .stat-num{color:var(--green)}
+
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:90px 1fr;gap:1rem;align-items:start}
+.nist-control{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--blue);padding-top:.15rem}
+.nist-desc{font-size:.88rem;color:var(--ink3);line-height:1.7}
+.nist-desc strong{color:var(--ink)}
+
+.tool-preview{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-preview-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between}
+.tool-preview-header a{color:#4a9eff;font-size:.65rem;letter-spacing:.1em}
+.tool-preview-body{padding:0;background:#f1f5f9}
+.tool-preview-body img{width:100%;display:block}
+.tool-preview-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+
+.cipher-box{background:#0a0f1a;border-radius:2px;padding:1.5rem;margin:2rem 0;border-left:3px solid #1a4fa0}
+.cipher-header{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#60a5fa;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.cipher-triangle{width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid #e8374a;display:inline-block}
+.cipher-dialogue{font-family:var(--mono);font-size:.78rem;color:#e2e8f0;line-height:1.7}
+.cipher-dialogue .q{color:#60a5fa;margin-bottom:.25rem}
+.cipher-dialogue .a{color:#e2e8f0;margin-bottom:1rem;padding-left:1rem;border-left:2px solid #1a4fa0}
+
+.launch-btn{display:inline-flex;align-items:center;gap:.75rem;background:#1a4fa0;color:#fff;padding:.9rem 1.75rem;font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:background .2s;margin-top:.5rem}
+.launch-btn:hover{background:#1e3d8f;text-decoration:none;color:#fff}
+.launch-btn .material-icons{font-size:1rem}
+
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;gap:1.25rem}
+  footer{flex-direction:column;align-items:flex-start;gap:.75rem}
+  .mast-bar{padding:.8rem 1.75rem}
+}
+</style>
+</head>
+<body>
+
+<div class="mobile-notice">Best viewed on desktop · <strong>Optimized for 1024px+</strong></div>
+
+<nav class="back-nav">
+  <a href="../index.html">Portfolio</a>
+</nav>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Field Notes</div>
+    <h1 class="title">The Email That Could Cost<br>a <span>Defense Contract</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item">
+        <div class="label">Author</div>
+        <div class="value">Yana Ivanov</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Published</div>
+        <div class="value">March 2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Category · Type</div>
+        <div class="value">Tools · Field Notes</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Stack</div>
+        <div class="value">Claude API · Cloudflare · Google OAuth</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Detection</div>
+        <div class="value">MITRE ATT&CK · Glassworm · MQL</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Status</div>
+        <div class="value">Live · Open Source</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mast-bar">
+  <div class="mast-bar-dot"></div>
+  SECURITY AWARENESS · CMMC AT.2.056 · PHISHING SIMULATION
+</div>
+
+<div class="wrap">
+<div class="content">
+
+<div class="section">
+  <div class="section-num">01 — The Problem</div>
+  <h2>It Always Starts With an Email</h2>
+
+  <p>A machinist at a defense subcontractor gets an email. It looks like it's from HR. It says there's an update to the benefits portal and they need to verify their credentials. They click. They log in. And just like that, someone who isn't them now has access to systems that handle Controlled Unclassified Information — the kind of data the Department of Defense is legally required to protect.</p>
+
+  <p>This isn't a hypothetical. <strong>Over 90% of cyberattacks begin with a phishing email.</strong> Not a sophisticated zero-day exploit. Not a nation-state hacking team tunneling through your firewall. An email. And the scary part? Most employees who click on phishing emails don't know they did anything wrong. <a href="https://zensec.co.uk/blog/2025-phishing-statistics-the-alarming-rise-in-attacks/" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:.7rem;color:var(--blue);">[CISA via Zensec, 2025]</a></p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">By the numbers — phishing in 2025–2026</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-red">
+        <div class="stat-num">$4.88M</div>
+        <div class="stat-label">Average cost per breach</div>
+        <div class="stat-sub"><a href="https://www.ibm.com/reports/data-breach" target="_blank" rel="noopener" style="color:#94a3b8;">IBM Cost of a Data Breach Report 2025</a></div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">68%</div>
+        <div class="stat-label">Breaches involving a human element</div>
+        <div class="stat-sub"><a href="https://www.verizon.com/business/resources/reports/dbir/" target="_blank" rel="noopener" style="color:#94a3b8;">Verizon DBIR 2025</a></div>
+      </div>
+      <div class="stat-item stat-blue">
+        <div class="stat-num">$2.77B</div>
+        <div class="stat-label">BEC losses in the US in 2024</div>
+        <div class="stat-sub"><a href="https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf" target="_blank" rel="noopener" style="color:#94a3b8;">FBI IC3 Annual Report 2024</a></div>
+      </div>
+      <div class="stat-item stat-green">
+        <div class="stat-num">38%</div>
+        <div class="stat-label">Lower click rates after awareness training</div>
+        <div class="stat-sub"><a href="https://www.verizon.com/business/resources/reports/dbir/" target="_blank" rel="noopener" style="color:#94a3b8;">Verizon DBIR 2025</a></div>
+      </div>
+    </div>
+  </div>
+
+  <p>For defense contractors, the stakes are even higher. A successful phishing attack doesn't just cost money — it can mean a failed CMMC audit, a lost contract, and in the worst case, compromised national security data making its way to people who shouldn't have it.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The CMMC reality check:</strong> Phase 1 enforcement has been active since November 10, 2025 — self-assessment affirmations are now a condition of contract award. Phase 2 mandatory third-party certification begins November 2026. Here's the number that should concern every defense contractor: only <strong>1% of contractors are currently audit-ready</strong> — down from 8% in 2023, then 4% in 2025. Compliance is going down, not up. Not because there are more contractors — because as enforcement got real, companies discovered they were far less compliant than they believed. There are 350,000 contractors requiring certification and only 600 certified assessors. Wait times already exceed 18 months. <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/analysis/CMMC_Supply_Chain.html" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:.7rem;color:var(--amber);">[Full CMMC Supply Chain Analysis →]</a></p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-num">02 — The Idea</div>
+  <h2>People Learn by Doing, Not by Reading Slides</h2>
+
+  <p>I've sat through enough security awareness training sessions to know what doesn't work: a slide deck with clipart of a fishing hook, a 45-minute video nobody watches, a quiz everyone retakes until they get 100%. These check the compliance box. They don't change behavior.</p>
+
+  <p>What actually works is <strong>seeing it in your own inbox.</strong> When someone looks at an email they received last Tuesday and realizes — oh, that was a phishing attempt — it lands differently than any hypothetical example ever could. The email is real. The sender is someone they almost trusted. The mistake was almost theirs to make.</p>
+
+  <p>That's why I built the Email Threat Analyzer. Not to replace security tooling. Not to compete with enterprise email gateways. To give employees — especially at defense contractors who aren't security professionals — a way to look at their own email and understand what threats actually look like in the wild.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The training insight:</strong> Organizations that adopt security behavior change programs — not just compliance training — see employees recognize and report phishing attacks with a <strong>6x improvement in 6 months</strong>, and reduce malicious clicks by 87%. The difference is making it personal and practical. <a href="https://hoxhunt.com/guide/phishing-trends-report" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:.7rem;color:var(--blue);">[Hoxhunt Phishing Trends Report 2025]</a></p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-num">03 — The Tool</div>
+  <h2>What It Does, in Plain English</h2>
+
+  <p>The Email Threat Analyzer is a browser-based security tool that connects to your Gmail inbox via Google OAuth — read-only access, nothing stored, nothing sent anywhere it shouldn't go — and runs AI-powered threat analysis on your emails. It maps findings to MITRE ATT&CK techniques, flags indicators of compromise, and explains what to look for in language that doesn't require a security degree to understand.</p>
+
+  <div class="tool-preview">
+    <div class="tool-preview-header">
+      <span>Email Threat Analyzer — live tool</span>
+      <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/tools/email-threat-analyzer.html" target="_blank">Launch Tool →</a>
+    </div>
+    <div class="figure-body" style="background:#f1f5f9;padding:2rem;text-align:center;">
+      <div style="background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:2rem;max-width:600px;margin:0 auto;">
+        <div style="font-family:var(--mono);font-size:.7rem;color:var(--blue);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;">Tool Interface</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.5rem;margin-bottom:1.5rem;">
+          <div style="background:#1a4fa0;color:#fff;padding:.5rem;font-family:var(--mono);font-size:.65rem;text-align:center;border-radius:2px;">Gmail Live</div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:.5rem;font-family:var(--mono);font-size:.65rem;text-align:center;border-radius:2px;color:#374151;">Upload File</div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:.5rem;font-family:var(--mono);font-size:.65rem;text-align:center;border-radius:2px;color:#374151;">Paste Raw</div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:.5rem;font-family:var(--mono);font-size:.65rem;text-align:center;border-radius:2px;color:#374151;">Demo Samples</div>
+        </div>
+        <div style="text-align:left;background:#f8fafc;border:1px solid #e2e8f0;padding:1rem;border-radius:2px;">
+          <div style="display:flex;align-items:center;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #e2e8f0;">
+            <div style="width:28px;height:28px;background:rgba(192,57,43,0.12);border:1px solid rgba(192,57,43,0.3);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.7rem;">⚠</div>
+            <div style="flex:1;font-size:.8rem;color:#1a1a2e;font-family:var(--serif);">CEO Wire Transfer Fraud (BEC)</div>
+            <div style="background:rgba(192,57,43,0.1);color:#c0392b;font-family:var(--mono);font-size:.65rem;padding:.2rem .6rem;border-radius:2px;font-weight:600;">CRITICAL</div>
+            <div style="font-family:var(--mono);font-size:.65rem;color:#94a3b8;">BEC/Fraud</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.75rem;padding:.5rem 0;border-bottom:1px solid #e2e8f0;">
+            <div style="width:28px;height:28px;background:rgba(192,57,43,0.12);border:1px solid rgba(192,57,43,0.3);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.7rem;">⚡</div>
+            <div style="flex:1;font-size:.8rem;color:#1a1a2e;font-family:var(--serif);">Microsoft 365 Credential Phishing</div>
+            <div style="background:rgba(192,57,43,0.1);color:#c0392b;font-family:var(--mono);font-size:.65rem;padding:.2rem .6rem;border-radius:2px;font-weight:600;">CRITICAL</div>
+            <div style="font-family:var(--mono);font-size:.65rem;color:#94a3b8;">Phishing</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:.75rem;padding:.5rem 0;">
+            <div style="width:28px;height:28px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:.7rem;">✓</div>
+            <div style="flex:1;font-size:.8rem;color:#1a1a2e;font-family:var(--serif);">Amazon Customer Service</div>
+            <div style="background:rgba(20,90,50,0.08);color:#145a32;font-family:var(--mono);font-size:.65rem;padding:.2rem .6rem;border-radius:2px;font-weight:600;">CLEAN</div>
+            <div style="font-family:var(--mono);font-size:.65rem;color:#94a3b8;">Clean</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tool-preview-caption">The Email Threat Analyzer classifies each email by risk level, maps to MITRE ATT&CK techniques, and provides plain-language training explanations. Four input modes: Gmail Live, file upload, paste raw headers, and built-in demo samples.</div>
+  </div>
+
+  <p>There are four ways to use it. You can connect your Gmail account directly via Google OAuth. You can upload an exported email file. You can paste raw email headers. Or you can run through six built-in demo samples designed to cover the most common attack patterns — Business Email Compromise, credential phishing, malware delivery, social engineering, and more.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Connect or upload</div>
+        <div class="step-content-desc">Sign in with Google (read-only access) or upload an exported .eml or .mbox file from any email client — Gmail, Outlook, Yahoo, Exchange, Apple Mail.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">AI analysis runs</div>
+        <div class="step-content-desc">The tool sends email headers and content to Claude AI for threat analysis — checking for domain spoofing, urgency manipulation, credential harvesting patterns, invisible Unicode payloads, and more.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">Review findings</div>
+        <div class="step-content-desc">Each email gets a risk rating (Critical / High / Medium / Low / Clean), a threat type, mapped MITRE ATT&CK techniques, specific indicators of compromise, and a plain-language training explanation of what to look for.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">Ask CIPHER</div>
+        <div class="step-content-desc">CIPHER — the tool's built-in AI analyst — is available to answer questions about any flagged email in plain language. No jargon. No acronyms without explanation. Just honest, clear answers about what the threat is and why it matters.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-content-label">Export the report</div>
+        <div class="step-content-desc">Download a CSV report of all findings — useful for CMMC documentation, security awareness training records, or presenting results to a CISO.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-num">04 — Meet CIPHER</div>
+  <h2>Your AI Security Guide, Not a Chatbot</h2>
+
+  <p>One of the things I was most deliberate about is that this tool should never make someone feel stupid for asking a question. Security is full of jargon that excludes people — and that exclusion is a security risk in itself. If your employees don't understand why something is dangerous, they can't make good decisions.</p>
+
+  <p>CIPHER is the tool's built-in AI analyst. When you open any flagged email, CIPHER is available in a side panel to answer questions about what was found and why it matters. Ask it anything — "what does T1566.002 mean?", "why is a Reply-To mismatch suspicious?", "is this email actually dangerous or just weird-looking?" — and it will give you a straight answer in plain English.</p>
+
+  <div class="cipher-box">
+    <div class="cipher-header">
+      <div class="cipher-triangle"></div>
+      CIPHER — AI Security Analyst
+    </div>
+    <div class="cipher-dialogue">
+      <div class="q">You: This email says it's from Microsoft but it flagged as phishing. How can I tell?</div>
+      <div class="a">Look at the actual sending domain — not the display name. Display names can say anything. The real test is the domain in the From address: <em>no-reply@microsofft-security.com</em> has an extra 't' in Microsoft. That's a typosquatted domain designed to look legitimate at a glance. Microsoft would always send from @microsoft.com. This email is also requesting urgent action with a 24-hour deadline — that urgency is manufactured to stop you from thinking clearly before you click.</div>
+      <div class="q">You: So what should I do if I get something like this at work?</div>
+      <div class="a">Don't click anything in the email. Don't reply. Forward it to your IT security team and let them investigate. If you're genuinely concerned about your Microsoft account, go directly to microsoft.com by typing it in your browser — never follow a link in a suspicious email to verify your account.</div>
+    </div>
+  </div>
+
+  <p>CIPHER updates its context when you open a specific email, so its answers are always relevant to what you're actually looking at — not generic advice. It's not a replacement for a real security analyst, but it bridges the gap between "I got a weird email" and "I know exactly what I'm dealing with."</p>
+</div>
+
+<div class="section">
+  <div class="section-num">05 — What I Found</div>
+  <h2>When I Ran It Against My Own Inbox</h2>
+
+  <p>The most useful thing I did during development was run the tool against my actual Gmail inbox — 70 real emails from the past 30 days. What I found was genuinely interesting, and it made the tool significantly better.</p>
+
+  <p><strong>The false positive problem.</strong> The tool kept flagging emails from ALLMODERN, Hotels.com, Glassdoor, and a handful of other legitimate senders as critical threats. At first I thought there was a bug. Then I dug into the raw email data and found something I hadn't expected: these companies were embedding invisible Unicode characters — zero-width spaces and variation selectors — between individual letters of my email address in their tracking URLs. It looked exactly like a known attack technique called Glassworm, which uses the same invisible characters to hide malicious payloads.</p>
+
+  <p>Turns out, email marketing platforms do this legitimately for recipient fingerprinting — making each email unique so they can track who clicked what. The technique is identical to the attack. The intent is different. That required me to build detection logic that can tell the difference between a marketing platform's tracking fingerprint and an actual invisible Unicode payload attack.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The Glassworm detection:</strong> The tool includes custom detection rules for Glassworm-style invisible Unicode payloads — a March 2026 supply chain attack confirmed across 151+ GitHub repositories, npm packages, and VS Code extensions. These rules were also submitted as open-source detection rules to Sublime Security's community rule feed (PR #4267). Real-world testing revealed that legitimate email tracking uses the same technique, requiring threshold-based detection rather than zero-tolerance matching.</p>
+  </div>
+
+  <p>This kind of finding — discovering that a legitimate technology and a malicious technique are nearly indistinguishable at the byte level — is exactly the kind of nuance that makes security hard. It's also exactly the kind of thing a good security analyst needs to be able to recognize and explain.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Validation results — 70-email real inbox test, March 2026</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-blue">
+        <div class="stat-num">70</div>
+        <div class="stat-label">Emails analyzed</div>
+        <div class="stat-sub">Real inbox, last 30 days</div>
+      </div>
+      <div class="stat-item stat-green">
+        <div class="stat-num">50+</div>
+        <div class="stat-label">ZW char threshold</div>
+        <div class="stat-sub">Tuned to eliminate tracking false positives</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">3</div>
+        <div class="stat-label">False positive classes found</div>
+        <div class="stat-sub">Gmail formatting, emoji rendering, tracking fingerprinting</div>
+      </div>
+      <div class="stat-item stat-blue">
+        <div class="stat-num">2</div>
+        <div class="stat-label">MQL rules submitted</div>
+        <div class="stat-sub">Sublime Security open-source community PR #4267</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-num">06 — The Use Case</div>
+  <h2>Phishing Simulation for Defense Contractors</h2>
+
+  <p>Here's where this becomes more than a portfolio project. One of the most effective security awareness techniques is the phishing simulation — you send crafted phishing emails to employees, see who clicks, and then use that as a teaching moment. Companies like KnowBe4 and Proofpoint charge significant money for this service. The Email Threat Analyzer makes it something you can do in a controlled, hands-on workshop format.</p>
+
+  <p>The engagement looks like this: before the session, I send simulated phishing emails to employees — crafted to match real attack patterns relevant to the defense industry (fake supplier invoices, IT helpdesk password resets, HR policy updates, government portal credentials). During the session, employees connect their work Gmail or upload the emails, and the tool shows them exactly what they received, why it was suspicious, and what they should have done differently.</p>
+
+  <p>The difference between this and a slide deck is that <strong>they're looking at an email they actually received.</strong> The mistake was almost real. The lesson lands.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Why this matters for CMMC specifically:</strong> CMMC Practice AT.2.056 requires organizations to provide security awareness training that includes recognizing and reporting potential indicators of threat — including phishing. A phishing simulation that produces documented results directly satisfies this requirement and gives you evidence for your assessment. It's not a checkbox — it's proof that your people can actually identify threats. <a href="https://dodcio.defense.gov/CMMC/" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:.7rem;color:var(--amber);">[DoD CMMC Program]</a></p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Attack Type</th>
+          <th>What it looks like</th>
+          <th>CMMC relevance</th>
+          <th>Covered by tool</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Business Email Compromise</strong></td>
+          <td>Fake CEO or CFO requesting urgent wire transfer or supplier payment change</td>
+          <td class="blue">AT.2.056 · AC.1.001</td>
+          <td class="green">Yes — BEC demo included</td>
+        </tr>
+        <tr>
+          <td><strong>Credential Phishing</strong></td>
+          <td>Fake Microsoft 365, VPN, or government portal login page</td>
+          <td class="blue">AT.2.056 · IA.1.076</td>
+          <td class="green">Yes — credential harvest demo</td>
+        </tr>
+        <tr>
+          <td><strong>Malware Delivery</strong></td>
+          <td>Fake HR policy PDF with hidden .exe, or ZIP with disguised executable</td>
+          <td class="blue">AT.2.056 · SI.1.210</td>
+          <td class="green">Yes — malware delivery demo</td>
+        </tr>
+        <tr>
+          <td><strong>Vendor Invoice Fraud</strong></td>
+          <td>Lookalike vendor domain requesting banking detail update before payment</td>
+          <td class="blue">AT.2.056 · AC.1.001</td>
+          <td class="green">Yes — invoice BEC demo</td>
+        </tr>
+        <tr>
+          <td><strong>Invisible Unicode Payload</strong></td>
+          <td>Emails containing hidden Glassworm-style steganography in body or attachments</td>
+          <td class="blue">AT.2.056 · SI.1.211</td>
+          <td class="green">Yes — custom Glassworm detection</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-num">07 — CMMC Connection</div>
+  <h2>Why Email Security Is a Compliance Issue, Not Just an IT Issue</h2>
+
+  <p>Most people in the defense supply chain think of CMMC as an IT problem. Their IT team handles it. They just have to take a training course once a year. That framing is exactly why <strong>99% of contractors are not currently audit-ready.</strong></p>
+
+  <p>CMMC is a people problem as much as it is a technical one. <strong>The most common initial access vector in defense-related breaches isn't a firewall misconfiguration. It's a phishing email.</strong> An employee clicks a link. A credential gets harvested. An attacker sits quietly inside the network for an average of 254 days before anyone notices. By then the damage is done. <a href="https://hunto.ai/blog/phishing-attack-statistics/" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:.7rem;color:var(--blue);">[Hunto AI, 2026]</a></p>
+
+  <div class="nist-box">
+    <div class="nist-box-title">Applicable NIST SP 800-171 Controls</div>
+    <div class="nist-items">
+      <div class="nist-item">
+        <span class="nist-control">3.2.1<br>AT.2.056</span>
+        <span class="nist-desc"><strong>Security awareness training.</strong> Ensure personnel are aware of security risks associated with their activities and of applicable policies and procedures. Phishing simulation with documented results directly satisfies this control.</span>
+      </div>
+      <div class="nist-item">
+        <span class="nist-control">3.2.2<br>AT.2.057</span>
+        <span class="nist-desc"><strong>Role-based training.</strong> Ensure personnel with security responsibilities receive appropriate training. Using this tool in a facilitated workshop creates a documented, role-relevant training record.</span>
+      </div>
+      <div class="nist-item">
+        <span class="nist-control">3.14.1<br>SI.1.210</span>
+        <span class="nist-desc"><strong>Malicious code protection.</strong> Identify, report, and correct information and information system flaws — including those introduced through malicious email attachments and phishing links.</span>
+      </div>
+    </div>
+  </div>
+
+  <p>The good news is that awareness training actually works — when it's done right. <strong>Organizations with active security behavior programs reduce phishing incidents by 86%</strong> and employees report threats 4x more often. The key word is "active." Passive training — a video, a quiz — produces passive results. Hands-on simulation produces behavior change. <a href="https://controld.com/blog/phishing-statistics-industry-trends/" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:.7rem;color:var(--blue);">[ControlD / Cisco Talos, 2025]</a></p>
+</div>
+
+<div class="section">
+  <div class="section-num">08 — Try It</div>
+  <h2>See What's in Your Inbox</h2>
+
+  <p>The tool is free, open source, and live. You don't need an account. You don't need to install anything. If you have a Gmail account and a browser, you can run a threat analysis on your inbox right now.</p>
+
+  <p>If you're not ready to connect Gmail, start with the Demo Samples — six built-in emails covering the most common attack patterns, with full AI analysis and CIPHER available to answer questions. It takes about five minutes and gives you a real sense of what the tool does.</p>
+
+  <div style="margin:2rem 0;">
+    <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/tools/email-threat-analyzer.html" target="_blank" class="launch-btn">
+      <span class="material-icons">launch</span>
+      Launch Email Threat Analyzer
+    </a>
+  </div>
+
+  <p style="margin-top:1.5rem;">If you're a defense contractor or CMMC consultant interested in using this as part of a phishing simulation engagement, I'd be glad to talk through how it fits into your workflow. The tool is built to be run in a facilitated workshop — not just handed to employees and forgotten.</p>
+
+  <div class="callout callout-green">
+    <p><strong>Open source:</strong> The detection rules, source code, and Glassworm MQL rules submitted to Sublime Security are all available on GitHub at <a href="https://github.com/yana-ivanov/cybersecurity-portfolio" target="_blank">github.com/yana-ivanov/cybersecurity-portfolio</a>. The Glassworm detection rule is live in PR #4267 on the Sublime Security community rule feed.</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-num">09 — References</div>
+  <h2>Sources</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Source</th><th>Stat / Finding</th><th>Link</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>IBM Cost of a Data Breach Report 2025</strong></td>
+          <td>$4.88M average cost per phishing breach</td>
+          <td class="blue"><a href="https://www.ibm.com/reports/data-breach" target="_blank" rel="noopener">ibm.com/reports/data-breach</a></td>
+        </tr>
+        <tr>
+          <td><strong>Verizon DBIR 2025</strong></td>
+          <td>68% of breaches involve human element · 38% lower click rates after training</td>
+          <td class="blue"><a href="https://www.verizon.com/business/resources/reports/dbir/" target="_blank" rel="noopener">verizon.com/business/dbir</a></td>
+        </tr>
+        <tr>
+          <td><strong>FBI IC3 Annual Report 2024</strong></td>
+          <td>$2.77B in BEC losses in the US in 2024</td>
+          <td class="blue"><a href="https://www.ic3.gov/AnnualReport/Reports/2024_IC3Report.pdf" target="_blank" rel="noopener">ic3.gov/AnnualReport</a></td>
+        </tr>
+        <tr>
+          <td><strong>Hoxhunt Phishing Trends Report 2025</strong></td>
+          <td>6x improvement in reporting · 87% reduction in malicious clicks · 86% reduction in incidents</td>
+          <td class="blue"><a href="https://hoxhunt.com/guide/phishing-trends-report" target="_blank" rel="noopener">hoxhunt.com/guide/phishing-trends-report</a></td>
+        </tr>
+        <tr>
+          <td><strong>CISA / Zensec 2025</strong></td>
+          <td>Over 90% of cyberattacks begin with phishing</td>
+          <td class="blue"><a href="https://zensec.co.uk/blog/2025-phishing-statistics-the-alarming-rise-in-attacks/" target="_blank" rel="noopener">zensec.co.uk/phishing-statistics</a></td>
+        </tr>
+        <tr>
+          <td><strong>Hunto AI Phishing Statistics 2026</strong></td>
+          <td>254-day average dwell time after phishing breach</td>
+          <td class="blue"><a href="https://hunto.ai/blog/phishing-attack-statistics/" target="_blank" rel="noopener">hunto.ai/blog/phishing-attack-statistics</a></td>
+        </tr>
+        <tr>
+          <td><strong>CMMC Supply Chain Analysis — Yana Ivanov, 2026</strong></td>
+          <td>1% audit-ready (down from 8% in 2023) · 350K contractors · 600 assessors · 18-month wait times</td>
+          <td class="blue"><a href="https://yana-ivanov.github.io/cybersecurity-portfolio/analysis/CMMC_Supply_Chain.html" target="_blank" rel="noopener">CMMC Supply Chain Analysis</a></td>
+        </tr>
+        <tr>
+          <td><strong>DoD CIO — CMMC Program</strong></td>
+          <td>CMMC enforcement active November 10, 2025 · AT.2.056 requirements</td>
+          <td class="blue"><a href="https://dodcio.defense.gov/CMMC/" target="_blank" rel="noopener">dodcio.defense.gov/CMMC</a></td>
+        </tr>
+        <tr>
+          <td><strong>Sublime Security — PR #4267</strong></td>
+          <td>Glassworm invisible Unicode detection rule submission</td>
+          <td class="blue"><a href="https://github.com/sublime-security/sublime-rules/pull/4267" target="_blank" rel="noopener">github.com/sublime-security/sublime-rules/pull/4267</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+</div>
+
+<div class="bio">
+  <div class="bio-avatar">Y</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Compliance Analyst &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC compliance consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>The Email That Could Cost a Defense Contract &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; March 2026</span>
+  <span>Based on original tool development · For educational use · Independent analysis</span>
+</footer>
+
+</body>
+</html>
