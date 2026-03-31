@@ -1629,8 +1629,8 @@ body.drawer-open .cipher-wrap {
         <div class="safety-banner green">
           <div class="safety-banner-icon">🎓</div>
           <div>
-            <div style="font-weight:700;margin-bottom:3px;">Training mode — built-in phishing samples</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.6;">These are realistic but fictional phishing email samples for classroom training. No real email accounts needed. Select one or more scenarios and run analysis — CIPHER will guide students through what to look for in each.</div>
+            <div style="font-weight:700;margin-bottom:3px;">Training mode — Meridian Defense Solutions scenario</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.6;">You are an employee at Meridian Defense Solutions, a Connecticut defense subcontractor supplying precision components for submarine and aerospace programs. Your company handles Controlled Unclassified Information (CUI) and must comply with CMMC Level 2. Select one or more emails below and analyze them — CIPHER will walk you through each threat.</div>
           </div>
         </div>
 
@@ -2544,41 +2544,41 @@ ${emailsStr}`
 const DEMO_SAMPLES = [
   {
     id: 'demo1', label: 'CRITICAL', risk: 'critical',
-    title: 'CEO Wire Transfer Fraud (BEC)',
-    desc: 'Classic Business Email Compromise — impersonates CEO requesting urgent wire transfer.',
-    raw: `From: Richard Hartwell <r.hartwell@company-corp.net>\nTo: sarah.finance@yourcompany.com\nSubject: URGENT - Wire Transfer Needed Today\nDate: Mon, 30 Mar 2026 07:42:11 -0500\nReply-To: richard.h.ceo@gmail.com\nX-Originating-IP: 185.234.218.47\n\nSarah,\n\nI'm in a board meeting and can't take calls. I need you to process a wire transfer IMMEDIATELY — this is time-sensitive and confidential, please do not discuss with anyone else.\n\nAmount: $47,500.00\nBeneficiary: Meridian Trade Partners LLC\nAccount: 4829103847\nRouting: 021000021\nBank: JP Morgan Chase\n\nThis needs to go out before 2pm today. Do not reply to this email — text me on my personal number.\n\nRichard Hartwell\nCEO`
+    title: 'BEC — CEO Wire Fraud',
+    desc: 'Business Email Compromise. Fake CEO email to AP coordinator requesting urgent wire transfer referencing a real submarine contract. Reply-To routes to a personal Gmail.',
+    raw: `From: Thomas Beckett <t.beckett@meridian-defense-grp.com>\nTo: linda.kowalski@meridiandefense.com\nSubject: URGENT — Wire Transfer Required Before EOD\nDate: Mon, 30 Mar 2026 07:18:44 -0500\nReply-To: thomas.beckett.ceo@gmail.com\nX-Originating-IP: 185.234.218.47\n\nLinda,\n\nI'm in a classified briefing at Electric Boat all day and can't take calls. I need you to process a wire transfer before close of business today — this is related to the VA-class hull component contract and must stay confidential until the contract amendment is signed.\n\nAmount: $94,500.00\nBeneficiary: Coastal Precision Components LLC\nAccount Number: 7743021856\nRouting Number: 021000021\nBank: JP Morgan Chase, New York\n\nPlease process immediately and confirm by text — do NOT reply to this email as I won't have access. My personal cell is 203-555-0147.\n\nThank you,\nThomas Beckett\nCEO, Meridian Defense Solutions`
   },
   {
     id: 'demo2', label: 'CRITICAL', risk: 'critical',
-    title: 'Microsoft 365 Credential Phishing',
-    desc: 'Fake Microsoft security alert with typosquatted domain to steal O365 credentials.',
-    raw: `From: Microsoft Security Alert <no-reply@microsofft-security.com>\nTo: user@yourcompany.com\nSubject: [Action Required] Your Microsoft 365 account will be suspended in 24 hours\nDate: Mon, 30 Mar 2026 08:15:44 -0400\nX-Mailer: PHPMailer 6.5.0\nReceived: from 94.102.49.33 (unknown)\n\nMICROSOFT SECURITY CENTER\n\nYour account has triggered a suspicious login alert.\nLocation: Kyiv, Ukraine — Device: Unknown Windows 11 PC — Time: 03:47 AM EST\n\nIf this was not you, your account may be compromised. Your access will be SUSPENDED in 24 hours unless you verify immediately.\n\n[ SECURE MY ACCOUNT NOW ] → http://micros0ft-verify.login-secure.xyz/auth?token=a8f3k2\n\nMicrosoft Security Team\n© 2026 Microsoft Corporation`
+    title: 'Spearphishing — VPN Credential Theft',
+    desc: 'Targeted spearphishing using Meridian company context. Spoofed IT helpdesk with fake VPN reset portal designed to steal Active Directory credentials and access CUI systems.',
+    raw: `From: Meridian IT Helpdesk <helpdesk@meridian-defense.support-desk.net>\nTo: employee@meridiandefense.com\nSubject: [URGENT] Your VPN and network access expires in 2 hours\nDate: Mon, 30 Mar 2026 10:44:11 -0500\nReply-To: it-noreply@outlook-helpdesk-portal.com\nX-Mailer: PHPMailer 6.5.0\n\nHello,\n\nOur systems have detected that your VPN credentials are scheduled to expire at 1:00 PM EST today. Failure to reset before expiration will lock you out of all Meridian network resources including shared drives, ITAR-controlled document repositories, and the SPRS compliance portal for up to 72 hours.\n\nReset your credentials here:\nhttps://meridian-vpn.active-directory-reset.xyz/auth?emp=reset\n\nYou will need your current username and Windows password to verify your identity.\n\nIT Support\nMeridian Defense Solutions\nTicket Reference: ITH-20260330-9921`
   },
   {
-    id: 'demo3', label: 'HIGH', risk: 'high',
-    title: 'HR Policy Malware Delivery',
-    desc: 'Impersonates HR with a ZIP attachment containing disguised executable files.',
-    raw: `From: HR Department <hr-updates@yourcompany-hr.org>\nTo: all-staff@yourcompany.com\nSubject: Updated Employee Handbook 2026 - Action Required\nDate: Mon, 30 Mar 2026 09:00:00 -0500\nX-Originating-IP: 77.88.21.145\n\nDear Team,\n\nPlease find attached the updated Employee Handbook effective April 1st, 2026. All employees must review and sign the acknowledgment form included.\n\nDeadline: Friday, April 4th, 2026\nAttachment: HR_Policy_2026_Update.zip (contains: Policy_Document.pdf.exe, Sign_Here_Form.docm)\n\nHR Department`
+    id: 'demo3', label: 'CRITICAL', risk: 'critical',
+    title: 'Ransomware — Malicious ZIP in HR Email',
+    desc: 'Ransomware delivery disguised as a CMMC compliance update. ZIP attachment contains a disguised executable that would encrypt all CUI files on the network.',
+    raw: `From: HR Department <hr-compliance@meridian-defense-hr.org>\nTo: all-staff@meridiandefense.com\nSubject: Action Required — Updated CUI Handling Policy 2026\nDate: Mon, 30 Mar 2026 09:00:00 -0500\nX-Originating-IP: 77.88.21.145\n\nDear Meridian Team,\n\nAs part of our CMMC Level 2 compliance preparation, all employees who handle Controlled Unclassified Information are required to review and acknowledge the updated CUI Handling Policy effective April 1, 2026.\n\nPlease open the attached document, read the updated procedures, and complete the acknowledgment form by Friday, April 4th. Employees who do not complete this by the deadline will have CUI system access suspended.\n\nAttachment: CUI_Policy_Update_2026.zip\nContents: CUI_Handling_Procedures_v3.pdf.exe, Acknowledgment_Form.docm\n\nHR & Compliance Team\nMeridian Defense Solutions`
   },
   {
     id: 'demo4', label: 'HIGH', risk: 'high',
-    title: 'IT Helpdesk Password Reset Phish',
-    desc: 'Spoofed internal IT helpdesk with fake VPN reset portal link.',
-    raw: `From: IT Helpdesk <helpdesk@yourcompany.support-tickets.net>\nTo: employee@yourcompany.com\nSubject: Your VPN password expires in 2 hours — reset now\nDate: Mon, 30 Mar 2026 11:30:00 -0500\nReply-To: it-reset@outlook-helpdesk.com\n\nHello,\n\nYour VPN and Active Directory password is set to expire in 2 hours. If you do not reset it before expiration, you will be locked out of all systems for up to 48 hours.\n\nReset your password here: https://it-helpdesk.yourcompany.reset-portal.xyz\n\nYou will need your current username and password to verify identity before setting a new one.\n\nIT Support Team\nTicket #ITH-20260330-4821`
+    title: 'Malicious Link — Fake Supplier Portal',
+    desc: 'Email with a malicious link disguised as a vendor portal migration. Clicking silently installs a credential harvester before showing a legitimate-looking login page.',
+    raw: `From: James Whitfield <j.whitfield@acme-supp1iers.com>\nTo: ap@meridiandefense.com\nSubject: RE: Supplier Portal Migration — Action Required by April 4\nDate: Mon, 30 Mar 2026 13:10:22 -0500\n\nHi,\n\nAcme Suppliers is migrating to a new supplier portal for invoice management and purchase order tracking. All vendor contacts must re-register before April 4 to avoid disruption to existing purchase orders.\n\nRegister here:\nhttps://acme-suppliers-portal.vendor-migration.net/register?ref=meridian\n\nYou will need your current Acme account credentials and your company DUNS number. The process takes about 3 minutes.\n\nIf you do not register by April 4, your existing POs will be placed on hold.\n\nJames Whitfield\nVendor Relations, Acme Suppliers Inc.`
   },
   {
-    id: 'demo5', label: 'MEDIUM', risk: 'medium',
-    title: 'Vendor Invoice Banking Redirect (BEC)',
-    desc: 'Lookalike vendor domain requests banking detail update before payment processing.',
-    raw: `From: accounts@acme-supp1iers.com\nTo: ap@yourcompany.com\nSubject: RE: Invoice #INV-2026-0847 — Updated Banking Details\nDate: Mon, 30 Mar 2026 13:10:22 -0500\n\nHi,\n\nWe wanted to reach out ahead of our upcoming payment due date regarding Invoice #INV-2026-0847 ($24,800).\n\nWe recently switched banking providers. Please update your records before processing this payment:\n\nBank: First National Commerce Bank\nAccount Number: 7730291847\nRouting: 026009593\n\nPlease confirm receipt and that the new details have been updated.\n\nJames Whitfield\nAccounts Receivable, Acme Suppliers`
+    id: 'demo5', label: 'HIGH', risk: 'high',
+    title: 'Zero-Day — Fake DoD Compliance Tool',
+    desc: 'Zero-day attack disguised as an official DoD CMMC scanner. The executable exploits an unpatched vulnerability — no antivirus signatures exist for it yet. Requires admin privileges to maximize damage.',
+    raw: `From: DoD Cybersecurity Compliance <cmmc-notices@dod-compliance-portal.org>\nTo: compliance@meridiandefense.com\nSubject: Required: CMMC Pre-Assessment Scan Tool — Install Before April 10\nDate: Mon, 30 Mar 2026 14:30:00 -0500\n\nDear Compliance Officer,\n\nThe Office of the Under Secretary of Defense for Acquisition and Sustainment is issuing a pre-assessment diagnostic tool to all Level 2 contractors ahead of the November 2026 C3PAO assessment window.\n\nThis tool scans your environment against all 110 NIST SP 800-171 controls and generates a pre-assessment gap report. Installation is mandatory for contractors with active SPRS affirmations.\n\nDownload and run the scan tool:\nhttps://dod-cmmc-tools.compliance-scanner.net/download?contractor=meridian\n\nAttachment: CMMC_PreAssessment_Tool_v2.1.exe\n\nThis tool must be run with administrator privileges to access all required system areas.\n\nOffice of the CDAO\nDepartment of Defense`
   },
   {
-    id: 'demo6', label: 'MEDIUM', risk: 'medium',
-    title: 'Fake FedEx Delivery Notification',
-    desc: 'Parcel delivery phish with fake tracking link to harvest payment info.',
-    raw: `From: noreply@fedex-delivery-tracking.net\nTo: you@yourcompany.com\nSubject: FedEx: Your package could not be delivered — action required\nDate: Mon, 30 Mar 2026 10:05:33 -0400\n\nFedEx Delivery Notification\n\nWe attempted to deliver your package (Tracking: FX-2026-9847261-US) but were unable to complete delivery due to an incorrect address.\n\nTo reschedule, a small redelivery fee of $1.99 is required.\n\n[ Reschedule Delivery ] → http://fedex-redeliver.parcel-update.net/track?id=9847261\n\nYour package will be held for 3 days before being returned to sender.\n\nFedEx Customer Service`
+    id: 'demo6', label: 'CLEAN', risk: 'clean',
+    title: 'Clean — Legitimate HR Training Notice',
+    desc: 'A real internal HR email about mandatory CMMC training. Included for comparison — shows employees what a legitimate company email looks like vs. the threats above.',
+    raw: `From: Sarah Chen <s.chen@meridiandefense.com>\nTo: all-staff@meridiandefense.com\nSubject: Mandatory CMMC Security Awareness Training — Complete by April 15\nDate: Mon, 30 Mar 2026 08:30:00 -0500\n\nHi everyone,\n\nAs part of our CMMC Level 2 compliance requirements under NIST SP 800-171 Control 3.2.1, all employees must complete the annual cybersecurity awareness training by April 15, 2026.\n\nThe training covers phishing recognition, CUI handling procedures, incident reporting, and password hygiene. It takes approximately 45 minutes and is available at training.meridiandefense.com.\n\nEmployees who do not complete by April 15 will have CUI system access suspended until completion.\n\nSarah Chen\nHR & Compliance Coordinator\nMeridian Defense Solutions\ns.chen@meridiandefense.com | (203) 555-0182`
   }
-];
+]
 
 let selectedDemos = new Set();
 
@@ -3297,20 +3297,29 @@ function showVtResult(url, data, type, containerId) {
   const scoreClass = malicious === 0 ? 'vt-clean' : malicious <= 3 ? 'vt-suspicious' : 'vt-malicious';
   const scoreLabel = malicious === 0 ? 'Clean' : malicious <= 3 ? 'Suspicious' : 'Malicious';
   const cats = Object.values(categories).slice(0, 4);
-  const catExplain = cats.length ? `<div style="font-size:11px;color:var(--muted);margin-top:4px;">
+
+  // Detect character substitution in defanged URL
+  const looksLikeSpoofed = /micros0ft|paypa1|g00gle|arnazon|1inkedin|faceb00k|app1e/.test(url.toLowerCase());
+  const flagNote = looksLikeSpoofed
+    ? `<div style="font-size:12px;color:var(--red);margin-top:6px;font-weight:600;">⚠ Character substitution detected — this domain uses a zero or number in place of a letter to impersonate a trusted brand. This is a confirmed phishing technique regardless of engine count.</div>`
+    : '';
+
+  const catExplain = cats.length ? `<div style="font-size:12px;color:var(--muted);margin-top:6px;">
     Categories reported by security vendors: <strong style="color:var(--text);">${cats.join(', ')}</strong>
     ${cats.some(c => c.toLowerCase().includes('phish')) ? ' — URL matches known phishing patterns.' : ''}
     ${cats.some(c => c.toLowerCase().includes('malware')) ? ' — URL associated with malware distribution.' : ''}
-    ${cats.some(c => c.toLowerCase().includes('exposure') || c.toLowerCase().includes('suspicious')) ? ' — URL flagged as potentially dangerous but not yet confirmed malicious.' : ''}
+    ${cats.some(c => c.toLowerCase().includes('exposure') || c.toLowerCase().includes('suspicious')) ? ' — URL flagged as potentially dangerous but not yet confirmed malicious by all engines. Low engine count may mean this URL is newly registered.' : ''}
   </div>` : '';
+
   results.innerHTML += `
     <div class="vt-result-row">
-      <div class="vt-defanged" style="font-size:12px;margin-bottom:8px;">${defang(url)}</div>
+      <div class="vt-defanged" style="font-size:13px;margin-bottom:10px;">${defang(url)}</div>
       <div class="vt-result-bar">
-        <div class="vt-result-score ${scoreClass}" style="font-size:18px;min-width:48px;">${malicious}/${total}</div>
+        <div class="vt-result-score ${scoreClass}" style="font-size:20px;min-width:52px;font-weight:700;">${malicious}/${total}</div>
         <div style="flex:1;">
-          <div class="vt-result-label" style="font-size:12px;">security engines flagged this URL · <strong class="${scoreClass}" style="font-size:13px;">${scoreLabel}</strong></div>
+          <div class="vt-result-label" style="font-size:13px;">security engines flagged this URL · <strong class="${scoreClass}" style="font-size:14px;">${scoreLabel}</strong></div>
           ${catExplain}
+          ${flagNote}
         </div>
       </div>
     </div>`;
