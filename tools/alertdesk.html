@@ -94,7 +94,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .btn-amber:hover{background:rgba(245,158,11,.25)}
 .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
 .btn-ghost:hover{border-color:var(--border2);color:var(--text)}
-.spacer{flex:1}
+.spacer{flex:0}
 
 /* ── CAT CHIPS ── */
 .cat-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:.5rem 1rem;display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
@@ -360,6 +360,11 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
     <button class="btn btn-ghost" id="reloadBtn" style="display:none" onclick="document.getElementById('reloadInput').click()">↺ New File</button>
     <input type="file" id="reloadInput" accept=".csv" style="display:none" onchange="handleReload(event)">
     <button class="btn btn-ghost" id="exportBtn" style="display:none" onclick="showExportModal()">↓ Export</button>
+    <div id="bulkBtns" style="display:none;align-items:center;gap:.4rem">
+      <button class="btn btn-red" onclick="bulkVerdict('escalate')">⚠ Escalate</button>
+      <button class="btn btn-amber" onclick="bulkVerdict('investigate')">🔍 Investigate</button>
+      <button class="btn btn-green" onclick="bulkVerdict('clean')">✓ Clean</button>
+    </div>
     <button class="btn btn-blue" id="classifyBtn" style="display:none" onclick="startClassify()">⚡ AI Classify</button>
   </div>
 </div>
@@ -460,9 +465,6 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       <span class="toolbar-label">All</span>
     </div>
     <div style="margin-left:auto;display:flex;align-items:center;gap:.5rem;flex-shrink:0">
-      <button class="btn btn-red" onclick="bulkVerdict('escalate')">⚠ Escalate</button>
-      <button class="btn btn-amber" onclick="bulkVerdict('investigate')">🔍 Investigate</button>
-      <button class="btn btn-green" onclick="bulkVerdict('clean')">✓ Clean</button>
       <button class="btn-undo" id="undoBtn" onclick="undoVerdict()" title="Undo last action (Ctrl+Z)">↩ Undo <span class="undo-count" id="undoCount">0</span></button>
     </div>
   </div>
@@ -1027,6 +1029,7 @@ function processCSV(text, filename) {
   document.getElementById('headerCount').style.display = 'block';
   document.getElementById('reloadBtn').style.display = 'inline-flex';
   document.getElementById('exportBtn').style.display = 'inline-flex';
+  document.getElementById('bulkBtns').style.display = 'inline-flex';
   document.getElementById('classifyBtn').style.display = 'inline-flex';
   document.getElementById('headerTotal').textContent = ALERTS.length;
   initFilterChips();
