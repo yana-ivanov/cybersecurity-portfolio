@@ -528,46 +528,64 @@ async function fetchPlaylistFromAPI(playlistId) {
 
   CHANNELS = [];
   let pageToken = '';
-  let page = 0;
 
   try {
-    while (true) {
-      const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50${pageToken ? '&pageToken=' + pageToken : ''}`;
-      const res = await fetch(url, { headers: { Authorization: 'Bearer ' + accessToken } });
-      const data = await res.json();
-
-      if (data.error) {
-        if (data.error.code === 404) {
-          statusEl.style.color = 'var(--red)';
-          statusEl.textContent = '✗ Playlist not found or empty';
-        } else {
+    // Liked Videos uses videos.list with myRating=like instead of playlistItems
+    if (playlistId === 'LL') {
+      while (true) {
+        const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&myRating=like&maxResults=50${pageToken ? '&pageToken=' + pageToken : ''}`;
+        const res = await fetch(url, { headers: { Authorization: 'Bearer ' + accessToken } });
+        const data = await res.json();
+        if (data.error) {
           statusEl.style.color = 'var(--red)';
           statusEl.textContent = '✗ ' + data.error.message;
+          return;
         }
-        return;
-      }
-
-      const items = data.items || [];
-      items.forEach(item => {
-        const snippet = item.snippet;
-        const videoId = snippet?.resourceId?.videoId;
-        if (!videoId) return;
-        CHANNELS.push({
-          id: videoId,
-          title: snippet.title || videoId,
-          url: 'https://www.youtube.com/watch?v=' + videoId,
-          timestamp: snippet.publishedAt || '',
-          category: 'Video',
-          playlistItemId: item.id // needed for removal
+        const items = data.items || [];
+        items.forEach(item => {
+          CHANNELS.push({
+            id: item.id,
+            title: item.snippet?.title || item.id,
+            url: 'https://www.youtube.com/watch?v=' + item.id,
+            timestamp: item.snippet?.publishedAt || '',
+            category: 'Video',
+            playlistItemId: item.id
+          });
         });
-      });
-
-      page++;
-      statusEl.textContent = 'Fetched ' + CHANNELS.length + ' videos...';
-
-      pageToken = data.nextPageToken || '';
-      if (!pageToken) break;
-      await new Promise(r => setTimeout(r, 100));
+        statusEl.textContent = 'Fetched ' + CHANNELS.length + ' liked videos...';
+        pageToken = data.nextPageToken || '';
+        if (!pageToken) break;
+        await new Promise(r => setTimeout(r, 100));
+      }
+    } else {
+      while (true) {
+        const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50${pageToken ? '&pageToken=' + pageToken : ''}`;
+        const res = await fetch(url, { headers: { Authorization: 'Bearer ' + accessToken } });
+        const data = await res.json();
+        if (data.error) {
+          statusEl.style.color = 'var(--red)';
+          statusEl.textContent = '✗ ' + data.error.message;
+          return;
+        }
+        const items = data.items || [];
+        items.forEach(item => {
+          const snippet = item.snippet;
+          const videoId = snippet?.resourceId?.videoId;
+          if (!videoId) return;
+          CHANNELS.push({
+            id: videoId,
+            title: snippet.title || videoId,
+            url: 'https://www.youtube.com/watch?v=' + videoId,
+            timestamp: snippet.publishedAt || '',
+            category: 'Video',
+            playlistItemId: item.id
+          });
+        });
+        statusEl.textContent = 'Fetched ' + CHANNELS.length + ' videos...';
+        pageToken = data.nextPageToken || '';
+        if (!pageToken) break;
+        await new Promise(r => setTimeout(r, 100));
+      }
     }
 
     if (!CHANNELS.length) {
