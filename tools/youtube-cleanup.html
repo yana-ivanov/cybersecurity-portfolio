@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YouTube Subscription Cleaner</title>
+<title>YouTube Purge — Channel Audit Tool</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&family=Changa+One:ital@0;1&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -51,7 +51,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .app{display:none}
 .app.visible{display:block}
 
-.header{background:#0d1117;border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.back-nav{background:#0a0d14;padding:.4rem 2rem;border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:101}
+.back-nav a{font-family:'IBM Plex Mono',monospace;font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover{color:#93c5fd}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.header{background:#0d1117;border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:29px;z-index:100}
 .header-left{display:flex;align-items:center;gap:.75rem}
 .logo{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase}
 .header-title{font-size:.95rem;font-weight:600;color:var(--text)}
@@ -228,9 +232,22 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 <!-- ── MAIN APP ── -->
 <div class="app" id="app">
 
+  <div class="back-nav">
+    <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/index.html">← Portfolio</a>
+  </div>
+
   <div class="header">
     <div class="header-left">
-      <span class="header-title" style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--text)"><span style="color:#FF0000">YouTube</span> Subscription Cleaner</span>
+      <link href="https://fonts.googleapis.com/css2?family=Changa+One:ital@0;1&display=swap" rel="stylesheet">
+      <div style="font-family:'Changa One',sans-serif;font-size:1.4rem;font-weight:400;letter-spacing:.04em;display:flex;align-items:center;gap:.5rem;">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+          <rect x="2" y="4" width="20" height="16" rx="3" fill="#FF0000"/>
+          <rect x="2" y="4" width="20" height="16" rx="3" fill="#b91c1c" opacity="0.35"/>
+          <polygon points="10,8.5 10,15.5 16,12" fill="white"/>
+        </svg>
+        <span style="color:#FF0000;">YouTube</span><span style="color:var(--text);"> Purge</span>
+        <span style="font-size:.62rem;font-family:'IBM Plex Mono',monospace;background:rgba(255,0,0,.1);color:#FF0000;border:1px solid rgba(255,0,0,.25);padding:.2rem .5rem;border-radius:2px;letter-spacing:.15em;display:inline-flex;align-items:center;gap:5px;"><span style="width:5px;height:5px;border-radius:50%;background:#FF0000;animation:pulse 2s ease-in-out infinite;display:inline-block;"></span> CHANNEL AUDIT</span>
+      </div>
     </div>
     <div class="header-right">
       <span class="header-count" id="headerCount">1,903 subscriptions</span>
