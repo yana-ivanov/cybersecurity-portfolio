@@ -459,7 +459,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       <!-- populated by updateFilterChips() -->
     </div>
     <div style="width:1px;height:18px;background:var(--border);flex-shrink:0"></div>
-    <input class="search-input" id="searchInput" placeholder="Search..." oninput="renderGrid()" style="width:150px">
+    <input class="search-input" id="searchInput" placeholder="Search..." oninput="renderGrid()" style="flex:1;min-width:120px;max-width:400px">
     <div class="toolbar-group" style="align-items:center;gap:.4rem">
       <input type="checkbox" id="selectAllChk" title="Select all visible" style="width:15px;height:15px;cursor:pointer;accent-color:var(--blue)" onchange="toggleSelectAll(this.checked)">
       <span class="toolbar-label">All</span>
