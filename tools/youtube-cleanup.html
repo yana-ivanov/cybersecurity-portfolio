@@ -52,7 +52,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .app.visible{display:block}
 
 .back-nav{background:#0a0d14;padding:.4rem 2rem;border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:101}
-.back-nav a{font-family:'IBM Plex Mono',monospace;font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a{font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a::before{content:'←';font-size:13px}
 .back-nav a:hover{color:#93c5fd}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .header{background:#0d1117;border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:29px;z-index:100}
@@ -72,7 +73,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .status-spinner{width:10px;height:10px;border:2px solid rgba(74,158,255,0.3);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-.toolbar{background:var(--surface);border-bottom:1px solid var(--border);padding:.8rem 2rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.toolbar{background:var(--surface);border-bottom:1px solid var(--border);padding:.8rem 2rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;position:sticky;top:85px;z-index:99}
 .search-box{flex:1;min-width:180px;position:relative}
 .search-box input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:.45rem 1rem .45rem 2rem;font-family:var(--mono);font-size:.78rem;color:var(--text);outline:none;transition:border-color .2s}
 .search-box input:focus{border-color:var(--blue)}
@@ -233,7 +234,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 <div class="app" id="app">
 
   <div class="back-nav">
-    <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/index.html">← Portfolio</a>
+    <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/index.html">Portfolio</a>
   </div>
 
   <div class="header">
@@ -895,7 +896,7 @@ Format — every channel must appear exactly once using its exact title:
   updateStats();
   renderGrid();
   saveState();
-  window.scrollTo({top: 220, behavior: "smooth"});
+  window.scrollTo({top: 0, behavior: "smooth"});
 }
 
 // ── Render ─────────────────────────────────────────────────────────────────
