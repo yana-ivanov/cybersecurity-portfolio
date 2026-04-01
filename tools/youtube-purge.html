@@ -452,7 +452,7 @@ function parsePLCSV(text, filename) {
 
   status.style.color = 'var(--green)';
   status.textContent = '✓ ' + CHANNELS.length + ' videos loaded from ' + filename;
-  document.getElementById('plLaunchBtn').disabled = false;
+  const _plBtn = document.getElementById('plLaunchBtn') || document.getElementById('launchBtn'); if (_plBtn) _plBtn.disabled = false;
 }
 
 function launchPlaylistApp() {
@@ -507,7 +507,7 @@ function launchApp() {
 // ── FETCH PLAYLIST FROM YOUTUBE API ──
 async function fetchPlaylistFromAPI(playlistId) {
   const statusEl = document.getElementById('plFetchStatus');
-  const launchBtn = document.getElementById('plLaunchBtn');
+  const launchBtn = document.getElementById('plLaunchBtn') || document.getElementById('launchBtn');
 
   // Need access token - trigger OAuth if not connected
   if (!accessToken) {
@@ -1193,7 +1193,7 @@ function returnToHome() {
   setMode('subscriptions');
   // Reset launch buttons
   document.getElementById('launchBtn').disabled = true;
-  document.getElementById('plLaunchBtn').disabled = true;
+  const _plBtn2 = document.getElementById('plLaunchBtn') || document.getElementById('launchBtn'); if (_plBtn2) _plBtn2.disabled = true;
   const csvStatus = document.getElementById('csvStatus');
   if (csvStatus) csvStatus.textContent = '';
   const plStatus = document.getElementById('plStatus');
