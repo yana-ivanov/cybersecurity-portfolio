@@ -1,0 +1,2039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlertDesk — SOC Triage Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Changa+One:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root,[data-theme="dark"]{
+  --bg:#0a0f1a;--surface:#0f1623;--surface2:#141e2e;--surface3:#1a2640;
+  --blue:#4a9eff;--red:#ef4444;--green:#4ecdc4;--amber:#f59e0b;--purple:#a78bfa;--cyan:#4ecdc4;
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#4a5568;
+  --border:#1e2d45;--border2:#2a3f5f;
+  --mono:'DM Mono',monospace;--sans:'Space Grotesk',sans-serif;
+}
+[data-theme="light"]{
+  --bg:#f4f6fb;--surface:#ffffff;--surface2:#f0f4fa;--surface3:#e2e8f0;
+  --blue:#2563eb;--red:#dc2626;--green:#0e9f8e;--amber:#d97706;--purple:#7c3aed;--cyan:#0e9f8e;
+  --text:#0f172a;--text2:#475569;--text3:#94a3b8;
+  --border:#d1dae8;--border2:#b8c5d8;
+  --mono:'DM Mono',monospace;--sans:'Space Grotesk',sans-serif;
+}
+html{font-size:16px}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.025) 39px,rgba(255,255,255,0.025) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.025) 39px,rgba(255,255,255,0.025) 40px);pointer-events:none;z-index:0}
+[data-theme="light"] body::before{background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,0,0,0.025) 39px,rgba(0,0,0,0.025) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,0,0,0.025) 39px,rgba(0,0,0,0.025) 40px)}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,0.025) 39px,rgba(255,255,255,0.025) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,0.025) 39px,rgba(255,255,255,0.025) 40px);pointer-events:none;z-index:0}
+[data-theme="light"] body::before{background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(0,0,0,0.03) 39px,rgba(0,0,0,0.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(0,0,0,0.03) 39px,rgba(0,0,0,0.03) 40px)}
+
+/* ── HEADER ── */
+.back-nav{background:#0a0d14;padding:.4rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:102}
+.back-nav a{font-family:var(--mono);font-size:13px;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a::before{content:'←';font-size:13px}
+.back-nav a:hover{color:#93c5fd}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:29px;z-index:100}
+.logo{font-family:'Changa One',sans-serif;font-size:1.4rem;font-weight:400;letter-spacing:.04em;display:flex;align-items:center;gap:.5rem;align-items:center}
+.logo-alert{color:#ef4444}
+.logo-desk{color:var(--text)}
+.logo-badge{font-size:.62rem;font-family:var(--mono);background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.25);padding:.2rem .5rem;border-radius:2px;letter-spacing:.15em;display:inline-flex;align-items:center;gap:5px}
+.logo-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:#ef4444;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.header-right{display:flex;align-items:center;gap:1rem}
+.header-count{font-family:var(--mono);font-size:.85rem;color:var(--text2)}
+.header-count span{color:var(--text)}
+
+/* ── STATS BAR ── */
+.stats-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:.5rem 1.5rem;display:flex;gap:1.5rem;flex-wrap:wrap}
+.stat{display:flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.72rem}
+.stat-dot{width:7px;height:7px;border-radius:50%}
+.stat-label{color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-size:.72rem;font-family:var(--mono)}
+.stat-num{font-weight:600}
+.stat-escalate .stat-num{color:var(--red)}
+.stat-investigate .stat-num{color:var(--amber)}
+.stat-clean .stat-num{color:var(--green)}
+.stat-unreviewed .stat-num{color:var(--text2)}
+.stat-total .stat-num{color:var(--blue)}
+
+/* ── ONBOARDING ── */
+.onboard{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 100px);padding:2rem;text-align:center}
+.onboard-icon{margin-bottom:1.5rem;opacity:.9;filter:drop-shadow(0 0 16px rgba(239,68,68,.35))}
+.onboard-title{font-family:'Changa One',sans-serif;font-size:2.5rem;font-weight:400;margin-bottom:.5rem;letter-spacing:.02em}
+.onboard-title .accent{color:var(--red)}
+.onboard-sub{color:var(--text2);font-size:1rem;max-width:480px;line-height:1.7;margin-bottom:2rem}
+.upload-zone{border:2px dashed var(--border2);border-radius:4px;padding:2.5rem 3rem;cursor:pointer;transition:all .2s;background:var(--surface);max-width:480px;width:100%}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--blue);background:rgba(74,158,255,.05)}
+.upload-zone-icon{font-size:2rem;margin-bottom:.75rem;opacity:.5}
+.upload-zone-text{font-family:var(--mono);font-size:.9rem;color:var(--text2);margin-bottom:.5rem}
+.upload-zone-sub{font-size:.82rem;color:var(--text3)}
+.upload-zone input{display:none}
+.or-divider{color:var(--text3);font-size:.75rem;margin:1rem 0;font-family:var(--mono)}
+.sample-btn{font-family:var(--mono);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;padding:.5rem 1.2rem;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .2s}
+.sample-btn:hover{border-color:var(--blue);color:var(--blue)}
+.format-hint{margin-top:1.5rem;font-size:.82rem;color:var(--text3);max-width:480px;line-height:1.8}
+.format-hint code{font-family:var(--mono);color:var(--text2);background:var(--surface2);padding:.1rem .3rem;border-radius:3px}
+
+/* ── MAIN LAYOUT ── */
+.main{display:none;flex-direction:column;height:calc(100vh - 100px)}
+.toolbar{background:var(--surface);border-bottom:1px solid var(--border);padding:.5rem 1rem;display:flex;align-items:center;gap:.5rem;flex-wrap:nowrap;overflow-x:auto;position:sticky;top:85px;z-index:99}
+.toolbar-group{display:flex;align-items:center;gap:.5rem}
+.toolbar-label{font-family:var(--mono);font-size:.75rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;white-space:nowrap}
+.filter-select{font-family:var(--mono);font-size:.82rem;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:.35rem .7rem;border-radius:4px;cursor:pointer;appearance:none;min-width:120px;color-scheme:inherit}
+.search-input{font-family:var(--mono);font-size:.82rem;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:.35rem .7rem;border-radius:4px;width:200px;outline:none;color-scheme:inherit}
+.search-input:focus{border-color:var(--blue)}
+.search-input::placeholder{color:var(--text3)}
+.btn{font-family:var(--mono);font-size:.8rem;letter-spacing:.07em;text-transform:uppercase;padding:.4rem .9rem;border-radius:3px;border:none;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:hover{background:#3b8ee8}
+.btn-red{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.btn-red:hover{background:rgba(239,68,68,.25)}
+.btn-green{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.btn-green:hover{background:rgba(34,197,94,.25)}
+.btn-amber{background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+.btn-amber:hover{background:rgba(245,158,11,.25)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
+.spacer{flex:1}
+
+/* ── CAT CHIPS ── */
+.cat-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:.5rem 1rem;display:flex;gap:.4rem;flex-wrap:wrap;align-items:center}
+.cat-chip{font-family:var(--mono);font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;padding:.3rem .7rem;border-radius:2px;border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .15s;user-select:none;white-space:nowrap}
+.cat-chip:hover{border-color:var(--border2);color:var(--text)}
+.cat-chip.active{border-color:var(--blue);color:var(--blue);background:rgba(74,158,255,.08)}
+.cat-chip.drop-hint{border-color:var(--blue);border-style:dashed}
+.cat-chip.drag-over{background:rgba(74,158,255,.15);border-color:var(--blue);color:var(--blue)}
+
+/* ── GRID ── */
+.grid-wrap{flex:1;overflow-y:auto;padding:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:.75rem}
+.empty{display:none;flex-direction:column;align-items:center;justify-content:center;padding:4rem;text-align:center;color:var(--text3);font-family:var(--mono);font-size:.8rem}
+.empty.show{display:flex}
+
+/* ── ALERT CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.85rem;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;user-select:none}
+.card:hover{border-color:var(--border2);transform:translateY(-1px)}
+.card.escalate{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.04)}
+.card.investigate{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.04)}
+.card.clean{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.04)}
+.card-severity-bar{position:absolute;top:0;left:0;width:3px;height:100%}
+.card-severity-bar.critical{background:var(--red)}
+.card-severity-bar.high{background:var(--amber)}
+.card-severity-bar.medium{background:var(--blue)}
+.card-severity-bar.low{background:var(--green)}
+.card-severity-bar.info{background:var(--text3)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;margin-bottom:.4rem;margin-left:.4rem}
+.card-title{font-family:var(--mono);font-size:.85rem;font-weight:600;color:var(--text);line-height:1.4;flex:1}
+.card-verdict{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;padding:.2rem .5rem;border-radius:3px;white-space:nowrap;flex-shrink:0}
+.card-verdict.escalate{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.card-verdict.investigate{background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+.card-verdict.clean{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.card-verdict.unreviewed{background:transparent;color:var(--text3);border:1px solid var(--border)}
+.card-meta{display:flex;flex-wrap:wrap;gap:.3rem .75rem;margin-left:.4rem;margin-bottom:.5rem}
+.card-meta-item{font-family:var(--mono);font-size:.75rem;color:var(--text3);display:flex;align-items:center;gap:.25rem}
+.card-meta-item .label{color:var(--text3)}
+.card-meta-item .val{color:var(--text2)}
+.card-category-tag{display:inline-flex;align-items:center;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;padding:.15rem .45rem;border-radius:3px;border:1px solid;margin-left:.4rem;margin-bottom:.4rem;text-transform:uppercase}
+.card-actions{display:flex;gap:.35rem;margin-left:.4rem;margin-top:.5rem;flex-wrap:wrap}
+.card-action-btn{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:.25rem .55rem;border-radius:3px;border:1px solid;cursor:pointer;transition:all .15s;background:transparent}
+.card-action-btn.escalate{color:var(--red);border-color:rgba(239,68,68,.3)}
+.card-action-btn.escalate:hover{background:rgba(239,68,68,.1)}
+.card-action-btn.investigate{color:var(--amber);border-color:rgba(245,158,11,.3)}
+.card-action-btn.investigate:hover{background:rgba(245,158,11,.1)}
+.card-action-btn.clean{color:var(--green);border-color:rgba(34,197,94,.3)}
+.card-action-btn.clean:hover{background:rgba(34,197,94,.1)}
+
+/* category colors */
+.cat-phishing{color:#f87171;border-color:rgba(248,113,113,.3);background:rgba(248,113,113,.08)}
+.cat-malware{color:#ef4444;border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.08)}
+.cat-lateral{color:#a78bfa;border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.08)}
+.cat-recon{color:#60a5fa;border-color:rgba(96,165,250,.3);background:rgba(96,165,250,.08)}
+.cat-brute{color:#fb923c;border-color:rgba(251,146,60,.3);background:rgba(251,146,60,.08)}
+.cat-c2{color:#f43f5e;border-color:rgba(244,63,94,.3);background:rgba(244,63,94,.08)}
+.cat-exfil{color:#e879f9;border-color:rgba(232,121,249,.3);background:rgba(232,121,249,.08)}
+.cat-privesc{color:#fbbf24;border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.08)}
+.cat-insider{color:#f59e0b;border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.08)}
+.cat-fp{color:#22c55e;border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.08)}
+.cat-ddos{color:#06b6d4;border-color:rgba(6,182,212,.3);background:rgba(6,182,212,.08)}
+.cat-ransomware{color:#dc2626;border-color:rgba(220,38,38,.3);background:rgba(220,38,38,.08)}
+.cat-other{color:#94a3b8;border-color:rgba(148,163,184,.3);background:rgba(148,163,184,.08)}
+
+/* ── DETAIL PANEL ── */
+.detail-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center;padding:1.5rem}
+.detail-overlay.show{display:flex}
+.detail-panel{background:var(--surface);border:1px solid var(--border2);border-radius:4px;width:100%;max-width:780px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.detail-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-shrink:0}
+.detail-title{font-family:var(--mono);font-size:1rem;font-weight:700;line-height:1.4}
+.detail-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:1.1rem;padding:.2rem;line-height:1;flex-shrink:0}
+.detail-close:hover{color:var(--text)}
+.detail-body{padding:1rem 1.25rem;overflow-y:auto;flex:1}
+.detail-section{margin-bottom:1.25rem}
+.detail-section-title{font-family:var(--mono);font-size:.82rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.5rem}
+.detail-field{display:flex;gap:.75rem;margin-bottom:.35rem;font-size:.8rem}
+.detail-field-label{font-family:var(--mono);font-size:.85rem;color:var(--text3);min-width:110px;flex-shrink:0}
+.detail-field-val{color:var(--text);word-break:break-all;font-family:var(--mono);font-size:.85rem}
+.detail-ai-box{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:.85rem;font-size:.9rem;line-height:1.7;color:var(--text2)}
+.detail-ai-box .ai-label{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:.4rem}
+.detail-footer{padding:.85rem 1.25rem;border-top:1px solid var(--border);display:flex;gap:.5rem;flex-shrink:0;flex-wrap:wrap}
+
+/* ── EXPORT MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center;padding:1.5rem}
+.modal-overlay.show{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:4px;width:100%;max-width:500px;overflow:hidden}
+.modal-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:var(--mono);font-size:.95rem;font-weight:700}
+.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:1.1rem}
+.modal-body{padding:1.25rem}
+.modal-footer{padding:.85rem 1.25rem;border-top:1px solid var(--border);display:flex;gap:.5rem;justify-content:flex-end}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:.75rem;padding:.6rem 1.2rem;border-radius:3px;z-index:999;transition:transform .3s;white-space:nowrap;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── CIPHER ── */
+.cipher-wrap{position:fixed;bottom:1.25rem;right:1.25rem;z-index:150}
+.cipher-btn{width:46px;height:46px;cursor:pointer;position:relative;filter:drop-shadow(0 0 8px rgba(74,158,255,.3));transition:filter .2s}
+.cipher-btn:hover{filter:drop-shadow(0 0 12px rgba(74,158,255,.5))}
+.cipher-badge{position:absolute;top:-4px;right:-4px;width:16px;height:16px;background:var(--blue);border-radius:50%;font-family:var(--mono);font-size:.55rem;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
+.cipher-panel{display:none;position:absolute;bottom:54px;right:0;width:300px;background:var(--surface);border:1px solid var(--border2);border-radius:8px;overflow:hidden}
+.cipher-panel.open{display:flex;flex-direction:column}
+.cipher-panel-header{padding:.65rem .85rem;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:.8rem;font-weight:700;color:var(--blue);display:flex;align-items:center;justify-content:space-between}
+.cipher-msgs{flex:1;max-height:220px;overflow-y:auto;padding:.75rem;display:flex;flex-direction:column;gap:.5rem}
+.cipher-msg{font-size:.85rem;line-height:1.6;padding:.5rem .7rem;border-radius:4px}
+.cipher-msg.bot{background:var(--surface2);color:var(--text2)}
+.cipher-msg.user{background:rgba(74,158,255,.1);color:var(--text);text-align:right}
+.cipher-input-row{display:flex;border-top:1px solid var(--border);padding:.5rem}
+.cipher-input{flex:1;background:transparent;border:none;outline:none;font-family:var(--mono);font-size:.82rem;color:var(--text);padding:.25rem .5rem}
+.cipher-input::placeholder{color:var(--text3)}
+.cipher-send{background:none;border:none;color:var(--blue);cursor:pointer;font-size:.85rem;padding:.25rem .5rem}
+
+/* ── AI CLASSIFY PROGRESS ── */
+.classify-bar{display:none;position:fixed;top:0;left:0;right:0;height:3px;background:rgba(74,158,255,.2);z-index:999}
+.classify-bar.visible{display:block}
+.classify-bar-fill{height:100%;background:var(--blue);transition:width .3s}
+
+/* ── SCROLLBAR ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .grid{grid-template-columns:1fr}
+  .search-input{width:130px}
+}
+
+/* ── FIELD MAPPER ── */
+.mapper{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 100px);padding:2rem}
+.mapper.show{display:flex}
+.mapper-card{background:var(--surface);border:1px solid var(--border);border-radius:4px;width:100%;max-width:680px;overflow:hidden}
+.mapper-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border)}
+.mapper-title{font-family:'Changa One',sans-serif;font-size:1.4rem;font-weight:400;margin-bottom:.3rem}
+.mapper-title .accent{color:var(--red)}
+.mapper-sub{font-size:.82rem;color:var(--text2);font-family:var(--mono)}
+.mapper-source{display:inline-flex;align-items:center;gap:.4rem;margin-top:.5rem;font-family:var(--mono);font-size:.72rem;color:var(--blue);background:rgba(74,158,255,.08);border:1px solid rgba(74,158,255,.2);padding:.2rem .6rem;border-radius:2px}
+.mapper-body{padding:1.25rem 1.5rem;display:flex;flex-direction:column;gap:.6rem;max-height:55vh;overflow-y:auto}
+.mapper-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:.75rem}
+.mapper-field-label{font-family:var(--mono);font-size:.78rem;font-weight:500;color:var(--text);display:flex;flex-direction:column;gap:.15rem}
+.mapper-field-desc{font-size:.68rem;color:var(--text3);font-weight:400}
+.mapper-arrow{color:var(--text3);font-size:.8rem;text-align:center}
+.mapper-select{font-family:var(--mono);font-size:.78rem;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:.4rem .6rem;border-radius:3px;width:100%;cursor:pointer;outline:none;transition:border-color .2s}
+.mapper-select:focus{border-color:var(--blue)}
+.mapper-select.matched{border-color:rgba(78,205,196,.4);color:var(--green)}
+.mapper-select.unmatched{border-color:var(--border);color:var(--text3)}
+.mapper-divider{height:1px;background:var(--border);margin:.25rem 0}
+.mapper-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.mapper-preview{font-family:var(--mono);font-size:.7rem;color:var(--text3)}
+.mapper-preview strong{color:var(--green)}
+.mapper-actions{display:flex;gap:.5rem}
+.mapper-profile-bar{padding:.6rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.mapper-profile-label{font-family:var(--mono);font-size:.68rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.profile-chip{font-family:var(--mono);font-size:.68rem;padding:.2rem .55rem;border-radius:2px;border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .15s;background:transparent}
+.profile-chip:hover{border-color:var(--blue);color:var(--blue)}
+.profile-chip.active{border-color:var(--blue);color:var(--blue);background:rgba(74,158,255,.08)}
+
+/* ── ANALYST REPORT ── */
+.analyst-report{display:flex;flex-direction:column;gap:.75rem}
+.analyst-section{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.85rem 1rem}
+.analyst-section-header{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem}
+.analyst-section-icon{font-size:1rem}
+.analyst-section-title{font-family:var(--mono);font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.analyst-section-title.red{color:var(--red)}
+.analyst-section-title.amber{color:var(--amber)}
+.analyst-section-title.blue{color:var(--blue)}
+.analyst-section-title.green{color:var(--green)}
+.analyst-section-body{font-size:.9rem;line-height:1.8;color:var(--text2)}
+.analyst-section-body ul{padding-left:1.25rem;display:flex;flex-direction:column;gap:.2rem}
+.analyst-section-body li{color:var(--text)}
+.analyst-loading{display:flex;align-items:center;gap:.75rem;color:var(--text3);font-family:var(--mono);font-size:.78rem;padding:.5rem 0}
+.analyst-loading-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);animation:analyst-pulse 1.2s ease-in-out infinite}
+.analyst-loading-dot:nth-child(2){animation-delay:.2s}
+.analyst-loading-dot:nth-child(3){animation-delay:.4s}
+@keyframes analyst-pulse{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+.analyst-cached{font-family:var(--mono);font-size:.62rem;color:var(--text3);margin-left:auto}
+.detail-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.detail-tab{font-family:var(--mono);font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;padding:.65rem 1.1rem;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3);transition:all .15s;background:none;border-top:none;border-left:none;border-right:none}
+.detail-tab:hover{color:var(--text2)}
+.detail-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.detail-tab-content{display:none;flex:1;overflow-y:auto;padding:1rem 1.25rem}
+.detail-tab-content.active{display:block}
+
+.btn-undo{background:transparent;color:var(--text3);border:1px solid var(--border);font-family:var(--mono);font-size:.75rem;padding:.35rem .65rem;border-radius:3px;cursor:pointer;transition:all .2s;display:none;align-items:center;gap:.35rem}
+.btn-undo.has-history{display:inline-flex;color:var(--text2);border-color:var(--border2)}
+.btn-undo:hover{color:var(--blue);border-color:var(--blue)}
+.undo-count{background:var(--blue);color:#fff;font-size:.6rem;padding:.1rem .3rem;border-radius:2px;min-width:16px;text-align:center}
+
+/* ── FILTER BADGES ── */
+.filter-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:2px;font-size:.65rem;font-weight:700;padding:0 4px;margin-left:4px;font-family:var(--mono)}
+.filter-badge.red{background:rgba(239,68,68,.2);color:var(--red)}
+.filter-badge.amber{background:rgba(245,158,11,.2);color:var(--amber)}
+.filter-badge.green{background:rgba(78,205,196,.2);color:var(--green)}
+.filter-badge.blue{background:rgba(74,158,255,.2);color:var(--blue)}
+.filter-badge.gray{background:rgba(148,163,184,.15);color:var(--text3)}
+.cat-chip .chip-count{font-size:.6rem;background:rgba(255,255,255,.1);border-radius:2px;padding:0 3px;margin-left:3px;font-weight:700}
+.cat-chip.has-alerts{border-color:var(--border2);color:var(--text)}
+.cat-chip.has-alerts .chip-count{background:rgba(74,158,255,.2);color:var(--blue)}
+
+/* ── SELECT ALL / BULK ── */
+.select-bar{display:none;align-items:center;gap:.75rem;padding:.4rem 1rem;background:rgba(74,158,255,.06);border-bottom:1px solid rgba(74,158,255,.2);font-family:var(--mono);font-size:.78rem}
+.select-bar.show{display:flex}
+.select-bar-count{color:var(--blue);font-weight:600}
+.select-bar-label{color:var(--text2)}
+.card-checkbox{position:absolute;top:.6rem;right:.6rem;width:16px;height:16px;cursor:pointer;accent-color:var(--blue)}
+.card.selected{outline:2px solid var(--blue);outline-offset:-2px}
+
+/* ── IOC HIGHLIGHTS IN DETAIL ── */
+.ioc-flag{display:inline-flex;align-items:center;gap:.3rem;font-family:var(--mono);font-size:.72rem;padding:.2rem .5rem;border-radius:3px;margin:.15rem .15rem 0 0}
+.ioc-flag.critical{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.ioc-flag.warning{background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.3)}
+.ioc-flag.info{background:rgba(74,158,255,.12);color:var(--blue);border:1px solid rgba(74,158,255,.25)}
+.ioc-panel{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.75rem 1rem;margin-bottom:.75rem}
+.ioc-panel-title{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:.5rem}
+.detail-field-val.highlight-red{color:var(--red)!important;font-weight:600}
+.detail-field-val.highlight-amber{color:var(--amber)!important;font-weight:600}
+
+/* ── FILTER CHIPS ── */
+.filter-chip{font-family:var(--mono);font-size:.72rem;padding:.28rem .6rem;border-radius:3px;border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .15s;user-select:none;white-space:nowrap;display:inline-flex;align-items:center;gap:.3rem;background:transparent}
+.filter-chip:hover{border-color:var(--border2);color:var(--text)}
+.filter-chip.active{font-weight:600}
+.filter-chip.v-all.active{border-color:var(--blue);color:var(--blue);background:rgba(74,158,255,.08)}
+.filter-chip.v-unreviewed.active{border-color:var(--text3);color:var(--text);background:rgba(148,163,184,.1)}
+.filter-chip.v-escalate.active{border-color:var(--red);color:var(--red);background:rgba(239,68,68,.08)}
+.filter-chip.v-investigate.active{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,.08)}
+.filter-chip.v-clean.active{border-color:var(--green);color:var(--green);background:rgba(78,205,196,.08)}
+.filter-chip.s-critical.active{border-color:var(--red);color:var(--red);background:rgba(239,68,68,.08)}
+.filter-chip.s-high.active{border-color:var(--amber);color:var(--amber);background:rgba(245,158,11,.08)}
+.filter-chip.s-medium.active{border-color:var(--blue);color:var(--blue);background:rgba(74,158,255,.08)}
+.filter-chip.s-low.active{border-color:var(--green);color:var(--green);background:rgba(78,205,196,.08)}
+.filter-chip.s-info.active{border-color:var(--text3);color:var(--text2);background:rgba(148,163,184,.08)}
+.filter-chip .chip-n{font-size:.68rem;opacity:.8}
+</style>
+</head>
+<body>
+
+<!-- CLASSIFY PROGRESS BAR -->
+<div class="classify-bar" id="classifyBar"><div class="classify-bar-fill" id="classifyBarFill" style="width:0%"></div></div>
+
+<!-- BACK NAV -->
+<div class="back-nav">
+  <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/index.html">Portfolio</a>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+  <path d="M12 2L4 5.5V11C4 15.55 7.41 19.74 12 21C16.59 19.74 20 15.55 20 11V5.5L12 2Z" fill="#ef4444"/>
+  <path d="M12 4.18L6 6.84V11C6 14.56 8.63 17.89 12 19.08C15.37 17.89 18 14.56 18 11V6.84L12 4.18Z" fill="#b91c1c" opacity="0.4"/>
+  <path d="M11 14.5L8 11.5L9.41 10.09L11 11.67L14.59 8.08L16 9.5L11 14.5Z" fill="white"/>
+</svg>
+    <span class="logo-alert">Alert</span><span class="logo-desk">Desk</span>
+    <span class="logo-badge">SOC TRIAGE</span>
+  </div>
+  <div class="header-right">
+    <button class="btn btn-ghost" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode" style="font-size:.85rem;padding:.35rem .65rem">🌙</button>
+    <div class="header-count" id="headerCount" style="display:none">
+      <span id="headerTotal">0</span> alerts loaded
+    </div>
+    <button class="btn btn-ghost" id="reloadBtn" style="display:none" onclick="document.getElementById('reloadInput').click()">↺ New File</button>
+    <input type="file" id="reloadInput" accept=".csv" style="display:none" onchange="handleReload(event)">
+    <button class="btn btn-ghost" id="exportBtn" style="display:none" onclick="showExportModal()">↓ Export</button>
+    <button class="btn btn-blue" id="classifyBtn" style="display:none" onclick="startClassify()">⚡ AI Classify</button>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar" id="statsBar" style="display:none">
+  <div class="stat stat-total"><div class="stat-dot" style="background:var(--blue)"></div><span class="stat-label">Total</span><span class="stat-num" id="statTotal">0</span></div>
+  <div class="stat stat-escalate"><div class="stat-dot" style="background:var(--red)"></div><span class="stat-label">Escalate</span><span class="stat-num" id="statEscalate">0</span></div>
+  <div class="stat stat-investigate"><div class="stat-dot" style="background:var(--amber)"></div><span class="stat-label">Investigate</span><span class="stat-num" id="statInvestigate">0</span></div>
+  <div class="stat stat-clean"><div class="stat-dot" style="background:var(--green)"></div><span class="stat-label">Reviewed Clean</span><span class="stat-num" id="statClean">0</span></div>
+  <div class="stat stat-unreviewed"><div class="stat-dot" style="background:var(--text3)"></div><span class="stat-label">Unreviewed</span><span class="stat-num" id="statUnreviewed">0</span></div>
+</div>
+
+<!-- ONBOARDING -->
+<div class="onboard" id="onboard">
+  <div class="onboard-icon">
+  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2L4 5.5V11C4 15.55 7.41 19.74 12 21C16.59 19.74 20 15.55 20 11V5.5L12 2Z" fill="#ef4444" opacity="0.9"/>
+    <path d="M12 4.18L6 6.84V11C6 14.56 8.63 17.89 12 19.08C15.37 17.89 18 14.56 18 11V6.84L12 4.18Z" fill="#b91c1c" opacity="0.5"/>
+    <path d="M11 14.5L8 11.5L9.41 10.09L11 11.67L14.59 8.08L16 9.5L11 14.5Z" fill="white"/>
+  </svg>
+</div>
+  <div class="onboard-title"><span class="accent">Alert</span>Desk</div>
+  <div class="onboard-sub">Upload a SIEM CSV export. AI classifies each alert by threat type. Triage each alert: Escalate, Investigate, or mark Reviewed Clean. Nothing is hidden — you can always undo.</div>
+  <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()" ondragover="zoneDragOver(event)" ondragleave="zoneDragLeave(event)" ondrop="zoneDrop(event)">
+    <div class="upload-zone-icon">⬆</div>
+    <div class="upload-zone-text">Drop SIEM CSV here or click to browse</div>
+    <div class="upload-zone-sub">Splunk · Microsoft Sentinel · Elastic · QRadar · any CSV</div>
+    <input type="file" id="fileInput" accept=".csv" onchange="handleFile(event)">
+  </div>
+  <div class="or-divider">— or —</div>
+  <button class="sample-btn" onclick="loadSample()">Load Sample Data (25 alerts)</button>
+  <div class="format-hint">
+    Expected columns (auto-detected): <code>alert_name</code> · <code>severity</code> · <code>src_ip</code> · <code>dst_ip</code> · <code>timestamp</code> · <code>user</code> · <code>host</code> · <code>description</code> · <code>signature</code> · <code>count</code>
+  </div>
+</div>
+
+<!-- FIELD MAPPER -->
+<div class="mapper" id="mapper">
+  <div class="mapper-card">
+    <div class="mapper-header">
+      <div class="mapper-title"><span class="accent">Unknown</span> Format</div>
+      <div class="mapper-sub">We couldn't confidently identify your SIEM format. Review the field matches below — highlighted fields were auto-detected. Fix any that look wrong, then click Load.</div>
+      <div class="mapper-source" id="mapperSource">📄 no file</div>
+    </div>
+    <div class="mapper-profile-bar">
+      <span class="mapper-profile-label">Quick profile:</span>
+      <button class="profile-chip" onclick="applyProfile('splunk')">Splunk</button>
+      <button class="profile-chip" onclick="applyProfile('sentinel')">MS Sentinel</button>
+      <button class="profile-chip" onclick="applyProfile('elastic')">Elastic</button>
+      <button class="profile-chip" onclick="applyProfile('qradar')">QRadar</button>
+      <button class="profile-chip" onclick="applyProfile('cicids')">CICIDS 2017</button>
+      <button class="profile-chip" onclick="applyProfile('unsw')">UNSW-NB15</button>
+      <button class="profile-chip" onclick="applyProfile('auto')">Auto-detect</button>
+    </div>
+    <div class="mapper-body" id="mapperBody"></div>
+    <div class="mapper-footer">
+      <div class="mapper-preview" id="mapperPreview"></div>
+      <div class="mapper-actions">
+        <button class="btn btn-ghost" onclick="cancelMapper()">← Back</button>
+        <button class="btn btn-blue" onclick="confirmMapping()">Load Alerts →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="main" id="main">
+  <!-- TOOLBAR -->
+  <!-- Hidden selects keep JS logic working -->
+  <select id="verdictFilter" style="display:none" onchange="renderGrid()">
+    <option value="all">All</option>
+    <option value="unreviewed">Unreviewed</option>
+    <option value="escalate">Escalate</option>
+    <option value="investigate">Investigate</option>
+    <option value="clean">Reviewed Clean</option>
+  </select>
+  <select id="severityFilter" style="display:none" onchange="renderGrid()">
+    <option value="all">All</option>
+    <option value="critical">Critical</option>
+    <option value="high">High</option>
+    <option value="medium">Medium</option>
+    <option value="low">Low</option>
+    <option value="info">Info</option>
+  </select>
+  <div class="toolbar">
+    <div class="toolbar-group" id="verdictChips">
+      <!-- populated by updateFilterChips() -->
+    </div>
+    <div style="width:1px;height:18px;background:var(--border);flex-shrink:0"></div>
+    <div class="toolbar-group" id="severityChips">
+      <!-- populated by updateFilterChips() -->
+    </div>
+    <div style="width:1px;height:18px;background:var(--border);flex-shrink:0"></div>
+    <input class="search-input" id="searchInput" placeholder="Search..." oninput="renderGrid()" style="width:150px">
+    <div class="toolbar-group" style="align-items:center;gap:.4rem">
+      <input type="checkbox" id="selectAllChk" title="Select all visible" style="width:15px;height:15px;cursor:pointer;accent-color:var(--blue)" onchange="toggleSelectAll(this.checked)">
+      <span class="toolbar-label">All</span>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:.5rem;flex-shrink:0">
+      <button class="btn btn-red" onclick="bulkVerdict('escalate')">⚠ Escalate</button>
+      <button class="btn btn-amber" onclick="bulkVerdict('investigate')">🔍 Investigate</button>
+      <button class="btn btn-green" onclick="bulkVerdict('clean')">✓ Clean</button>
+      <button class="btn-undo" id="undoBtn" onclick="undoVerdict()" title="Undo last action (Ctrl+Z)">↩ Undo <span class="undo-count" id="undoCount">0</span></button>
+    </div>
+  </div>
+
+  <!-- CAT CHIPS -->
+  <div class="cat-bar" id="catBar">
+    <span class="toolbar-label" style="margin-right:.25rem">Category</span>
+  </div>
+
+  <!-- GRID -->
+  <!-- SELECT BAR -->
+  <div class="select-bar" id="selectBar">
+    <span class="select-bar-count" id="selectCount">0</span>
+    <span class="select-bar-label">alerts selected</span>
+    <button class="btn btn-red" style="padding:.25rem .7rem;font-size:.72rem" onclick="bulkVerdictSelected('escalate')">⚠ Escalate</button>
+    <button class="btn btn-amber" style="padding:.25rem .7rem;font-size:.72rem" onclick="bulkVerdictSelected('investigate')">🔍 Investigate</button>
+    <button class="btn btn-green" style="padding:.25rem .7rem;font-size:.72rem" onclick="bulkVerdictSelected('clean')">✓ Clean</button>
+    <button class="btn btn-ghost" style="padding:.25rem .7rem;font-size:.72rem" onclick="exportSelected()">↓ Export Selected</button>
+    <button class="btn btn-ghost" style="padding:.25rem .7rem;font-size:.72rem;margin-left:auto" onclick="clearSelection()">✕ Clear</button>
+  </div>
+  <div class="grid-wrap">
+    <div class="grid" id="alertGrid"></div>
+    <div class="empty" id="emptyState">No alerts match the current filters.</div>
+  </div>
+</div>
+
+<!-- DETAIL PANEL -->
+<div class="detail-overlay" id="detailOverlay" onclick="closeDetail(event)">
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-header">
+      <div class="detail-title" id="detailTitle"></div>
+      <button class="detail-close" onclick="closeDetailPanel()">✕</button>
+    </div>
+    <div class="detail-body" id="detailBody"></div>
+    <div class="detail-footer" id="detailFooter"></div>
+  </div>
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Export Report</div>
+      <button class="modal-close" onclick="document.getElementById('exportModal').classList.remove('show')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.82rem;color:var(--text2);line-height:1.7;margin-bottom:1rem">Choose what to export. The HTML report is formatted for sharing with your team or attaching to a ticket.</p>
+      <div style="display:flex;flex-direction:column;gap:.5rem">
+        <label style="display:flex;align-items:center;gap:.5rem;font-size:.8rem;cursor:pointer"><input type="radio" name="exportType" value="all" checked> All alerts (CSV)</label>
+        <label style="display:flex;align-items:center;gap:.5rem;font-size:.8rem;cursor:pointer"><input type="radio" name="exportType" value="escalate"> Escalated only (CSV)</label>
+        <label style="display:flex;align-items:center;gap:.5rem;font-size:.8rem;cursor:pointer"><input type="radio" name="exportType" value="report"> Incident Report (HTML)</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('exportModal').classList.remove('show')">Cancel</button>
+      <button class="btn btn-blue" onclick="doExport()">Download</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- CIPHER MASCOT -->
+<div class="cipher-wrap">
+  <div class="cipher-btn" onclick="toggleCipher()">
+    <svg width="46" height="46" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="23,4 42,38 4,38" fill="#1a2235" stroke="none"/>
+      <line x1="23" y1="4" x2="4" y2="38" stroke="#4a9eff" stroke-width="1.5"/>
+      <line x1="23" y1="4" x2="42" y2="38" stroke="#22c55e" stroke-width="1.5"/>
+      <line x1="4" y1="38" x2="42" y2="38" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="23" y="29" text-anchor="middle" font-family="IBM Plex Mono" font-size="11" font-weight="700" fill="#e2e8f0">C</text>
+    </svg>
+    <div class="cipher-badge">?</div>
+  </div>
+  <div class="cipher-panel" id="cipherPanel">
+    <div class="cipher-panel-header">
+      <span>CIPHER — AI Guide</span>
+      <span style="color:var(--text3);font-size:.6rem">powered by Groq</span>
+    </div>
+    <div class="cipher-msgs" id="cipherMsgs">
+      <div class="cipher-msg bot">Hey! I'm CIPHER. Upload a SIEM CSV and I'll help you triage alerts. Ask me anything about what you're seeing.</div>
+    </div>
+    <div class="cipher-input-row">
+      <input class="cipher-input" id="cipherInput" placeholder="Ask about an alert..." onkeydown="if(event.key==='Enter')sendCipher()">
+      <button class="cipher-send" onclick="sendCipher()">➤</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+let ALERTS = [];
+let state = {}; // id -> 'escalate' | 'investigate' | 'close' | 'unreviewed'
+let categories = {}; // id -> category string
+let fieldMap = {}; // canonical field -> actual CSV column
+let groqKey = localStorage.getItem('groq_key') || '';
+let detailId = null;
+
+const CATEGORIES = ['Phishing','Malware','Ransomware','Lateral Movement','Recon','Brute Force','C2/Beacon','Data Exfiltration','Privilege Escalation','DDoS','Insider Threat','False Positive','Other'];
+
+const CAT_CLASS = {
+  'Phishing':'cat-phishing','Malware':'cat-malware','Ransomware':'cat-ransomware',
+  'Lateral Movement':'cat-lateral','Recon':'cat-recon','Brute Force':'cat-brute',
+  'C2/Beacon':'cat-c2','Data Exfiltration':'cat-exfil','Privilege Escalation':'cat-privesc',
+  'DDoS':'cat-ddos','Insider Threat':'cat-insider','False Positive':'cat-fp','Other':'cat-other'
+};
+
+// ── FIELD DEFINITIONS ──
+const FIELD_DEFS = [
+  { key:'alert_name',  label:'Alert Name',   desc:'Rule or signature name',        required:true,  candidates:['alert','rule','signature','name','title','event','eventname','alert_name','rulename','detect'] },
+  { key:'severity',    label:'Severity',     desc:'Critical / High / Medium / Low', required:true,  candidates:['severity','sev','priority','level','risk','magnitude','urgency'] },
+  { key:'src_ip',      label:'Source IP',    desc:'Attacker or origin IP',          required:false, candidates:['src_ip','source_ip','src','sourceaddress','source ip','src ip','sourceip','source.ip','attacker_ip','client_ip'] },
+  { key:'dst_ip',      label:'Dest IP',      desc:'Target IP address',              required:false, candidates:['dst_ip','dest_ip','destination_ip','dst','destaddress','dest ip','destip','destination.ip','target_ip'] },
+  { key:'timestamp',   label:'Timestamp',    desc:'When the alert fired',           required:false, candidates:['timestamp','time','date','_time','eventtime','createdat','created','start time','datetime','@timestamp','generated'] },
+  { key:'user',        label:'User',         desc:'Account or username involved',   required:false, candidates:['user','username','account','login','subject','srcuser','user_name','userid','principal'] },
+  { key:'host',        label:'Host',         desc:'Endpoint or device name',        required:false, candidates:['host','hostname','computer','device','machine','endpoint','computername','asset'] },
+  { key:'description', label:'Description',  desc:'Alert details or message',       required:false, candidates:['description','message','details','summary','msg','alert_desc','desc','details','info','payload'] },
+  { key:'count',       label:'Count',        desc:'Number of occurrences',          required:false, candidates:['count','occurrences','freq','events','hits','flowcount','event count'] },
+  { key:'category',    label:'Category',     desc:'Pre-existing threat category',   required:false, candidates:['category','type','threat','class','attack','label','classification','threat_name'] },
+];
+
+// SIEM profiles — known column mappings
+const SIEM_PROFILES = {
+  splunk:   { alert_name:'signature', severity:'severity', src_ip:'src_ip', dst_ip:'dest_ip', timestamp:'_time', user:'user', host:'host', description:'message', count:'count' },
+  sentinel: { alert_name:'AlertName', severity:'AlertSeverity', src_ip:'SourceIp', dst_ip:'DestinationIp', timestamp:'TimeGenerated', user:'UserName', host:'Computer', description:'Description', count:'IncidentNumber' },
+  elastic:  { alert_name:'rule.name', severity:'kibana.alert.severity', src_ip:'source.ip', dst_ip:'destination.ip', timestamp:'@timestamp', user:'user.name', host:'host.name', description:'message', count:'event.count' },
+  qradar:   { alert_name:'Event Name', severity:'Magnitude', src_ip:'Source IP', dst_ip:'Destination IP', timestamp:'Start Time', user:'Username', host:'Log Source', description:'Payload', count:'Event Count' },
+  cicids:   { alert_name:'Label', severity:'Label', src_ip:'Src IP', dst_ip:'Dst IP', timestamp:'Timestamp', user:'', host:'', description:'Label', count:'Flow Duration' },
+  unsw:     { alert_name:'attack_cat', severity:'attack_cat', src_ip:'srcip', dst_ip:'dstip', timestamp:'Stime', user:'', host:'', description:'attack_cat', count:'Spkts' },
+  auto:     null,
+};
+
+// ── CSV PARSER ──
+let _rawCSVText = '';
+let _rawHeaders = [];
+let _pendingFilename = '';
+
+function parseCSVHeaders(text) {
+  const lines = text.trim().split('\n');
+  if (!lines.length) return [];
+  return splitCSVLine(lines[0]).map(h => h.trim());
+}
+
+function parseCSVRows(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = splitCSVLine(lines[0]).map(h => h.trim());
+  const results = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = splitCSVLine(lines[i]);
+    if (vals.length < 2) continue;
+    const row = {};
+    headers.forEach((h, idx) => { row[h] = (vals[idx] || '').trim(); });
+    results.push(row);
+  }
+  return results;
+}
+
+function splitCSVLine(line) {
+  const result = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQ = !inQ; continue; }
+    if (c === ',' && !inQ) { result.push(cur); cur = ''; continue; }
+    cur += c;
+  }
+  result.push(cur);
+  return result;
+}
+
+function autoDetectMapping(headers) {
+  const h = headers.map(x => x.toLowerCase().trim());
+  const map = {};
+  FIELD_DEFS.forEach(def => {
+    for (const c of def.candidates) {
+      const i = h.findIndex(x => x === c || x.includes(c));
+      if (i !== -1) { map[def.key] = headers[i]; break; }
+    }
+    if (!map[def.key]) map[def.key] = '';
+  });
+  return map;
+}
+
+function getField(row, canonical) {
+  const col = fieldMap[canonical];
+  return col ? (row[col] || '') : '';
+}
+
+// ── SIEM FINGERPRINTING ──
+// Returns {profileName, mapping, confidence} — confidence 0-1
+function fingerprintSIEM(headers) {
+  const h = new Set(headers.map(x => x.toLowerCase().trim()));
+
+  // Signature header sets for each SIEM
+  const signatures = {
+    splunk:   ['_time','sourcetype','index','splunk_server','linecount'],
+    sentinel: ['timegenerated','alertname','alertseverity','workspaceid','tenantid'],
+    elastic:  ['@timestamp','kibana.alert.severity','rule.name','source.ip','host.name'],
+    qradar:   ['event name','magnitude','log source','payload','start time'],
+    cicids:   ['flow id','flow duration','src ip','dst ip','src port','dst port','protocol','label'],
+    unsw:     ['srcip','dstip','proto','state','dur','sbytes','dbytes','sttl','dttl','attack_cat'],
+  };
+
+  let best = null, bestScore = 0;
+  for (const [name, sigs] of Object.entries(signatures)) {
+    const score = sigs.filter(s => h.has(s) || [...h].some(hh => hh.includes(s))).length / sigs.length;
+    if (score > bestScore) { bestScore = score; best = name; }
+  }
+
+  // Apply profile if confident enough (>= 2 signature matches)
+  if (best && bestScore >= 0.4) {
+    const profileMap = {...SIEM_PROFILES[best]};
+    // Only keep mapped columns that actually exist in this file
+    Object.keys(profileMap).forEach(k => {
+      if (profileMap[k] && !headers.includes(profileMap[k])) profileMap[k] = '';
+    });
+    return { profileName: best, mapping: profileMap, confidence: bestScore };
+  }
+
+  // Fall back to fuzzy auto-detect
+  return { profileName: 'auto', mapping: autoDetectMapping(headers), confidence: bestScore };
+}
+
+// Count how many required + useful fields got mapped
+function mappingScore(mapping) {
+  return Object.values(mapping).filter(v => v && v !== '— skip —').length;
+}
+
+// ── FIELD MAPPER ENTRY POINT ──
+function showMapper(text, filename) {
+  _rawCSVText = text;
+  _rawHeaders = parseCSVHeaders(text);
+  _pendingFilename = filename;
+
+  if (!_rawHeaders.length) { showToast('Could not read CSV headers'); return; }
+
+  // Try to fingerprint the SIEM
+  const { profileName, mapping, confidence } = fingerprintSIEM(_rawHeaders);
+  const mapped = mappingScore(mapping);
+
+  // Check saved mapping for this exact column fingerprint
+  const fingerprint = _rawHeaders.slice(0,8).join(',');
+  const saved = localStorage.getItem('alertdesk_map_' + btoa(fingerprint).substring(0,20));
+  if (saved) {
+    try {
+      fieldMap = JSON.parse(saved);
+      showToast('Loaded saved column mapping — ' + Object.values(fieldMap).filter(Boolean).length + ' fields matched');
+      processCSV(_rawCSVText, _pendingFilename);
+      return;
+    } catch(e) {}
+  }
+
+  // If we identified it confidently AND got enough fields mapped — just load it
+  if (mapped >= 3) {
+    fieldMap = mapping;
+    const label = profileName !== 'auto'
+      ? profileName.charAt(0).toUpperCase() + profileName.slice(1) + ' format detected'
+      : 'Auto-mapped';
+    showToast(`${label} — ${mapped} fields matched, loading alerts...`);
+    processCSV(_rawCSVText, _pendingFilename);
+    return;
+  }
+
+  // Not confident enough — show the mapper but pre-filled and with a clear message
+  document.getElementById('onboard').style.display = 'none';
+  document.getElementById('mapper').classList.add('show');
+  document.getElementById('mapperSource').textContent =
+    '📄 ' + filename + ' · ' + _rawHeaders.length + ' columns · ' +
+    (profileName !== 'auto' ? profileName.toUpperCase() + ' detected' : 'Unknown format — please confirm fields below');
+
+  // Highlight the matching profile chip
+  document.querySelectorAll('.profile-chip').forEach(c => c.classList.remove('active'));
+  const chip = document.querySelector(`.profile-chip[onclick*="${profileName}"]`);
+  if (chip) chip.classList.add('active');
+
+  renderMapperRows(mapping);
+  updateMapperPreview();
+}
+
+function renderMapperRows(mapping) {
+  const body = document.getElementById('mapperBody');
+  const opts = ['— skip —', ..._rawHeaders];
+  body.innerHTML = FIELD_DEFS.map(def => {
+    const matched = mapping[def.key] && _rawHeaders.includes(mapping[def.key]);
+    const val = mapping[def.key] || '';
+    const selectCls = matched ? 'mapper-select matched' : 'mapper-select unmatched';
+    const optionsHtml = opts.map(o => `<option value="${escHtml(o)}" ${o === val ? 'selected' : ''}>${escHtml(o)}</option>`).join('');
+    return `<div class="mapper-row">
+      <div class="mapper-field-label">
+        ${escHtml(def.label)}${def.required ? ' <span style="color:var(--red)">*</span>' : ''}
+        <span class="mapper-field-desc">${escHtml(def.desc)}</span>
+      </div>
+      <div class="mapper-arrow">→</div>
+      <select class="${selectCls}" data-field="${def.key}" onchange="onMapperChange(this)">
+        ${optionsHtml}
+      </select>
+    </div>`;
+  }).join('<div class="mapper-divider"></div>');
+}
+
+function onMapperChange(sel) {
+  sel.className = sel.value && sel.value !== '— skip —' ? 'mapper-select matched' : 'mapper-select unmatched';
+  updateMapperPreview();
+}
+
+function updateMapperPreview() {
+  const mapped = document.querySelectorAll('.mapper-select');
+  let count = 0;
+  mapped.forEach(s => { if (s.value && s.value !== '— skip —') count++; });
+  const rows = parseCSVRows(_rawCSVText);
+  document.getElementById('mapperPreview').innerHTML =
+    `<strong>${count}</strong> fields mapped · <strong>${rows.length}</strong> alerts ready`;
+}
+
+function applyProfile(profileKey) {
+  document.querySelectorAll('.profile-chip').forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  const profile = SIEM_PROFILES[profileKey];
+  const mapping = profile ? {...profile} : autoDetectMapping(_rawHeaders);
+  // Only keep values that exist in headers
+  if (profile) {
+    Object.keys(mapping).forEach(k => {
+      if (mapping[k] && !_rawHeaders.includes(mapping[k])) mapping[k] = '';
+    });
+  }
+  renderMapperRows(mapping);
+  updateMapperPreview();
+}
+
+function cancelMapper() {
+  document.getElementById('mapper').classList.remove('show');
+  document.getElementById('onboard').style.display = 'flex';
+}
+
+function confirmMapping() {
+  // Build fieldMap from selects
+  fieldMap = {};
+  document.querySelectorAll('.mapper-select').forEach(sel => {
+    if (sel.value && sel.value !== '— skip —') {
+      fieldMap[sel.dataset.field] = sel.value;
+    }
+  });
+  // Save profile to localStorage keyed by column fingerprint
+  const fingerprint = _rawHeaders.slice(0,5).join(',');
+  localStorage.setItem('alertdesk_map_' + btoa(fingerprint).substring(0,20), JSON.stringify(fieldMap));
+
+  document.getElementById('mapper').classList.remove('show');
+  processCSV(_rawCSVText, _pendingFilename);
+}
+
+// ── SAMPLE DATA ──
+function loadSample() {
+  const sample = `alert_name,severity,src_ip,dst_ip,timestamp,user,host,description,count
+Brute Force Login Attempt,High,185.220.101.45,10.0.1.25,2026-03-27 02:14:33,admin,DC01,Multiple failed login attempts detected from external IP,847
+Outbound DNS Tunneling,Critical,10.0.2.88,8.8.8.8,2026-03-27 02:18:01,jsmith,WS-142,Unusually long DNS queries consistent with tunneling,1203
+Ransomware File Extension Change,Critical,10.0.3.12,,2026-03-27 02:21:45,mwilson,WS-089,Mass file renaming with .locked extension detected,5621
+Phishing Email Clicked,Medium,10.0.1.15,91.195.240.117,2026-03-27 01:55:12,rjones,WS-034,User clicked link in suspected phishing email,1
+Mimikatz Credential Dump,Critical,10.0.2.44,,2026-03-27 02:35:22,SYSTEM,WS-201,LSASS memory access pattern matching Mimikatz detected,3
+Lateral Movement via SMB,High,10.0.2.44,10.0.4.18,2026-03-27 02:36:01,SYSTEM,FS-SERVER,SMB lateral movement from compromised host,14
+Port Scan Detected,Medium,45.142.212.100,10.0.0.0/24,2026-03-27 01:30:00,,FW-EDGE,External port scan covering 254 hosts,12894
+C2 Beacon to Known Bad IP,Critical,10.0.3.45,194.165.16.8,2026-03-27 02:45:11,bthomas,WS-178,Regular interval beaconing to known C2 infrastructure,288
+Suspicious PowerShell Execution,High,10.0.2.44,,2026-03-27 02:37:15,SYSTEM,WS-201,Encoded PowerShell command executed post-credential dump,2
+Data Exfiltration via HTTPS,High,10.0.3.45,194.165.16.8,2026-03-27 02:50:44,bthomas,WS-178,Large outbound transfer to suspicious IP over HTTPS,1
+Failed VPN Auth from TOR Exit Node,Medium,185.220.101.99,,2026-03-27 00:45:00,agarcia,VPN-GW,VPN login attempt from known TOR exit node,4
+USB Mass Storage Device Plugged In,Low,,,2026-03-27 09:12:00,clee,WS-055,Unauthorized USB device connected during off-hours,1
+Antivirus Alert - TrojanSpy,High,10.0.1.78,,2026-03-27 08:30:22,ptaylor,WS-067,AV detected TrojanSpy.Win32.AgentTesla on endpoint,1
+Privilege Escalation - Local Admin,High,10.0.4.22,,2026-03-27 07:15:33,hmartin,WS-099,Non-admin user account added to local Administrators group,1
+DNS Request to Sinkholed Domain,Info,10.0.1.45,10.0.0.5,2026-03-27 03:10:00,dwhite,WS-012,DNS request to previously sinkholed malware domain,1
+Repeated Auth Failures - Service Account,Medium,10.0.5.10,10.0.1.25,2026-03-27 06:00:00,svc_backup,SRV-BAK,Service account login failures suggesting password spray,33
+Suspicious Scheduled Task Created,High,10.0.2.44,,2026-03-27 02:38:00,SYSTEM,WS-201,New scheduled task created for persistence post-compromise,1
+Network Scan - Internal,Medium,10.0.2.44,10.0.0.0/24,2026-03-27 02:39:00,SYSTEM,WS-201,Internal network reconnaissance from compromised host,4201
+Outbound SMTP to External Server,Low,10.0.1.90,74.125.200.108,2026-03-27 10:05:00,lhenderson,WS-033,Unusual direct SMTP connection bypassing mail relay,3
+Security Software Disabled,Critical,10.0.2.44,,2026-03-27 02:40:00,SYSTEM,WS-201,Windows Defender disabled on compromised host,1
+RDP Brute Force - External,High,91.109.190.3,10.0.1.25,2026-03-27 04:20:00,,DC01,External RDP brute force against domain controller,1244
+Kerberoasting Attack Detected,High,10.0.4.55,,2026-03-27 05:45:00,omorales,WS-110,Service ticket requests consistent with Kerberoasting,28
+Impossible Travel Alert,Medium,,,2026-03-27 11:00:00,jsmith,CLOUD,User authenticated from US and EU within 45 minutes,1
+GeoIP Anomaly - Login from Sanctioned Country,High,,,2026-03-27 01:20:00,ceo_acct,CLOUD,Executive account login from sanctioned country,1
+Antivirus Alert - False Positive (EICAR),Info,10.0.1.5,,2026-03-27 09:55:00,itadmin,WS-001,EICAR test file triggered AV during IT security test,1`;
+  // Sample uses known columns — skip mapper
+  fieldMap = {alert_name:'alert_name',severity:'severity',src_ip:'src_ip',dst_ip:'dst_ip',timestamp:'timestamp',user:'user',host:'host',description:'description',count:'count',category:'category'};
+  processCSV(sample, 'sample_siem_data.csv');
+}
+
+// ── FILE HANDLING ──
+// ── STREAMING CSV READER ──
+// Reads large files in 2MB chunks, parses on the fly, never loads the whole file
+async function readCSVFile(file, callback) {
+  const MB = (file.size / 1024 / 1024).toFixed(1);
+  const CHUNK = 2 * 1024 * 1024; // 2MB chunks
+  let offset = 0;
+  let headers = null;
+  let rows = [];
+  let leftover = '';
+  let totalRows = 0;
+
+  // Show progress
+  const btn = document.getElementById('classifyBtn');
+  showToast(`Reading ${MB}MB file...`);
+
+  // Show loading overlay on upload zone
+  const zone = document.getElementById('uploadZone');
+  if (zone) {
+    zone.innerHTML = `<div style="font-family:var(--mono);font-size:.85rem;color:var(--text2);text-align:center">
+      <div style="margin-bottom:.75rem">⏳ Loading ${MB}MB...</div>
+      <div style="background:var(--border);border-radius:2px;height:4px;width:200px;margin:0 auto">
+        <div id="loadProgress" style="background:var(--blue);height:100%;border-radius:2px;width:0%;transition:width .2s"></div>
+      </div>
+      <div id="loadStatus" style="margin-top:.5rem;font-size:.72rem;color:var(--text3)">Parsing rows...</div>
+    </div>`;
+  }
+
+  const updateProgress = (pct, status) => {
+    const bar = document.getElementById('loadProgress');
+    const stat = document.getElementById('loadStatus');
+    if (bar) bar.style.width = pct + '%';
+    if (stat) stat.textContent = status;
+  };
+
+  const processChunk = (text) => {
+    const combined = leftover + text;
+    const lines = combined.split('\n');
+    // Keep the last (possibly incomplete) line as leftover
+    leftover = lines[lines.length - 1];
+
+    const complete = lines.slice(0, -1);
+    if (!headers) {
+      // First line is headers
+      let headerLine = complete[0] || '';
+      // Strip BOM
+      if (headerLine.charCodeAt(0) === 0xFEFF) headerLine = headerLine.slice(1);
+      headers = splitCSVLine(headerLine);
+      for (let i = 1; i < complete.length; i++) {
+        if (!complete[i].trim()) continue;
+        const vals = splitCSVLine(complete[i]);
+        if (vals.length < 2) continue;
+        const row = {};
+        headers.forEach((h, idx) => { row[h.trim()] = (vals[idx] || '').trim(); });
+        rows.push(row);
+      }
+    } else {
+      for (let i = 0; i < complete.length; i++) {
+        if (!complete[i].trim()) continue;
+        const vals = splitCSVLine(complete[i]);
+        if (vals.length < 2) continue;
+        const row = {};
+        headers.forEach((h, idx) => { row[h.trim()] = (vals[idx] || '').trim(); });
+        rows.push(row);
+      }
+    }
+    totalRows = rows.length;
+  };
+
+  // Read file in chunks
+  while (offset < file.size) {
+    const chunk = file.slice(offset, offset + CHUNK);
+    const text = await chunk.text();
+    processChunk(text);
+    offset += CHUNK;
+    const pct = Math.min(99, Math.round((offset / file.size) * 100));
+    updateProgress(pct, `${rows.length.toLocaleString()} rows parsed...`);
+    // Yield to browser to keep UI responsive
+    await new Promise(r => setTimeout(r, 0));
+  }
+
+  // Process any leftover
+  if (leftover.trim()) {
+    const vals = splitCSVLine(leftover);
+    if (vals.length >= 2 && headers) {
+      const row = {};
+      headers.forEach((h, idx) => { row[h.trim()] = (vals[idx] || '').trim(); });
+      rows.push(row);
+    }
+  }
+
+  updateProgress(100, `Complete — ${rows.length.toLocaleString()} rows`);
+
+  // Restore upload zone
+  if (zone) {
+    zone.innerHTML = `<div class="upload-zone-icon">⬆</div>
+      <div class="upload-zone-text">Drop SIEM CSV here or click to browse</div>
+      <div class="upload-zone-sub">Splunk · Microsoft Sentinel · Elastic · QRadar · any CSV</div>
+      <input type="file" id="fileInput" accept=".csv" onchange="handleFile(event)">`;
+  }
+
+  if (!headers || !rows.length) {
+    showToast('Could not parse CSV — check format');
+    return;
+  }
+
+  // Rebuild a text representation for showMapper (which needs raw text for header detection)
+  // Just pass headers + first 5 rows as text for fingerprinting, but pass full rows separately
+  const previewText = [headers.join(','), ...rows.slice(0,5).map(r => headers.map(h=>r[h]||'').join(','))].join('\n');
+
+  // Store full parsed rows globally so processCSV can use them directly
+  window._parsedRows = rows;
+  window._parsedHeaders = headers;
+
+  showToast(`✓ ${rows.length.toLocaleString()} rows loaded from ${file.name} (${MB}MB)`);
+  callback(previewText, file.name);
+}
+
+function handleFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  readCSVFile(file, showMapper);
+  e.target.value = '';
+}
+
+function handleReload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  readCSVFile(file, showMapper);
+  e.target.value = '';
+}
+
+function zoneDragOver(e) { e.preventDefault(); document.getElementById('uploadZone').classList.add('drag-over'); }
+function zoneDragLeave() { document.getElementById('uploadZone').classList.remove('drag-over'); }
+function zoneDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  readCSVFile(file, showMapper);
+}
+
+function processCSV(text, filename) {
+  // Use pre-parsed rows from streaming reader if available
+  let rows;
+  if (window._parsedRows && window._parsedRows.length) {
+    rows = window._parsedRows;
+    window._parsedRows = null;
+    window._parsedHeaders = null;
+  } else {
+    rows = parseCSVRows(text);
+  }
+  if (!rows.length) { showToast('Could not parse CSV — check format'); return; }
+  ALERTS = rows.map((row, i) => ({
+    id: 'alert_' + i,
+    raw: row,
+    alert_name: getField(row,'alert_name') || 'Unknown Alert ' + (i+1),
+    severity: normalizeSeverity(getField(row,'severity')),
+    src_ip: getField(row,'src_ip'),
+    dst_ip: getField(row,'dst_ip'),
+    timestamp: getField(row,'timestamp'),
+    user: getField(row,'user'),
+    host: getField(row,'host'),
+    description: getField(row,'description'),
+    count: getField(row,'count'),
+    raw_category: getField(row,'category')
+  }));
+  state = {};
+  categories = {};
+  ALERTS.forEach(a => {
+    state[a.id] = 'unreviewed';
+    categories[a.id] = a.raw_category || 'Other';
+  });
+  document.getElementById('onboard').style.display = 'none';
+  document.getElementById('main').style.display = 'flex';
+  document.getElementById('statsBar').style.display = 'flex';
+  document.getElementById('headerCount').style.display = 'block';
+  document.getElementById('reloadBtn').style.display = 'inline-flex';
+  document.getElementById('exportBtn').style.display = 'inline-flex';
+  document.getElementById('classifyBtn').style.display = 'inline-flex';
+  document.getElementById('headerTotal').textContent = ALERTS.length;
+  initFilterChips();
+  buildCatBar();
+  updateStats();
+  renderGrid();
+  showToast('Loaded ' + ALERTS.length + ' alerts from ' + filename);
+}
+
+function normalizeSeverity(s) {
+  s = (s || '').toLowerCase().trim();
+  if (['critical','crit','5','p1'].includes(s)) return 'critical';
+  if (['high','4','p2'].includes(s)) return 'high';
+  if (['medium','med','moderate','3','p3'].includes(s)) return 'medium';
+  if (['low','2','p4'].includes(s)) return 'low';
+  if (['info','informational','1','p5','0'].includes(s)) return 'info';
+  // UNSW-NB15 attack_cat used as severity — map attack types to severity levels
+  if (['exploits','backdoor','shellcode','worms'].includes(s)) return 'critical';
+  if (['dos','reconnaissance','analysis'].includes(s)) return 'high';
+  if (['fuzzers','generic'].includes(s)) return 'medium';
+  if (['normal',''].includes(s)) return 'info';
+  // CICIDS Label used as severity — map attack names
+  if (s.includes('ddos') || s.includes('dos')) return 'high';
+  if (s.includes('brute') || s.includes('patator')) return 'high';
+  if (s.includes('web attack') || s.includes('sql') || s.includes('xss')) return 'medium';
+  if (s.includes('benign') || s === 'benign') return 'info';
+  if (s.includes('infiltration') || s.includes('botnet') || s.includes('heartbleed')) return 'critical';
+  return s ? 'medium' : 'medium';
+}
+
+
+function setVerdictFilter(val) {
+  document.getElementById('verdictFilter').value = val;
+  renderGrid();
+}
+function setSeverityFilter(val) {
+  document.getElementById('severityFilter').value = val;
+  renderGrid();
+}
+
+function updateFilterChips(counts, sevCounts) {
+  const vf = document.getElementById('verdictFilter').value;
+  const sf = document.getElementById('severityFilter').value;
+
+  const vc = document.getElementById('verdictChips');
+  if (vc) {
+    const total = ALERTS.length;
+    const verdicts = [
+      {val:'all', label:'All', n: total, cls:'v-all'},
+      {val:'unreviewed', label:'Unreviewed', n: counts.unreviewed||0, cls:'v-unreviewed'},
+      {val:'escalate', label:'Escalate', n: counts.escalate||0, cls:'v-escalate'},
+      {val:'investigate', label:'Investigate', n: counts.investigate||0, cls:'v-investigate'},
+      {val:'clean', label:'Clean', n: counts.clean||0, cls:'v-clean'},
+    ];
+    vc.innerHTML = verdicts.map(v =>
+      `<button class="filter-chip ${v.cls}${vf===v.val?' active':''}" onclick="setVerdictFilter('${v.val}')">
+        ${v.label}${v.n > 0 ? `<span class="chip-n">${v.n}</span>` : ''}
+      </button>`
+    ).join('');
+  }
+
+  const sc = document.getElementById('severityChips');
+  if (sc) {
+    const sevs = [
+      {val:'all', label:'All Sev', n:0, cls:'v-all'},
+      {val:'critical', label:'Critical', n: sevCounts.critical||0, cls:'s-critical'},
+      {val:'high', label:'High', n: sevCounts.high||0, cls:'s-high'},
+      {val:'medium', label:'Medium', n: sevCounts.medium||0, cls:'s-medium'},
+      {val:'low', label:'Low', n: sevCounts.low||0, cls:'s-low'},
+      {val:'info', label:'Info', n: sevCounts.info||0, cls:'s-info'},
+    ];
+    sc.innerHTML = sevs.map(s =>
+      `<button class="filter-chip ${s.cls}${sf===s.val?' active':''}" onclick="setSeverityFilter('${s.val}')">
+        ${s.label}${s.n > 0 ? `<span class="chip-n">${s.n}</span>` : ''}
+      </button>`
+    ).join('');
+  }
+}
+
+// ── CAT BAR ──
+function initFilterChips() {
+  updateFilterChips({unreviewed:0,escalate:0,investigate:0,clean:0},{critical:0,high:0,medium:0,low:0,info:0});
+}
+
+function buildCatBar() {
+  const bar = document.getElementById('catBar');
+  bar.innerHTML = '<span class="toolbar-label" style="margin-right:.25rem">Category</span>';
+  const all = document.createElement('div');
+  all.className = 'cat-chip active';
+  all.textContent = 'All';
+  all.dataset.cat = '';
+  all.onclick = () => { document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('active')); all.classList.add('active'); renderGrid(); };
+  all.ondragover = e => { e.preventDefault(); all.classList.add('drag-over'); };
+  all.ondragleave = () => all.classList.remove('drag-over');
+  all.ondrop = e => { e.preventDefault(); all.classList.remove('drag-over'); handleChipDrop(e, ''); };
+  bar.appendChild(all);
+  CATEGORIES.forEach(cat => {
+    const chip = document.createElement('div');
+    const catCount = ALERTS.filter(a => categories[a.id] === cat).length;
+    chip.className = 'cat-chip' + (catCount > 0 ? ' has-alerts' : '');
+    chip.dataset.cat = cat;
+    chip.innerHTML = escHtml(cat) + (catCount > 0 ? `<span class="chip-count">${catCount}</span>` : '');
+    chip.onclick = () => {
+      document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      renderGrid();
+    };
+    chip.ondragover = e => { e.preventDefault(); chip.classList.add('drag-over'); };
+    chip.ondragleave = () => chip.classList.remove('drag-over');
+    chip.ondrop = e => { e.preventDefault(); chip.classList.remove('drag-over'); handleChipDrop(e, cat); };
+    if (catCount === 0) chip.style.opacity = '0.35';
+    bar.appendChild(chip);
+  });
+}
+
+
+function handleCardClick(e, id) {
+  // Don't intercept button clicks
+  if (e.target.closest('button') || e.target.closest('.card-action-btn')) return;
+  toggleSelect(id, !selectedIds.has(id));
+  // Visual feedback — re-render just this card's selected state
+  const card = e.currentTarget;
+  if (selectedIds.has(id)) card.classList.add('selected');
+  else card.classList.remove('selected');
+}
+
+function handleChipDrop(e, cat) {
+  const id = e.dataTransfer.getData('text/plain');
+  if (!id) return;
+  categories[id] = cat || 'Other';
+  renderGrid(); updateStats();
+}
+
+// ── RENDER ──
+function renderGrid() {
+  const vf = document.getElementById('verdictFilter').value;
+  const sf = document.getElementById('severityFilter').value;
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const activeCat = document.querySelector('.cat-chip.active')?.dataset?.cat || '';
+  const grid = document.getElementById('alertGrid');
+  const empty = document.getElementById('emptyState');
+
+  let filtered = ALERTS.filter(a => {
+    if (vf !== 'all' && state[a.id] !== vf) return false;
+    if (sf !== 'all' && a.severity !== sf) return false;
+    if (activeCat && categories[a.id] !== activeCat) return false;
+    if (search && !a.alert_name.toLowerCase().includes(search) && !a.description.toLowerCase().includes(search) && !a.src_ip.includes(search) && !a.user.toLowerCase().includes(search) && !a.host.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  // Sort: critical/high first, then unreviewed first
+  const sevOrder = {critical:0,high:1,medium:2,low:3,info:4};
+  const verdOrder = {escalate:0,investigate:1,unreviewed:2,clean:3};
+  filtered.sort((a,b) => {
+    const vs = (sevOrder[a.severity]||2) - (sevOrder[b.severity]||2);
+    if (vs !== 0) return vs;
+    return (verdOrder[state[a.id]]||2) - (verdOrder[state[b.id]]||2);
+  });
+
+  if (!filtered.length) { grid.innerHTML=''; empty.classList.add('show'); return; }
+  empty.classList.remove('show');
+
+  grid.innerHTML = filtered.map(a => {
+    const v = state[a.id];
+    const cat = categories[a.id] || 'Other';
+    const catCls = CAT_CLASS[cat] || 'cat-other';
+    const sel = selectedIds.has(a.id);
+    return `<div class="card ${v !== 'unreviewed' ? v : ''} ${sel ? 'selected' : ''}" draggable="true"
+      ondragstart="e => e.dataTransfer.setData('text/plain','${a.id}')"
+      onclick="handleCardClick(event,'${a.id}')"
+      data-id="${a.id}">
+
+      <div class="card-severity-bar ${a.severity}"></div>
+      <div class="card-top">
+        <div class="card-title">${escHtml(a.alert_name)}</div>
+        <div class="card-verdict ${v}">${v === 'unreviewed' ? '—' : v.toUpperCase()}</div>
+      </div>
+      <div class="card-meta">
+        ${a.timestamp ? `<div class="card-meta-item"><span class="label">Time</span><span class="val">${escHtml(a.timestamp)}</span></div>` : ''}
+        ${a.src_ip ? `<div class="card-meta-item"><span class="label">SRC</span><span class="val">${escHtml(a.src_ip)}</span></div>` : ''}
+        ${a.dst_ip ? `<div class="card-meta-item"><span class="label">DST</span><span class="val">${escHtml(a.dst_ip)}</span></div>` : ''}
+        ${a.user ? `<div class="card-meta-item"><span class="label">User</span><span class="val">${escHtml(a.user)}</span></div>` : ''}
+        ${a.host ? `<div class="card-meta-item"><span class="label">Host</span><span class="val">${escHtml(a.host)}</span></div>` : ''}
+        ${a.count ? `<div class="card-meta-item"><span class="label">Count</span><span class="val">${escHtml(a.count)}</span></div>` : ''}
+      </div>
+      <div class="card-category-tag ${catCls}">${escHtml(cat)}</div>
+      ${a.description ? `<div style="font-size:.72rem;color:var(--text3);margin-left:.4rem;margin-bottom:.4rem;line-height:1.5">${escHtml(a.description.substring(0,100))}${a.description.length>100?'…':''}</div>` : ''}
+      <div class="card-actions">
+        <button class="card-action-btn escalate" onclick="setVerdict(event,'${a.id}','escalate')">⚠ Escalate</button>
+        <button class="card-action-btn investigate" onclick="setVerdict(event,'${a.id}','investigate')">🔍 Investigate</button>
+        <button class="card-action-btn clean" onclick="setVerdict(event,'${a.id}','clean')">✓ Reviewed Clean</button>
+        <button class="card-action-btn" style="color:var(--blue);border-color:rgba(74,158,255,.3)" onclick="showDetail(event,'${a.id}')">Detail</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Wire up drag
+  grid.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('dragstart', e => {
+      e.dataTransfer.setData('text/plain', card.dataset.id);
+      setTimeout(() => card.classList.add('dragging'), 0);
+    });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+  });
+}
+
+// ── UNDO STACK ──
+const undoStack = []; // [{id, prev}] or [{bulk: [{id, prev}]}]
+
+function pushUndo(entry) {
+  undoStack.push(entry);
+  if (undoStack.length > 100) undoStack.shift();
+  updateUndoBtn();
+}
+
+function updateUndoBtn() {
+  const btn = document.getElementById('undoBtn');
+  const cnt = document.getElementById('undoCount');
+  if (!btn) return;
+  if (undoStack.length > 0) {
+    btn.classList.add('has-history');
+    cnt.textContent = undoStack.length;
+  } else {
+    btn.classList.remove('has-history');
+    cnt.textContent = '0';
+  }
+}
+
+function undoVerdict() {
+  if (!undoStack.length) { showToast('Nothing to undo'); return; }
+  const entry = undoStack.pop();
+  if (entry.bulk) {
+    entry.bulk.forEach(({id, prev}) => { state[id] = prev; });
+    showToast(`Undone — ${entry.bulk.length} alerts restored`);
+  } else {
+    state[entry.id] = entry.prev;
+    showToast(`Undone — alert restored to "${entry.prev}"`);
+  }
+  updateUndoBtn();
+  updateStats(); renderGrid();
+}
+
+// Ctrl+Z support
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undoVerdict(); }
+});
+
+// ── SELECTION ──
+let selectedIds = new Set();
+
+function toggleSelectAll(checked) {
+  const visible = getVisibleAlerts();
+  if (checked) visible.forEach(a => selectedIds.add(a.id));
+  else selectedIds.clear();
+  updateSelectBar();
+  renderGrid();
+}
+
+function toggleSelect(id, checked) {
+  if (checked) selectedIds.add(id);
+  else selectedIds.delete(id);
+  updateSelectBar();
+  const chk = document.getElementById('selectAllChk');
+  if (chk) {
+    const visible = getVisibleAlerts();
+    chk.checked = visible.length > 0 && visible.every(a => selectedIds.has(a.id));
+    chk.indeterminate = selectedIds.size > 0 && !chk.checked;
+  }
+}
+
+function getVisibleAlerts() {
+  const vf = document.getElementById('verdictFilter').value;
+  const sf = document.getElementById('severityFilter').value;
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const activeCat = document.querySelector('.cat-chip.active')?.dataset?.cat || '';
+  return ALERTS.filter(a => {
+    if (vf !== 'all' && state[a.id] !== vf) return false;
+    if (sf !== 'all' && a.severity !== sf) return false;
+    if (activeCat && categories[a.id] !== activeCat) return false;
+    if (search && !a.alert_name.toLowerCase().includes(search) && !a.src_ip.includes(search)) return false;
+    return true;
+  });
+}
+
+function updateSelectBar() {
+  const bar = document.getElementById('selectBar');
+  const cnt = document.getElementById('selectCount');
+  if (selectedIds.size > 0) { bar.classList.add('show'); cnt.textContent = selectedIds.size; }
+  else { bar.classList.remove('show'); }
+}
+
+function clearSelection() {
+  selectedIds.clear();
+  const chk = document.getElementById('selectAllChk');
+  if (chk) { chk.checked = false; chk.indeterminate = false; }
+  updateSelectBar(); renderGrid();
+}
+
+function bulkVerdictSelected(verdict) {
+  if (!selectedIds.size) return;
+  pushUndo({bulk: [...selectedIds].map(id => ({id, prev: state[id]}))});
+  selectedIds.forEach(id => { state[id] = verdict; });
+  clearSelection();
+  updateStats(); renderGrid();
+  showToast(`Marked ${selectedIds.size || 'selected'} alerts as "${verdict}"`);
+}
+
+function exportSelected() {
+  const alerts = ALERTS.filter(a => selectedIds.has(a.id));
+  if (!alerts.length) { showToast('No alerts selected'); return; }
+  const headers = ['alert_name','severity','category','verdict','src_ip','dst_ip','timestamp','user','host','description','count'];
+  const rows = alerts.map(a => headers.map(h => {
+    const v = h === 'verdict' ? state[a.id] : h === 'category' ? (categories[a.id]||'Other') : (a[h] || '');
+    return '"' + String(v).replace(/"/g,'""') + '"';
+  }).join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  downloadText(csv, 'selected_alerts.csv', 'text/csv');
+  showToast(`Exported ${alerts.length} selected alerts`);
+}
+
+// ── VERDICT ──
+function setVerdict(e, id, verdict) {
+  e.stopPropagation();
+  const prev = state[id];
+  if (prev === verdict) return; // no change
+  pushUndo({id, prev});
+  state[id] = verdict;
+  updateStats(); renderGrid();
+}
+
+async function bulkVerdict(verdict) {
+  const vf = document.getElementById('verdictFilter').value;
+  const sf = document.getElementById('severityFilter').value;
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const activeCat = document.querySelector('.cat-chip.active')?.dataset?.cat || '';
+  const targets = ALERTS.filter(a => {
+    if (vf !== 'all' && state[a.id] !== vf) return false;
+    if (sf !== 'all' && a.severity !== sf) return false;
+    if (activeCat && categories[a.id] !== activeCat) return false;
+    if (search && !a.alert_name.toLowerCase().includes(search) && !a.src_ip.includes(search)) return false;
+    return true;
+  });
+  if (!targets.length) { showToast('No visible alerts to mark'); return; }
+  // Push bulk undo entry
+  pushUndo({bulk: targets.map(a => ({id: a.id, prev: state[a.id]}))});
+  targets.forEach(a => { state[a.id] = verdict; });
+  updateStats(); renderGrid();
+  showToast(`Marked ${targets.length} alerts as "${verdict}" — Ctrl+Z to undo`);
+}
+
+// ── STATS ──
+function updateStats() {
+  const counts = {escalate:0,investigate:0,clean:0,unreviewed:0};
+  const sevCounts = {critical:0,high:0,medium:0,low:0,info:0};
+  ALERTS.forEach(a => {
+    const v = state[a.id]; counts[v] = (counts[v]||0) + 1;
+    sevCounts[a.severity] = (sevCounts[a.severity]||0) + 1;
+  });
+  document.getElementById('statTotal').textContent = ALERTS.length;
+  document.getElementById('statEscalate').textContent = counts.escalate||0;
+  document.getElementById('statInvestigate').textContent = counts.investigate||0;
+  document.getElementById('statClean').textContent = counts.clean||0;
+  document.getElementById('statUnreviewed').textContent = counts.unreviewed||0;
+
+  updateFilterChips(counts, sevCounts);
+}
+
+
+// ── IOC DETECTION ──
+function detectIOCs(a) {
+  const flags = [];
+  const fieldFlags = {};
+  const raw = a.raw || {};
+
+  // Helper to get numeric value from raw
+  const num = (keys) => {
+    for (const k of keys) {
+      const v = parseFloat(raw[k]);
+      if (!isNaN(v)) return v;
+    }
+    return null;
+  };
+
+  // ── HIGH PACKET / BYTE COUNTS ──
+  const totalFwd = num(['Total Fwd Packet','Total Fwd Packets','TotalFwdPackets','Fwd Packets']);
+  const totalBwd = num(['Total Bwd packets','Total Bwd Packets','TotalBwdPackets','Bwd Packets']);
+  const flowBytes = num(['Flow Bytes/s','Flow Bytes_s','flow_bytes_per_sec']);
+  const flowPkts = num(['Flow Packets/s','Flow Packets_s','flow_pkts_per_sec']);
+  const flowDur = num(['Flow Duration','flow_duration','FlowDuration']);
+  const totBytes = num(['Total Length of Fwd Packet','Total Length of Fwd Packets']);
+
+  if (totalFwd !== null && totalFwd > 5000) {
+    flags.push({level:'critical', icon:'📦', msg:`${totalFwd.toLocaleString()} fwd packets — volume attack indicator`});
+    fieldFlags['Total Fwd Packet'] = 'critical';
+    fieldFlags['Total Fwd Packets'] = 'critical';
+  } else if (totalFwd !== null && totalFwd > 1000) {
+    flags.push({level:'warning', icon:'📦', msg:`${totalFwd.toLocaleString()} fwd packets — elevated`});
+    fieldFlags['Total Fwd Packet'] = 'warning';
+  }
+
+  if (flowBytes !== null && flowBytes > 100000) {
+    flags.push({level:'critical', icon:'🌊', msg:`${(flowBytes/1000).toFixed(1)}k bytes/s — high throughput`});
+    fieldFlags['Flow Bytes/s'] = 'critical';
+  }
+
+  if (flowPkts !== null && flowPkts > 10000) {
+    flags.push({level:'critical', icon:'⚡', msg:`${flowPkts.toLocaleString()} packets/s — DDoS/flood rate`});
+    fieldFlags['Flow Packets/s'] = 'critical';
+  } else if (flowPkts !== null && flowPkts > 1000) {
+    flags.push({level:'warning', icon:'⚡', msg:`${flowPkts.toLocaleString()} packets/s — elevated rate`});
+    fieldFlags['Flow Packets/s'] = 'warning';
+  }
+
+  // ── SHORT FLOW DURATION (rapid fire / scanning) ──
+  if (flowDur !== null && flowDur < 1000 && totalFwd !== null && totalFwd > 100) {
+    flags.push({level:'critical', icon:'⏱', msg:`${flowDur}μs duration with ${totalFwd} packets — scanning pattern`});
+    fieldFlags['Flow Duration'] = 'critical';
+  }
+
+  // ── ZERO BACKWARD PACKETS (one-way flood) ──
+  if (totalFwd !== null && totalBwd !== null && totalBwd === 0 && totalFwd > 100) {
+    flags.push({level:'warning', icon:'→', msg:'Zero response packets — one-way traffic (DoS/scan)'});
+    fieldFlags['Total Bwd packets'] = 'warning';
+    fieldFlags['Total Bwd Packets'] = 'warning';
+  }
+
+  // ── SUSPICIOUS PORTS ──
+  const dport = raw['Dst Port'] || raw['Destination Port'] || raw['dst_port'] || '';
+  const sport = raw['Src Port'] || raw['Source Port'] || raw['src_port'] || '';
+  const suspPorts = {'22':'SSH','23':'Telnet','3389':'RDP','445':'SMB','1433':'MSSQL','3306':'MySQL','6379':'Redis','27017':'MongoDB'};
+  if (dport && suspPorts[dport]) {
+    flags.push({level:'warning', icon:'🔌', msg:`Port ${dport} (${suspPorts[dport]}) — common attack target`});
+    fieldFlags['Dst Port'] = 'warning';
+  }
+
+  // ── TIMESTAMP PATTERN ──
+  const ts = raw['Timestamp'] || raw['timestamp'] || raw['_time'] || '';
+  if (ts) {
+    // Check if same second as other alerts (rapid pinging) - flag if flow duration is very short
+    if (flowDur !== null && flowDur < 500) {
+      flags.push({level:'info', icon:'🕐', msg:`Timestamp: ${ts} — sub-millisecond flow`});
+    }
+  }
+
+  // ── PROTOCOL FLAGS ──
+  const proto = raw['Protocol'] || raw['protocol'] || '';
+  if (proto === '0' || proto === 'HOPOPT') {
+    flags.push({level:'warning', icon:'🔀', msg:'Protocol 0 (HOPOPT) — unusual, used in evasion'});
+    fieldFlags['Protocol'] = 'warning';
+  }
+
+  // ── INTERNAL → INTERNAL with high volume ──
+  const src = a.src_ip || '';
+  const dst = a.dst_ip || '';
+  const isIntSrc = src.startsWith('192.168.') || src.startsWith('10.') || src.startsWith('172.');
+  const isIntDst = dst.startsWith('192.168.') || dst.startsWith('10.') || dst.startsWith('172.');
+  if (isIntSrc && isIntDst && totalFwd !== null && totalFwd > 500) {
+    flags.push({level:'critical', icon:'🏠', msg:'Internal→Internal high-volume — lateral movement or insider'});
+  }
+
+  return { flags, fieldFlags };
+}
+
+// ── DETAIL PANEL ──
+// Cache for analyst reports per alert
+const analystCache = {};
+
+function showDetail(e, id) {
+  e.stopPropagation();
+  detailId = id;
+  const a = ALERTS.find(x => x.id === id);
+  if (!a) return;
+
+  // Severity badge color
+  const sevColors = {critical:'var(--red)',high:'var(--amber)',medium:'var(--blue)',low:'var(--green)',info:'var(--text3)'};
+  const sevColor = sevColors[a.severity] || 'var(--text2)';
+
+  document.getElementById('detailTitle').innerHTML =
+    `${escHtml(a.alert_name)} <span style="font-size:.7rem;font-family:var(--mono);padding:.15rem .4rem;border-radius:2px;background:${sevColor}22;color:${sevColor};border:1px solid ${sevColor}44;vertical-align:middle">${a.severity.toUpperCase()}</span>`;
+
+  // IOC detection — flag suspicious field values
+  const iocFlags = detectIOCs(a);
+
+  const allFields = Object.entries(a.raw).filter(([k,v]) => v).map(([k,v]) => {
+    const ioc = iocFlags.fieldFlags && iocFlags.fieldFlags[k];
+    const valCls = ioc === 'critical' ? 'highlight-red' : ioc === 'warning' ? 'highlight-amber' : '';
+    return `<div class="detail-field"><div class="detail-field-label">${escHtml(k)}</div><div class="detail-field-val ${valCls}">${escHtml(v)}</div></div>`;
+  }).join('');
+
+  const body = document.getElementById('detailBody');
+  body.innerHTML = `
+    <div class="detail-tabs">
+      <button class="detail-tab active" onclick="switchTab(event,'tab-fields')">Raw Fields</button>
+      <button class="detail-tab" onclick="switchTab(event,'tab-analyst')">🤖 Analyst Report</button>
+    </div>
+    <div class="detail-tab-content active" id="tab-fields">
+      <div class="detail-section" style="margin-bottom:.5rem">
+        <div class="detail-section-title">Category</div>
+        <div style="margin-top:.35rem">
+          <span style="font-family:var(--mono);font-size:.78rem;padding:.2rem .55rem;border-radius:3px;background:rgba(74,158,255,.1);border:1px solid rgba(74,158,255,.25);color:var(--blue)">${escHtml(categories[id]||'Unclassified')}</span>
+          &nbsp;<span style="font-family:var(--mono);font-size:.72rem;color:var(--text3)">Verdict: <strong style="color:var(--text)">${state[id]||'unreviewed'}</strong></span>
+        </div>
+      </div>
+      ${iocFlags.flags.length ? `<div class="ioc-panel">
+        <div class="ioc-panel-title">🚨 Analyst Flags — Focus Here</div>
+        <div>${iocFlags.flags.map(f => `<span class="ioc-flag ${f.level}">${f.icon} ${escHtml(f.msg)}</span>`).join('')}</div>
+      </div>` : ''}
+      <div class="detail-section">
+        <div class="detail-section-title">All Fields <span style="font-size:.7rem;color:var(--text3);font-weight:400">(red = high value · amber = notable)</span></div>
+        ${allFields}
+      </div>
+    </div>
+    <div class="detail-tab-content" id="tab-analyst">
+      <div id="analystContent-${id}"></div>
+    </div>`;
+
+  const footer = document.getElementById('detailFooter');
+  footer.innerHTML = `
+    <button class="btn btn-red" onclick="setVerdict(event,'${id}','escalate');closeDetailPanel()">⚠ Escalate</button>
+    <button class="btn btn-amber" onclick="setVerdict(event,'${id}','investigate');closeDetailPanel()">🔍 Investigate</button>
+    <button class="btn btn-green" onclick="setVerdict(event,'${id}','clean');closeDetailPanel()">✓ Reviewed Clean</button>
+    <button class="btn btn-ghost" style="margin-left:auto" onclick="loadAnalystReport('${id}')">🤖 Generate Report</button>`;
+
+  document.getElementById('detailOverlay').classList.add('show');
+
+  // Auto-load report if cached or auto-generate
+  if (analystCache[id]) {
+    renderAnalystReport(id, analystCache[id]);
+  }
+}
+
+function switchTab(e, tabId) {
+  document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.detail-tab-content').forEach(t => t.classList.remove('active'));
+  e.target.classList.add('active');
+  const tc = document.getElementById(tabId);
+  if (tc) tc.classList.add('active');
+  // Auto-load analyst report when switching to it
+  if (tabId === 'tab-analyst' && detailId && !analystCache[detailId]) {
+    loadAnalystReport(detailId);
+  }
+}
+
+async function loadAnalystReport(id) {
+  const a = ALERTS.find(x => x.id === id);
+  if (!a) return;
+
+  // Switch to analyst tab first so container exists
+  document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.detail-tab-content').forEach(t => t.classList.remove('active'));
+  const tabs = document.querySelectorAll('.detail-tab');
+  if (tabs[1]) tabs[1].classList.add('active');
+  const analystTab = document.getElementById('tab-analyst');
+  if (analystTab) analystTab.classList.add('active');
+
+  // Now find or create container
+  let container = document.getElementById('analystContent-' + id);
+  if (!container) {
+    // Container missing — create it inside the analyst tab
+    if (analystTab) {
+      container = document.createElement('div');
+      container.id = 'analystContent-' + id;
+      analystTab.appendChild(container);
+    } else return;
+  }
+
+  if (analystCache[id]) { renderAnalystReport(id, analystCache[id]); return; }
+
+  if (!groqKey) {
+    groqKey = prompt('Enter your Groq API key (free at console.groq.com) to generate analyst reports:');
+    if (!groqKey) return;
+    localStorage.setItem('groq_key', groqKey);
+  }
+
+  container.innerHTML = `<div class="analyst-loading">
+    <div class="analyst-loading-dot"></div>
+    <div class="analyst-loading-dot"></div>
+    <div class="analyst-loading-dot"></div>
+    <span>Generating analyst report...</span>
+  </div>`;
+
+  const allData = Object.entries(a.raw).filter(([k,v])=>v).map(([k,v])=>`${k}: ${v}`).join(' | ');
+  const prompt = `You are a senior SOC analyst. Analyze this security alert and provide a structured analyst report.
+
+Alert Data: ${allData}
+Category: ${categories[id]||'Unknown'}
+Severity: ${a.severity}
+
+Respond ONLY with a valid JSON object in this exact format (no markdown, no extra text):
+{
+  "why_flagged": "2-3 sentences explaining what triggered this alert and why it's suspicious",
+  "investigation_steps": ["step 1", "step 2", "step 3", "step 4"],
+  "containment_steps": ["step 1", "step 2", "step 3"],
+  "false_positive_indicators": "1-2 sentences describing what would indicate this is a false positive",
+  "risk_level": "Critical|High|Medium|Low",
+  "mitre_tactic": "MITRE ATT&CK tactic name",
+  "mitre_technique": "T1XXX - Technique Name"
+}`;
+
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+      body: JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        messages:[{role:'user',content:prompt}],
+        temperature:0.2,
+        max_tokens:600
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    let text = data.choices[0].message.content.trim().replace(/```json|```/g,'').trim();
+    const report = JSON.parse(text);
+    analystCache[id] = report;
+    renderAnalystReport(id, report);
+  } catch(err) {
+    if (container) container.innerHTML = `<div style="color:var(--red);font-family:var(--mono);font-size:.78rem;padding:1rem">Error: ${escHtml(err.message)}<br><br><button class="btn btn-ghost" onclick="loadAnalystReport('${id}')">Retry</button></div>`;
+  }
+}
+
+function renderAnalystReport(id, report) {
+  const container = document.getElementById('analystContent-' + id);
+  if (!container) return;
+  const riskColors = {Critical:'red',High:'amber',Medium:'blue',Low:'green'};
+  const rc = riskColors[report.risk_level] || 'blue';
+  const invSteps = Array.isArray(report.investigation_steps)
+    ? '<ul>' + report.investigation_steps.map(s=>`<li>${escHtml(s)}</li>`).join('') + '</ul>'
+    : escHtml(report.investigation_steps||'');
+  const conSteps = Array.isArray(report.containment_steps)
+    ? '<ul>' + report.containment_steps.map(s=>`<li>${escHtml(s)}</li>`).join('') + '</ul>'
+    : escHtml(report.containment_steps||'');
+  container.innerHTML = `<div class="analyst-report">
+    <div class="analyst-section">
+      <div class="analyst-section-header">
+        <span class="analyst-section-icon">🔍</span>
+        <span class="analyst-section-title blue">Why It Was Flagged</span>
+        ${report.mitre_technique ? `<span style="margin-left:auto;font-family:var(--mono);font-size:.65rem;color:var(--text3);background:var(--surface);border:1px solid var(--border);padding:.15rem .4rem;border-radius:2px;font-size:.75rem">${escHtml(report.mitre_technique)}</span>` : ''}
+      </div>
+      <div class="analyst-section-body">${escHtml(report.why_flagged||'')}</div>
+    </div>
+    <div class="analyst-section">
+      <div class="analyst-section-header">
+        <span class="analyst-section-icon">📋</span>
+        <span class="analyst-section-title amber">Investigation Steps</span>
+      </div>
+      <div class="analyst-section-body">${invSteps}</div>
+    </div>
+    <div class="analyst-section">
+      <div class="analyst-section-header">
+        <span class="analyst-section-icon">🛑</span>
+        <span class="analyst-section-title red">Containment Actions</span>
+      </div>
+      <div class="analyst-section-body">${conSteps}</div>
+    </div>
+    <div class="analyst-section">
+      <div class="analyst-section-header">
+        <span class="analyst-section-icon">✅</span>
+        <span class="analyst-section-title green">False Positive Check</span>
+      </div>
+      <div class="analyst-section-body">${escHtml(report.false_positive_indicators||'')}</div>
+    </div>
+  </div>`;
+}
+
+function closeDetail(e) { if (e.target === document.getElementById('detailOverlay')) closeDetailPanel(); }
+function closeDetailPanel() { document.getElementById('detailOverlay').classList.remove('show'); detailId = null; }
+
+// ── AI CLASSIFY ──
+// Fuzzy match AI response to a known category
+function fuzzyCategory(raw) {
+  if (!raw) return null;
+  const s = raw.toLowerCase().trim();
+  // Exact match first
+  const exact = CATEGORIES.find(c => c.toLowerCase() === s);
+  if (exact) return exact;
+  // Partial match
+  const partial = CATEGORIES.find(c => s.includes(c.toLowerCase()) || c.toLowerCase().includes(s));
+  if (partial) return partial;
+  // Known aliases
+  const aliases = {
+    // UNSW-NB15 attack_cat values
+    'exploits':'Malware','backdoor':'Malware','shellcode':'Malware','worms':'Malware',
+    'fuzzers':'Recon','analysis':'Recon','reconnaissance':'Recon',
+    'generic':'Malware','normal':'False Positive',
+    // CICIDS / general
+    'dos':'Malware','ddos':'DDoS','denial of service':'Malware',
+    'brute':'Brute Force','bruteforce':'Brute Force','password spray':'Brute Force',
+    'c2':'C2/Beacon','beacon':'C2/Beacon','command and control':'C2/Beacon',
+    'exfil':'Data Exfiltration','exfiltration':'Data Exfiltration','data theft':'Data Exfiltration',
+    'lateral':'Lateral Movement','pivot':'Lateral Movement','smb spread':'Lateral Movement',
+    'privesc':'Privilege Escalation','privilege':'Privilege Escalation','escalation':'Privilege Escalation',
+    'recon':'Recon','reconnaissance':'Recon','scan':'Recon','port scan':'Recon',
+    'phish':'Phishing','spear phish':'Phishing','email attack':'Phishing',
+    'ransomware':'Ransomware','crypto locker':'Ransomware','file encrypt':'Ransomware',
+    'benign':'False Positive','clean':'False Positive','normal':'False Positive','false':'False Positive',
+    'insider':'Insider Threat','malicious insider':'Insider Threat',
+    'web attack':'Malware','xss':'Malware','sql injection':'Malware','injection':'Malware',
+    'infiltration':'Lateral Movement','trojan':'Malware','virus':'Malware','worm':'Malware',
+    'botnet':'C2/Beacon','ares':'C2/Beacon',
+  };
+  for (const [alias, cat] of Object.entries(aliases)) {
+    if (s.includes(alias)) return cat;
+  }
+  return 'Other';
+}
+
+// Build compact alert summary (max ~80 chars) for classification
+function summarizeAlert(a) {
+  // Priority: alert_name > Label field > description > src/dst IPs
+  const parts = [];
+  const name = a.alert_name && !a.alert_name.startsWith('Unknown Alert') ? a.alert_name : '';
+  if (name) parts.push(name);
+  // Look for attack category column — prefer attack_cat (UNSW) over Label (CICIDS)
+  const label = a.raw['attack_cat'] || a.raw['Attack_cat'] || a.raw['Label'] || a.raw['label'] || a.raw[' Label'] || '';
+  if (label && label !== name && label !== '0' && label !== '1') parts.push('ThreatType:' + label);
+  if (a.description && a.description !== name) parts.push(a.description.substring(0,60));
+  if (a.src_ip) parts.push('src:' + a.src_ip);
+  if (a.dst_ip) parts.push('dst:' + a.dst_ip);
+  // Also check raw for port/protocol which helps classify scans vs DDoS
+  const dport = a.raw['Dst Port'] || a.raw['Destination Port'] || a.raw['dst_port'] || '';
+  const proto = a.raw['Protocol'] || a.raw['protocol'] || '';
+  if (dport) parts.push('port:' + dport);
+  if (proto) parts.push('proto:' + proto);
+  if (a.severity && a.severity !== 'medium') parts.push('sev:' + a.severity);
+
+  return parts.join(' | ').substring(0, 200);
+}
+
+async function startClassify() {
+  if (!groqKey) {
+    groqKey = prompt('Enter your Groq API key (free at console.groq.com):');
+    if (!groqKey) return;
+    localStorage.setItem('groq_key', groqKey);
+  }
+  const btn = document.getElementById('classifyBtn');
+  btn.disabled = true; btn.textContent = '⚡ Classifying...';
+  const bar = document.getElementById('classifyBar');
+  const fill = document.getElementById('classifyBarFill');
+  bar.classList.add('visible');
+
+  // ── PASS 1: Direct label mapping (no AI needed) ──
+  // For alerts where the name IS the attack type, map directly
+  let directMapped = 0;
+  ALERTS.forEach(a => {
+    const name = a.alert_name || '';
+    const direct = fuzzyCategory(name);
+    if (direct && direct !== 'Other') {
+      categories[a.id] = direct;
+      directMapped++;
+    }
+    // Also check raw Label/attack_cat fields
+    const rawLabel = a.raw['Label'] || a.raw[' Label'] || a.raw['attack_cat'] || '';
+    if (rawLabel && rawLabel !== '0' && rawLabel !== '1') {
+      const fromLabel = fuzzyCategory(rawLabel);
+      if (fromLabel && fromLabel !== 'Other') {
+        categories[a.id] = fromLabel;
+        directMapped++;
+      }
+    }
+  });
+
+  // Only send to AI alerts that couldn't be directly mapped
+  const needsAI = ALERTS.filter(a => !categories[a.id] || categories[a.id] === 'Other');
+  renderGrid(); updateStats(); buildCatBar();
+
+  if (!needsAI.length) {
+    bar.classList.remove('visible');
+    fill.style.width = '0%';
+    btn.disabled = false; btn.textContent = '⚡ AI Classify';
+    buildCatBar();
+    showToast(`Classified ${directMapped} alerts via direct mapping — no AI needed!`);
+    return;
+  }
+
+  showToast(`Direct mapped ${directMapped} alerts, sending ${needsAI.length} to AI...`);
+
+  // Smaller batches = more reliable JSON output
+  const batchSize = 5;
+  let done = 0;
+  let classified = 0;
+  let errors = 0;
+
+  for (let i = 0; i < needsAI.length; i += batchSize) {
+    const batch = needsAI.slice(i, i + batchSize);
+
+    const prompt = `You are a SOC analyst. Classify each alert into exactly one category from this list:
+Phishing, Malware, Ransomware, Lateral Movement, Recon, Brute Force, C2/Beacon, Data Exfiltration, Privilege Escalation, DDoS, Insider Threat, False Positive, Other
+
+Rules:
+- BENIGN or normal traffic = False Positive
+- SSH/FTP/RDP brute force = Brute Force  
+- DoS/DDoS/flood = DDoS
+- Web Attack XSS/SQLi = Malware
+- Infiltration/SMB spread = Lateral Movement
+- Port scan/recon = Recon
+- Botnet/beacon/C2 = C2/Beacon
+- Label field is the ground truth if present
+
+Alerts to classify:
+${batch.map((a,idx) => (idx+1) + '. ' + summarizeAlert(a)).join('\n')}
+
+Reply with ONLY a JSON array with exactly ${batch.length} strings. No explanation, no markdown.
+Example for ${batch.length} alerts: ${JSON.stringify(Array(batch.length).fill('Malware'))}`;
+
+    try {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+        body: JSON.stringify({
+          model: 'llama-3.3-70b-versatile',
+          messages: [{role:'user', content: prompt}],
+          temperature: 0.0,
+          max_tokens: 80  // 5 alerts × ~10 tokens each = well within 80
+        })
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message);
+      let text = data.choices[0].message.content.trim();
+      // Strip any markdown fences or stray text before the array
+      const arrMatch = text.match(/\[[\s\S]*\]/);
+      if (!arrMatch) throw new Error('No JSON array in response: ' + text.substring(0,100));
+      const results = JSON.parse(arrMatch[0]);
+      batch.forEach((a, idx) => {
+        const raw = results[idx];
+        const cat = fuzzyCategory(raw);
+        if (cat) { categories[a.id] = cat; classified++; }
+      });
+    } catch(err) {
+      errors++;
+      console.error('Classify batch error:', err);
+      // Don't give up — mark as Other so they're not stuck unclassified
+      batch.forEach(a => { if (!categories[a.id] || categories[a.id] === 'Other') categories[a.id] = 'Other'; });
+    }
+    done += batch.length;
+    fill.style.width = Math.round((done / needsAI.length) * 100) + '%';
+    btn.textContent = `⚡ Classifying ${done}/${needsAI.length}...`;
+    await new Promise(r => setTimeout(r, 200));
+  }
+
+  bar.classList.remove('visible');
+  fill.style.width = '0%';
+  btn.disabled = false; btn.textContent = '⚡ AI Classify';
+  renderGrid(); updateStats(); buildCatBar();
+  const msg = errors > 0
+    ? `Classified ${classified} alerts (${errors} batch errors — check console)`
+    : `Classified ${classified} alerts successfully`;
+  showToast(msg);
+}
+
+// ── EXPORT ──
+function showExportModal() {
+  if (!ALERTS.length) { showToast('No alerts loaded'); return; }
+  document.getElementById('exportModal').classList.add('show');
+}
+
+function doExport() {
+  const type = document.querySelector('input[name="exportType"]:checked').value;
+  document.getElementById('exportModal').classList.remove('show');
+  if (type === 'report') exportReport();
+  else exportCSV(type);
+}
+
+function exportCSV(filter) {
+  const alerts = filter === 'escalate' ? ALERTS.filter(a => state[a.id] === 'escalate') : ALERTS;
+  if (!alerts.length) { showToast('No alerts to export'); return; }
+  const headers = ['alert_name','severity','category','verdict','src_ip','dst_ip','timestamp','user','host','description','count'];
+  const rows = alerts.map(a => headers.map(h => {
+    const v = h === 'verdict' ? state[a.id] : h === 'category' ? (categories[a.id]||'Other') : (a[h] || '');
+    return '"' + String(v).replace(/"/g,'""') + '"';
+  }).join(','));
+  const csv = [headers.join(','), ...rows].join('\n');
+  downloadText(csv, filter === 'escalate' ? 'escalated_alerts.csv' : 'all_alerts.csv', 'text/csv');
+  showToast('CSV exported');
+}
+
+function exportReport() {
+  const escalated = ALERTS.filter(a => state[a.id] === 'escalate');
+  const investigated = ALERTS.filter(a => state[a.id] === 'investigate');
+  const closed = ALERTS.filter(a => state[a.id] === 'clean');
+  const now = new Date().toISOString().replace('T',' ').substring(0,19);
+
+  const alertRows = escalated.concat(investigated).map(a => `
+    <tr>
+      <td>${escHtml(a.alert_name)}</td>
+      <td><span class="sev-${a.severity}">${a.severity.toUpperCase()}</span></td>
+      <td>${escHtml(categories[a.id]||'Other')}</td>
+      <td class="${state[a.id]}">${state[a.id].toUpperCase()}</td>
+      <td>${escHtml(a.src_ip)}</td>
+      <td>${escHtml(a.user)}</td>
+      <td>${escHtml(a.host)}</td>
+      <td>${escHtml(a.timestamp)}</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>AlertDesk Incident Report — ${now}</title>
+<style>body{font-family:'DM Mono',monospace;background:#0a0f1a;color:#e2e8f0;padding:2rem;font-size:13px}
+h1{color:#ef4444;font-size:1.4rem;margin-bottom:.25rem}
+.subtitle{color:#64748b;margin-bottom:2rem;font-size:.8rem}
+.stats{display:flex;gap:2rem;margin-bottom:2rem;padding:1rem;background:#111827;border:1px solid rgba(255,255,255,.07);border-radius:6px}
+.stat{text-align:center}.stat-n{font-size:1.5rem;font-weight:700}.stat-n.red{color:#ef4444}.stat-n.amber{color:#f59e0b}.stat-n.green{color:#22c55e}
+.stat-l{font-size:.7rem;color:#64748b;text-transform:uppercase;letter-spacing:.08em}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th{text-align:left;padding:.5rem .75rem;border-bottom:1px solid rgba(255,255,255,.1);color:#64748b;text-transform:uppercase;letter-spacing:.08em;font-size:.65rem}
+td{padding:.5rem .75rem;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
+.sev-critical{color:#ef4444}.sev-high{color:#f59e0b}.sev-medium{color:#4a9eff}.sev-low{color:#22c55e}.sev-info{color:#64748b}
+.escalate{color:#ef4444}.investigate{color:#f59e0b}.clean{color:#4ecdc4}
+.footer{margin-top:2rem;color:#374151;font-size:.7rem}
+</style></head><body>
+<h1>AlertDesk Incident Report</h1>
+<div class="subtitle">Generated: ${now} · Source: AlertDesk SOC Triage Tool · Portfolio: yana-ivanov.github.io/cybersecurity-portfolio</div>
+<div class="stats">
+  <div class="stat"><div class="stat-n">${ALERTS.length}</div><div class="stat-l">Total Alerts</div></div>
+  <div class="stat"><div class="stat-n red">${escalated.length}</div><div class="stat-l">Escalated</div></div>
+  <div class="stat"><div class="stat-n amber">${investigated.length}</div><div class="stat-l">Investigate</div></div>
+  <div class="stat"><div class="stat-n green">${closed.length}</div><div class="stat-l">Reviewed Clean</div></div>
+</div>
+<table><thead><tr><th>Alert</th><th>Severity</th><th>Category</th><th>Verdict</th><th>Src IP</th><th>User</th><th>Host</th><th>Timestamp</th></tr></thead>
+<tbody>${alertRows}</tbody></table>
+<div class="footer">AlertDesk · Yana Ivanov · Information Assurance & CMMC Compliance Analyst</div>
+</body></html>`;
+  downloadText(html, 'alertdesk_report.html', 'text/html');
+  showToast('Report exported');
+}
+
+function downloadText(text, filename, mime) {
+  const blob = new Blob([text], {type: mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// ── CIPHER BOT ──
+function toggleCipher() {
+  const panel = document.getElementById('cipherPanel');
+  panel.classList.toggle('open');
+}
+
+async function sendCipher() {
+  const input = document.getElementById('cipherInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  addCipherMsg(msg, 'user');
+  if (!groqKey) {
+    groqKey = prompt('Enter your Groq API key to use CIPHER:');
+    if (!groqKey) return;
+    localStorage.setItem('groq_key', groqKey);
+  }
+  const context = ALERTS.length ? `The user has loaded ${ALERTS.length} SIEM alerts. Stats: ${ALERTS.filter(a=>state[a.id]==='escalate').length} escalated, ${ALERTS.filter(a=>state[a.id]==='investigate').length} investigate, ${ALERTS.filter(a=>state[a.id]==='clean').length} reviewed clean, ${ALERTS.filter(a=>state[a.id]==='unreviewed').length} unreviewed.` : 'No alerts loaded yet.';
+  try {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+      body: JSON.stringify({model:'llama-3.3-70b-versatile',messages:[
+        {role:'system',content:`You are CIPHER, a SOC analyst AI assistant embedded in AlertDesk, a SIEM triage tool. ${context} Be concise, practical, and security-focused. Help the analyst triage and understand alerts.`},
+        {role:'user',content:msg}
+      ],max_tokens:300})
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    addCipherMsg(data.choices[0].message.content, 'bot');
+  } catch(err) {
+    addCipherMsg('Error: ' + err.message, 'bot');
+  }
+}
+
+function addCipherMsg(text, who) {
+  const msgs = document.getElementById('cipherMsgs');
+  const div = document.createElement('div');
+  div.className = 'cipher-msg ' + who;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ── THEME ──
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  document.getElementById('themeToggle').textContent = next === 'dark' ? '🌙' : '☀️';
+  localStorage.setItem('alertdesk_theme', next);
+}
+// Restore saved theme on load
+(function(){
+  const saved = localStorage.getItem('alertdesk_theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('themeToggle');
+    if (btn) btn.textContent = saved === 'dark' ? '🌙' : '☀️';
+  });
+})();
+
+// ── UTILS ──
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
