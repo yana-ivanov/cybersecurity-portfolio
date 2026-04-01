@@ -72,7 +72,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .app.visible{display:flex}
 .header{padding:.85rem 2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:rgba(17,24,39,0.95);backdrop-filter:blur(8px);position:sticky;top:0;z-index:50}
 .header-left{display:flex;align-items:center;gap:.75rem}
-.header-title-text{font-family:var(--mono);font-size:16px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.header-title-text{font-family:'Changa One',sans-serif;font-size:1.4rem;font-weight:400;letter-spacing:.04em}
 .header-right{display:flex;align-items:center;gap:.75rem}
 .hbtn{font-family:var(--mono);font-size:.82rem;color:var(--text3);background:none;border:none;cursor:pointer;letter-spacing:.04em;transition:color .2s}
 .hbtn:hover{color:var(--text2)}
@@ -285,11 +285,8 @@ let unsubStopped = false;
 let csvLoaded = false;
 
 function goStep(n) {
-  if (n === 2 && APP_MODE === 'playlist') {
-    document.querySelectorAll('.onboard-step').forEach(s=>s.classList.remove('active'));
-    document.getElementById('step4').classList.add('active');
-    return;
-  }
+  // Single screen mode — all paths go to step1
+  if (n !== 1) { return; }
   document.querySelectorAll('.onboard-step').forEach(s=>s.classList.remove('active'));
   document.getElementById('step'+n).classList.add('active');
   // If going to step 3, pre-fill client ID if already entered
@@ -377,7 +374,7 @@ function handleCSV(e) {
 function checkLaunchReady() {
   const hasToken = accessToken.length > 0;
   const hasCSV = csvLoaded;
-  document.getElementById('launchBtn').disabled = !(hasCSV); // CSV required; OAuth optional but recommended
+  document.getElementById('launchBtn').disabled = false; // CSV required; OAuth optional but recommended
 }
 
 
@@ -1365,12 +1362,8 @@ async function askBot(text){
 
     <!-- Step 1: Welcome + How to get the file -->
     <div class="onboard-step active" id="step1">
-      <div class="step-pills">
-        <div class="step-pill active"></div>
-        <div class="step-pill"></div>
-        <div class="step-pill"></div>
-      </div>
-      <div class="onboard-header">
+      <!-- Logo -->
+      <div class="onboard-header" style="margin-bottom:1rem">
         <div>
           <div class="onboard-title" style="font-family:'Changa One',sans-serif;font-size:1.4rem;font-weight:400;letter-spacing:.04em;display:flex;align-items:center;gap:.5rem">
             <svg width="26" height="18" viewBox="0 0 26 18" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="26" height="18" rx="4" fill="#FF0000"/><polygon points="10,4 20,9 10,14" fill="white"/></svg>
@@ -1378,128 +1371,67 @@ async function askBot(text){
           </div>
         </div>
       </div>
-      <div style="display:flex;align-items:flex-start;gap:.85rem;margin-bottom:1.25rem">
+
+      <!-- CIPHER intro -->
+      <div style="display:flex;align-items:flex-start;gap:.85rem;margin-bottom:1.5rem">
         <svg class="mascot-svg" viewBox="0 0 64 64" style="width:52px;height:52px;flex-shrink:0;margin-top:.1rem"><use href="#cia-mascot"/></svg>
-        <div class="onboard-sub" style="margin-bottom:0">Hi! I'm <strong style="color:var(--blue)">CIPHER</strong> 👋 — I'll help you clean up your YouTube subscriptions and playlists. Here's how it works:</div>
+        <div class="onboard-sub" style="margin-bottom:0">Hi! I'm <strong style="color:var(--blue)">CIPHER</strong> 👋 — Upload your YouTube export file and I'll help you review and clean it. Works with subscriptions, liked videos, playlists, and watch later.</div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem">
-        <div style="display:flex;gap:1rem;align-items:flex-start;background:var(--bg);border-radius:8px;padding:.85rem 1rem">
-          <div style="font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--blue);min-width:24px">1</div>
-          <div>
-            <div style="font-family:var(--mono);font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:.2rem">Download your subscription list</div>
-            <div style="font-size:.88rem;color:var(--text2);line-height:1.5">Export it from Google Takeout - takes about 2 minutes. We'll show you how.</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:1rem;align-items:flex-start;background:var(--bg);border-radius:8px;padding:.85rem 1rem">
-          <div style="font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--blue);min-width:24px">2</div>
-          <div>
-            <div style="font-family:var(--mono);font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:.2rem">Upload the file & review your channels</div>
-            <div style="font-size:.88rem;color:var(--text2);line-height:1.5">Mark each channel Keep, Remove, or Unsure. AI helps sort them into categories.</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:1rem;align-items:flex-start;background:var(--bg);border-radius:8px;padding:.85rem 1rem">
-          <div style="font-family:var(--mono);font-size:1rem;font-weight:700;color:var(--blue);min-width:24px">3</div>
-          <div>
-            <div style="font-family:var(--mono);font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:.2rem">Unsubscribe from your Remove list</div>
-            <div style="font-size:.88rem;color:var(--text2);line-height:1.5">Get a script to paste into YouTube - it only removes channels you marked Remove. Nothing else is touched.</div>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:1.25rem;margin-bottom:.5rem">
-        <div style="font-family:var(--mono);font-size:.78rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem">What do you want to clean?</div>
-        <div style="display:flex;gap:.75rem">
-          <button id="modeSubBtn" onclick="setMode('subscriptions')"
-            style="flex:1;padding:.75rem;border-radius:8px;border:2px solid var(--blue);background:rgba(74,158,255,.1);font-family:var(--mono);font-size:.85rem;color:var(--blue);cursor:pointer;font-weight:600">
-            📺 Subscriptions
-          </button>
-          <button id="modePLBtn" onclick="setMode('playlist')"
-            style="flex:1;padding:.75rem;border-radius:8px;border:2px solid var(--border2);background:transparent;font-family:var(--mono);font-size:.85rem;color:var(--text2);cursor:pointer">
-            🎵 Playlist / Likes
-          </button>
-        </div>
-      </div>
-      <div class="onboard-actions">
-        <button class="btn-primary" onclick="goStep(2)">Get Started -></button>
-      </div>
-    </div>
-
-    <!-- Step 2: Get the CSV file -->
-    <div class="onboard-step" id="step2">
-      <div class="step-pills">
-        <div class="step-pill done"></div>
-        <div class="step-pill active"></div>
-        <div class="step-pill"></div>
-      </div>
-      <div class="onboard-header">
-        <div class="mascot-wrap">
-          <svg class="mascot-svg" viewBox="0 0 64 64"><use href="#cia-mascot"/></svg>
-        </div>
-        <div>
-          <div class="onboard-title">Get Your Subscriptions File</div>
-          <div style="font-family:var(--mono);font-size:.78rem;color:var(--text3);margin-top:.2rem">Google Takeout · ~2 minutes</div>
-        </div>
-      </div>
-      <div class="onboard-sub">You need to download your YouTube subscription list. Follow these steps exactly:</div>
-      <div class="instruction-block">
-        <ol>
-          <li>Go to <a href="https://takeout.google.com" target="_blank"><strong>takeout.google.com</strong></a> and sign in to your YouTube account</li>
-          <li>Click <strong>Deselect all</strong> at the top</li>
-          <li>Scroll down, find <strong>YouTube and YouTube Music</strong> and check it</li>
-          <li>Click the <strong>All YouTube data included</strong> button -> click <strong>Deselect all</strong> -> check only <strong>subscriptions</strong> -> click <strong>OK</strong></li>
-          <li>Scroll down -> click <strong>Next step</strong> -> <strong>Create export</strong></li>
-          <li>Download the zip -> unzip it -> find <strong>subscriptions.csv</strong> inside the YouTube folder</li>
-        </ol>
-      </div>
-      <div class="tip-box">⚠️ It must be the file named exactly <strong>subscriptions.csv</strong> - not any other YouTube file.</div>
-      <div class="onboard-actions">
-        <button class="btn-ghost" onclick="goStep(1)">← Back</button>
-        <button class="btn-primary" onclick="goStep(3)">I Have the File -></button>
-      </div>
-    </div>
-
-    <!-- Step 3: Upload CSV - that's it, launch -->
-    <div class="onboard-step" id="step3">
-      <div class="step-pills">
-        <div class="step-pill done"></div>
-        <div class="step-pill done"></div>
-        <div class="step-pill active"></div>
-      </div>
-      <div class="onboard-header">
-        <div class="mascot-wrap">
-          <svg class="mascot-svg" viewBox="0 0 64 64"><use href="#cia-mascot"/></svg>
-        </div>
-        <div>
-          <div class="onboard-title">Upload subscriptions.csv</div>
-          <div style="font-family:var(--mono);font-size:.78rem;color:var(--text3);margin-top:.2rem">Last step!</div>
-        </div>
-      </div>
-      <div class="onboard-sub">Upload the subscriptions.csv file you just downloaded. That's all you need to get started.</div>
-
-      <!-- Drop zone -->
+      <!-- Single upload zone — auto-detects file type -->
       <div id="csvDropZone" onclick="document.getElementById('csvInput').click()"
         style="border:2px dashed var(--border2);border-radius:10px;padding:2rem;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:.75rem"
         ondragover="event.preventDefault();this.style.borderColor='var(--blue)';this.style.background='var(--blue-dim)'"
         ondragleave="this.style.borderColor='';this.style.background=''"
         ondrop="event.preventDefault();this.style.borderColor='';this.style.background='';handleCSVDrop(event)">
         <div style="font-size:2rem;margin-bottom:.5rem">📂</div>
-        <div style="font-family:var(--mono);font-size:.95rem;color:var(--text);font-weight:600">Click to upload subscriptions.csv</div>
-        <div style="font-family:var(--mono);font-size:.82rem;color:var(--text3);margin-top:.3rem">or drag and drop the file here</div>
+        <div style="font-family:var(--mono);font-size:.95rem;color:var(--text);font-weight:600">Drop your CSV file here or click to browse</div>
+        <div style="font-family:var(--mono);font-size:.8rem;color:var(--text3);margin-top:.5rem;line-height:1.6">
+          subscriptions.csv · Liked-videos.csv · Watch-later.csv · any playlist CSV
+        </div>
+        <div style="font-family:var(--mono);font-size:.75rem;color:var(--text3);margin-top:.35rem">File type is detected automatically</div>
         <input type="file" id="csvInput" accept=".csv" onchange="handleCSV(event)" style="display:none">
       </div>
-      <div id="csvStatus" style="font-family:var(--mono);font-size:.88rem;margin-bottom:1rem;min-height:1.4rem;text-align:center"></div>
+      <div id="csvStatus" style="font-family:var(--mono);font-size:.88rem;margin-bottom:.75rem;min-height:1.4rem;text-align:center"></div>
 
-      <!-- Power user: optional Google connect - collapsed by default -->
+      <!-- Liked Videos direct fetch -->
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.85rem 1rem;margin-bottom:.75rem">
+        <div style="font-family:var(--mono);font-size:.78rem;color:var(--text3);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.08em">Or fetch directly from YouTube</div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <button onclick="fetchPlaylistFromAPI('LL')" style="flex:1;min-width:110px;padding:.55rem .75rem;border-radius:6px;border:1px solid var(--border2);background:transparent;font-family:var(--mono);font-size:.78rem;color:var(--text2);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">👍 Liked Videos</button>
+          <button onclick="fetchPlaylistFromAPI('WL')" style="flex:1;min-width:110px;padding:.55rem .75rem;border-radius:6px;border:1px solid var(--border2);background:transparent;font-family:var(--mono);font-size:.78rem;color:var(--text2);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">⏰ Watch Later</button>
+          <button onclick="fetchPlaylistFromAPI('FL')" style="flex:1;min-width:110px;padding:.55rem .75rem;border-radius:6px;border:1px solid var(--border2);background:transparent;font-family:var(--mono);font-size:.78rem;color:var(--text2);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">⭐ Favorites</button>
+        </div>
+        <div id="plFetchStatus" style="font-family:var(--mono);font-size:.78rem;color:var(--text3);min-height:1.2rem;margin-top:.5rem;text-align:center"></div>
+      </div>
+
+      <!-- Takeout instructions collapsible -->
+      <details style="border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:.75rem">
+        <summary style="padding:.75rem 1rem;font-family:var(--mono);font-size:.82rem;color:var(--text2);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">
+          <span>📦 How to get your CSV from Google Takeout</span>
+          <span style="font-size:.7rem;color:var(--text3)">expand</span>
+        </summary>
+        <div style="padding:1rem;background:var(--bg);border-top:1px solid var(--border)">
+          <ol style="font-size:.85rem;color:var(--text2);line-height:1.8;padding-left:1.25rem">
+            <li>Go to <a href="https://takeout.google.com" target="_blank" style="color:var(--blue)"><strong>takeout.google.com</strong></a> and sign in</li>
+            <li>Click <strong>Deselect all</strong>, then check <strong>YouTube and YouTube Music</strong></li>
+            <li>Click <strong>All YouTube data included</strong> → check only what you want (subscriptions, playlists, etc.)</li>
+            <li>Click <strong>Next step</strong> → <strong>Create export</strong> → download and unzip</li>
+            <li>Find your CSV files inside the YouTube folder</li>
+          </ol>
+        </div>
+      </details>
+
+      <!-- Optional Google OAuth -->
       <details style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
         <summary style="padding:.75rem 1rem;font-family:var(--mono);font-size:.82rem;color:var(--text2);cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between">
-          <span>⚡ Advanced: Connect Google Account for auto-unsubscribe</span>
+          <span>⚡ Connect Google Account for auto-unsubscribe</span>
           <span style="font-size:.7rem;color:var(--text3)">optional</span>
         </summary>
         <div style="padding:1rem;background:var(--bg);border-top:1px solid var(--border)">
           <div style="font-size:.88rem;color:var(--text2);line-height:1.6;margin-bottom:.75rem">
-            Skip the script and let the app unsubscribe automatically via the YouTube API. Requires setting up a free Google Cloud project.
-            <a href="#" onclick="showOAuthInstructions();return false" style="color:var(--blue);margin-left:.3rem">How to set this up -></a>
+            Skip the script and let the app unsubscribe automatically via the YouTube API.
+            <a href="#" onclick="showOAuthInstructions();return false" style="color:var(--blue);margin-left:.3rem">How to set this up →</a>
           </div>
           <button class="oauth-btn" id="oauthBtn" onclick="connectGoogle()" style="margin-top:0">
             <svg width="18" height="18" viewBox="0 0 18 18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
@@ -1510,68 +1442,16 @@ async function askBot(text){
       </details>
 
       <div class="onboard-actions" style="margin-top:1.25rem">
-        <button class="btn-ghost" onclick="goStep(2)">← Back</button>
-        <button class="btn-primary" id="launchBtn" disabled onclick="launchApp()">Launch App -></button>
+        <button class="btn-primary" id="launchBtn" disabled onclick="launchApp()">Launch App →</button>
       </div>
     </div>
 
-    <!-- Step 4: Playlist upload mode -->
-    <div class="onboard-step" id="step4">
-      <div class="step-pills">
-        <div class="step-pill done"></div>
-        <div class="step-pill active"></div>
-      </div>
-      <div class="onboard-header">
-        <div class="mascot-wrap">
-          <svg class="mascot-svg" viewBox="0 0 64 64"><use href="#cia-mascot"/></svg>
-        </div>
-        <div>
-          <div class="onboard-title">Clean a Playlist</div>
-          <div style="font-family:var(--mono);font-size:.78rem;color:var(--text3);margin-top:.2rem">Liked Videos · Favorites · Watch Later · any playlist</div>
-        </div>
-      </div>
+    <!-- Steps 2-4 kept for compatibility but never shown -->
+    <div class="onboard-step" id="step2"></div>
+    <div class="onboard-step" id="step3"></div>
+    <div class="onboard-step" id="step4"></div>
 
-      <!-- Option A: Fetch from YouTube API -->
-      <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:1.25rem;margin-bottom:.75rem">
-        <div style="font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:.5rem">⚡ Option A — Fetch directly from YouTube</div>
-        <div style="font-family:var(--mono);font-size:.78rem;color:var(--text2);line-height:1.6;margin-bottom:.85rem">Connect your Google account and fetch any playlist — including Liked Videos which Takeout no longer exports. Free, no daily limit for reading.</div>
-        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem">
-          <button onclick="fetchPlaylistFromAPI('LL')" style="flex:1;min-width:120px;padding:.6rem .75rem;border-radius:6px;border:1px solid var(--border2);background:var(--bg);font-family:var(--mono);font-size:.78rem;color:var(--text2);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">👍 Liked Videos</button>
-          <button onclick="fetchPlaylistFromAPI('WL')" style="flex:1;min-width:120px;padding:.6rem .75rem;border-radius:6px;border:1px solid var(--border2);background:var(--bg);font-family:var(--mono);font-size:.78rem;color:var(--text2);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">⏰ Watch Later</button>
-          <button onclick="fetchPlaylistFromAPI('FL')" style="flex:1;min-width:120px;padding:.6rem .75rem;border-radius:6px;border:1px solid var(--border2);background:var(--bg);font-family:var(--mono);font-size:.78rem;color:var(--text2);cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--blue)';this.style.color='var(--blue)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">⭐ Favorites</button>
-        </div>
-        <div id="plFetchStatus" style="font-family:var(--mono);font-size:.78rem;color:var(--text3);min-height:1.2rem;text-align:center"></div>
-      </div>
-
-      <!-- Divider -->
-      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
-        <div style="flex:1;height:1px;background:var(--border)"></div>
-        <span style="font-family:var(--mono);font-size:.72rem;color:var(--text3)">or</span>
-        <div style="flex:1;height:1px;background:var(--border)"></div>
-      </div>
-
-      <!-- Option B: CSV Upload -->
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1.25rem;margin-bottom:.75rem">
-        <div style="font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:.5rem">📂 Option B — Upload from Google Takeout</div>
-        <div id="plDropZone" onclick="document.getElementById('plInput').click()"
-          style="border:2px dashed var(--border2);border-radius:8px;padding:1.25rem;text-align:center;cursor:pointer;transition:all .2s"
-          ondragover="event.preventDefault();this.style.borderColor='var(--blue)';this.style.background='rgba(74,158,255,.05)'"
-          ondragleave="this.style.borderColor='';this.style.background=''"
-          ondrop="event.preventDefault();this.style.borderColor='';this.style.background='';handlePLDrop(event)">
-          <div style="font-family:var(--mono);font-size:.85rem;color:var(--text)">Drop *-videos.csv here or click to browse</div>
-          <div style="font-family:var(--mono);font-size:.75rem;color:var(--text3);margin-top:.3rem">From takeout.google.com → YouTube → playlists folder</div>
-          <input type="file" id="plInput" accept=".csv" onchange="handlePLCSV(event)" style="display:none">
-        </div>
-      </div>
-
-      <div id="plStatus" style="font-family:var(--mono);font-size:.88rem;margin-bottom:.75rem;min-height:1.4rem;text-align:center"></div>
-      <div class="onboard-actions">
-        <button class="btn-ghost" onclick="goStep(1)">← Back</button>
-        <button class="btn-primary" id="plLaunchBtn" disabled onclick="launchPlaylistApp()">Launch App →</button>
-      </div>
     </div>
-
-  </div>
 </div>
 
 
