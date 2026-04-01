@@ -56,7 +56,7 @@ body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:
 .section-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--rule)}
 .section-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.4rem}
 .section-title{font-family:var(--display);font-size:1.45rem;font-weight:700;color:var(--ink)}
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.5rem}
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
 .card{background:var(--paper);border:1px solid var(--rule);border-radius:2px;text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden}
 .card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.1);border-color:#cbd5e1}
 .card-accent{height:3px;width:100%}
@@ -97,16 +97,8 @@ footer a{color:#4a9eff;text-decoration:none}
 footer a:hover{color:#60a5fa}
 .portfolio-item.hidden{display:none}
 /* Single visible card in a grid always takes full width */
-.card-grid .portfolio-item:not(.hidden):only-child,
-.card-grid .portfolio-item:not(.hidden):first-child:nth-last-child(1){
-  grid-column: 1 / -1;
-  flex-direction: row;
-  align-items: stretch;
-}
-.card-grid .portfolio-item:not(.hidden):only-child .card-accent,
-.card-grid .portfolio-item:not(.hidden):first-child:nth-last-child(1) .card-accent{
-  width:4px;height:auto;min-height:100%;
-}
+/* Single card only stretches full width if it's truly the only one */
+@media(max-width:900px){.card-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:680px){
   .mast-inner,.filter-inner,.main{padding-left:1.5rem;padding-right:1.5rem}
   .mast-stats{gap:1.5rem}
@@ -117,6 +109,7 @@ footer a:hover{color:#60a5fa}
   .mobile-filter-select{display:block}
   .results-count{margin-left:0}
   .filter-chips-row{flex-wrap:wrap}
+  .card-grid{grid-template-columns:1fr}
 }
 .mobile-filter-select{display:none;width:100%;padding:.5rem .75rem;font-family:var(--mono);font-size:.75rem;border:1px solid var(--rule);border-radius:2px;background:#fff;color:var(--ink);outline:none;cursor:pointer}
 .scroll-top-btn{position:fixed;bottom:1.5rem;right:1.5rem;width:42px;height:42px;background:#0a0f1a;color:#fff;border:none;border-radius:2px;font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:200;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:opacity .2s}
@@ -575,7 +568,7 @@ footer a:hover{color:#60a5fa}
       </a>
 
       <a href="tools/youtube-cleanup.html" class="card portfolio-item"
-         data-tags="tools fieldnotes automation security privacy"
+         data-tags="tools automation security privacy"
          data-title="youtube subscription cleaner channel audit bulk unsubscribe privacy cleanup browser tool oauth">
         <div class="card-accent blue"></div>
         <div class="card-body">
@@ -829,8 +822,11 @@ function setFilter(filter, el) {
   if (sel) sel.value = filter;
   updateLatestReportCard();
   filterPortfolio();
-  // Scroll to top of content grid
-  if (GRID_TOP) GRID_TOP.scrollIntoView({behavior:'smooth', block:'start'});
+  // Scroll so cards are visible below sticky filter bar
+  const filterBar = document.querySelector('.filter-bar');
+  const filterBarH = filterBar ? filterBar.offsetHeight : 0;
+  const mainTop = GRID_TOP ? GRID_TOP.getBoundingClientRect().top + window.scrollY - filterBarH : 0;
+  window.scrollTo({top: mainTop, behavior:'smooth'});
 }
 
 function updateLatestReportCard() {
