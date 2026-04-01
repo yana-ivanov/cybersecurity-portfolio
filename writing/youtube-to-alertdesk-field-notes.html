@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>From 1,000 Subscriptions to a SOC Triage Tool | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em;text-wrap:balance}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.left{border-top:3px solid var(--blue)}
+.compare-box.right{border-top:3px solid var(--amber)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.left .compare-label{color:var(--blue)}
+.compare-box.right .compare-label{color:var(--amber)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#fff;padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#0a0f1a}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-red .stat-num{color:var(--red)}
+.stat-green .stat-num{color:var(--green)}
+
+.fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.75rem 0}
+.fn-card{background:var(--paper);border:1px solid var(--rule);padding:1rem 1.1rem;border-top:2px solid var(--blue)}
+.fn-name{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--blue);margin-bottom:.3rem}
+.fn-desc{font-size:.82rem;color:var(--ink3);line-height:1.55}
+
+.launch-btn{display:inline-flex;align-items:center;gap:.75rem;background:#1a4fa0;color:#fff;padding:.9rem 1.75rem;font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:background .2s;margin-top:.5rem}
+.launch-btn:hover{background:#1e3d8f;text-decoration:none;color:#fff}
+.launch-btn .material-icons{font-size:1rem}
+
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .compare-grid{grid-template-columns:1fr}
+  .fn-grid{grid-template-columns:1fr}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;gap:1.25rem}
+  footer{flex-direction:column;align-items:flex-start;gap:.75rem}
+  .mast-bar{padding:.8rem 1.75rem}
+}
+</style>
+</head>
+<body>
+
+<div class="mobile-notice">Best viewed on desktop · <strong>Optimized for 1024px+</strong></div>
+
+<nav class="back-nav">
+  <a href="../index.html">Portfolio</a>
+</nav>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Field Notes</div>
+    <h1 class="title">From 1,000 Subscriptions<br>to a <span>SOC Triage Tool</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item">
+        <div class="label">Author</div>
+        <div class="value">Yana Ivanov</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Published</div>
+        <div class="value">March 2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Category · Type</div>
+        <div class="value">Tools · Field Notes</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Stack</div>
+        <div class="value">YouTube Data API · Groq AI · OAuth</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Concepts</div>
+        <div class="value">AI Triage · Log Analysis · SOC Workflow</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Status</div>
+        <div class="value">Live · In Development</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mast-bar">
+  <div class="mast-bar-dot"></div>
+  TOOLS · SOC TRIAGE · AI CLASSIFICATION
+</div>
+
+<div class="wrap">
+<div class="content">
+
+<div class="section">
+  <div class="section-num">01 — How It Started</div>
+  <h2>My Twin Sons Subscribed to<br>1,900 YouTube Channels</h2>
+
+  <p>For the last five years, my twin sons used my YouTube account. They're kids — they found channels they liked and subscribed to all of them. Gaming, Minecraft, random comedy, cooking videos, whatever caught their attention that week. I wasn't paying close attention. By the time I reclaimed the account, I had over 1,900 subscriptions.</p>
+
+  <p>When I made the decision to move seriously into cybersecurity, one of the first things I wanted to do was rebuild my information diet. I wanted to follow the right people — security researchers, cloud practitioners, people doing the work I'm trying to learn. Gerald Auger from Simply Cyber. Professor Messer. Chris Greer. Adam Marczak on Azure. But my feed was completely buried under years of my kids' subscriptions. I couldn't find anything relevant.</p>
+
+  <p>The obvious solution was to go through them one by one and unsubscribe. YouTube doesn't have a bulk unsubscribe feature. At one channel every 10 seconds, 1,900 channels would take over five hours of clicking. That wasn't happening.</p>
+
+  <p>So I built a tool instead.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The YouTube Subscription Cleaner</strong> connects to your YouTube account via OAuth, loads your full subscription list, uses AI to categorize channels by topic, and lets you bulk-unsubscribe from ones you no longer want. The goal: get from 1,900+ subscriptions down to the channels I actually care about — in an hour, not a weekend.</p>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-num">02 — What I Built</div>
+  <h2>How the Tool Works</h2>
+
+  <p>The architecture is straightforward: authenticate with Google OAuth, pull the full subscription list via the YouTube Data API, send each channel's name and description to an AI classifier, and bucket them into categories — Tech & Dev, Cybersecurity, News, Entertainment, Gaming, and so on. Then you review each bucket, mark channels as Keep or Remove, and generate a script that unsubscribes from everything in the Remove pile.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">YouTube Subscription Cleaner — how it works</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-blue">
+        <div class="stat-num">1,900+</div>
+        <div class="stat-label">Subscriptions loaded</div>
+        <div class="stat-sub">Via YouTube Data API OAuth</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">AI</div>
+        <div class="stat-label">Category classification</div>
+        <div class="stat-sub">Groq AI — channel name + description</div>
+      </div>
+      <div class="stat-item stat-blue">
+        <div class="stat-num">Bulk</div>
+        <div class="stat-label">Unsubscribe script</div>
+        <div class="stat-sub">Generated for browser DevTools</div>
+      </div>
+      <div class="stat-item stat-green">
+        <div class="stat-num">OAuth</div>
+        <div class="stat-label">Auth method</div>
+        <div class="stat-sub">Google — no credentials stored</div>
+      </div>
+    </div>
+  </div>
+
+  <p>The first version worked. The AI correctly categorized most channels. I reviewed the buckets, marked the ones to remove, generated the unsubscribe script, pasted it into DevTools on YouTube, and hit run.</p>
+
+  <p>And then it broke everything.</p>
+</div>
+
+<div class="section">
+  <div class="section-num">03 — What Went Wrong</div>
+  <h2>I Broke It. Then Fixed It Manually.</h2>
+
+  <p>The unsubscribe script ran too fast, hit YouTube's rate limits, errored out partway through, and left my subscription list in a half-processed state. Some channels were gone. Some weren't. I couldn't tell which ones had actually been removed and which had failed silently.</p>
+
+  <p>I stared at it for a while. I could debug the script, add rate limiting, rebuild the state tracking. Or I could just do it manually. I ended up doing it manually — going through the remaining subscriptions one by one and unsubscribing from everything I didn't want to keep. It took a few hours.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The honest version:</strong> The tool worked well enough to prove the concept but not well enough to trust with a bulk operation at scale without careful rate limiting. I learned more from breaking it than I would have from a clean first run. And the manual cleanup left me with a subscription list I actually know — about 60 channels, all intentional.</p>
+  </div>
+
+  <p>The CyberSoccer problem also surfaced during testing. A channel called CyberSoccer — a sports channel — got classified as cybersecurity because the AI was pattern-matching on the word "Cyber" without understanding context. That's a prompt engineering problem, not an AI problem. The fix is to send more context — channel description, recent video titles, subscriber count — not just the name. It's the kind of false positive that teaches you something about how classification actually works.</p>
+</div>
+
+<div class="section">
+  <div class="section-num">04 — The Parallel I Couldn't Ignore</div>
+  <h2>This Is Exactly What a SOC Analyst<br>Does Every Day</h2>
+
+  <p>Somewhere around hour two of the manual cleanup, it hit me. What I was doing — loading a large volume of items, having AI classify them into categories, reviewing the classifications, and making triage decisions — is structurally identical to what a SOC analyst does with security alerts.</p>
+
+  <p>A SOC analyst at a defense contractor might start a shift with 500 alerts in the queue. Each one needs to be reviewed, classified, and acted on. Is this a phishing attempt? Lateral movement? A false positive? Ransomware behavior? The volume is the problem. No human can thoughtfully review 500 alerts in a shift. They skim. They miss things.</p>
+
+  <div class="compare-grid">
+    <div class="compare-box left">
+      <div class="compare-label">YouTube Subscription Cleaner</div>
+      <p><strong>Input:</strong> 1,000+ YouTube subscriptions</p>
+      <p><strong>AI does:</strong> Classifies by topic — Tech, News, Entertainment, Cybersecurity</p>
+      <p><strong>Human does:</strong> Reviews categories, marks Keep or Remove</p>
+      <p><strong>Output:</strong> Curated list, unsubscribe script</p>
+    </div>
+    <div class="compare-box right">
+      <div class="compare-label">AlertDesk — SOC Triage Tool</div>
+      <p><strong>Input:</strong> SIEM log export — Splunk, Sentinel, Elastic</p>
+      <p><strong>AI does:</strong> Classifies by threat type — Phishing, Ransomware, Lateral Movement, False Positive</p>
+      <p><strong>Human does:</strong> Reviews categories, marks Escalate, Investigate, or Close</p>
+      <p><strong>Output:</strong> Prioritized alert queue, triage report</p>
+    </div>
+  </div>
+
+  <p>The pattern is identical. Volume comes in. AI does a first pass. Human makes the judgment calls. The AI doesn't replace the analyst — it removes the noise so the analyst can focus on what actually matters.</p>
+
+  <p>That's AlertDesk.</p>
+</div>
+
+<div class="section">
+  <div class="section-num">05 — AlertDesk</div>
+  <h2>What I'm Building Next</h2>
+
+  <p>AlertDesk is a browser-based SOC triage tool. You upload a CSV export from any SIEM — Splunk, Microsoft Sentinel, Elastic, or even a manually formatted log file — and the tool runs AI classification on every alert, organizing them into threat categories with severity scoring.</p>
+
+  <div class="fn-grid">
+    <div class="fn-card">
+      <div class="fn-name">Phishing & BEC</div>
+      <div class="fn-desc">Email-based attacks, credential harvesting, display name spoofing, Reply-To mismatches</div>
+    </div>
+    <div class="fn-card">
+      <div class="fn-name">Ransomware Behavior</div>
+      <div class="fn-desc">Mass file encryption patterns, shadow copy deletion, unusual write volumes</div>
+    </div>
+    <div class="fn-card">
+      <div class="fn-name">Lateral Movement</div>
+      <div class="fn-desc">Pass-the-hash, Kerberoasting, unusual authentication across internal hosts</div>
+    </div>
+    <div class="fn-card">
+      <div class="fn-name">Recon & Scanning</div>
+      <div class="fn-desc">Port scanning, service enumeration, LDAP queries, unusual DNS lookups</div>
+    </div>
+    <div class="fn-card">
+      <div class="fn-name">C2 / Beacon</div>
+      <div class="fn-desc">Periodic outbound connections, unusual destination IPs, long-duration low-volume traffic</div>
+    </div>
+    <div class="fn-card">
+      <div class="fn-name">False Positive</div>
+      <div class="fn-desc">Known-good traffic patterns, legitimate admin tools, authorized scanning activity</div>
+    </div>
+  </div>
+
+  <p>For each alert the analyst can mark it as <strong>Escalate</strong>, <strong>Investigate</strong>, or <strong>Close</strong>. The tool tracks verdicts, generates a triage report, and exports findings — producing exactly the kind of documented evidence that CMMC assessors want to see for incident response and monitoring controls.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>Why this matters for defense contractors:</strong> CMMC Level 2 requires continuous monitoring and incident response capability — but most small and mid-size defense subcontractors don't have a dedicated SOC. AlertDesk is designed for exactly that gap: giving a non-specialist the ability to systematically review security logs and produce documented triage decisions without needing a team of analysts.</p>
+  </div>
+
+  <p>The CyberSoccer problem matters here too. False positive classification in a SOC context isn't funny — it's how real threats get missed. AlertDesk uses channel name plus description plus recent behavior patterns to classify, and it's designed to be explicit about its confidence level. A low-confidence classification gets flagged for human review, not auto-closed.</p>
+</div>
+
+<div class="section">
+  <div class="section-num">06 — Try It</div>
+  <h2>The YouTube Cleaner Is Live Now</h2>
+
+  <p>The YouTube Subscription Cleaner is live and working — rate limiting and all. If your subscription feed has become noise, it's worth running. Connect your account, let the AI sort your channels, review the categories, and clean house.</p>
+
+  <div style="margin:2rem 0;display:flex;gap:1rem;flex-wrap:wrap;">
+    <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/tools/youtube-cleanup.html" target="_blank" class="launch-btn">
+      <span class="material-icons">launch</span>
+      YouTube Subscription Cleaner
+    </a>
+  </div>
+
+  <p style="margin-top:1.5rem;">AlertDesk is in active development. If you work in security operations or are a defense contractor trying to get a handle on your log monitoring, I'd love to talk through how it fits your workflow.</p>
+</div>
+
+</div>
+</div>
+
+<div class="bio">
+  <div class="bio-avatar">Y</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Compliance Analyst &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC compliance consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>From 1,000 Subscriptions to a SOC Triage Tool &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; For educational use · Independent analysis</span>
+</footer>
+
+</body>
+</html>
