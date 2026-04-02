@@ -73,8 +73,14 @@ source: |
   // BLOCK 3: Sender is not a known trusted source
   // Reduces false positives from legitimate bulk senders (e.g. accounting SaaS)
   // -----------------------------------------------------------------------
-  and sender.email.domain.root_domain not in $high_trust_sender_root_domains
-  and sender.email.domain.root_domain not in $org_domains
+  and (
+    sender.email.domain.root_domain not in $high_trust_sender_root_domains
+    and coalesce(headers.auth_summary.dmarc.pass, false)
+  )
+  and (
+    sender.email.domain.root_domain not in $org_domains
+    and coalesce(headers.auth_summary.dmarc.pass, false)
+  )
 
 tags:
   - "BEC"
