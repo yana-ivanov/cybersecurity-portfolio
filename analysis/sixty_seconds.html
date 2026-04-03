@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>60 Seconds | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --ink:   #0a0f1a;
+  --ink2:  #1e2d45;
+  --ink3:  #374151;
+  --red:   #c0392b; --red-dim: rgba(192,57,43,0.08); --red-mid: rgba(192,57,43,0.15);
+  --amber: #b45309; --amber-dim: rgba(180,83,9,0.08);
+  --blue:  #1a4fa0; --blue-dim: rgba(26,79,160,0.08);
+  --green: #145a32; --green-dim: rgba(20,90,50,0.08);
+  --rule:  #e2e8f0;
+  --bg:    #f8fafc;
+  --paper: #ffffff;
+  --shadow: 0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --mono:    'JetBrains Mono', monospace;
+  --serif:   'Source Serif 4', Georgia, serif;
+  --display: 'Playfair Display', Georgia, serif;
+  --display-clean: 'IBM Plex Serif', Georgia, serif;
+}
+
+html { scroll-behavior: smooth; font-size: 20px; }
+body { font-family: var(--serif); background: var(--bg); color: var(--ink); line-height: 1.8; font-size: 20px; }
+
+.back-nav {
+  background: #0a0f1a;
+  padding: .65rem 3rem;
+  display: flex; align-items: center;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  position: sticky; top: 0; z-index: 999;
+}
+.back-nav a {
+  font-family: var(--mono); font-size: .65rem; letter-spacing: .12em;
+  color: #4a9eff; text-decoration: none; text-transform: uppercase;
+  display: inline-flex; align-items: center; gap: .5rem;
+}
+.back-nav a::before { content: '←'; font-size: .75rem; }
+
+.masthead {
+  background: #0a0f1a; color: #fff;
+  padding: 3.5rem 0 0;
+  position: relative; overflow: hidden;
+}
+.masthead::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,.03) 39px, rgba(255,255,255,.03) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,.03) 39px, rgba(255,255,255,.03) 40px);
+}
+.mast-inner { max-width: 900px; margin: 0 auto; padding: 0 3rem; position: relative; z-index: 1; }
+.mast-kicker {
+  font-family: var(--mono); font-size: .7rem; letter-spacing: .2em;
+  color: #60a5fa; text-transform: uppercase; margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: .75rem;
+}
+.mast-kicker::before, .mast-kicker::after { content: ''; display: inline-block; width: 32px; height: 1px; background: #60a5fa; }
+h1.title {
+  font-family: var(--display-clean); font-size: clamp(1.9rem, 4vw, 2.9rem); font-weight: 600;
+  line-height: 1.15; margin-bottom: 1.5rem; color: #fff;
+}
+h1.title em { color: #ef4444; font-style: normal; }
+.mast-meta {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem;
+  padding: 1.5rem 0; border-top: 1px solid rgba(255,255,255,.12); margin-top: 2rem;
+}
+.meta-item .label {
+  font-family: var(--mono); font-size: .65rem; letter-spacing: .15em;
+  color: #94a3b8; text-transform: uppercase; margin-bottom: .3rem;
+}
+.meta-item .value { font-size: .9rem; color: #e2e8f0; font-weight: 600; }
+.mast-bar {
+  background: #ef4444; margin-top: 2.5rem; padding: .6rem 3rem;
+  font-family: var(--mono); font-size: .72rem; letter-spacing: .08em;
+  color: #fff; display: flex; align-items: center; gap: 2rem;
+}
+.mast-bar-dot { width: 8px; height: 8px; border-radius: 50%; background: #fff; animation: blink 1.5s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+.wrap { max-width: 900px; margin: 0 auto; padding: 0 3rem; }
+.content { padding: 4rem 0; }
+.section { margin-bottom: 4rem; padding-bottom: 4rem; border-bottom: 1px solid var(--rule); }
+.section:last-child { border-bottom: none; }
+.section-num {
+  font-family: var(--mono); font-size: .65rem; letter-spacing: .2em;
+  color: var(--red); text-transform: uppercase; margin-bottom: .75rem;
+}
+
+h2 {
+  font-family: var(--display); font-size: 1.75rem; font-weight: 700;
+  color: var(--ink); line-height: 1.25; margin-bottom: 1.5rem; letter-spacing: -.01em;
+}
+h3 {
+  font-family: var(--display); font-size: 1.2rem; font-weight: 700;
+  color: var(--ink2); margin: 2rem 0 .75rem;
+}
+
+p { margin-bottom: 1.25rem; color: var(--ink3); }
+p strong { color: var(--ink); font-weight: 600; }
+p:last-child { margin-bottom: 0; }
+
+.callout { padding: 1.25rem 1.5rem; border-radius: 4px; margin: 1.75rem 0; border-left: 4px solid; box-shadow: var(--shadow); }
+.callout-red   { background: var(--red-dim);   border-color: var(--red);   }
+.callout-amber { background: var(--amber-dim); border-color: var(--amber); }
+.callout-blue  { background: var(--blue-dim);  border-color: var(--blue);  }
+.callout-green { background: var(--green-dim); border-color: var(--green); }
+.callout p { margin: 0; font-size: .92rem; line-height: 1.7; }
+.callout strong { color: var(--ink); }
+
+.tbl-wrap { overflow-x: auto; margin: 1.75rem 0; border-radius: 4px; box-shadow: var(--shadow); }
+table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+thead tr { background: var(--ink); color: #fff; }
+th { padding: .85rem 1rem; text-align: left; font-family: var(--mono); font-size: .68rem; letter-spacing: .1em; font-weight: 600; }
+td { padding: .75rem 1rem; border-bottom: 1px solid var(--rule); color: var(--ink3); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) td { background: rgba(0,0,0,.018); }
+td strong { color: var(--ink); font-weight: 600; }
+td.red   { color: var(--red);   font-weight: 700; font-family: var(--mono); font-size: .82rem; }
+td.amber { color: var(--amber); font-weight: 700; font-family: var(--mono); font-size: .82rem; }
+td.green { color: var(--green); font-weight: 700; font-family: var(--mono); font-size: .82rem; }
+td.code  { font-family: var(--mono); font-size: .8rem; color: var(--blue); }
+
+.mat-card { background: var(--paper); border-radius: 6px; box-shadow: var(--shadow-md); margin: 2rem 0; overflow: hidden; }
+.mat-card-title { font-family: var(--mono); font-size: .65rem; letter-spacing: .15em; text-transform: uppercase; color: var(--ink3); padding: 1rem 1.5rem; border-bottom: 1px solid var(--rule); background: #f8fafc; }
+
+.stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 0; }
+.stat-item { padding: 1.75rem 1.5rem; border-right: 1px solid var(--rule); text-align: center; }
+.stat-item:last-child { border-right: none; }
+.stat-num { font-family: var(--display-clean); font-size: 1.8rem; font-weight: 700; line-height: 1; margin-bottom: .4rem; }
+.stat-label { font-family: var(--mono); font-size: .65rem; letter-spacing: .08em; color: var(--ink3); text-transform: uppercase; margin-bottom: .4rem; line-height: 1.4; }
+.stat-sub { font-size: .78rem; color: #94a3b8; line-height: 1.5; }
+.stat-red   .stat-num { color: var(--red);   }
+.stat-amber .stat-num { color: var(--amber); }
+.stat-blue  .stat-num { color: var(--blue);  }
+.stat-green .stat-num { color: var(--green); }
+
+.attack-flow {
+  display: grid; grid-template-columns: repeat(5,1fr);
+  gap: .75rem; margin: 1.5rem 0;
+}
+.flow-step {
+  background: var(--paper); border: 1px solid var(--rule);
+  padding: 1.1rem .85rem; position: relative;
+}
+.flow-step::after {
+  content: '→'; position: absolute; right: -.85rem; top: 50%; transform: translateY(-50%);
+  font-size: .9rem; color: #94a3b8; z-index: 2; font-family: var(--mono);
+}
+.flow-step:last-child::after { display: none; }
+.flow-step-num {
+  font-family: var(--mono); font-size: .58rem; letter-spacing: .1em;
+  color: var(--red); text-transform: uppercase; margin-bottom: .5rem;
+}
+.flow-step-icon { margin-bottom: .4rem; color: var(--ink3); }
+.flow-step-icon .material-icons { font-size: 1.4rem; }
+.flow-step-label {
+  font-size: .75rem; font-weight: 700; color: var(--ink);
+  line-height: 1.3; margin-bottom: .3rem; font-family: var(--mono);
+}
+.flow-step-desc { font-size: .68rem; color: var(--ink3); line-height: 1.4; }
+.flow-step.danger  { background: var(--red-dim);   border-color: rgba(192,57,43,.25); }
+.flow-step.danger  .flow-step-num { color: var(--red); }
+.flow-step.danger  .flow-step-icon { color: var(--red); }
+.flow-step.warning { background: var(--amber-dim); border-color: rgba(180,83,9,.25); }
+.flow-step.warning .flow-step-num { color: var(--amber); }
+
+.split-visual { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0; }
+.split-panel {
+  padding: 1.5rem; border: 1px solid var(--rule); background: var(--paper);
+}
+.split-panel-title {
+  font-family: var(--mono); font-size: .65rem; letter-spacing: .12em;
+  text-transform: uppercase; margin-bottom: .85rem; font-weight: 600;
+  display: flex; align-items: center; gap: .4rem;
+}
+.split-panel.left  { border-top: 3px solid var(--green); }
+.split-panel.right { border-top: 3px solid var(--red); }
+.split-panel.left  .split-panel-title { color: var(--green); }
+.split-panel.right .split-panel-title { color: var(--red); }
+.split-panel p { font-size: .85rem; margin-bottom: .65rem; color: var(--ink3); }
+.split-panel p:last-child { margin-bottom: 0; }
+.split-panel code { font-family: var(--mono); font-size: .78rem; color: var(--blue); background: var(--blue-dim); padding: .1rem .3rem; border-radius: 2px; }
+
+.timeline { margin: 1.5rem 0; border-left: 2px solid var(--rule); padding-left: 2rem; }
+.tl-item { position: relative; padding: .5rem 0 1.5rem; }
+.tl-item::before {
+  content: ''; position: absolute; left: -2.4rem; top: .6rem;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--red); border: 2px solid var(--bg);
+}
+.tl-date {
+  font-family: var(--mono); font-size: .65rem; letter-spacing: .08em;
+  color: var(--red); text-transform: uppercase; margin-bottom: .25rem;
+}
+.tl-title { font-weight: 700; color: var(--ink); margin-bottom: .35rem; font-size: .95rem; }
+.tl-item p { font-size: .88rem; color: var(--ink3); margin: 0; line-height: 1.6; }
+
+.findings-list { list-style: none; margin: 1.5rem 0; }
+.findings-list li {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1rem 0; border-bottom: 1px solid var(--rule);
+}
+.findings-list li:last-child { border-bottom: none; }
+.finding-tag {
+  font-family: var(--mono); font-size: .6rem; letter-spacing: .08em;
+  text-transform: uppercase; padding: .2rem .6rem; border-radius: 2px;
+  font-weight: 600; flex-shrink: 0; margin-top: .2rem;
+}
+.finding-critical .finding-tag { background: var(--red-mid); color: var(--red); }
+.finding-high     .finding-tag { background: var(--amber-dim); color: var(--amber); }
+.finding-medium   .finding-tag { background: var(--blue-dim); color: var(--blue); }
+.findings-list li > div > strong { display: block; color: var(--ink); margin-bottom: .25rem; }
+.findings-list li > div > p { margin: 0; font-size: .88rem; color: var(--ink3); }
+
+.step-list { margin: 1.5rem 0; }
+.step-item {
+  display: grid; grid-template-columns: 2.5rem 1fr; gap: 1.25rem;
+  padding: 1.1rem 0; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.step-item:last-child { border-bottom: none; }
+.step-num {
+  font-family: var(--display); font-size: 1.8rem; font-weight: 900;
+  color: var(--rule); line-height: 1; text-align: right;
+}
+.step-title {
+  font-family: var(--mono); font-size: .78rem; letter-spacing: .04em;
+  font-weight: 600; color: var(--ink); margin-bottom: .4rem;
+  display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+}
+.cmmc-tag {
+  font-family: var(--mono); font-size: .6rem; background: var(--red-dim);
+  color: var(--red); padding: .1rem .45rem; border-radius: 2px;
+}
+.step-content p { margin: 0; font-size: .88rem; color: var(--ink3); }
+
+.control-list { margin: 1.5rem 0; }
+.control-item {
+  display: grid; grid-template-columns: 1fr auto; gap: 1rem;
+  padding: .85rem 1rem; border-bottom: 1px solid var(--rule); align-items: start;
+}
+.control-item:first-child { border-top: 1px solid var(--rule); }
+.control-item:last-child { border-bottom: none; }
+.control-vector { font-size: .88rem; color: var(--ink); font-weight: 600; margin-bottom: .2rem; }
+.control-name { font-size: .78rem; color: var(--ink3); margin-bottom: .2rem; }
+.control-id { font-family: var(--mono); font-size: .65rem; color: var(--red); letter-spacing: .06em; }
+.control-right { text-align: right; }
+.control-status {
+  font-family: var(--mono); font-size: .6rem; letter-spacing: .08em;
+  text-transform: uppercase; padding: .25rem .6rem; border-radius: 2px; font-weight: 600;
+}
+.status-red   { background: var(--red-dim);   color: var(--red);   }
+.status-amber { background: var(--amber-dim); color: var(--amber); }
+.status-blue  { background: var(--blue-dim);  color: var(--blue);  }
+.status-green { background: var(--green-dim); color: var(--green); }
+
+/* ── KILL CHAIN (vertical) ── */
+.kill-chain { margin: 2rem 0; }
+.kc-item {
+  display: grid; grid-template-columns: 9rem 1.5rem 1fr;
+  gap: 0 1.25rem; margin-bottom: 0;
+}
+.kc-last .kc-connector .kc-line { display: none; }
+.kc-left {
+  text-align: right; padding-top: .2rem; padding-bottom: 1.75rem;
+}
+.kc-step {
+  font-family: var(--mono); font-size: .6rem; letter-spacing: .12em;
+  text-transform: uppercase; margin-bottom: .25rem;
+}
+.kc-critical .kc-step { color: var(--red); }
+.kc-warning  .kc-step { color: var(--amber); }
+.kc-label {
+  font-family: var(--mono); font-size: .68rem; font-weight: 600;
+  letter-spacing: .06em; color: var(--ink); line-height: 1.3;
+}
+.kc-connector {
+  display: flex; flex-direction: column; align-items: center;
+}
+.kc-dot {
+  width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: .3rem;
+}
+.kc-critical .kc-dot { background: var(--red); }
+.kc-warning  .kc-dot { background: var(--amber); }
+.kc-line {
+  width: 2px; flex: 1; margin-top: 4px;
+  background: var(--rule);
+}
+.kc-right {
+  padding-bottom: 1.75rem; padding-top: .1rem;
+  border-left: none;
+}
+.kc-right p { font-size: .88rem; color: var(--ink3); margin: 0; line-height: 1.7; }
+code.ic {
+  font-family: var(--mono); font-size: .8rem; color: var(--blue);
+  background: var(--blue-dim); padding: .1rem .3rem; border-radius: 2px;
+}
+.code-block {
+  background: #0a0f1a; border-radius: 4px; padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0; overflow-x: auto;
+}
+.code-block code {
+  font-family: var(--mono); font-size: .78rem; color: #93c5fd; line-height: 1.8;
+  white-space: pre;
+}
+.code-block .comment { color: #4a5568; }
+.code-block .string  { color: #86efac; }
+.code-block .keyword { color: #f87171; }
+.code-block .label   { color: #fbbf24; }
+
+.bio{background:var(--ink);color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:2rem}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+.back-nav-link { font-family: var(--mono); font-size: .65rem; letter-spacing: .12em; color: #4a9eff; text-decoration: none; text-transform: uppercase; display: inline-flex; align-items: center; gap: .5rem; }
+.back-nav-link::before { content: '←'; }
+
+footer{background:var(--ink2);color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+@media(max-width:700px){
+  .wrap, .mast-inner { padding: 0 1.5rem; }
+  .mast-meta { grid-template-columns: 1fr 1fr; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .stat-item { border-bottom: 1px solid var(--rule); }
+  .attack-flow { grid-template-columns: 1fr; }
+  .flow-step::after { display: none; }
+  .split-visual { grid-template-columns: 1fr; }
+  .bio { grid-template-columns: 1fr; }
+  footer { flex-direction: column; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Threat Analysis &nbsp;·&nbsp; Supply Chain &nbsp;·&nbsp; Nation-State</div>
+    <h1 class="title"><em>60 Seconds</em><br>How North Korea Hijacked a Library Used by 100 Million Developers — and Why It Took Three Hours to Notice</h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">April 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Threat Actor</div><div class="value">UNC1069 / BlueNoroff</div></div>
+      <div class="meta-item"><div class="label">Target</div><div class="value">axios npm package</div></div>
+      <div class="meta-item"><div class="label">Malware</div><div class="value">WAVESHAPER.V2 RAT</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    Active IOCs — sfrclak[.]com · 142.11.206.73 · axios@1.14.1 · axios@0.30.4 — All affected versions removed from npm registry
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 — EXECUTIVE SUMMARY -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>A Library the World Trusted, a Backdoor<br>Nobody Saw Coming</h2>
+
+  <p>At 00:21 UTC on March 31, 2026, a North Korea-nexus threat actor silently pushed two backdoored versions of axios — the most widely used JavaScript HTTP client in the world — to the npm registry. The malicious versions contained a hidden dependency that no one in the axios codebase had authored, reviewed, or approved. For the next three hours, every developer, build pipeline, and CI/CD system that ran <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px;">npm install</code> silently received a cross-platform remote access trojan.</p>
+
+  <p>The attack was not a zero-day exploit. The axios library itself was not vulnerable. No one's firewall failed. <strong>The trust chain failed.</strong> An attacker compromised a single npm maintainer account and weaponized the implicit trust that over 100 million weekly downloads had earned over years of legitimate use. The code was fine. The delivery mechanism was not.</p>
+
+  <p>Google Threat Intelligence Group attributed the attack to UNC1069, a financially motivated North Korea-nexus actor linked to BlueNoroff — a well-documented Lazarus Group subunit specializing in cryptocurrency theft and financial sector intrusion. The malware deployed was WAVESHAPER.V2, an evolution of a RAT previously used in prior BlueNoroff campaigns. It beaconed home every 60 seconds.</p>
+
+  <p>This report examines who did this and why, how the attack was constructed step by step, what the malware does and what it looks like in traffic, why detection took three hours rather than three minutes, and what organizations — particularly defense contractors whose developers depend on JavaScript tooling — can do to detect and prevent the next iteration.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Attack at a Glance</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-red">
+        <div class="stat-num">3hrs</div>
+        <div class="stat-label">Window of exposure</div>
+        <div class="stat-sub">00:21 to 03:20 UTC, March 31, 2026</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">100M+</div>
+        <div class="stat-label">Weekly downloads at risk</div>
+        <div class="stat-sub">axios is the most downloaded JS HTTP client</div>
+      </div>
+      <div class="stat-item stat-blue">
+        <div class="stat-num">18hrs</div>
+        <div class="stat-label">Pre-staging window</div>
+        <div class="stat-sub">Phantom dependency published before the attack</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">60sec</div>
+        <div class="stat-label">C2 beacon interval</div>
+        <div class="stat-sub">WAVESHAPER.V2 phoned home every 60 seconds</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 02 — THE ACTOR -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>Who Is UNC1069 — and Why Are They<br>Targeting Developer Tools?</h2>
+
+  <p>UNC1069 is a financially motivated threat actor that Google Threat Intelligence Group has tracked since at least 2018. The group operates within the North Korean intelligence apparatus — specifically linked to BlueNoroff, a specialized subunit of the Lazarus Group that operates under the Reconnaissance General Bureau, North Korea's primary foreign intelligence service.</p>
+
+  <p>BlueNoroff's mandate is financial. Unlike other Lazarus subunits focused on espionage or destructive attacks, BlueNoroff generates hard currency for the North Korean state — primarily through cryptocurrency theft, financial sector intrusion, and increasingly, supply chain compromise. The funds finance North Korea's weapons programs. This is not criminal activity incidental to the state. It is state activity conducted through criminal methods.</p>
+
+  <p>UNC1069's historical TTPs show a group that adapts its delivery mechanisms while maintaining consistent objectives. Prior campaigns used AI-generated deepfake videos and fabricated meeting invitations to target executives at cryptocurrency and decentralized finance firms. The axios attack represents an evolution: rather than targeting individual high-value victims through social engineering, UNC1069 chose to compromise a single widely trusted delivery mechanism and let the global developer community distribute the payload on their behalf.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Strategic Shift:</strong> UNC1069 has moved from targeting individuals through deception to targeting infrastructure through trust. The attack surface has changed from human judgment to automated systems — build pipelines, dependency managers, and CI/CD workflows that install packages without human review.</p>
+  </div>
+
+  <h3>The Coordination Question — UNC1069 and TeamPCP</h3>
+
+  <p>Google's assessment formally separates UNC1069 from TeamPCP (UNC6780), the North Korea-nexus group behind the recent Trivy vulnerability scanner compromise and subsequent attacks on PyPI packages associated with projects including LiteLLM and Checkmarx. GTIG explicitly stated the axios attack is "unrelated to the recent TeamPCP supply chain issues."</p>
+
+  <p>The technical separation is accurate — the malware, infrastructure, and TTPs are distinct. But treating these as entirely independent operations may underestimate the coordination capability of North Korean offensive cyber programs. Both groups operate within the same intelligence apparatus, under the same command structure, with the same financial mandate. The Reconnaissance General Bureau does not run its cyber units as truly independent commercial entities.</p>
+
+  <p>TeamPCP's recent operations harvested over 500,000 corporate identities including developer credentials, API tokens, and publishing keys from compromised developer environments. If any portion of that credential harvest included npm publishing tokens — plausible given that developer tools were the specific targets — those credentials could have been shared or sold within the North Korean intelligence apparatus, potentially informing or enabling the axios maintainer account compromise.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>Analytical Note:</strong> The temporal proximity of two separate North Korean supply chain attacks against the same npm ecosystem within days of each other warrants consideration of whether intelligence sharing occurred between UNC1069 and UNC6780. Nation-state cyber units within the same command structure routinely share operational intelligence. The alternative — that two North Korean groups independently chose to attack npm within the same week purely by coincidence — is the less parsimonious explanation.</p>
+  </div>
+</div>
+
+<!-- SECTION 03 — THE ATTACK -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>The Attack, Step by Step — How a Trusted Package Became a Weapon</h2>
+
+  <p>The axios attack succeeded not because of a technical vulnerability but because of a systemic assumption: that packages from trusted maintainers with long publishing histories are safe to install. Understanding how the attack was constructed reveals why that assumption is insufficient and what controls would have broken the kill chain.</p>
+
+  <div class="kill-chain">
+    <div class="kc-item kc-critical">
+      <div class="kc-left">
+        <div class="kc-step">Step 01</div>
+        <div class="kc-label">ACCOUNT COMPROMISE</div>
+      </div>
+      <div class="kc-connector"><div class="kc-dot"></div><div class="kc-line"></div></div>
+      <div class="kc-right">
+        <p>npm maintainer credentials stolen via unknown credential theft vector. Attacker changed the account email to an attacker-controlled ProtonMail address and obtained a long-lived access token — bypassing the OIDC publishing protections entirely because the legacy token took precedence.</p>
+      </div>
+    </div>
+    <div class="kc-item kc-warning">
+      <div class="kc-left">
+        <div class="kc-step">Step 02</div>
+        <div class="kc-label">PRE-STAGING</div>
+      </div>
+      <div class="kc-connector"><div class="kc-dot"></div><div class="kc-line"></div></div>
+      <div class="kc-right">
+        <p><code class="ic">plain-crypto-js@4.2.1</code> published to npm 18 hours before the attack — not to build fake usage history, but to give the package any npm presence at all. Enough to pass zero-history detection checks that would flag a brand-new account injecting itself into a 100M-download library.</p>
+      </div>
+    </div>
+    <div class="kc-item kc-warning">
+      <div class="kc-left">
+        <div class="kc-step">Step 03</div>
+        <div class="kc-label">PAYLOAD INJECTION</div>
+      </div>
+      <div class="kc-connector"><div class="kc-dot"></div><div class="kc-line"></div></div>
+      <div class="kc-right">
+        <p>Malicious axios versions <code class="ic">1.14.1</code> and <code class="ic">0.30.4</code> published at 00:21 UTC with <code class="ic">plain-crypto-js</code> injected as a dependency. Both release branches hit within 39 minutes. Any developer or CI/CD pipeline running <code class="ic">npm install</code> against either version silently received the dropper.</p>
+      </div>
+    </div>
+    <div class="kc-item kc-critical">
+      <div class="kc-left">
+        <div class="kc-step">Step 04</div>
+        <div class="kc-label">SILENT EXECUTION</div>
+      </div>
+      <div class="kc-connector"><div class="kc-dot"></div><div class="kc-line"></div></div>
+      <div class="kc-right">
+        <p>npm's <code class="ic">postinstall</code> hook automatically executed <code class="ic">setup.js</code> the moment the package was installed — no user interaction, no prompt, no warning. The dropper checked the target OS, fetched the platform-specific payload, deployed WAVESHAPER.V2, then deleted itself and overwrote <code class="ic">package.json</code> with a clean version.</p>
+      </div>
+    </div>
+    <div class="kc-item kc-critical kc-last">
+      <div class="kc-left">
+        <div class="kc-step">Step 05</div>
+        <div class="kc-label">RAT DEPLOYED</div>
+      </div>
+      <div class="kc-connector"><div class="kc-dot"></div></div>
+      <div class="kc-right">
+        <p>WAVESHAPER.V2 active on Windows, macOS, and Linux. Persistence established via registry run key named <code class="ic">MicrosoftUpdate</code>. Dropper evidence erased. RAT begins beaconing to <code class="ic">sfrclak[.]com</code> on port 8000 — every 60 seconds, waiting for instructions.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>The Pre-Staging Deception — What "Building History" Actually Means</h3>
+
+  <p>Eighteen hours before the attack, UNC1069 published <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px;">plain-crypto-js@4.2.1</code> to the npm registry as a standalone package. This was not fake usage history — the package had no meaningful download statistics. The purpose was narrower: to ensure the package was not flagged as a zero-history account publishing to a major dependency for the first time.</p>
+
+  <p>Some automated security scanners flag dependencies that come from packages with no prior npm presence whatsoever — a brand-new account injecting itself into a library with 100 million weekly downloads is an obvious signal. By publishing 18 hours early, UNC1069 gave the malicious package an npm existence, a version number, and a publication timestamp. Enough to pass the most basic zero-history checks.</p>
+
+  <p>The name itself deserves analysis. In developer contexts, <em>crypto</em> refers to cryptography — the mathematical science of securing data — not cryptocurrency. The Node.js built-in cryptography module has been called <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px;">crypto</code> for decades. A package with <em>crypto</em> in its name would not raise immediate red flags among developers working with security primitives. But <em>plain-crypto-js</em> contains a semantic contradiction: plain means unencrypted, crypto means encrypted. A legitimate developer would not name a cryptographic utility plain-crypto. The attackers understood their audience precisely well enough to choose a name that would appear plausible to developers while being technically incoherent to anyone who stopped to read it carefully.</p>
+
+  <div class="split-visual">
+    <div class="split-panel left">
+      <div class="split-panel-title">✓ Legitimate Dependency</div>
+      <p><strong>Name makes sense</strong> for the parent package's purpose.</p>
+      <p>axios is an HTTP client. Legitimate dependencies handle things like HTTP adapters, form data, URL encoding.</p>
+      <p><strong>Established history</strong> proportional to the parent package's age and download volume.</p>
+      <p>No postinstall scripts making outbound network connections.</p>
+    </div>
+    <div class="split-panel right">
+      <div class="split-panel-title">✗ plain-crypto-js (Malicious)</div>
+      <p><strong>Semantically incoherent name</strong> — "plain" contradicts "crypto".</p>
+      <p>An HTTP client has no legitimate need for a cryptographic dependency. Purpose mismatch is an immediate red flag.</p>
+      <p><strong>Zero history</strong> before 18 hours prior to the attack. Published specifically to pass basic checks.</p>
+      <p>postinstall hook executes <code>setup.js</code> which makes outbound C2 connections.</p>
+    </div>
+  </div>
+
+  <h3>The Long-Lived Token Problem</h3>
+
+  <p>The axios maintainer had multi-factor authentication configured. OIDC-based short-lived tokens were set up for the publishing workflow. On paper, the account security was reasonable. The attack succeeded anyway because a long-lived npm access token — the kind that never expires unless manually revoked — was still present alongside the OIDC configuration. When both exist, npm uses the long-lived token. The OIDC protections were effectively bypassed by a credential that should not have existed.</p>
+
+  <p>The attacker changed the maintainer's email address to an attacker-controlled ProtonMail account and used the stolen long-lived token to publish directly via the npm CLI, entirely bypassing the GitHub Actions publishing workflow where the OIDC controls lived. The security was on the right path. The residual long-lived token was the gap.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The Core Failure:</strong> Long-lived credentials are a liability that accumulates risk over time. A token that never expires is a permanent key. Every day it exists is another day it can be stolen and used. The axios attack was made possible by a credential that should have been rotated out of existence.</p>
+  </div>
+</div>
+
+<!-- SECTION 04 — THE MALWARE -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>WAVESHAPER.V2 — What the RAT Does and What It Looks Like</h2>
+
+  <p>WAVESHAPER.V2 is not a keylogger. Calling it a keylogger significantly undersells its capabilities and leads to underestimating the severity of an infection. It is a fully functional remote access trojan — a persistent, cross-platform backdoor that gives the attacker complete control over any system it runs on.</p>
+
+  <p>The dropper (SILKBELL / setup.js) checks the target operating system upon execution and delivers platform-specific payloads. On Windows, it copies the legitimate PowerShell executable to <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px;">%PROGRAMDATA%\wt.exe</code> disguised as Windows Terminal and uses a VBScript launcher. On macOS it masquerades as a system daemon. On Linux it drops a Python RAT to <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px;">/tmp/ld.py</code> launched via nohup. After delivering its payload, the dropper deletes itself and overwrites package.json with a clean version containing no postinstall reference — eliminating forensic traces of how the infection occurred.</p>
+
+  <h3>Persistence — This Does Not Go Away on Reboot</h3>
+
+  <p>Unlike Meterpreter, which lives purely in memory and disappears on reboot, WAVESHAPER.V2 establishes persistence mechanisms specifically designed to survive system restarts. On Windows, it creates a hidden batch file at <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px;">%PROGRAMDATA%\system.bat</code> and adds a registry run key named <strong>MicrosoftUpdate</strong> under <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px;">HKCU\Software\Microsoft\Windows\CurrentVersion\Run</code>. Every time the system boots, WAVESHAPER.V2 restarts automatically. The name MicrosoftUpdate is deliberate — it blends with the kind of registry entry that legitimate software creates, reducing the chance a cursory review flags it.</p>
+
+  <h3>The Beacon — 60 Seconds, Every Time</h3>
+
+  <p>Once deployed, WAVESHAPER.V2 beacons to its command and control server every 60 seconds using Base64-encoded JSON sent over port 8000. Each beacon includes system telemetry: hostname, username, boot time, timezone, OS version, and a detailed list of running processes. The C2 server responds with instructions — run a command, inject code into a process, enumerate the filesystem, or do nothing and wait for the next check-in.</p>
+
+  <p>The User-Agent string is among the most immediately detectable elements: the RAT identifies itself as Internet Explorer 8 running on Windows XP. No legitimate software in 2026 sends that User-Agent. Any SOC analyst, any IPS rule, any SIEM query looking at User-Agent strings should flag this immediately.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">WAVESHAPER.V2 — Traffic Signature</div>
+    <div style="padding:1.5rem;">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Signal</th>
+              <th>Value</th>
+              <th>Why It Matters</th>
+              <th>Severity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Destination Port</strong></td>
+              <td class="code">8000</td>
+              <td>Unusual for production traffic. Not a standard web service port.</td>
+              <td class="amber">High</td>
+            </tr>
+            <tr>
+              <td><strong>Beacon Interval</strong></td>
+              <td class="code">60 seconds exactly</td>
+              <td>Machine-precise regularity. No human-generated traffic is this consistent.</td>
+              <td class="red">Critical</td>
+            </tr>
+            <tr>
+              <td><strong>User-Agent</strong></td>
+              <td class="code">MSIE 8.0 / Windows XP</td>
+              <td>IE8 on XP in 2026. No legitimate software sends this. Immediate escalation required.</td>
+              <td class="red">Critical</td>
+            </tr>
+            <tr>
+              <td><strong>Destination</strong></td>
+              <td class="code">Raw IP — no domain</td>
+              <td>Legitimate traffic resolves hostnames. Direct IP connections evade DNS-based filtering.</td>
+              <td class="red">Critical</td>
+            </tr>
+            <tr>
+              <td><strong>Body Encoding</strong></td>
+              <td class="code">Base64 JSON</td>
+              <td>Encoded payloads obscure content from inspection. Common C2 obfuscation technique.</td>
+              <td class="amber">High</td>
+            </tr>
+            <tr>
+              <td><strong>Initiating Process</strong></td>
+              <td class="code">powershell.exe / wt.exe</td>
+              <td>PowerShell making outbound connections on port 8000 is anomalous in most environments.</td>
+              <td class="red">Critical</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <h3>Wireshark Detection Filter</h3>
+  <p>The following Wireshark display filter will surface WAVESHAPER.V2 C2 traffic using the documented behavioral indicators. Analysts capturing traffic on networks where affected axios versions may have been installed should apply this filter:</p>
+
+  <div class="code-block">
+    <code><span class="comment">// WAVESHAPER.V2 C2 Detection — Wireshark Display Filter</span>
+<span class="comment">// Matches beacon traffic by port, destination pattern, and known C2 IP</span>
+
+<span class="keyword">tcp.dstport == 8000</span>
+<span class="keyword">or ip.dst == 142.11.206.73</span>
+<span class="keyword">or (http.user_agent contains "MSIE 8.0")</span>
+<span class="keyword">or (http.request.method == "POST" and not http.host)</span>
+
+<span class="comment">// Combined high-confidence filter:</span>
+<span class="label">tcp.dstport == 8000 and (http.request.method == "POST" or not dns)</span></code>
+  </div>
+
+  <h3>KQL Detection Rule — Microsoft Sentinel</h3>
+  <p>For organizations running Microsoft Sentinel, the following KQL queries detect WAVESHAPER.V2 persistence and C2 beaconing:</p>
+
+  <div class="code-block">
+    <code><span class="comment">// Detect MicrosoftUpdate persistence registry key</span>
+<span class="label">DeviceRegistryEvents</span>
+<span class="keyword">| where</span> RegistryKey <span class="keyword">contains</span> <span class="string">"CurrentVersion\\Run"</span>
+<span class="keyword">| where</span> RegistryValueName <span class="keyword">==</span> <span class="string">"MicrosoftUpdate"</span>
+<span class="keyword">| where</span> InitiatingProcessFileName <span class="keyword">in</span> (<span class="string">"powershell.exe"</span>, <span class="string">"wt.exe"</span>, <span class="string">"wscript.exe"</span>)
+<span class="keyword">| project</span> Timestamp, DeviceName, RegistryKey, RegistryValueName, InitiatingProcessFileName
+
+<span class="comment">// Detect outbound C2 beaconing on port 8000</span>
+<span class="label">DeviceNetworkEvents</span>
+<span class="keyword">| where</span> RemotePort <span class="keyword">==</span> 8000
+<span class="keyword">| where</span> InitiatingProcessFileName <span class="keyword">in</span> (<span class="string">"powershell.exe"</span>, <span class="string">"wt.exe"</span>, <span class="string">"python.exe"</span>)
+<span class="keyword">| where</span> RemoteIPType <span class="keyword">==</span> <span class="string">"Public"</span>
+<span class="keyword">| summarize</span> ConnectionCount <span class="keyword">=</span> count() <span class="keyword">by</span> DeviceName, RemoteIP, bin(Timestamp, 1m)
+<span class="keyword">| where</span> ConnectionCount <span class="keyword">>=</span> 1
+<span class="keyword">| project</span> Timestamp, DeviceName, RemoteIP, RemotePort, ConnectionCount</code>
+  </div>
+</div>
+
+<!-- SECTION 05 — WHY 3 HOURS -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>Why Did It Take Three Hours —<br>The Four Detection Gaps</h2>
+
+  <p>Three hours is fast by historical standards for supply chain compromises, which have gone undetected for months or years. StepSecurity, a firm that monitors npm publishing patterns, caught the unexpected dependency within the exposure window. But for organizations whose build pipelines pulled the affected versions before detection, three hours was long enough. Understanding why detection was not faster reveals the specific gaps that made this attack hard to catch in real time.</p>
+
+  <ul class="findings-list">
+    <li class="finding-critical">
+      <span class="finding-tag">Critical</span>
+      <div>
+        <strong>No WAVESHAPER.V2 Signatures Existed at Attack Start</strong>
+        <p>At 00:21 UTC when the attack began, WAVESHAPER.V2 was an updated variant. IPS signature databases, EDR platforms, and antivirus engines did not contain detection rules for it. Signature-based detection fundamentally cannot catch a threat it has never seen. The gap between a new variant appearing and signatures being written and distributed is always an exposure window. In this case that window was the entire three-hour attack duration.</p>
+      </div>
+    </li>
+    <li class="finding-critical">
+      <span class="finding-tag">Critical</span>
+      <div>
+        <strong>CI/CD Pipelines Have Different Security Visibility Than Workstations</strong>
+        <p>Many victims were not individual developers but automated build systems running npm install as part of continuous integration workflows. These pipelines are designed to execute system commands — that is their function. An IPS watching a build pipeline sees expected behavior: a process running, network connections being made, files being written. Without specific behavioral rules tuned to flag C2 beaconing from build environments, the malicious activity blended into normal pipeline execution.</p>
+      </div>
+    </li>
+    <li class="finding-high">
+      <span class="finding-tag">High</span>
+      <div>
+        <strong>The Dropper Eliminated Its Own Forensic Evidence</strong>
+        <p>By the time any analyst began investigating, setup.js was gone. The postinstall script had been removed. package.json had been overwritten with a clean version. The chain of events that explained how the infection happened had been deliberately erased. What remained was a running RAT with no obvious explanation of its origin — significantly complicating both triage and attribution at the individual system level.</p>
+      </div>
+    </li>
+    <li class="finding-high">
+      <span class="finding-tag">High</span>
+      <div>
+        <strong>The Traffic Signals Were Individually Ambiguous</strong>
+        <p>Port 8000 outbound traffic is unusual but not blocked by default. PowerShell making network connections is common. Base64-encoded POST bodies are used by legitimate applications. No single signal was definitively malicious in isolation. Detection required correlating multiple signals simultaneously — port, process, encoding, destination, regularity — into a composite alert. Organizations without behavioral correlation rules tuned to catch this specific combination missed it in the noise.</p>
+      </div>
+    </li>
+  </ul>
+
+  <div class="callout callout-blue">
+    <p><strong>What Would Have Caught It in Minutes:</strong> A Sentinel analytic rule monitoring for registry key creation under <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;">HKCU\...\Run</code> with the value name <strong>MicrosoftUpdate</strong> initiated by PowerShell would have fired the moment WAVESHAPER.V2 established persistence — likely within the first five minutes of infection. The persistence mechanism is the earliest durable artifact the RAT creates. Detection rules targeting persistence behaviors, not malware signatures, are more resilient to variant evasion.</p>
+  </div>
+</div>
+
+<!-- SECTION 06 — VARIANT EVOLUTION AND AI -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>From WAVESHAPER to WAVESHAPER.V2 — Why Signatures Fail and What Comes Next</h2>
+
+  <p>WAVESHAPER.V2 is an evolution of WAVESHAPER, a RAT previously used in prior BlueNoroff campaigns. The core functionality is consistent across versions — beaconing, command execution, process injection, reconnaissance, persistence. What changed is the code implementation: enough modification to generate a different hash, defeat signature-based detection, and require new YARA rules to be written before automated systems could catch it.</p>
+
+  <p>This is the fundamental limitation of signature-based detection: it is a museum of known threats. Every new variant that modifies its implementation, however slightly, starts the museum-building process again. The attacker modifies, the defender writes new signatures, the attacker modifies again. The attacker moves first. The defender always reacts.</p>
+
+  <p>Behavioral detection inverts this dynamic. Rather than matching what malware looks like, behavioral detection matches what malware does. WAVESHAPER and WAVESHAPER.V2 both beacon to a C2 server at precise intervals. Both inject into legitimate processes. Both create registry persistence keys with legitimate-sounding names. Both use encoded POST bodies. Those behaviors are consistent across variants — and they are detectable without knowing what the malware is called.</p>
+
+  <p>This is where machine learning is actively transforming the field. Platforms like CrowdStrike Falcon and Darktrace build behavioral baselines from billions of observed data points and flag deviations — not because they recognize WAVESHAPER.V2 specifically, but because a process making machine-precise 60-second outbound connections using a 16-year-old browser identity to a raw IP address on an unusual port is anomalous regardless of what the underlying malware is named. The question is not "is this WAVESHAPER?" but "is this normal?" The answer in every compromised environment was unambiguously no.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The AI Frontier:</strong> Researchers are applying transformer-based sequence models — the same architecture underlying large language models — to malware analysis. Code execution traces, API call sequences, and network traffic patterns have sequential structure that these models can learn from. A model trained on WAVESHAPER's behavioral DNA would recognize WAVESHAPER.V2 not by signature but by the pattern of what it does. This approach is active research with commercial products emerging. The arms race between offense and defense is increasingly being fought with the same AI tools.</p>
+  </div>
+</div>
+
+<!-- SECTION 07 — DEFENSE -->
+<div class="section">
+  <div class="section-num">Section 07</div>
+  <h2>What Should Have Happened —<br>and What to Do Now</h2>
+
+  <p>The axios attack was not inevitable. At multiple points in the kill chain, specific controls would have broken the attack or significantly accelerated detection. The following recommendations are ordered by impact and urgency, with particular attention to defense contractors whose development teams depend on open-source JavaScript tooling.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">01</div>
+      <div class="step-content">
+        <div class="step-title">Eliminate Long-Lived Publishing Tokens Immediately <span class="cmmc-tag">CM.2.061</span></div>
+        <p>Audit all npm, PyPI, and GitHub publishing accounts for long-lived access tokens. Revoke them. Replace with OIDC-based short-lived tokens that expire after a single use or a defined window. A token that cannot survive a rotation cannot be stolen and used indefinitely. This is the single highest-impact change a development organization can make today.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">02</div>
+      <div class="step-content">
+        <div class="step-title">Deploy Behavioral Detection Rules for Persistence Mechanisms <span class="cmmc-tag">SI.2.216</span></div>
+        <p>Write and deploy Sentinel or Splunk analytic rules that flag registry run key creation by unusual initiating processes. The MicrosoftUpdate key created by PowerShell is not something legitimate Windows Update does. Behavior-based persistence detection would have fired within minutes of infection, before WAVESHAPER.V2 completed its first beacon cycle.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">03</div>
+      <div class="step-content">
+        <div class="step-title">Implement Dependency Verification in CI/CD Pipelines <span class="cmmc-tag">SA.4.171</span></div>
+        <p>Integrate tools like Socket.dev, Snyk, or Dependabot into build pipelines with blocking — not just alerting — configuration. Flag any new dependency added to an established package that has no logical relationship to that package's purpose. Flag packages with publishing history shorter than the parent package's age. Require human review for unexpected dependency additions before build proceeds.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">04</div>
+      <div class="step-content">
+        <div class="step-title">Monitor Outbound Traffic for Beaconing Patterns</div>
+        <p>Deploy network monitoring rules that flag machine-precise outbound connection intervals. A process connecting to an external IP on port 8000 every 60 seconds exactly is not human-generated traffic. Darktrace and similar platforms detect this pattern automatically. For organizations without ML-based network monitoring, a basic SIEM rule correlating connection regularity with unusual ports catches this class of behavior.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">05</div>
+      <div class="step-content">
+        <div class="step-title">Rotate All Credentials Used in Affected Environments</div>
+        <p>Any system that ran npm install against axios@1.14.1 or axios@0.30.4 during the exposure window should be treated as fully compromised. Rotate every secret, API key, deploy key, and credential that process had access to. Rebuild from clean snapshots where possible. The RAT's reconnaissance capabilities mean it enumerated all accessible credentials during its dwell time.</p>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">06</div>
+      <div class="step-content">
+        <div class="step-title">Subscribe to Threat Intelligence Feeds for npm Monitoring</div>
+        <p>Platforms including AlienVault OTX and the GitHub Advisory Database publish IOCs within hours of confirmed supply chain compromises. Automated ingestion of these feeds into SIEM detection rules means confirmed attack infrastructure — like the C2 IP 142.11.206.73 and domain sfrclak[.]com — triggers alerts automatically the moment they appear in threat intelligence rather than requiring manual rule updates.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Confirmed IOCs — Block and Monitor</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Indicator</th>
+          <th>Type</th>
+          <th>Action</th>
+          <th>Source</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>sfrclak[.]com</strong></td>
+          <td class="code">C2 Domain</td>
+          <td>Block at DNS and firewall. Monitor for historical connections.</td>
+          <td class="green">Confirmed</td>
+        </tr>
+        <tr>
+          <td><strong>142.11.206.73</strong></td>
+          <td class="code">C2 IP Address</td>
+          <td>Block outbound on all ports. Alert on any historical connection logs.</td>
+          <td class="green">Confirmed</td>
+        </tr>
+        <tr>
+          <td><strong>axios@1.14.1</strong></td>
+          <td class="code">npm Package</td>
+          <td>Identify all systems that installed this version. Treat as compromised.</td>
+          <td class="green">Confirmed</td>
+        </tr>
+        <tr>
+          <td><strong>axios@0.30.4</strong></td>
+          <td class="code">npm Package</td>
+          <td>Identify all systems that installed this version. Treat as compromised.</td>
+          <td class="green">Confirmed</td>
+        </tr>
+        <tr>
+          <td><strong>plain-crypto-js@4.2.1</strong></td>
+          <td class="code">npm Package</td>
+          <td>Remove from node_modules. Presence confirms dropper execution.</td>
+          <td class="green">Confirmed</td>
+        </tr>
+        <tr>
+          <td><strong>HKCU\...\Run\MicrosoftUpdate</strong></td>
+          <td class="code">Registry Key</td>
+          <td>Presence confirms WAVESHAPER.V2 persistence. Immediate incident response.</td>
+          <td class="red">Critical</td>
+        </tr>
+        <tr>
+          <td><strong>%PROGRAMDATA%\system.bat</strong></td>
+          <td class="code">File Artifact</td>
+          <td>Hidden batch file. Presence confirms active infection.</td>
+          <td class="red">Critical</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 08 — CONCLUSION -->
+<div class="section">
+  <div class="section-num">Section 08</div>
+  <h2>The Trust Problem Is the Real Vulnerability</h2>
+
+  <p>The axios attack did not exploit a bug. It exploited an assumption — that packages from trusted maintainers with long histories are safe to install without inspection. That assumption is structural to how modern software development works. Developers install hundreds of dependencies without reading their code. Build pipelines run npm install without human review of every transitive dependency. The efficiency gains are real. So is the attack surface.</p>
+
+  <p>North Korean offensive cyber operations have identified this structural trust as a primary attack vector. UNC1069's choice to compromise a single npm maintainer account rather than targeting individual victims reflects a sophisticated understanding of leverage: one compromised account, one popular package, and the global developer community becomes your delivery mechanism. The attacker does not need to reach each victim. The victims install the payload themselves, automatically, because they trust the ecosystem.</p>
+
+  <p>The 60-second beacon is the clearest metaphor for what this attack represents. Once deployed, WAVESHAPER.V2 checked in with its operators every minute, waiting for instructions. Every 60 seconds, on every compromised system, it announced: <em>I am here. What do you want me to do?</em> For every system where detection and response did not happen within those 60-second windows, the attacker had another opportunity. The question for every organization that uses npm — which is most of them — is whether their detection capability can close that window before the instructions arrive.</p>
+
+  <div class="callout callout-red">
+    <p><strong>For Defense Contractors Specifically:</strong> JavaScript tooling is deeply embedded in modern software development, including in environments that build systems for classified programs. A compromised developer workstation is not just an IT problem — it is a potential supply chain compromise of the software being developed. The same patterns used to compromise axios could be used to compromise internal tooling, internal package registries, or build pipelines that touch controlled unclassified information. The threat is not theoretical. It is active, capable, and patient.</p>
+  </div>
+</div>
+
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Compliance Consultant &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance. This analysis was produced independently as a contribution to the security community's understanding of active threats against US defense infrastructure.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>60 Seconds · Yana Ivanov · 2026</span>
+  <span>Based on public reporting · For educational use · Independent analysis</span>
+</footer>
+
+</body>
+</html>
