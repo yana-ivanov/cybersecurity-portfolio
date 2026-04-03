@@ -235,7 +235,7 @@ footer span{color:#94a3b8}
 
   <p>This lab analyzes a synthetic training pcap built from publicly documented WAVESHAPER.V2 behavioral indicators — the 60-second beacon interval, the IE8/Windows XP User-Agent fingerprint, the Base64-encoded JSON telemetry, and the confirmed C2 infrastructure at <strong>142.11.206.73:8000</strong>. The goal is to demonstrate what this attack looks like in Wireshark and how pre-built behavioral detection filters catch it — in some cases faster than IOC-specific signature rules.</p>
 
-  <p>The full threat analysis is documented in the companion report <a href="sixty_seconds.html">60 Seconds</a>. This lab focuses on detection methodology.</p>
+  <p>The full threat analysis is documented in the companion report <a href="../analysis/sixty_seconds.html">60 Seconds</a>. This lab focuses on detection methodology.</p>
 
   <div class="env-box">
     <div class="env-box-title">Lab Environment</div>
@@ -486,7 +486,7 @@ footer span{color:#94a3b8}
   <div class="section-num">Section 07</div>
   <h2>Findings Summary</h2>
 
-  <p>This lab demonstrated that WAVESHAPER.V2 C2 traffic is detectable using general-purpose behavioral filters that require no prior knowledge of the specific malware. The I/O Graph revealed the beacon pattern before any filter was applied. Large packet detection caught the stage 2 payload download at T=30s. The behavioral HTTP External filter and the signature-based MSIE 8.0 filter both returned identical results — eight C2 POST requests — but through fundamentally different detection mechanisms.</p>
+  <p>This lab demonstrated that WAVESHAPER.V2 C2 traffic is detectable using general-purpose behavioral filters that require no prior knowledge of the specific malware. The I/O Graph revealed the beacon pattern after the C2 IP was identified. Large packet detection caught the stage 2 payload download at T=30s. The behavioral HTTP External filter and the signature-based MSIE 8.0 filter both returned identical results — eight C2 POST requests — but through fundamentally different detection mechanisms. The full threat intelligence context for this attack is documented in <a href="../analysis/sixty_seconds.html">60 Seconds</a>.</p>
 
   <p>The practical implication for defense contractors whose developers use npm: the tools to catch this attack were already available. The detection window was a rule coverage problem, not a tool capability problem. Pre-built behavioral filters running in a monitored environment would have isolated an infected machine before WAVESHAPER.V2 completed its first full beacon cycle.</p>
 
