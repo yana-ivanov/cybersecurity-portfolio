@@ -284,9 +284,9 @@ footer span{color:#94a3b8}
   <p>My first filter was a pre-built behavioral rule I use across all captures: <strong>frame.len > 1400</strong>. This flags any frame larger than 1400 bytes — the threshold that separates routine acknowledgment packets from packets carrying significant data payloads. It returned one result in this capture.</p>
 
   <div class="figure">
-    <div class="figure-title">Figure 1 — Large Packets Filter · frame.len > 1400</div>
+    <div class="figure-title">Figure 1 — Stage 2 Payload Download</div>
     <div class="figure-body"><img src="../labs/img/009/large_packets_1400.png" alt="Wireshark showing single large packet from C2 IP with MZ binary payload"></div>
-    <div class="figure-caption">Frame 14 — a single 2,183-byte HTTP response from 142.11.206.73 to 192.168.1.47 at T=30.35s. Content-Type: application/octet-stream. The hex pane shows 4D 5A — the MZ magic bytes of a Windows PE executable. This is SILKBELL delivering WAVESHAPER.V2 to the victim machine.</div>
+    <div class="figure-caption"><strong style="font-style:normal;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--blue)">Filter: frame.len > 1400</strong><br>Frame 14 — a single 2,183-byte HTTP response from 142.11.206.73 to 192.168.1.47 at T=30.35s. Content-Type: application/octet-stream. The hex pane shows 4D 5A — the MZ magic bytes of a Windows PE executable. This is SILKBELL delivering WAVESHAPER.V2 to the victim machine.</div>
   </div>
 
   <p>Frame 14 is the moment of infection — the C2 server responding to SILKBELL's initial check-in with the WAVESHAPER.V2 payload. The packet detail pane confirms:</p>
@@ -319,9 +319,9 @@ footer span{color:#94a3b8}
   <p>With the C2 IP identified from Frame 14, I applied my pre-built beaconing filter: <strong>ip.dst == 142.11.206.73</strong>. This shows all traffic destined for the C2 server — the full picture of how many times the infected machine checked in and at what intervals.</p>
 
   <div class="figure">
-    <div class="figure-title">Figure 2 — Beaconing Filter · ip.dst == 142.11.206.73</div>
-    <div class="figure-body"><img src="../labs/img/009/MSIE_8_0.png" alt="Wireshark showing 8 C2 connections at regular 60-second intervals with timestamps"></div>
-    <div class="figure-caption">23 packets displayed — all C2-bound traffic. HTTP POST requests to /packages.npm.org/product1 at T=90s, 150s, 210s, 270s, 330s, 390s, and 450s. Intervals between beacons: 60.7s, 59.6s, 60.0s, 60.2s, 60.1s, 60.0s. Average: 60.1 seconds. Maximum deviation: 0.7 seconds. Machine-precise.</div>
+    <div class="figure-title">Figure 2 — C2 Beacon Pattern</div>
+    <div class="figure-body"><img src="../labs/img/009/beaconing.png" alt="Wireshark I/O Graph showing evenly spaced beacon spikes at 60-second intervals"></div>
+    <div class="figure-caption"><strong style="font-style:normal;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--blue)">Filter: ip.dst == 142.11.206.73 — Statistics → I/O Graphs</strong><br>I/O Graph with beaconing filter applied — showing only C2-destined traffic. Seven spikes at machine-precise 60-second intervals from T=90s to T=450s. The small dot at T=30s is the SILKBELL stage 2 download. With all other traffic removed the regularity is unambiguous — this is not human-generated traffic.</div>
   </div>
 
   <div class="host-card">
@@ -341,13 +341,7 @@ footer span{color:#94a3b8}
 
   <p>After confirming the C2 IP from the large packet filter and scoping the beacon count with the beaconing filter, I opened the Wireshark I/O Graph — Statistics → I/O Graphs — to visualize the full pattern. What the timestamp column showed numerically, the graph makes immediately obvious visually. Seven evenly spaced spikes from T=90s through T=450s. The mechanical regularity of a RAT checking in every 60 seconds looks nothing like human-generated traffic or legitimate application behavior.</p>
 
-  <p>WAVESHAPER.V2 beacons every 60 seconds exactly. The graph shows seven spikes — each one a POST request carrying Base64-encoded system telemetry to the C2 server. The red bars are TCP errors from the synthetic pcap's simplified checksums, not a real infection artifact. The pattern is what matters — and it is immediately visible without any filter applied.</p>
-
-  <div class="figure">
-    <div class="figure-title">Figure 4 — Wireshark I/O Graph · waveshaper_v2_training.pcap</div>
-    <div class="figure-body"><img src="../labs/img/009/beaconing.png" alt="Wireshark I/O Graph showing evenly spaced beacon spikes at 60-second intervals"></div>
-    <div class="figure-caption">Seven beacon spikes at machine-precise 60-second intervals from T=90s to T=450s. The initial cluster at T=0–30s is the SILKBELL dropper contact and stage 2 payload download — already identified by the large packet filter. The I/O graph makes the regularity visually unambiguous.</div>
-  </div>
+  <p>The I/O Graph is shown above in Figure 2 alongside the beaconing filter results. The red bars are TCP errors from the synthetic pcap's simplified checksums — not a real infection artifact. The gray spikes are the beacon pattern. The regularity is the signal.</p>
 
   <div class="callout callout-blue">
     <p><strong>Detection principle:</strong> Beaconing regularity is a behavioral indicator that survives variant updates. WAVESHAPER.V2 and WAVESHAPER both beacon at 60-second intervals regardless of code changes. A detection rule targeting interval regularity catches new variants that evade signature-based rules targeting specific code patterns.</p>
@@ -362,15 +356,15 @@ footer span{color:#94a3b8}
   <p>After confirming the beacon pattern I applied two HTTP-level filters to the same capture. Both returned identical results — 8 packets, all WAVESHAPER.V2 C2 traffic. But they work on completely different detection logic, and understanding the difference matters for building a real detection strategy.</p>
 
   <div class="figure">
-    <div class="figure-title">Figure 3 — WAVESHAPER.V2 Signature Filter · http.user_agent contains "MSIE 8.0"</div>
+    <div class="figure-title">Figure 3 — WAVESHAPER.V2 User-Agent Detection</div>
     <div class="figure-body"><img src="../labs/img/009/MSIE_8_0.png" alt="Wireshark showing 8 POST beacons filtered by IE8 User-Agent string"></div>
-    <div class="figure-caption">8 packets displayed — all HTTP POST requests from 192.168.1.47 to 142.11.206.73:8000. Filter matches on the WAVESHAPER.V2 hardcoded User-Agent: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0). Internet Explorer 8 on Windows XP has not been in legitimate use since 2014.</div>
+    <div class="figure-caption"><strong style="font-style:normal;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--blue)">Filter: http.user_agent contains "MSIE 8.0"</strong><br>8 packets displayed — all HTTP POST requests from 192.168.1.47 to 142.11.206.73:8000. Filter matches on the WAVESHAPER.V2 hardcoded User-Agent: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0). Internet Explorer 8 on Windows XP has not been in legitimate use since 2014.</div>
   </div>
 
   <div class="figure">
-    <div class="figure-title">Figure 4 — Behavioral HTTP External Filter · http.request and !(http.host contains "microsoft") and !(http.host contains "windowsupdate") and !(http.host contains "msocsp")</div>
+    <div class="figure-title">Figure 4 — Behavioral HTTP External Detection</div>
     <div class="figure-body"><img src="../labs/img/009/http_external.png" alt="Wireshark showing same 8 packets filtered by HTTP External behavioral rule"></div>
-    <div class="figure-caption">9 packets displayed — same C2 POST requests plus one additional legitimate HTTP request to a non-safe-listed host. The filter catches everything going outbound that is not on the known-safe list, regardless of what the specific malware is.</div>
+    <div class="figure-caption"><strong style="font-style:normal;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--blue)">Filter: http.request and !(http.host contains "microsoft") and !(http.host contains "windowsupdate") and !(http.host contains "msocsp")</strong><br>9 packets displayed — same C2 POST requests plus one additional legitimate HTTP request to a non-safe-listed host. The filter catches everything going outbound that is not on the known-safe list, regardless of what the specific malware is.</div>
   </div>
 
   <div class="compare-grid">
@@ -398,11 +392,11 @@ footer span{color:#94a3b8}
   <p>In a real SOC workflow these filters work in sequence, not in isolation:</p>
 
   <div class="code-label">Detection Workflow</div>
-  <div class="code-block"><pre><span class="highlight">Step 1</span> — I/O Graph shows regular beacon spikes → anomaly flagged
-<span class="highlight">Step 2</span> — frame.len > 1400 finds binary download from unknown IP → C2 identified
-<span class="highlight">Step 3</span> — ip.dst == 142.11.206.73 scopes all C2 connections → beacon count confirmed
-<span class="highlight">Step 4</span> — HTTP External filter finds all suspicious outbound HTTP → no-filter-required catch
-<span class="highlight">Step 5</span> — MSIE 8.0 filter confirms WAVESHAPER.V2 attribution → escalate with confidence
+  <div class="code-block"><pre><span class="highlight">Step 1</span> — frame.len > 1400 finds single large packet from unknown IP → C2 IP 142.11.206.73 identified
+<span class="highlight">Step 2</span> — ip.dst == 142.11.206.73 scopes all C2 connections → 7 beacons at 60-second intervals confirmed
+<span class="highlight">Step 3</span> — I/O Graph visualizes the beacon pattern → machine-precise regularity visually confirmed
+<span class="highlight">Step 4</span> — HTTP External filter catches all suspicious outbound HTTP → same 8 packets, no IOC knowledge needed
+<span class="highlight">Step 5</span> — http.user_agent contains "MSIE 8.0" confirms WAVESHAPER.V2 attribution → escalate with confidence
 <span class="comment">
 # Result: CRITICAL — WAVESHAPER.V2 infection confirmed
 # Action: Isolate host, image memory, rotate all credentials</span></pre>
@@ -414,7 +408,7 @@ footer span{color:#94a3b8}
   <div class="section-num">Section 06</div>
   <h2>What Should Have Fired — and When</h2>
 
-  <p>The three-hour detection window in the real axios attack was not inevitable. Each of the filters applied in this lab would have generated an alert within the first beacon cycle — within 90 seconds of npm install executing on a compromised machine. The gap was not tool capability. It was rule coverage.</p>
+  <p>The three-hour detection window in the real axios attack was not inevitable. Behavioral detection rules would have fired within 30 seconds of npm install executing — at the moment SILKBELL downloaded the stage 2 payload. Signature-based rules failed entirely because WAVESHAPER.V2 was a new variant. The gap was not tool capability. It was rule coverage.</p>
 
   <div class="tbl-wrap">
     <table>
