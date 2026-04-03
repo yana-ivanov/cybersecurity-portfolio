@@ -285,7 +285,7 @@ footer span{color:#94a3b8}
 
   <div class="figure">
     <div class="figure-title">Figure 1 — Stage 2 Payload Download</div>
-    <div class="figure-body"><img src="../labs/img/009/large_packets_1400.png" alt="Wireshark showing single large packet from C2 IP with MZ binary payload"></div>
+    <div class="figure-body"><img src="../labs/img/009/figure_1.png" alt="Wireshark showing single large packet from C2 IP with MZ binary payload"></div>
     <div class="figure-caption"><strong style="font-style:normal;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--blue)">Filter: frame.len > 1400</strong><br>Frame 14 — a single 2,183-byte HTTP response from 142.11.206.73 to 192.168.1.47 at T=30.35s. Content-Type: application/octet-stream. The hex pane shows 4D 5A — the MZ magic bytes of a Windows PE executable. This is SILKBELL delivering WAVESHAPER.V2 to the victim machine.</div>
   </div>
 
@@ -320,7 +320,7 @@ footer span{color:#94a3b8}
 
   <div class="figure">
     <div class="figure-title">Figure 2 — C2 Beacon Pattern</div>
-    <div class="figure-body"><img src="../labs/img/009/beaconing.png" alt="Wireshark I/O Graph showing evenly spaced beacon spikes at 60-second intervals"></div>
+    <div class="figure-body"><img src="../labs/img/009/figure_2.png" alt="Wireshark I/O Graph showing evenly spaced beacon spikes at 60-second intervals"></div>
     <div class="figure-caption"><strong style="font-style:normal;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--blue)">Filter: ip.dst == 142.11.206.73 — Statistics → I/O Graphs</strong><br>I/O Graph with beaconing filter applied — showing only C2-destined traffic. Seven spikes at machine-precise 60-second intervals from T=90s to T=450s. The small dot at T=30s is the SILKBELL stage 2 download. With all other traffic removed the regularity is unambiguous — this is not human-generated traffic.</div>
   </div>
 
@@ -357,13 +357,13 @@ footer span{color:#94a3b8}
 
   <div class="figure">
     <div class="figure-title">Figure 3 — WAVESHAPER.V2 User-Agent Detection</div>
-    <div class="figure-body"><img src="../labs/img/009/MSIE_8_0.png" alt="Wireshark showing 8 POST beacons filtered by IE8 User-Agent string"></div>
+    <div class="figure-body"><img src="../labs/img/009/figure_3.png" alt="Wireshark showing 8 POST beacons filtered by IE8 User-Agent string"></div>
     <div class="figure-caption"><strong style="font-style:normal;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--blue)">Filter: http.user_agent contains "MSIE 8.0"</strong><br>8 packets displayed — all HTTP POST requests from 192.168.1.47 to 142.11.206.73:8000. Filter matches on the WAVESHAPER.V2 hardcoded User-Agent: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0). Internet Explorer 8 on Windows XP has not been in legitimate use since 2014.</div>
   </div>
 
   <div class="figure">
     <div class="figure-title">Figure 4 — Behavioral HTTP External Detection</div>
-    <div class="figure-body"><img src="../labs/img/009/http_external.png" alt="Wireshark showing same 8 packets filtered by HTTP External behavioral rule"></div>
+    <div class="figure-body"><img src="../labs/img/009/figure_4.png" alt="Wireshark showing same 8 packets filtered by HTTP External behavioral rule"></div>
     <div class="figure-caption"><strong style="font-style:normal;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--blue)">Filter: http.request and !(http.host contains "microsoft") and !(http.host contains "windowsupdate") and !(http.host contains "msocsp")</strong><br>9 packets displayed — same C2 POST requests plus one additional legitimate HTTP request to a non-safe-listed host. The filter catches everything going outbound that is not on the known-safe list, regardless of what the specific malware is.</div>
   </div>
 
