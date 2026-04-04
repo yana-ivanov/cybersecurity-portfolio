@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Document You Trusted | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.blue{color:var(--blue);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#fff;padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#0a0f1a}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-red .stat-num{color:var(--red)}
+.stat-green .stat-num{color:var(--green)}
+
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:90px 1fr;gap:1rem;align-items:start}
+.nist-control{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--blue);padding-top:.15rem}
+.nist-desc{font-size:.88rem;color:var(--ink3);line-height:1.7}
+.nist-desc strong{color:var(--ink)}
+
+.launch-btn{display:inline-flex;align-items:center;gap:.75rem;background:#1a4fa0;color:#fff;padding:.9rem 1.75rem;font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:background .2s;margin-top:.5rem}
+.launch-btn:hover{background:#1e3d8f;text-decoration:none;color:#fff}
+.launch-btn .material-icons{font-size:1rem}
+
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;gap:1.25rem}
+  footer{flex-direction:column;align-items:flex-start;gap:.75rem}
+  .mast-bar{padding:.8rem 1.75rem}
+}
+</style>
+</head>
+<body>
+
+<div class="mobile-notice">Best viewed on desktop · <strong>Optimized for 1024px+</strong></div>
+
+<nav class="back-nav">
+  <a href="../index.html">Portfolio</a>
+</nav>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Field Notes · Document Security</div>
+    <h1 class="title">The Document You Trusted<br><span>Is Not Always What It Contains</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item">
+        <div class="label">Author</div>
+        <div class="value">Yana Ivanov</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Published</div>
+        <div class="value">April 2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Category · Type</div>
+        <div class="value">Tools · Field Notes</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Stack</div>
+        <div class="value">Python · Flask · Railway</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Tested Against</div>
+        <div class="value">MalwareBazaar · Real Samples</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Status</div>
+        <div class="value">Live · Open Source</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mast-bar">
+  <div class="mast-bar-dot"></div>
+  DOCUMENT SECURITY · STATIC ANALYSIS · CMMC · POLYGLOT DETECTION · ZERO EXECUTION
+</div>
+
+<div class="wrap">
+<div class="content">
+
+<!-- 01 -->
+<div class="section">
+  <div class="section-num">01 — The Problem</div>
+  <h2>The Attachment Is the Blind Spot</h2>
+
+  <p>The executive has a flight tomorrow. Their assistant is coordinating — the calendar, the hotel confirmation, the travel itinerary. A PDF arrives from what looks like the airline: a boarding pass, an e-ticket update, a gate change. The assistant opens it. Nothing visible happens. But somewhere between the travel agency, the booking platform, and the inbox, someone intercepted that file and replaced the QR code with one that points somewhere else entirely. Or embedded a tracking pixel that phoned home the moment the document rendered, leaking the executive's corporate email, device fingerprint, and exact timestamp to an attacker who now knows the travel schedule, the destination, and that someone just opened a document on the corporate network.</p>
+
+  <p>The assistant is not careless. They are doing exactly what they were hired to do. The file looked right. The sender looked right. Nobody told them what to look for inside the attachment — because until now, there was no tool that made that check possible for a non-technical person.</p>
+
+  <p>A subcontractor at a defense firm gets a PDF. It's an invoice from a vendor they've worked with before. The email passes their spam filter. The attachment passes their antivirus scan. They open it. Nothing visible happens. But the moment that PDF renders in their reader, it phones home — leaking their IP address, operating system, and an exact timestamp to whoever sent it. And that's the benign version of the story.</p>
+
+  <p>The more dangerous version: the PDF contains an embedded Windows executable hidden at offset 36,700 bytes — past where any signature scanner checks — wrapped in a file structure that looks completely legitimate. The payload sits dormant until a user clicks, or auto-executes the moment the document opens via a PDF <code>/AA</code> action flag. The employee never knew. The antivirus never flagged it. The email security platform analyzed the email. Nobody analyzed what was inside the attachment.</p>
+
+  <p>This is the gap that Ladon was built to close.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The pattern keeps showing up:</strong> In my analysis of the TeamPCP supply chain attack — <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/analysis/telnyx_supply_chain_analysis.html" target="_blank" rel="noopener">The Trusted Channel</a> — the final payload was hidden inside WAV audio files fetched live from a command-and-control server, extracted in memory, and executed silently. No executable written to disk. No recognizable file. The same principle applies to documents: the threat is never where you think to look. It is always inside something that is trusted by default.</p>
+  </div>
+
+  <p>Email security platforms do excellent work analyzing the email envelope — headers, sender reputation, link analysis. The attachment is treated as a black box. A PDF that passes basic type-checking gets delivered. What lives inside that PDF — auto-executing JavaScript, a tracking pixel, a QR code pointing to a typosquatted domain, an embedded executable — is rarely analyzed at the point of delivery. That is not a gap in a specific product. It is a structural gap in how document security is approached across the industry.</p>
+</div>
+
+<!-- 02 -->
+<div class="section">
+  <div class="section-num">02 — How It Started</div>
+  <h2>The Idea Came From Reading</h2>
+
+  <p>The idea did not start with a tool. It started with reading.</p>
+
+  <p>I read threat intelligence the way some people read the news — continuously, as a habit built from genuine curiosity about how attacks work and why defenses fail. When a new attack surfaces, my brain doesn't stop at "that's interesting." It immediately asks three questions: how did this happen, why did existing defenses miss it, and what would it take to prevent it.</p>
+
+  <p>The pattern that led to Ladon was not a single attack — it was the accumulation of several. Supply chain attacks embedding malware in WAV audio files. Boarding pass QR codes replaced with credential harvesting links. Calendar invites bypassing email security filters entirely because <code>.ics</code> files are auto-added to Outlook and Google Calendar regardless of whether the original email was quarantined. PDF tracking pixels that phone home the moment a document is opened, leaking the recipient's IP address, operating system, and exact timestamp before they read a single word.</p>
+
+  <p>Each of these attack vectors shared something in common — they exploited the implicit trust users place in documents that look legitimate. A boarding pass is a boarding pass. A calendar invite from IT is from IT. A PDF invoice from a vendor is from a vendor. The malicious content is invisible to the eye and, critically, invisible to most security tools that analyze the email itself rather than what is embedded inside the attachments.</p>
+
+  <p>The question that crystallized the idea was simple: <strong>what if anyone could drag and drop a suspicious attachment into a tool and get a plain-English explanation of exactly what is suspicious about it and why it matters — before opening it?</strong> Not a cryptic hash match or a vendor confidence score, but a real explanation that teaches the user something about how the attack works.</p>
+
+  <p>That question became Ladon.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>On the name:</strong> In Greek mythology, Ladon was the hundred-headed serpent that never slept, assigned by Hera to guard the golden apples in the Garden of the Hesperides. It watched every angle simultaneously, never rested, and never missed a threat. The metaphor felt right for a tool designed to examine every attack surface in a document at once — PDF structure, embedded images, audio steganography, barcodes, calendar links — not just one thing, but all of them, simultaneously.</p>
+  </div>
+</div>
+
+<!-- 03 -->
+<div class="section">
+  <div class="section-num">03 — The Tool</div>
+  <h2>What Ladon Does, in Plain English</h2>
+
+  <p>Ladon is a static document security analyzer. You drag in a file — a PDF, an email, an image, a calendar invite, an audio file — and it tells you what's suspicious about it before you open it. It supports PDF, EML, ICS, JPG, PNG, GIF, BMP, WEBP, ICO, SVG, WAV, and MP3.</p>
+
+  <p>The word <em>static</em> is doing real work in that description. Ladon never executes the file. It reads the raw bytes and analyzes their structure, the same way a forensic investigator examines evidence without touching it. The malware has no idea it is being read. It cannot execute because nothing is interpreting it as a document — it is just data. This is not a minor technical detail. It is the core security guarantee that makes the tool safe to use on genuinely malicious files.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Detection Modules — What Ladon Examines</div>
+    <div class="figure-body" style="padding:1.5rem;">
+      <div class="step-list">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-content-label">PDF Structure Analysis</div>
+            <div class="step-content-desc">Detects dangerous PDF actions — code that auto-executes on open, hidden object streams, and external URL references embedded in document structure used as tracking pixels or payload delivery mechanisms.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-content-label">Polyglot Detection</div>
+            <div class="step-content-desc">Identifies files that are two things at once — a PDF that also contains a Windows executable, for example. Security tools that check only the file extension will classify it as safe. Ladon looks deeper.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-content-label">URL Analysis</div>
+            <div class="step-content-desc">Extracts and evaluates all URLs embedded in a document — flagging suspicious domains, unencrypted connections, and typosquatted addresses designed to impersonate legitimate services.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div>
+            <div class="step-content-label">Image Steganography</div>
+            <div class="step-content-desc">Detects hidden data concealed inside image files — content invisible to the eye and undetectable by tools that only check file type and size.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">5</div>
+          <div>
+            <div class="step-content-label">Audio Steganography</div>
+            <div class="step-content-desc">Detects payloads hidden inside audio files — the same delivery mechanism used in the TeamPCP/Telnyx supply chain attack documented in March 2026, where malware was concealed inside a WAV file and executed in memory.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">6</div>
+          <div>
+            <div class="step-content-label">QR Code Analysis</div>
+            <div class="step-content-desc">Decodes QR codes embedded in images and evaluates the destination URL — addressing the boarding pass attack vector where legitimate-looking codes redirect to credential harvesting pages.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">7</div>
+          <div>
+            <div class="step-content-label">Calendar / Meeting Spoofing</div>
+            <div class="step-content-desc">Analyzes calendar invites for spoofed organizer fields and suspicious embedded URLs — catching the ICS attack vector that bypasses email quarantine entirely because calendar files are auto-added on receipt.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-green">
+    <p><strong>The educational layer was intentional from the start.</strong> Security awareness training teaches people to be suspicious of unexpected attachments. It rarely explains the mechanics — what a tracking pixel actually does, why a QR code in a boarding pass can be dangerous, how data can be hidden in an image that looks completely normal. Every Ladon finding comes with a plain-English explanation of the technique, why it matters, and what an attacker gains from it.</p>
+  </div>
+</div>
+
+<!-- 04 -->
+<div class="section">
+  <div class="section-num">04 — The Test</div>
+  <h2>Four Real Samples. Zero Misses.</h2>
+
+  <p>Synthetic test files built to fire detection rules are a starting point — they prove the code runs, not that the tool works. Real validation requires real malware. On April 3, 2026, after installing a FlareVM malware analysis environment in an isolated Windows 11 virtual machine with Windows Defender disabled, I downloaded four confirmed malicious PDF samples from MalwareBazaar and uploaded each one to Ladon.</p>
+
+  <p>All four were detected. No false negatives. No crashes. No execution.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Validation results — April 3, 2026 · MalwareBazaar samples</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-blue">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Real malware samples tested</div>
+        <div class="stat-sub">MalwareBazaar confirmed malicious</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Detections — zero misses</div>
+        <div class="stat-sub">100% detection rate across all families</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Critical severity findings</div>
+        <div class="stat-sub">ValleyRAT · Phishing · Dropper</div>
+      </div>
+      <div class="stat-item stat-green">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Files executed during analysis</div>
+        <div class="stat-sub">Zero execution surface — static analysis only</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Sample</th>
+          <th>Family / Origin</th>
+          <th>Severity</th>
+          <th>Key Findings</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Unknown PDF dropper</strong><br><span style="font-family:var(--mono);font-size:.72rem;color:#94a3b8;">d67e62bb... · 293 KB</span></td>
+          <td>Unknown · MalwareBazaar 2026-03-31</td>
+          <td class="amber">HIGH</td>
+          <td>Polyglot: Windows PE signature inside PDF · <code>/ObjStm</code> stream (object hiding)</td>
+        </tr>
+        <tr>
+          <td><strong>Shui Wu Chou Cha She Shui Qi Ye Ming Dan</strong><br><span style="font-family:var(--mono);font-size:.72rem;color:#94a3b8;">e2b75baeb... · 158 KB</span></td>
+          <td>ValleyRAT / SilverFox · Chinese APT · 2026-03-13</td>
+          <td class="red">CRITICAL</td>
+          <td>Polyglot: PE signature inside PDF · 20× external URI · 13 suspicious URLs · Live C2 — <code>cos.ap-guangzhou.myqcloud.com</code></td>
+        </tr>
+        <tr>
+          <td><strong>Facebook Account Recovery Support Center 2026</strong><br><span style="font-family:var(--mono);font-size:.72rem;color:#94a3b8;">b046d04b... · 135 KB</span></td>
+          <td>Phishing · Social engineering · 2026-01-09</td>
+          <td class="red">CRITICAL</td>
+          <td>Polyglot: PE signature inside PDF · Auto-execute on open (6×) · 4× external URI · C2 — <code>maneger-accountr-solutieonst.site</code></td>
+        </tr>
+        <tr>
+          <td><strong>consider(15).pdf</strong><br><span style="font-family:var(--mono);font-size:.72rem;color:#94a3b8;">5095c647... · 155 KB</span></td>
+          <td>Gamaredon APT · Russian state-affiliated · 2025-11-24</td>
+          <td class="amber">HIGH</td>
+          <td>Polyglot: PE signature inside PDF · VBA macro content · PDF structure otherwise clean (sophisticated evasion)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 05 -->
+<div class="section">
+  <div class="section-num">05 — What We Found</div>
+  <h2>The Findings, One by One</h2>
+
+  <h3>Every sample was a polyglot</h3>
+  <p>All four samples contained a Windows PE executable hidden inside the PDF file body — past the point where most signature scanners check. This is not a coincidence. Polyglot files are a deliberate evasion technique. A tool that checks the first few bytes sees a valid PDF header and stops. Ladon reads the entire file.</p>
+
+  <h3>ValleyRAT: a live C2 URL baked into the PDF structure</h3>
+  <p>The ValleyRAT sample — delivered with a Chinese-language filename targeting Chinese-speaking businesses — embedded 20 external URI references and 13 suspicious URLs pointing to Chinese cloud infrastructure being abused as command-and-control. These URLs would be fetched automatically when the PDF renders — no user click required — delivering a secondary payload. The repetition of the same C2 domain across thirteen URLs is itself a ValleyRAT technique: embed enough copies that at least one resolves even if some are taken down.</p>
+
+  <h3>The Facebook phishing PDF: auto-execute on open</h3>
+  <p>The most technically aggressive sample was disguised as a Facebook account recovery notice. Beyond the embedded executable, Ladon detected auto-execute actions — a PDF capability that triggers code execution the moment the document renders. No macro to enable. No button to click. Simply opening the file in a PDF reader is enough. This is the attack that ends careers and fails CMMC audits: an employee receives what looks like an official communication, opens it following normal procedure, and the payload runs before they finish reading the first sentence.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Auto-execute in practice:</strong> The PDF specification includes legitimate mechanisms for triggering actions when a document opens — designed for form submission, accessibility features, and similar use cases. Attackers abuse these same mechanisms to execute malicious code on document open. The finding does not require the user to do anything wrong. Opening the file is the trigger.</p>
+  </div>
+
+  <h3>Gamaredon: sophisticated evasion, still caught</h3>
+  <p>The most interesting result was the Gamaredon sample. Gamaredon — also known as Primitive Bear, Shuckworm, or Aqua Blizzard — is a Russian FSB-attributed APT group active since at least 2013, primarily targeting Ukrainian government and military institutions with documented expansion toward NATO-aligned organizations. The security community has long debated how to characterize them: <a href="https://www.welivesecurity.com/en/podcasts/eset-research-podcast-gamaredon/" target="_blank" rel="noopener">ESET describes them</a> as "known for their unsophisticated and noisy approach" — yet ESET's own July 2025 research shows <a href="https://www.eset.com/us/about/newsroom/research/eset-research-russias-gamaredon-apt-group-unleashed-spearphishing-campaigns-against-ukraine-with-an-evolved-toolset/" target="_blank" rel="noopener">the group has notably adapted, with new tools designed primarily for stealth.</a> <a href="https://harfanglab.io/blog/strategy/cyber-threat-research-2025/" target="_blank" rel="noopener">HarfangLab notes</a> they are as active as ever but receive little in-depth coverage, with their ability to consistently evade detection making them a persistent threat.</p>
+
+  <p>What Ladon's result adds to that debate: the sophistication question is the wrong frame. Their sample was deliberately constructed to be clean at the PDF structure layer — no auto-execute flags, no hidden object streams, no external URI references. A tool that stopped at document structure analysis would have cleared this file as safe. Ladon caught it anyway, because polyglot detection does not depend on what the document structure claims. It reads the entire file independently. The embedded executable cannot hide from that check regardless of how clean the wrapper looks — or how the security community classifies the group that built it.</p>
+
+  <p>That is the architectural decision that matters. Defense in depth at the file level, not just at one layer.</p>
+</div>
+
+<!-- 06 -->
+<div class="section">
+  <div class="section-num">06 — Why This Matters for CMMC</div>
+  <h2>The Contractor Who Opens the PDF</h2>
+
+  <p>Defense contractors are not the primary target of most of these campaigns. They are a target of opportunity — organizations that handle Controlled Unclassified Information, that often lack dedicated security teams, and that receive documents from dozens of vendors, subcontractors, and government offices every day. The attack surface is the inbox. The vector is the PDF.</p>
+
+  <p>The ValleyRAT and Gamaredon families both have documented histories targeting organizations connected to defense supply chains. Gamaredon has been active since at least 2013, attributed to Russia's Federal Security Service, and has been observed specifically targeting defense industrial organizations in Eastern Europe and NATO member states. A contractor in Connecticut receiving a PDF from an unfamiliar sender is not paranoid to be cautious. They are operating in an environment where nation-state actors have explicitly demonstrated interest in exactly that attack vector.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The CMMC context:</strong> Phase 1 enforcement has been active since November 10, 2025. Phase 2 mandatory third-party certification begins November 2026. Only 1% of contractors are currently audit-ready — down from 8% in 2023. There are 350,000 contractors requiring certification and only 600 certified assessors. In that environment, a single successful document-based attack that results in a data breach is not just a security incident. It is a contract-ending event. <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/analysis/CMMC_Supply_Chain.html" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:.7rem;color:var(--amber);">[Full CMMC Supply Chain Analysis →]</a></p>
+  </div>
+
+  <p>Ladon is not a replacement for endpoint security or email gateways. It is the triage layer that exists before those tools are relevant — the thing you use when a file arrives and you need to know, before you open it, whether it is safe. For a CMMC-compliant organization, having a documented triage process for suspicious attachments is not just good hygiene. It maps directly to control requirements.</p>
+
+  <div class="nist-box">
+    <div class="nist-box-title">Applicable NIST SP 800-171 Controls</div>
+    <div class="nist-items">
+      <div class="nist-item">
+        <span class="nist-control">3.14.1<br>SI.1.210</span>
+        <span class="nist-desc"><strong>Malicious code protection.</strong> Identify, report, and correct information and information system flaws — including those introduced through malicious attachments. Static triage analysis before opening a file directly supports this control.</span>
+      </div>
+      <div class="nist-item">
+        <span class="nist-control">3.14.2<br>SI.2.214</span>
+        <span class="nist-desc"><strong>Security alerts and advisories.</strong> Monitor system security alerts and take action in response to malicious code. Ladon's plain-English findings give non-technical employees actionable, documented evidence to escalate.</span>
+      </div>
+      <div class="nist-item">
+        <span class="nist-control">3.2.1<br>AT.2.056</span>
+        <span class="nist-desc"><strong>Security awareness training.</strong> Ensure personnel are aware of security risks associated with their activities. Using Ladon in a facilitated session — running real suspicious files and explaining findings — creates a documented, role-relevant training record that satisfies this control.</span>
+      </div>
+      <div class="nist-item">
+        <span class="nist-control">3.13.1<br>SC.1.175</span>
+        <span class="nist-desc"><strong>Boundary protection.</strong> Monitor, control, and protect communications at external boundaries. Document triage is a boundary protection activity — analyzing what crosses the perimeter before it is introduced into the environment.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 07 -->
+<div class="section">
+  <div class="section-num">07 — What's Next</div>
+  <h2>The Tool Is the Proof of Concept</h2>
+
+  <p>Ladon is a portfolio piece today. The goal is for it to become infrastructure.</p>
+
+  <p>The manual triage workflow — drag a file, get a plain-English report — is the starting point. April 3, 2026 proved it works on real malware from real threat actors. The methodology is validated. What comes next is a larger problem: the gap is not just in manual triage, it is in the moment before an employee ever sees the file. That is the problem worth solving.</p>
+
+  <p>For CMMC-compliant defense contractors specifically, a pre-delivery document scanner that produces structured findings, maps to NIST controls, and generates audit-ready logs addresses a compliance gap that no existing consumer-grade tool fills. The market exists. The methodology is validated. The next step is the integration layer.</p>
+
+
+
+  <div class="callout callout-blue">
+    <p><strong>Currently in private testing.</strong> Ladon is being validated with real malware samples before public release. If you are a defense contractor, CMMC consultant, or security team lead interested in early access or want to discuss how document triage fits into your compliance workflow, reach out via the portfolio.</p>
+  </div>
+
+  <p>The detection methodology that powers Ladon builds on the same analytical foundation as my other published work — including the <a href="https://github.com/sublime-security/sublime-rules/pull/4267" target="_blank" rel="noopener">Glassworm homoglyph detection rule</a> submitted to Sublime Security's community rule feed. Each piece of work is a layer in the same argument: the threats are in the details nobody is checking, and the tools to check them can be built.</p>
+</div>
+
+<!-- 08 -->
+<div class="section">
+  <div class="section-num">08 — References</div>
+  <h2>Sources</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Source</th><th>Relevance</th><th>Link</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>MalwareBazaar — abuse.ch</strong></td>
+          <td>All four malware samples used in validation</td>
+          <td class="blue"><a href="https://bazaar.abuse.ch" target="_blank" rel="noopener">bazaar.abuse.ch</a></td>
+        </tr>
+        <tr>
+          <td><strong>MITRE ATT&CK — Gamaredon</strong></td>
+          <td>Russian FSB-attributed APT · Active since 2013 · NATO targeting</td>
+          <td class="blue"><a href="https://attack.mitre.org/groups/G0047/" target="_blank" rel="noopener">attack.mitre.org/groups/G0047</a></td>
+        </tr>
+        <tr>
+          <td><strong>TeamPCP / Telnyx Supply Chain Analysis</strong></td>
+          <td>WAV steganography in supply chain attack — same technique Ladon detects</td>
+          <td class="blue"><a href="https://yana-ivanov.github.io/cybersecurity-portfolio/analysis/telnyx_supply_chain_analysis.html" target="_blank" rel="noopener">The Trusted Channel →</a></td>
+        </tr>
+        <tr>
+          <td><strong>CMMC Supply Chain Analysis — Yana Ivanov, 2026</strong></td>
+          <td>1% audit-ready · 350K contractors · 600 assessors · 18-month wait times</td>
+          <td class="blue"><a href="https://yana-ivanov.github.io/cybersecurity-portfolio/analysis/CMMC_Supply_Chain.html" target="_blank" rel="noopener">CMMC Supply Chain Analysis →</a></td>
+        </tr>
+        <tr>
+          <td><strong>NIST SP 800-171 Rev 3</strong></td>
+          <td>Control mappings — SI.1.210, SI.2.214, AT.2.056, SC.1.175</td>
+          <td class="blue"><a href="https://csrc.nist.gov/publications/detail/sp/800-171/rev-3/final" target="_blank" rel="noopener">csrc.nist.gov</a></td>
+        </tr>
+        <tr>
+          <td><strong>DoD CIO — CMMC Program</strong></td>
+          <td>Phase 1 enforcement active November 10, 2025 · Phase 2 begins November 2026</td>
+          <td class="blue"><a href="https://dodcio.defense.gov/CMMC/" target="_blank" rel="noopener">dodcio.defense.gov/CMMC</a></td>
+        </tr>
+        <tr>
+          <td><strong>Sublime Security — PR #4267</strong></td>
+          <td>Glassworm invisible Unicode detection rule — community rule feed submission</td>
+          <td class="blue"><a href="https://github.com/sublime-security/sublime-rules/pull/4267" target="_blank" rel="noopener">sublime-rules/pull/4267</a></td>
+        </tr>
+        <tr>
+          <td><strong>Mandiant FlareVM</strong></td>
+          <td>Malware analysis environment used for isolated testing</td>
+          <td class="blue"><a href="https://github.com/mandiant/flare-vm" target="_blank" rel="noopener">github.com/mandiant/flare-vm</a></td>
+        </tr>
+        <tr>
+          <td><strong>ESET Research — Gamaredon 2024 White Paper</strong></td>
+          <td>"Known for unsophisticated and noisy approach" — yet evolving stealth capabilities</td>
+          <td class="blue"><a href="https://www.eset.com/us/about/newsroom/research/eset-research-russias-gamaredon-apt-group-unleashed-spearphishing-campaigns-against-ukraine-with-an-evolved-toolset/" target="_blank" rel="noopener">eset.com · July 2025</a></td>
+        </tr>
+        <tr>
+          <td><strong>HarfangLab — Cyber Threat Research 2025</strong></td>
+          <td>Gamaredon active as ever, little in-depth coverage, consistently evades detection</td>
+          <td class="blue"><a href="https://harfanglab.io/blog/strategy/cyber-threat-research-2025/" target="_blank" rel="noopener">harfanglab.io · December 2025</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+</div>
+
+<div class="bio">
+  <div class="bio-avatar">Y</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Cybersecurity Researcher &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC compliance consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance. This analysis was produced independently as a contribution to the security community's understanding of active threats against US defense infrastructure.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>The Document You Trusted &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; April 2026 &nbsp;·&nbsp; Independent analysis · Educational use only</span>
+  <span>Tested against real MalwareBazaar samples in isolated FlareVM environment</span>
+</footer>
+
+</body>
+</html>
