@@ -1753,7 +1753,10 @@ body.drawer-open .cipher-wrap {
         <div id="drSender" style="font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
         <div id="drSubject" style="font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
       </div>
-      <button class="close-btn" onclick="closeDrawerDirect()" title="Close">✕</button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onclick="exportDrawerReport()" title="Export report" style="font-family:var(--mono);font-size:11px;letter-spacing:.08em;padding:5px 10px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;text-transform:uppercase;transition:border-color .2s,color .2s" onmouseover="this.style.borderColor='#ff3f54';this.style.color='#ff3f54'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Export</button>
+        <button class="close-btn" onclick="closeDrawerDirect()" title="Close">✕</button>
+      </div>
     </div>
     <div class="drawer-body">
 
@@ -3421,6 +3424,54 @@ function saveApiKey() {}
     if (poly) poly.setAttribute('fill', '#ffffff');
   }
 })();
+
+
+function exportDrawerReport() {
+  if (!selectedEmail) return;
+  const a = selectedEmail.analysis || {};
+  const lines = [];
+  lines.push('EMAIL THREAT ANALYSIS REPORT');
+  lines.push('Generated: ' + new Date().toUTCString());
+  lines.push('='.repeat(40));
+  lines.push('');
+  lines.push('Subject:  ' + (selectedEmail.subject || 'N/A'));
+  lines.push('From:     ' + (selectedEmail.from || 'N/A'));
+  lines.push('Date:     ' + (selectedEmail.date || 'N/A'));
+  lines.push('Risk:     ' + (a.risk || 'N/A').toUpperCase());
+  lines.push('Threat:   ' + (a.threatType || 'N/A'));
+  lines.push('');
+  lines.push('THREAT SUMMARY');
+  lines.push('-'.repeat(40));
+  lines.push(a.summary || 'N/A');
+  lines.push('');
+  lines.push('INDICATORS OF COMPROMISE');
+  lines.push('-'.repeat(40));
+  (a.iocs || []).forEach(ioc => {
+    lines.push('[' + (ioc.type || '').toUpperCase() + '] ' + (ioc.description || ''));
+    if (ioc.value) lines.push('  Value: ' + ioc.value);
+  });
+  lines.push('');
+  lines.push('MITRE ATT&CK TECHNIQUES');
+  lines.push('-'.repeat(40));
+  (a.mitre || []).forEach(t => lines.push(t));
+  lines.push('');
+  lines.push('TRAINING — WHAT TO LOOK FOR');
+  lines.push('-'.repeat(40));
+  const tr = a.training || {};
+  if (tr.title) lines.push(tr.title);
+  if (tr.explanation) lines.push(tr.explanation);
+  (tr.redFlags || []).forEach(f => lines.push('* ' + f));
+  lines.push('');
+  lines.push('='.repeat(40));
+  lines.push('SiteWave Studio LLC — Email Threat Analyzer');
+
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  const subj = (selectedEmail.subject || 'report').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  link.download = 'email_threat_' + subj + '.txt';
+  link.click();
+}
 
 // Init
 document.getElementById('aiDot').classList.add('connected');
