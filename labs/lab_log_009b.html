@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WAVESHAPER.V2 — Triage Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0d1520; --bg2:#111c2d; --bg3:#162235;
+  --border:rgba(0,174,255,0.12); --border2:rgba(0,174,255,0.25);
+  --blue:#00aeff; --blue-dim:rgba(0,174,255,0.08);
+  --text:#e2e8f0; --text2:#94a3b8; --text3:#64748b;
+  --red:#e8374a; --orange:#f07840; --green:#2dd4a0; --amber:#f0c040;
+  --mono:"JetBrains Mono",monospace;
+  --display:"Orbitron",monospace;
+  --body:"Inter",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{font-family:var(--body);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+.layout{display:grid;grid-template-columns:300px 1fr;grid-template-rows:48px 1fr;height:100vh;overflow:hidden}
+
+/* TOPBAR */
+.topbar{grid-column:1/-1;background:var(--bg2);border-bottom:1px solid var(--border);padding:.75rem 2rem;display:flex;align-items:center;gap:1rem;z-index:100}
+.logo{font-family:var(--display);font-size:1.1rem;font-weight:600;color:var(--blue);letter-spacing:.15em;text-transform:uppercase}
+.logo-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);animation:pulse 2s ease-in-out infinite;margin-left:.5rem}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.topbar-badge{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--blue);border:1px solid var(--border2);padding:.2rem .5rem;border-radius:2px;text-transform:uppercase}
+.topbar-right{margin-left:auto;display:flex;gap:.75rem;align-items:center}
+.topbar-btn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .85rem;border-radius:2px;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--blue);transition:background .2s,opacity .2s;display:flex;align-items:center;gap:.4rem}
+.topbar-btn:hover{background:var(--blue-dim)}
+.topbar-btn:disabled{opacity:.3;cursor:not-allowed}
+.topbar-btn.export{background:var(--blue);color:#0d1520;border-color:var(--blue);font-weight:600}
+.topbar-btn.export:hover{opacity:.85}
+.topbar-btn.export:disabled{background:transparent;color:var(--text3);border-color:var(--border);font-weight:400;opacity:.35}
+
+/* SIDEBAR */
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:2rem 1.5rem;overflow-y:auto;height:100%}
+.sidebar-section{margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid var(--border)}
+.sidebar-section:last-child{border-bottom:none;margin-bottom:0}
+.sidebar-section-title{font-family:var(--mono);font-size:11px;letter-spacing:.15em;color:var(--text3);text-transform:uppercase;margin-bottom:1rem}
+.sidebar-text{font-size:14px;color:var(--text2);line-height:20px}
+.sidebar-text strong{color:var(--text)}
+.format-list{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.75rem}
+.format-tag{font-family:var(--mono);font-size:11px;color:var(--blue);background:var(--blue-dim);border:1px solid var(--border2);padding:.2rem .5rem;border-radius:2px}
+.disclaimer{font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1.7;padding:.75rem;background:rgba(240,120,64,0.06);border:1px solid rgba(240,120,64,0.2);border-radius:2px}
+.disclaimer strong{color:var(--orange)}
+
+/* MAIN */
+.main{overflow-y:auto;height:100%;padding:1.5rem 2rem;display:flex;flex-direction:column;gap:1.5rem}
+
+/* SECTION LABEL */
+.section-label{font-family:var(--mono);font-size:13px;letter-spacing:.2em;color:var(--text3);text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* SCENARIO CARDS */
+.scenarios-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.scenario-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:.85rem 1rem;cursor:pointer;transition:border-color .2s,background .2s;user-select:none}
+.scenario-card:hover{border-color:var(--border2);background:var(--bg3)}
+.scenario-card.active{border-color:var(--blue);background:var(--blue-dim);border-top:2px solid var(--blue)}
+.scenario-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;margin-bottom:.4rem}
+.scenario-type{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
+.scenario-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:.4rem}
+.scenario-desc{font-size:13px;color:var(--text2);line-height:1.55}
+.scenario-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:500;white-space:nowrap;flex-shrink:0}
+.scenario-badge.critical{background:rgba(232,55,74,0.12);color:#e8374a;border:1px solid rgba(232,55,74,0.25)}
+.scenario-badge.high{background:rgba(240,120,64,0.12);color:#f07840;border:1px solid rgba(240,120,64,0.25)}
+
+
+/* RESULTS */
+.result-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;overflow:hidden;display:none;flex-direction:column}
+.result-module-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;background:var(--bg3);border-bottom:1px solid var(--border);flex-shrink:0}
+.result-module-name{font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text);display:flex;align-items:center;gap:.75rem}
+.severity-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-family:var(--mono);font-size:13px;letter-spacing:.06em;white-space:nowrap;text-transform:uppercase;font-weight:500}
+.severity-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.severity-badge.critical{background:rgba(232,55,74,0.12);color:#e8374a;border:1px solid rgba(232,55,74,0.25)}
+.severity-badge.high{background:rgba(240,120,64,0.12);color:#f07840;border:1px solid rgba(240,120,64,0.25)}
+.severity-badge.medium{background:rgba(240,192,64,0.12);color:#f0c040;border:1px solid rgba(240,192,64,0.25)}
+.severity-badge.low{background:rgba(45,212,160,0.12);color:#2dd4a0;border:1px solid rgba(45,212,160,0.2)}
+.result-pre-wrap{overflow-y:auto;max-height:calc(100vh - 380px);padding:1.25rem 1.5rem}
+pre{font-family:var(--mono);font-size:13px;line-height:1.9;white-space:pre-wrap;word-break:break-word}
+
+/* color classes for pre output */
+.c-red{color:#e8374a;font-weight:600}
+.c-orange{color:#f07840;font-weight:600}
+.c-green{color:#2dd4a0}
+.c-blue{color:#00aeff;font-weight:500}
+.c-dim{color:#374151}
+.c-muted{color:#64748b}
+.c-amber{color:#f0c040;font-weight:700}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<div class="topbar">
+  <div class="logo">WAVESHAPER<span style="color:var(--text2)">.V2</span></div>
+  <div class="logo-dot"></div>
+  <div class="topbar-badge">Triage Demo</div>
+  <div class="topbar-right">
+    <button class="topbar-btn export" id="exportBtn" onclick="exportReport()" disabled>&#8595; Export Report</button>
+  </div>
+</div>
+
+<div class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">About This Tool</div>
+    <div class="sidebar-text">
+      <strong>waveshaper_triage.py</strong> is a Python script that reads a PCAP file and automatically detects WAVESHAPER.V2 C2 behavioral indicators — no manual filter entry required.<br><br>
+      Click any scenario below to run a simulated analysis against the synthetic training dataset.
+    </div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">What It Detects</div>
+    <div class="sidebar-text">
+      <strong>C2 IP connections</strong> — 142.11.206.73<br><br>
+      <strong>Beacon intervals</strong> — machine-precise 60s<br><br>
+      <strong>IE8/WinXP User-Agent</strong> — zero legitimate use<br><br>
+      <strong>Stage 2 binary</strong> — MZ/PE from C2<br><br>
+      <strong>Base64 telemetry</strong> — host recon data<br><br>
+      <strong>POST to raw IP</strong> — no domain resolution<br><br>
+      <strong>Known C2 URI paths</strong> — documented IOCs
+    </div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Dataset</div>
+    <div class="sidebar-text">
+      <strong>waveshaper_v2_training.pcap</strong><br>
+      59 packets · 7-minute window<br>
+      Synthetic · Educational use only
+    </div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-title">Disclaimer</div>
+    <div class="disclaimer">
+      <strong>Synthetic dataset.</strong> The training pcap and detection script were reconstructed from publicly documented WAVESHAPER.V2 behavioral indicators — beacon intervals, User-Agent strings, C2 IP, and URI paths from GTIG's March 2026 disclosure. Not from a real incident. Educational use only.
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div>
+    <div class="section-label">Example Attack Scenarios</div>
+    <div class="scenarios-grid">
+
+      <div class="scenario-card" id="card-1" onclick="runScenario(1)">
+        <div class="scenario-card-top">
+          <div class="scenario-type">Stage 1 — Initial Infection</div>
+          <div class="scenario-badge high">HIGH</div>
+        </div>
+        <div class="scenario-name">SILKBELL Stage 2 Payload Delivery</div>
+        <div class="scenario-desc">At T=30s, the C2 server responds to SILKBELL's initial check-in with a 2.1 KB Windows PE executable — WAVESHAPER.V2 arriving on the victim machine.</div>
+      </div>
+
+      <div class="scenario-card" id="card-2" onclick="runScenario(2)">
+        <div class="scenario-card-top">
+          <div class="scenario-type">Stage 2 — C2 Beaconing</div>
+          <div class="scenario-badge critical">CRITICAL</div>
+        </div>
+        <div class="scenario-name">Machine-Precise 60-Second Beacon Pattern</div>
+        <div class="scenario-desc">Eight POST requests to 142.11.206.73:8000 at exact 60-second intervals — IE8/WinXP User-Agent, Base64 JSON telemetry, zero deviation from documented interval.</div>
+      </div>
+
+      <div class="scenario-card" id="card-3" onclick="runScenario(3)">
+        <div class="scenario-card-top">
+          <div class="scenario-type">Stage 3 — Full Compromise</div>
+          <div class="scenario-badge critical">CRITICAL</div>
+        </div>
+        <div class="scenario-name">All Indicators — Complete 7-Minute Capture</div>
+        <div class="scenario-desc">Full 7-minute capture: payload download, 8 confirmed beacons, C2 DNS lookups, decoded telemetry, known URI paths. Complete picture of an active infection.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section-label" id="resultsLabel" style="display:none">Analysis Results</div>
+  <div class="result-card" id="resultCard">
+    <div class="result-module-header">
+      <div class="result-module-name" id="resultTitle">waveshaper_v2_training.pcap</div>
+      <span class="severity-badge" id="sevBadge"></span>
+    </div>
+    <div class="result-pre-wrap">
+      <pre id="resultOutput"></pre>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+const SCENARIOS = {
+  1: {
+    title: 'waveshaper_v2_training.pcap — Stage 1: Payload Delivery',
+    severity: 'HIGH',
+    output: `Analyzing: waveshaper_v2_training.pcap
+
+================================================================
+  WAVESHAPER.V2 TRIAGE REPORT
+  File    : waveshaper_v2_training.pcap
+  Packets : 59
+  IOCs    : GTIG/Google March 2026 — UNC1069 / BlueNoroff
+================================================================
+
+<span class="c-blue">[ VICTIM HOST IDENTITY ]</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+  IP Address  : 192.168.1.47
+  MAC Address : aa:bb:cc:11:22:33
+  Hostname    : DEVLAPTOP-047
+
+<span class="c-blue">[ STAGE 2 BINARY DOWNLOAD FROM C2 ] — 1 found</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+<span class="c-red">  !! PAYLOAD  Windows PE (MZ) response from 142.11.206.73</span>
+               Size  : 2.1 KB
+               Magic : 0x4D5A
+               Time  : 00:00:30 UTC
+<span class="c-orange">               Binary payload from C2 — SILKBELL stage 2 delivery</span>
+
+<span class="c-blue">[ CONFIRMED C2 IP CONNECTIONS ] — 1 packet (T=30s only)</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+<span class="c-orange">  !! MATCH  C2 IP: 142.11.206.73</span>
+             GTIG attribution: UNC1069 / BlueNoroff (North Korea-nexus)
+             First contact   : 00:00:30 UTC
+             URI             : /packages.npm.org/product2
+
+<span class="c-blue">[ SEVERITY ASSESSMENT ]</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+  Stage 2 binary download from C2  :   1  !!
+  Confirmed C2 IP connection       :   1  !!
+
+<span class="c-orange">  Severity : HIGH — STAGE 2 PAYLOAD DELIVERED
+  Action   : WAVESHAPER.V2 arrived on host at T=30s.
+             Isolate immediately. Image memory before reboot.</span>`,
+  },
+  2: {
+    title: 'waveshaper_v2_training.pcap — Stage 2: C2 Beaconing',
+    severity: 'CRITICAL',
+    output: `Analyzing: waveshaper_v2_training.pcap
+
+================================================================
+  WAVESHAPER.V2 TRIAGE REPORT
+  File    : waveshaper_v2_training.pcap
+  Packets : 59
+  IOCs    : GTIG/Google March 2026 — UNC1069 / BlueNoroff
+================================================================
+
+<span class="c-blue">[ VICTIM HOST IDENTITY ]</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+  IP Address  : 192.168.1.47
+  MAC Address : aa:bb:cc:11:22:33
+  Hostname    : DEVLAPTOP-047
+
+<span class="c-blue">[ C2 BEACON INTERVAL ANALYSIS ] — 8 POST beacons detected</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+  Beacons detected   : 8
+  Average interval   : 60.1s  (documented: 60.0s)
+  Max deviation      : 0.7s
+<span class="c-red">  Pattern            : MACHINE-PRECISE — C2 beaconing confirmed</span>
+
+  Beacon timestamps:
+<span class="c-orange">    [01] 00:00:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product2
+    [02] 00:01:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
+    [03] 00:02:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
+    [04] 00:03:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
+    [05] 00:04:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
+    [06] 00:05:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
+    [07] 00:06:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
+    [08] 00:07:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1</span>
+
+<span class="c-blue">[ ANOMALOUS USER-AGENT — IE8 / WINDOWS XP ] — 8 found</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+<span class="c-red">  !! UA    Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)</span>
+             Matched  : MSIE 8.0, Windows NT 5.1, Trident/4.0
+             Dst      : 142.11.206.73:8000
+<span class="c-orange">             IE8/WinXP in 2026 — zero legitimate use cases. Immediate escalation.</span>
+
+<span class="c-blue">[ BASE64-ENCODED JSON TELEMETRY ] — 7 decoded</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+<span class="c-orange">  !! B64   Beacon 1 — 00:01:30 UTC</span>
+             h  : DEVLAPTOP-047
+             u  : jsmith
+             os : Windows 10 Pro 22H2
+             tz : America/New_York
+             seq: 1
+
+<span class="c-blue">[ SEVERITY ASSESSMENT ]</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+  Machine-precise beaconing    :   1  !!
+  IE8/WinXP User-Agent anomaly :   8  !!
+  Base64 JSON telemetry        :   7  !!
+  POST to raw IP address       :   8  !!
+
+<span class="c-red">  Severity : CRITICAL — ACTIVE C2 BEACONING CONFIRMED
+  Action   : Active C2 channel to 142.11.206.73:8000.
+             Isolate host. Block egress to 142.11.206.73.</span>`,
+  },
+  3: {
+    title: 'waveshaper_v2_training.pcap — Full Compromise, All Indicators',
+    severity: 'CRITICAL',
+    output: `Analyzing: waveshaper_v2_training.pcap
+
+================================================================
+  WAVESHAPER.V2 TRIAGE REPORT
+  File    : waveshaper_v2_training.pcap
+  Packets : 59
+  IOCs    : GTIG/Google March 2026 — UNC1069 / BlueNoroff
+================================================================
+
+<span class="c-blue">[ VICTIM HOST IDENTITY ]</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+  IP Address  : 192.168.1.47
+  MAC Address : aa:bb:cc:11:22:33
+  Hostname    : DEVLAPTOP-047
+
+<span class="c-blue">[ CONFIRMED C2 IP CONNECTIONS ] — 8 packets</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+<span class="c-red">  !! MATCH  C2 IP: 142.11.206.73</span>
+             GTIG attribution: UNC1069 / BlueNoroff (North Korea-nexus)
+             Packets to C2   : 8
+             Total data sent : 3.7 KB
+             Ports contacted : 8000
+             First contact   : 00:00:30 UTC
+             Last contact    : 00:07:30 UTC
+
+<span class="c-blue">[ C2 DOMAIN DNS LOOKUP ] — 2 found</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+<span class="c-red">  !! DNS   sfrclak.com</span>
+             IOC  : sfrclak.com — confirmed GTIG C2 domain
+             Time : 00:03:20 UTC
+
+<span class="c-blue">[ C2 BEACON INTERVAL ANALYSIS ] — 8 POST beacons</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+  Beacons detected   : 8
+  Average interval   : 60.1s  (documented: 60.0s)
+  Max deviation      : 0.7s
+<span class="c-red">  Pattern            : MACHINE-PRECISE — C2 beaconing confirmed</span>
+
+<span class="c-orange">    [01] 00:00:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product2
+    [02] 00:01:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
+    [03] 00:02:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
+    [04] 00:03:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
+    [05] 00:04:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
+    [06] 00:05:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
+    [07] 00:06:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1
+    [08] 00:07:30 UTC  →  142.11.206.73:8000  /packages.npm.org/product1</span>
+
+<span class="c-blue">[ ANOMALOUS USER-AGENT — IE8 / WINDOWS XP ] — 8 found</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+<span class="c-red">  !! UA    Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)</span>
+<span class="c-orange">             IE8/WinXP in 2026 — zero legitimate use cases. Immediate escalation.</span>
+
+<span class="c-blue">[ BASE64-ENCODED JSON TELEMETRY ] — 7 decoded</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+<span class="c-orange">  !! B64   Beacon 1 — 00:01:30 UTC</span>
+             h  : DEVLAPTOP-047  |  u: jsmith
+             os : Windows 10 Pro 22H2  |  tz: America/New_York
+             seq: 1 → 7 (7 beacons decoded)
+
+<span class="c-blue">[ POST TO RAW IP — NO DOMAIN ] — 8 found</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+<span class="c-orange">  !! POST  142.11.206.73  /packages.npm.org/product2
+  !! POST  142.11.206.73  /packages.npm.org/product1  (×7)
+             POST to raw IP — legitimate apps resolve domain names</span>
+
+<span class="c-blue">[ STAGE 2 BINARY DOWNLOAD FROM C2 ] — 1 found</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+<span class="c-red">  !! PAYLOAD  Windows PE (MZ) response from 142.11.206.73</span>
+               Size  : 2.1 KB  |  Magic: 0x4D5A  |  Time: 00:00:30 UTC
+<span class="c-orange">               Binary payload from C2 — SILKBELL stage 2 delivery</span>
+
+<span class="c-blue">[ KNOWN WAVESHAPER C2 URI PATHS ] — 8 found</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+<span class="c-orange">  !! PATH  /packages.npm.org/product2  — Stage 2 download endpoint
+  !! PATH  /packages.npm.org/product1  — Regular beacon endpoint (×7)</span>
+
+<span class="c-blue">[ SEVERITY ASSESSMENT ]</span>
+<span class="c-dim">----------------------------------------------------------------</span>
+  Confirmed C2 IP connections    :   8  !!
+  C2 domain DNS lookups          :   2  !!
+  Machine-precise beaconing      :   1  !!
+  IE8/WinXP User-Agent anomaly   :   8  !!
+  Base64 JSON telemetry          :   7  !!
+  POST to raw IP address         :   8  !!
+  Stage 2 binary download        :   1  !!
+  Known WAVESHAPER C2 paths      :   8  !!
+
+<span class="c-red">  Severity : CRITICAL — WAVESHAPER.V2 INFECTION CONFIRMED
+  Action   : Active C2 beaconing detected. Isolate host immediately.
+             Block 142.11.206.73 and sfrclak.com at perimeter.
+             Image memory before reboot. Escalate to IR team.</span>`,
+  }
+};
+
+let activeScenario = null;
+
+function runScenario(n) {
+  [1,2,3].forEach(i => document.getElementById('card-'+i).classList.remove('active'));
+  document.getElementById('card-'+n).classList.add('active');
+
+  const s = SCENARIOS[n];
+  activeScenario = n;
+
+  setTimeout(() => {
+    document.getElementById('resultTitle').textContent = s.title;
+    document.getElementById('resultsLabel').style.display = 'flex';
+    const badge = document.getElementById('sevBadge');
+    badge.textContent = s.severity;
+    badge.className = 'severity-badge ' + s.severity.toLowerCase();
+    document.getElementById('resultOutput').innerHTML = s.output;
+    const card = document.getElementById('resultCard');
+    card.style.display = 'flex';
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    document.getElementById('exportBtn').disabled = false;
+  }, 800);
+}
+
+function exportReport() {
+  if (!activeScenario) return;
+  const s = SCENARIOS[activeScenario];
+  const plain = s.output.replace(/<[^>]+>/g, '');
+  const blob = new Blob([plain], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'waveshaper_v2_triage_scenario_' + activeScenario + '.txt';
+  a.click();
+}
+</script>
+</body>
+</html>
