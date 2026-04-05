@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Log 010 — Building Ladon | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.blue{color:var(--blue);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:#f07840;font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:#2dd4a0;font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.red{color:#e8374a;font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-red .stat-num{color:var(--red)}
+.stat-green .stat-num{color:var(--green)}
+
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.2rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.figure-body{padding:0}
+.figure-body img{width:100%;display:block}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic;line-height:1.6}
+
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.left{border-top:3px solid var(--blue)}
+.compare-box.right{border-top:3px solid var(--amber)}
+.compare-box.danger{border-top-color:var(--red)}
+.compare-box.safe{border-top-color:var(--green)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.left .compare-label{color:var(--blue)}
+.compare-box.right .compare-label{color:var(--amber)}
+.compare-box.danger .compare-label{color:var(--red)}
+.compare-box.safe .compare-label{color:var(--green)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+.compare-box code{font-family:var(--mono);font-size:.78rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px}
+
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.code-block{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.co{color:#94a3b8}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+
+.terminal{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.terminal-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-left:.5rem}
+.terminal pre{font-family:var(--mono);font-size:.76rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#e2e8f0}
+.t-red{color:#ef4444;font-weight:bold}
+.t-orange{color:#fb923c;font-weight:bold}
+.t-blue{color:#60a5fa;font-weight:bold}
+.t-green{color:#4ade80}
+.t-dim{color:#94a3b8}
+.t-bold{color:#e2e8f0;font-weight:bold}
+
+.env-box{background:var(--paper);border:1px solid var(--rule);padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+
+.fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.5rem 0}
+.fn-card{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.fn-name{font-family:var(--mono);font-size:.78rem;color:var(--blue);font-weight:600;margin-bottom:.4rem}
+.fn-desc{font-size:.82rem;color:var(--ink3);line-height:1.6}
+
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+
+
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .compare-grid{grid-template-columns:1fr}
+  .fn-grid{grid-template-columns:1fr}
+  .env-grid{grid-template-columns:1fr}
+  h2{font-size:1.55rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Lab Log 010 · Part 1 of 2</div>
+    <h1 class="title">Building Ladon —<br><span>A Static Document Security Analyzer</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">April 2026</div></div>
+      <div class="meta-item"><div class="label">Category</div><div class="value">Lab Log · Tool Build</div></div>
+      <div class="meta-item"><div class="label">Stack</div><div class="value">Python · Flask · Railway</div></div>
+      <div class="meta-item"><div class="label">Tool</div><div class="value">Ladon · document_triage.py</div></div>
+      <div class="meta-item"><div class="label">Read Time</div><div class="value">15 minutes</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    STATIC ANALYSIS ONLY · NO FILES EXECUTED · EDUCATIONAL USE · SITEWAVE STUDIO LLC
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>Why This Tool Exists</h2>
+
+  <p>The problem I kept running into while reading threat reports was a practical one. Someone receives a suspicious PDF. Their antivirus doesn't flag it. Their email gateway delivered it. They have no way to know if it's safe to open — not really. The advice is always "be careful with attachments" but there's no tool a non-technical person can use to actually check what's inside a file before they open it.</p>
+
+  <p>I decided to build one. I had no prior experience writing static file analysis tools. What I had was Python, a pile of file format specifications, and several months of reading threat reports that kept showing the same pattern: the threat was never where the existing defenses were looking. It was inside the attachment — inside the PDF, inside the image, inside the calendar invite — in places that email gateways don't reach and that users have no visibility into at all.</p>
+
+  <p>This lab documents how I built <strong>document_triage.py</strong> — the analysis engine at the core of Ladon. It's not a retrospective of a clean build. It's a record of the decisions made, the things that didn't work the first time, and what I learned from reading specifications that were never written with attackers in mind. The companion report <a href="../writing/ladon-field-notes.html">The Document You Trusted</a> covers the context and real-world validation. This lab covers the build.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>A note on how this was built:</strong> I'm not a developer. My background is UX design and enterprise technology, not software engineering. I built Ladon the way I approach most problems — through research, pattern recognition, and iteration. The detection methodology came from reading threat intelligence and file format specifications. The Python came from working with Claude as a coding collaborator to translate that methodology into working code. The UX decisions — plain-English explanations, drag-and-drop interface, results readable by a non-technical employee — came from 15 years of designing for real users. That combination is intentional. Most security tools are built by engineers for engineers. Ladon was designed for the person who just received a suspicious PDF and has no idea what to do with it.</p>
+  </div>
+
+  <div class="env-box">
+    <div class="env-box-title">Build Environment</div>
+    <div class="env-grid">
+      <div class="env-item"><div class="env-label">Development Host</div><div class="env-value">macOS · Apple Silicon</div></div>
+      <div class="env-item"><div class="env-label">Language</div><div class="env-value">Python 3.12</div></div>
+      <div class="env-item"><div class="env-label">Backend Framework</div><div class="env-value">Flask 3.x</div></div>
+      <div class="env-item"><div class="env-label">Deployment</div><div class="env-value">Railway · Auto-deploy on push</div></div>
+      <div class="env-item"><div class="env-label">Key Libraries</div><div class="env-value">Pillow · pyzbar · zlib · struct</div></div>
+      <div class="env-item"><div class="env-label">Repo</div><div class="env-value">Private · SiteWave Studio LLC</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>Architecture — Three Layers,<br>One Design Principle</h2>
+
+  <p>The first decision I made was the most important one: <strong>the tool must never execute anything it analyzes.</strong> Everything else followed from that. Reading bytes is safe. Interpreting them as a runnable program is not. If the tool executed a malicious file to figure out what it did, it would defeat the entire purpose of triage. So Ladon reads bytes — nothing more.</p>
+
+  <p>The build ended up with three distinct layers, each with a single responsibility. Separating them cleanly took a few iterations to get right.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">document_triage.py — The Analysis Engine</div>
+        <div class="step-content-desc">Pure Python. No web framework. Takes a file path, reads the raw bytes, runs all applicable detection modules, returns a structured results dictionary. Can be run from the command line independently of any web interface. This separation matters — the engine is the tool. The web layer is just delivery.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">ladon_server.py — The Flask Backend</div>
+        <div class="step-content-desc">A minimal Flask application with two routes: <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">GET /</code> serves the frontend HTML and <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">POST /analyze</code> accepts a file upload, calls the engine, and returns JSON results. The server never writes the uploaded file to permanent storage — it processes from memory and discards.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">ladon.html — The Frontend</div>
+        <div class="step-content-desc">Single-file HTML/CSS/JS. No framework dependencies. Drag-and-drop file upload, real-time analysis results rendered from the JSON response, severity badge, per-module finding cards with plain-English explanations. Designed to be readable by a non-technical employee — not just a security analyst.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-box left">
+      <div class="compare-label">What Ladon Does</div>
+      <p>✓&nbsp; Reads raw bytes from the uploaded file</p>
+      <p>✓&nbsp; Parses file structure against known patterns</p>
+      <p>✓&nbsp; Scores findings by severity</p>
+      <p>✓&nbsp; Returns structured results — no side effects</p>
+      <p>✓&nbsp; Discards the file immediately after analysis</p>
+    </div>
+    <div class="compare-box right">
+      <div class="compare-label">Zero Execution Guarantee</div>
+      <p>✗&nbsp; Does not execute or interpret the file</p>
+      <p>✗&nbsp; Does not open it in a renderer or viewer</p>
+      <p>✗&nbsp; Does not follow embedded URLs</p>
+      <p>✗&nbsp; Does not store or share the uploaded file</p>
+      <p>✗&nbsp; Does not send it anywhere — ever</p>
+    </div>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>Why static analysis matters here:</strong> Dynamic analysis — sandboxing, executing the file and observing behavior — is powerful but requires an isolated environment and carries real risk. Static analysis reads the structure and content of a file without triggering anything. For a triage tool designed to be used by non-technical employees before they open a suspicious attachment, static analysis is the only appropriate approach. The file cannot detonate during analysis because nothing is interpreting it.</p>
+  </div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>The Detection Modules —<br>What Each One Looks For</h2>
+
+  <p>Each module targets a specific attack surface independently. Their findings feed into a shared severity score. A file can trigger multiple modules at once — a malicious PDF with an embedded QR code pointing to a typosquatted domain would fire PDF structure, polyglot detection, barcode analysis, and URL analysis simultaneously. The modules were built one at a time with Claude — defining what each needed to detect, testing against synthetic samples, then adjusting until the output looked right.</p>
+
+  <h3>Module 1 — PDF Structure Analysis</h3>
+  <p>The PDF specification includes a rich set of actions that legitimate documents rarely use but that attackers routinely abuse. The module scans the raw PDF byte stream for dangerous keys and counts occurrences of each.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>PDF Key</th><th>What It Does</th><th>Why It's Dangerous</th></tr></thead>
+      <tbody>
+        <tr><td class="code">/JavaScript /JS</td><td>Embeds executable JavaScript</td><td>Runs code when document opens</td></tr>
+        <tr><td class="code">/OpenAction</td><td>Triggers action on document open</td><td>Auto-executes without user interaction</td></tr>
+        <tr><td class="code">/AA</td><td>Additional Actions</td><td>Executes code on page open/close/print</td></tr>
+        <tr><td class="code">/Launch</td><td>Launches external application</td><td>Can spawn shell commands</td></tr>
+        <tr><td class="code">/EmbeddedFile</td><td>Contains embedded file attachment</td><td>Dropper for secondary payload</td></tr>
+        <tr><td class="code">/ObjStm</td><td>Object stream</td><td>Commonly used to hide malicious objects from scanners</td></tr>
+        <tr><td class="code">/URI</td><td>External URI reference</td><td>Tracking pixel — phones home on render</td></tr>
+        <tr><td class="code">/SubmitForm</td><td>Form submission action</td><td>Data exfiltration on open</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="code-label">Core PDF Analysis Loop</div>
+  <div class="code-block"><pre><span class="ke">for</span> key, description <span class="ke">in</span> PDF_DANGEROUS_KEYS.items():
+    <span class="ke">if</span> key <span class="ke">in</span> data:
+        count = data.count(key)
+        results[<span class="va">'dangerous_keys'</span>].append({
+            <span class="va">'key'</span>:         key.decode(<span class="va">'latin-1'</span>),
+            <span class="va">'description'</span>: description,
+            <span class="va">'count'</span>:       count,
+        })</pre></div>
+
+  <h3>Module 2 — Polyglot Detection</h3>
+  <p>A polyglot file is simultaneously valid in two different file formats. A PDF that also contains a Windows PE executable is the most common attack variant — the file passes type checks because it has a valid PDF header, but it carries a runnable executable in its body. Ladon scans the entire file for secondary magic byte signatures, not just the first few bytes.</p>
+
+  <div class="code-label">Secondary Signature Scan</div>
+  <div class="code-block"><pre>secondary_checks = [
+    (b<span class="va">'\x50\x4b\x03\x04'</span>, <span class="va">'ZIP/PKPASS/DOCX'</span>,  <span class="hi">50</span>),
+    (b<span class="va">'\x25\x50\x44\x46'</span>, <span class="va">'PDF'</span>,               <span class="hi">50</span>),
+    (b<span class="va">'\x4d\x5a'</span>,         <span class="va">'Windows PE (EXE)'</span>, <span class="hi">50</span>),  <span class="co"># MZ header</span>
+    (b<span class="va">'\x7f\x45\x4c\x46'</span>, <span class="va">'Linux ELF'</span>,         <span class="hi">50</span>),
+]
+
+<span class="ke">for</span> magic, description, min_offset <span class="ke">in</span> secondary_checks:
+    idx = data.find(magic, min_offset)  <span class="co"># skip first 50 bytes</span>
+    <span class="ke">if</span> idx != <span class="hi">-1</span>:
+        findings.append({
+            <span class="va">'type'</span>:     <span class="va">'SECONDARY_SIGNATURE'</span>,
+            <span class="va">'detail'</span>:   <span class="va">f"{description} signature found at offset {idx}"</span>,
+            <span class="va">'severity'</span>: <span class="wa">'CRITICAL'</span> <span class="ke">if</span> <span class="va">'EXE'</span> <span class="ke">in</span> description <span class="ke">else</span> <span class="va">'HIGH'</span>,
+        })</pre></div>
+
+  <h3>Module 3 — Image Steganography</h3>
+  <p>Steganography hides data inside something that doesn't look like it contains data. Three sub-checks run on every image: appended data after the EOF marker, LSB (Least Significant Bit) distribution analysis, and Shannon entropy scoring. Legitimate images have slightly uneven LSB distributions. LSB steganography produces near-perfect 50/50 distribution — statistically detectable.</p>
+
+  <div class="code-label">LSB Distribution Analysis</div>
+  <div class="code-block"><pre><span class="ke">for</span> pixel <span class="ke">in</span> sample:
+    <span class="ke">for</span> channel <span class="ke">in</span> pixel:
+        lsb = channel & <span class="hi">1</span>  <span class="co"># extract least significant bit</span>
+        lsb_counts[lsb] += <span class="hi">1</span>
+
+deviation = abs(ratio_0 - <span class="hi">0.5</span>)
+<span class="co"># LSB steganography: deviation &lt; 0.02
+# Natural images: deviation &gt; 0.05</span>
+suspicious = deviation < <span class="hi">0.02</span></pre></div>
+
+  <h3>Module 4 — Audio Steganography</h3>
+  <p>WAV files have explicit chunk sizes declared in their RIFF header. Any bytes after the declared chunk boundary are appended data — not part of the audio. This is the exact delivery mechanism used in the TeamPCP/Telnyx supply chain attack, where malware was hidden inside a WAV file named <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">ringtone.wav</code> and extracted in memory.</p>
+
+  <div class="code-label">WAV Chunk Boundary Check</div>
+  <div class="code-block"><pre><span class="ke">if</span> data[:<span class="hi">4</span>] == b<span class="va">'RIFF'</span> <span class="ke">and</span> len(data) > <span class="hi">8</span>:
+    declared_size = struct.unpack(<span class="va">'&lt;I'</span>, data[<span class="hi">4</span>:<span class="hi">8</span>])[<span class="hi">0</span>] + <span class="hi">8</span>
+    actual_size   = len(data)
+    <span class="ke">if</span> actual_size > declared_size:
+        appended_bytes = actual_size - declared_size
+        entropy        = shannon_entropy(data[declared_size:])
+        <span class="co"># Flag as CRITICAL — data exists past audio boundary</span></pre></div>
+
+  <h3>Module 5 — URL Analysis</h3>
+  <p>URLs extracted from any module feed into a shared analysis pipeline. Each URL is checked against a known-safe allowlist, URL shortener list, suspicious TLD list, and a Levenshtein distance typosquatting check against known legitimate domains. The typosquatting check computes edit distance — a domain two characters different from a known airline or travel service is flagged as a potential impersonation.</p>
+
+  <h3>Module 6 — QR Code Analysis</h3>
+  <p>QR codes inside images are decoded using pyzbar, which handles QR Code Model 1/2, Micro QR, PDF417, and DataMatrix. The decoded URL is fed into the URL analysis pipeline. This module exists because of a documented attack pattern: boarding passes with QR codes replaced by codes pointing to credential harvesting pages. The QR code looks identical visually. Only decoding and analyzing the destination reveals the substitution.</p>
+
+  <h3>Module 7 — ICS Calendar Analysis</h3>
+  <p>Calendar invites are a persistent delivery mechanism — they are auto-added to the recipient's calendar even if the email is quarantined. The ICS module extracts URLs from the LOCATION, DESCRIPTION, ATTACH, and COMMENT fields and checks for meeting platform spoofing: an invite that claims to be a Zoom or Teams meeting but embeds a URL pointing to a different domain.</p>
+
+  <div class="code-label">Meeting Platform Spoof Detection</div>
+  <div class="code-block"><pre>MEETING_PLATFORMS = {
+    <span class="va">'zoom'</span>:        <span class="va">'zoom.us'</span>,
+    <span class="va">'teams'</span>:       <span class="va">'teams.microsoft.com'</span>,
+    <span class="va">'meet'</span>:        <span class="va">'meet.google.com'</span>,
+    <span class="va">'webex'</span>:       <span class="va">'webex.com'</span>,
+    <span class="va">'gotomeeting'</span>: <span class="va">'gotomeeting.com'</span>,
+}
+
+<span class="ke">for</span> platform, legit_domain <span class="ke">in</span> MEETING_PLATFORMS.items():
+    <span class="ke">if</span> re.search(rf<span class="va">'\b{platform}\b'</span>, domain_part) \
+       <span class="ke">and</span> legit_domain <span class="ke">not in</span> url_lower:
+        findings.append({<span class="va">'type'</span>: <span class="va">'MEETING_PLATFORM_SPOOF'</span>, <span class="wa">'severity'</span>: <span class="wa">'CRITICAL'</span>})</pre></div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>Severity Scoring —<br>How Findings Become a Verdict</h2>
+
+  <p>Each finding contributes points to a composite severity score. The score determines the final verdict — CRITICAL, HIGH, MEDIUM, or LOW. The thresholds are deliberately conservative: a single CRITICAL finding from polyglot detection (score += 5) puts a file over the HIGH threshold immediately.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Finding Type</th><th>Points</th><th>Rationale</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Polyglot — CRITICAL</strong> (EXE/ELF inside file)</td><td style="color:#e8374a;font-weight:600;font-family:var(--mono);font-size:.82rem">+5</td><td>Executable inside document is never legitimate</td></tr>
+        <tr><td><strong>Polyglot — HIGH</strong> (ZIP inside image)</td><td style="color:#f07840;font-weight:600;font-family:var(--mono);font-size:.82rem">+3</td><td>Unusual but not always malicious</td></tr>
+        <tr><td><strong>PDF dangerous key</strong> (JavaScript, OpenAction, Launch)</td><td style="color:#e8374a;font-weight:600;font-family:var(--mono);font-size:.82rem">+4</td><td>Actively dangerous — no legitimate use in typical docs</td></tr>
+        <tr><td><strong>PDF structural key</strong> (ObjStm, URI, etc.)</td><td style="color:#f07840;font-weight:600;font-family:var(--mono);font-size:.82rem">+2</td><td>Suspicious context — common in malicious docs</td></tr>
+        <tr><td><strong>Appended image data</strong></td><td style="color:#e8374a;font-weight:600;font-family:var(--mono);font-size:.82rem">+4</td><td>Data after EOF is almost never legitimate</td></tr>
+        <tr><td><strong>LSB steganography suspected</strong></td><td style="color:#f07840;font-weight:600;font-family:var(--mono);font-size:.82rem">+3</td><td>Statistical anomaly — possible hidden payload</td></tr>
+        <tr><td><strong>Audio appended data</strong></td><td style="color:#e8374a;font-weight:600;font-family:var(--mono);font-size:.82rem">+5</td><td>WAV with data past chunk boundary — confirmed technique</td></tr>
+        <tr><td><strong>URL risk — CRITICAL</strong></td><td style="color:#e8374a;font-weight:600;font-family:var(--mono);font-size:.82rem">+5</td><td>Typosquat, homoglyph, or confirmed malicious</td></tr>
+        <tr><td><strong>URL risk — HIGH</strong></td><td style="color:#f07840;font-weight:600;font-family:var(--mono);font-size:.82rem">+3</td><td>Shortener, suspicious TLD</td></tr>
+        <tr><td><strong>ICS meeting spoof</strong></td><td style="color:#e8374a;font-weight:600;font-family:var(--mono);font-size:.82rem">+5</td><td>Deliberate platform impersonation</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="code-label">Severity Thresholds</div>
+  <div class="code-block"><pre><span class="ke">if</span>   score >= <span class="hi">8</span>:  <span class="ke">return</span> <span style="color:#e8374a;font-weight:bold">'CRITICAL'</span>
+<span class="ke">elif</span> score >= <span class="hi">4</span>:  <span class="ke">return</span> <span style="color:#f07840;font-weight:bold">'HIGH'</span>
+<span class="ke">elif</span> score >= <span class="hi">1</span>:  <span class="ke">return</span> <span style="color:#f0c040;font-weight:bold">'MEDIUM'</span>
+<span class="ke">else</span>:            <span class="ke">return</span> <span style="color:#2dd4a0;font-weight:bold">'LOW'</span></pre></div>
+
+  <div class="callout callout-amber">
+    <p><strong>Design choice — conservative thresholds:</strong> The scoring is intentionally tuned to minimize false negatives over false positives. A file with a suspicious TLD (MEDIUM, score=1) should prompt review even if nothing else fires. A file with an embedded EXE (score=5) is immediately HIGH regardless of other findings. For the intended audience — a contractor's employee who receives an unexpected PDF — the cost of a false positive (reviewing a clean file) is far lower than the cost of a false negative (opening malware).</p>
+  </div>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>The Flask Backend —<br>Serving Analysis as an API</h2>
+
+  <p>The Flask layer is intentionally thin. Its job is to accept a file, call the engine, and return JSON. All the intelligence lives in <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">document_triage.py</code>. This separation means the analysis engine can be used directly from the command line, called from other scripts, or exposed through a different interface entirely — the web layer is not load-bearing for the detection logic.</p>
+
+  <div class="code-label">ladon_server.py — The Analyze Endpoint</div>
+  <div class="code-block"><pre><span class="ke">@app.route</span>(<span class="va">'/analyze'</span>, methods=[<span class="va">'POST'</span>])
+<span class="ke">def</span> <span class="hi">analyze</span>():
+    file = request.files.get(<span class="va">'file'</span>)
+    <span class="ke">if not</span> file:
+        <span class="ke">return</span> jsonify({<span class="va">'error'</span>: <span class="va">'No file uploaded'</span>}), <span class="hi">400</span>
+
+    <span class="co"># Save to temp file — analyze — discard</span>
+    <span class="ke">with</span> tempfile.NamedTemporaryFile(
+        suffix=Path(file.filename).suffix,
+        delete=<span class="ke">False</span>
+    ) <span class="ke">as</span> tmp:
+        file.save(tmp.name)
+        <span class="ke">try</span>:
+            results = analyze_file(tmp.name)
+            <span class="ke">return</span> jsonify(results)
+        <span class="ke">finally</span>:
+            os.unlink(tmp.name)  <span class="co"># always delete — no persistence</span></pre></div>
+
+  <p>The <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">finally</code> block is not an afterthought. It guarantees the uploaded file is deleted regardless of whether analysis succeeds or throws an exception. A malicious file that crashes the parser is still deleted. The server never accumulates files.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>On Railway deployment:</strong> Railway provides automatic deploys from GitHub — every push to main triggers a rebuild. The service runs on a paid plan ($5 deposited) to avoid cold starts on free tier. The URL is kept private during the testing and IP protection phase. Auto-deploy means the analysis engine and backend always stay in sync — no manual deployment steps.</p>
+  </div>
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>Decisions Made Along the Way</h2>
+
+  <p>Some of the most useful things to document are the decisions that aren't visible in the final code — the things I considered and rejected, and why. These came up repeatedly during the build.</p>
+
+  <h3>Why not send files to VirusTotal?</h3>
+  <p>The obvious first thought was to integrate VirusTotal. Then I thought about who the tool is for. A defense contractor submitting a suspicious vendor PDF to VirusTotal might inadvertently tip off the attacker that their document was analyzed — VirusTotal results are visible to subscribers. That disclosure risk is real, and it's the kind of thing that came from reading how analysts actually work rather than from writing code. Static local analysis means the file goes nowhere. Ladon reads it and discards it. Nothing leaves the system.</p>
+
+  <h3>Why not use a sandbox for dynamic analysis?</h3>
+  <p>Sandboxing is the professional answer for malware analysis. But sandboxing requires executing the file — which means you need an isolated environment, you need to know what you're doing, and you need to accept that something is going to run. The question Ladon is trying to answer is "is this safe to open?" Executing it to find out defeats the purpose. Static analysis answers the structural question without triggering anything.</p>
+
+  <h3>Why Python and not a compiled language?</h3>
+  <p>Python was Claude's recommendation for this use case and it turned out to be the right one. Speed wasn't the concern — documents are small files and analysis is fast regardless. Python's standard library handles binary parsing, Pillow and pyzbar handle images and barcodes, and the code is readable enough that I can follow what it's doing, spot when something looks wrong, and describe the fix I want clearly. That last part matters — I'm not writing the code independently, but I need to be able to evaluate whether what was written actually does what I intended.</p>
+
+  <h3>Why a single HTML file for the frontend?</h3>
+  <p>Simplicity. A single HTML file can be opened locally in a browser without a server, deployed anywhere, and inspected by anyone. No build pipeline, no bundler, no dependencies to audit. The frontend is not the interesting part of Ladon — the analysis engine is. Keeping the frontend simple keeps the focus where it belongs.</p>
+
+  <div class="callout callout-green">
+    <p><strong>The export function:</strong> The tool generates a plain-text export of every analysis session — filename, timestamp, severity, findings per module. The export format is intentionally simple: readable by a non-technical manager, pasteable into a ticket, attachable to a CMMC audit record. The timestamp is UTC. The footer attributes the export to SiteWave Studio LLC. Every design choice in the export serves the compliance documentation use case.</p>
+  </div>
+</div>
+
+<!-- SECTION 07 -->
+<div class="section">
+  <div class="section-num">Section 07</div>
+  <h2>What Was Learned</h2>
+
+  <p>Reading file format specifications to understand what was designed to be there — and then reading threat reports to understand what attackers put there instead — is where most of the build time went. The PDF spec is 756 pages. WAV chunk boundaries come from a 1991 IBM/Microsoft document. ICS is RFC 5545. None of them were written with attackers in mind, which is exactly why they're useful attack surfaces.</p>
+
+  <p>The typosquatting check took the most iterations to get right. The first version Claude wrote flagged too many legitimate domains — a travel booking site with a domain two characters different from "booking.com" is not necessarily a typosquat. I kept testing it against real URLs, flagging what looked wrong, and describing the adjustment needed. Tuning the edit distance threshold and minimum domain length down to something that caught real typosquats without flagging legitimate sites took several rounds of that back-and-forth.</p>
+
+  <p>The ICS meeting platform detection had the same problem. The first version checked if a platform keyword appeared anywhere in the URL string — which immediately broke on real-world cases I tested. A Proofpoint-wrapped Zoom URL has "zoom" buried in the destination but the actual domain is Proofpoint. A Calendly-scheduled Teams meeting says "teams" in the description but "calendly.com" in the URL. I found these by testing edge cases, described what was going wrong, and Claude rewrote the check to look at the domain portion only with word boundary matching. That's the pattern throughout the build — I find what's broken, describe what correct behavior looks like, and iterate until the output matches my expectation.</p>
+
+  <p>The most useful thing about building this way: the tool is only as good as the edge cases you think to test. Synthetic test files tell you the code runs. Real malware tells you the detection logic actually works. That validation is documented in <a href="lab_log_011.html">Lab Log 011</a>.</p>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">Ladon is a static analysis tool — it reads file structure and content without executing anything. All analysis runs server-side on Railway infrastructure. No files are stored after analysis. The tool is currently in private testing. SiteWave Studio LLC · Built by Yana Ivanov · April 2026</p>
+</div>
+
+</div></div>
+
+<footer>
+  <span>Lab Log 010 &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; April 2026 &nbsp;·&nbsp; Educational use only</span>
+  <a href="../index.html" style="color:#4a9eff;text-decoration:none;white-space:nowrap">← Portfolio</a>
+</footer>
+
+</body>
+</html>
