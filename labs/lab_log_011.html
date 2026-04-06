@@ -69,8 +69,8 @@ p em{font-style:italic;color:var(--ink2)}
 .tbl-wrap{margin:1.5rem 0}
 table{width:100%;border-collapse:collapse;font-size:.88rem;table-layout:fixed}
 thead tr{background:#0a0f1a;color:#fff}
-th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:#fff;word-break:normal}
-td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top;word-break:break-word}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:#fff;white-space:nowrap}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top;word-break:break-word;overflow-wrap:break-word}
 tr:last-child td{border-bottom:none}
 tr:nth-child(even) td{background:rgba(0,0,0,.018)}
 td strong{color:var(--ink);font-weight:600}
@@ -83,12 +83,11 @@ td.code{font-family:var(--mono);font-size:.78rem;color:var(--blue);white-space:n
 .chip-missed{background:rgba(232,55,74,.12);color:#e8374a;font-weight:600}
 .chip-partial{background:rgba(240,120,64,.12);color:#f07840;font-weight:600}
 /* column widths */
-.col-sample{width:22%}
-.col-attr{width:16%}
-.col-sev{width:10%}
-.col-offset{width:10%}
-.col-findings{width:27%}
-.col-result{width:15%}
+.col-sample{width:24%}
+.col-attr{width:18%}
+.col-sev{width:12%}
+.col-offset{width:12%}
+.col-findings{width:34%}
 
 .figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
 .figure-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.2rem;border-bottom:1px solid var(--rule);background:#f8fafc}
@@ -379,9 +378,9 @@ footer span{color:#94a3b8}
   <div class="tbl-wrap">
     <table>
       <colgroup>
-        <col class="col-sample"><col class="col-attr"><col class="col-sev"><col class="col-offset"><col class="col-findings"><col class="col-result">
+        <col class="col-sample"><col class="col-attr"><col class="col-sev"><col class="col-offset"><col class="col-findings">
       </colgroup>
-      <thead><tr><th>Sample</th><th>Attribution</th><th>Severity</th><th>PE Offset</th><th>Additional Findings</th><th>Without Polyglot Scan</th></tr></thead>
+      <thead><tr><th>Sample</th><th>Attribution</th><th>Severity</th><th>PE Offset</th><th>Additional Findings</th></tr></thead>
       <tbody>
         <tr>
           <td><strong>d67e62bb…</strong><br><span style="font-size:.75rem;color:#94a3b8">Unknown dropper</span></td>
@@ -389,40 +388,35 @@ footer span{color:#94a3b8}
           <td><span class="chip chip-high">HIGH</span></td>
           <td class="code">36,700</td>
           <td>/ObjStm — hides objects from scanners</td>
-          <td><span class="chip chip-missed">Likely missed</span></td>
-        </tr>
+          </tr>
         <tr>
           <td><strong>e2b75bae…</strong><br><span style="font-size:.75rem;color:#94a3b8">ValleyRAT / SilverFox</span></td>
           <td>Chinese APT</td>
           <td><span class="chip chip-critical">CRITICAL</span></td>
           <td class="code">4,937</td>
           <td>/URI ×20, live Tencent Cloud .msi + .exe C2</td>
-          <td><span class="chip chip-partial">Partial</span></td>
-        </tr>
+          </tr>
         <tr>
           <td><strong>b046d04b…</strong><br><span style="font-size:.75rem;color:#94a3b8">Facebook phishing</span></td>
           <td>Unknown</td>
           <td><span class="chip chip-critical">CRITICAL</span></td>
           <td class="code">18,238</td>
           <td>/AA ×6 auto-execute, /URI ×4, typosquatted .site domain</td>
-          <td><span class="chip chip-partial">Partial</span></td>
-        </tr>
+          </tr>
         <tr>
           <td><strong>5095c647…</strong><br><span style="font-size:.75rem;color:#94a3b8">Gamaredon loader</span></td>
           <td>Russian APT (FSB)</td>
           <td><span class="chip chip-high">HIGH</span></td>
           <td class="code">18,385</td>
           <td>None — clean PDF layer</td>
-          <td><span class="chip chip-missed">Missed</span></td>
-        </tr>
+          </tr>
         <tr>
-          <td><strong>Opportunity_OverviewNY921</strong><br><span style="font-size:.75rem;color:#94a3b8">Job scam · live catch</span></td>
+          <td><strong>Opportunity_<wbr>OverviewNY921</strong><br><span style="font-size:.75rem;color:#94a3b8">Job scam · live catch</span></td>
           <td>Unknown</td>
           <td><span class="chip chip-high">HIGH</span></td>
           <td class="code">10,303</td>
           <td>None — clean PDF layer</td>
-          <td><span class="chip chip-missed">Missed · Gmail passed it</span></td>
-        </tr>
+          </tr>
       </tbody>
     </table>
   </div>
@@ -437,11 +431,11 @@ footer span{color:#94a3b8}
 <!-- SECTION 04 -->
 <div class="section">
   <div class="section-num">Section 04</div>
-  <h2>What This Validates<br>About Ladon</h2>
+  <h2>What This Validates About Ladon</h2>
 
   <p>The detection methodology in Ladon was built from reading threat reports and file format specifications. These five samples are the first test against files that weren't constructed to test the tool. The results hold.</p>
 
-  <p>Every sample triggered the polyglot detection module correctly. The severity scoring separated the two CRITICAL samples — ValleyRAT and the Facebook phishing file, both with multiple compounding findings — from the three HIGH samples where the polyglot was the only or primary finding. The URL analysis module correctly flagged the live Tencent Cloud C2 URLs in sample 2 and the typosquatted domain in sample 3. The PDF structure module correctly identified the auto-execute actions in sample 3 and the object stream obfuscation in sample 1.</p>
+  <p>Every sample triggered the polyglot detection module correctly. The severity scoring separated the two CRITICAL samples — ValleyRAT and the Facebook phishing file, both with multiple compounding findings — from the three HIGH samples where the polyglot was the only or primary finding. The URL analysis module correctly flagged the live Tencent Cloud C2 URLs in sample 2 and the typosquatted domain in sample 3. The PDF structure module correctly identified the auto-execute actions in sample 3 and the object stream obfuscation in sample 1 — the unknown dropper.</p>
 
   <p>The live phishing sample — the job scam that arrived in my inbox — is the most meaningful data point. It was not sourced from a malware repository. It was not constructed to test anything. It was a real phishing email sent to a real target. Gmail did not flag the attachment. Ladon caught the embedded PE at offset 10,303 on the first scan.</p>
 
@@ -454,4 +448,11 @@ footer span{color:#94a3b8}
 
 </div></div>
 
-<f
+
+<footer>
+  <span>Lab Log 011 &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; April 2026 &nbsp;·&nbsp; Educational use only</span>
+  <a href="../index.html" style="color:#4a9eff;text-decoration:none;white-space:nowrap">← Portfolio</a>
+</footer>
+
+</body>
+</html>
