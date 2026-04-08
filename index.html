@@ -3,853 +3,1005 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ArgusX — Intel in. Defense out.</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<title>Yana Ivanov — Cybersecurity Analysis Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
 <style>
+*{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --bg:#ffffff;--bg2:#f4f6f9;--bg3:#e8ecf2;--border:#d1d8e4;--border2:#a0aec0;
-  --text1:#0d1117;--text2:#2d3748;--text3:#64748b;
-  --accent:#1a56db;
-  --blue-bg:#eff6ff;--blue-txt:#1e40af;
-  --red-bg:#fef2f2;--red-txt:#b91c1c;
-  --green-bg:#f0fdf4;--green-txt:#15803d;
-  --amber-bg:#fffbeb;--amber-txt:#b45309;
-  --purple-bg:#f5f3ff;--purple-txt:#6d28d9;
-  --code-bg:#f1f5f9;--shadow-md:0 4px 12px rgba(0,0,0,.1);
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--amber:#b45309;--blue:#1a4fa0;--green:#145a32;
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
 }
-[data-theme="dark"]{
-  --bg:#0d1117;--bg2:#161b24;--bg3:#1e2636;--border:#2a3348;--border2:#3d4f6e;
-  --text1:#e6edf3;--text2:#b0bdd0;--text3:#7a8a9e;
-  --accent:#4d8eff;
-  --blue-bg:#1a2744;--blue-txt:#93c5fd;
-  --red-bg:#2a1219;--red-txt:#fca5a5;
-  --green-bg:#0d2118;--green-txt:#86efac;
-  --amber-bg:#251a08;--amber-txt:#fcd34d;
-  --purple-bg:#1e1633;--purple-txt:#c4b5fd;
-  --code-bg:#1e2636;--shadow-md:0 4px 16px rgba(0,0,0,.5);
+html{scroll-behavior:smooth;font-size:22px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 2.5rem;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:1100px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.25em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.25rem}
+.mast-name{font-family:var(--display);font-size:clamp(2.2rem,5vw,3.5rem);font-weight:900;line-height:1.1;letter-spacing:-.02em;color:#fff;margin-bottom:.5rem}
+.mast-name span{color:#ef4444}
+.mast-title{font-family:var(--serif);font-size:.95rem;color:#94a3b8;margin-bottom:2rem;font-style:italic}
+.mast-bio{max-width:640px;font-size:.88rem;color:#cbd5e1;line-height:1.75;margin-bottom:2rem}
+.mast-links{display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.mast-link{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;color:#94a3b8;text-decoration:none;text-transform:uppercase;padding-bottom:2px;border-bottom:1px solid rgba(148,163,184,.3);transition:color .2s,border-color .2s}
+.mast-link:hover{color:#60a5fa;border-color:#60a5fa}
+.mast-stats{display:flex;gap:3rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,.1)}
+.stat-item .stat-num{font-family:var(--display);font-size:1.8rem;font-weight:700;color:#fff;line-height:1}
+.stat-item .stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;color:#64748b;text-transform:uppercase;margin-top:.25rem}
+.filter-bar{background:#fff;border-bottom:2px solid var(--rule);padding:1rem 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.filter-inner{max-width:1100px;margin:0 auto;padding:0 3rem;display:flex;flex-direction:column;gap:.75rem}
+.search-wrap{position:relative;width:100%}
+.search-wrap input{width:100%;padding:.55rem 1rem .55rem 2.4rem;border:1px solid var(--rule);border-radius:2px;font-family:var(--mono);font-size:.75rem;color:var(--ink);background:#fff;outline:none;transition:border-color .2s}
+.search-wrap input:focus{border-color:var(--blue)}
+.search-wrap input::placeholder{color:#94a3b8}
+.search-icon{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:.8rem;pointer-events:none}
+.filter-chips-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.filter-chips{display:flex;gap:.5rem;flex-wrap:wrap;flex:1}
+.search-icon{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:.8rem;pointer-events:none}
+.filter-chips{display:flex;gap:.5rem;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .75rem;border:1px solid var(--rule);border-radius:2px;cursor:pointer;color:#64748b;background:#fff;transition:all .15s;white-space:nowrap}
+.chip:hover{border-color:var(--ink);color:var(--ink)}
+.chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.results-count{font-family:var(--mono);font-size:.65rem;color:#94a3b8;margin-left:auto;white-space:nowrap}
+.main{max-width:1100px;margin:0 auto;padding:3rem}
+/* section groups — hidden when filtering */
+.section-group{margin-bottom:3.5rem}
+.section-group.hidden-group{display:none}
+.section-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--rule)}
+.section-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.4rem}
+.section-title{font-family:var(--display);font-size:1.45rem;font-weight:700;color:var(--ink)}
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+.card{background:var(--paper);border:1px solid var(--rule);border-radius:2px;text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s,border-color .2s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-3px);box-shadow:0 8px 32px rgba(0,0,0,.1);border-color:#cbd5e1}
+.card-accent{height:3px;width:100%}
+.card-accent.red{background:var(--red)}
+.card-accent.blue{background:var(--blue)}
+.card-accent.amber{background:var(--amber)}
+.card-accent.green{background:var(--green)}
+.card-accent.dark{background:#0a0f1a}
+.card-body{padding:1.5rem;flex:1;display:flex;flex-direction:column}
+.card-category{font-family:var(--mono);font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;margin-bottom:.6rem}
+.card-category.red{color:var(--red)}
+.card-category.blue{color:var(--blue)}
+.card-category.amber{color:var(--amber)}
+.card-category.green{color:var(--green)}
+.card-category.dark{color:#64748b}
+.card-title{font-family:var(--display);font-size:1rem;font-weight:700;line-height:1.3;color:var(--ink);margin-bottom:.6rem}
+.card-desc{font-size:.82rem;color:var(--ink3);line-height:1.65;flex:1;margin-bottom:1rem}
+.card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:.75rem;border-top:1px solid var(--rule)}
+.card-tags{display:flex;gap:.4rem;flex-wrap:wrap}
+.card-tag{font-family:var(--mono);font-size:.58rem;letter-spacing:.08em;padding:.2rem .5rem;border:1px solid var(--rule);color:#94a3b8;border-radius:1px}
+.card-arrow{font-family:var(--mono);font-size:.65rem;color:#94a3b8;transition:color .2s,transform .2s}
+.card:hover .card-arrow{color:var(--blue);transform:translateX(3px)}
+.card-date{font-family:var(--mono);font-size:.6rem;color:#94a3b8}
+.card-featured{grid-column:1/-1;flex-direction:row;align-items:stretch}
+.card-featured .card-accent{width:4px;height:auto;min-height:100%}
+.card-featured .card-body{padding:2rem 2rem 2rem 1.75rem}
+.card-featured .card-title{font-size:1.3rem}
+.card-featured-badge{font-family:var(--mono);font-size:.55rem;letter-spacing:.15em;color:#fff;background:var(--red);padding:.2rem .6rem;text-transform:uppercase;display:inline-block;margin-bottom:.75rem}
+.card-soon{opacity:.55;cursor:default;pointer-events:none}
+.card-soon-badge{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;color:#94a3b8;border:1px dashed #cbd5e1;padding:.2rem .5rem;display:inline-block;margin-bottom:.5rem}
+.card-series{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;color:var(--red);text-transform:uppercase;margin-bottom:.4rem;opacity:.8}
+.empty-state{text-align:center;padding:4rem 2rem;display:none}
+.empty-state.visible{display:block}
+.empty-icon{font-size:2.5rem;margin-bottom:1rem;opacity:.3}
+.empty-text{font-family:var(--mono);font-size:.75rem;color:#94a3b8;letter-spacing:.1em}
+footer{background:#0a0f1a;color:#64748b;padding:2rem 3rem;font-family:var(--mono);font-size:.6rem;letter-spacing:.08em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+footer a{color:#4a9eff;text-decoration:none}
+footer a:hover{color:#60a5fa}
+.portfolio-item.hidden{display:none}
+/* Single visible card in a grid always takes full width */
+/* Single card only stretches full width if it's truly the only one */
+@media(max-width:900px){.card-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){
+  .mast-inner,.filter-inner,.main{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-stats{gap:1.5rem}
+  .card-featured{flex-direction:column}
+  .card-featured .card-accent{width:100%;height:3px}
+  footer{flex-direction:column;text-align:center}
+  .filter-chips{display:none}
+  .mobile-filter-select{display:block}
+  .results-count{margin-left:0}
+  .filter-chips-row{flex-wrap:wrap}
+  .card-grid{grid-template-columns:1fr}
 }
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:16px;line-height:1.5;background:var(--bg);color:var(--text1);transition:background .2s,color .2s}
-.layout{display:grid;grid-template-columns:230px 1fr 210px;height:100vh;overflow:hidden}
-
-/* SIDEBAR */
-.sidebar{background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
-.sidebar-header{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
-.logo{display:flex;align-items:center;gap:10px;margin-bottom:4px}
-
-.logo-text{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.08em;color:var(--text1);line-height:1}
-.logo-text span{color:var(--accent)}
-.logo-tagline{font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;margin-bottom:14px;letter-spacing:.05em}
-.theme-toggle{display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text2);font-size:13px;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;transition:all .15s}
-.theme-toggle:hover{background:var(--bg3)}
-.sidebar-nav{padding:10px 8px;flex:1}
-.nav-section{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.09em;text-transform:uppercase;padding:12px 8px 5px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:14px;color:var(--text2);cursor:pointer;margin-bottom:2px;transition:all .15s;user-select:none}
-.nav-item:hover{background:var(--bg3);color:var(--text1)}
-.nav-item.active{background:var(--blue-bg);color:var(--blue-txt);font-weight:500}
-.nav-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.sidebar-footer{padding:10px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);font-family:'IBM Plex Mono',monospace;line-height:1.7}
-
-/* MAIN */
-.main{display:flex;flex-direction:column;overflow:hidden}
-.topbar{display:flex;align-items:center;gap:6px;padding:12px 18px;border-bottom:1px solid var(--border);background:var(--bg);flex-wrap:wrap;flex-shrink:0}
-.tab-btn{padding:7px 14px;border-radius:8px;border:1px solid var(--border);color:var(--text2);font-size:13px;background:var(--bg);cursor:pointer;transition:all .15s;font-family:'IBM Plex Sans',sans-serif;white-space:nowrap}
-.tab-btn.active{background:var(--accent);color:#fff;border-color:transparent;font-weight:500}
-.tab-btn:hover:not(.active){background:var(--bg3)}
-.filter-pill{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);color:var(--text2);font-size:13px;background:var(--bg);cursor:pointer;transition:all .15s;white-space:nowrap}
-.filter-pill:hover:not(.active){background:var(--bg3)}
-.filter-pill.active{background:var(--blue-bg);color:var(--blue-txt);border-color:transparent;font-weight:500}
-.tab-sep{width:1px;height:22px;background:var(--border);flex-shrink:0}
-.submit-btn{margin-left:auto;padding:8px 18px;border-radius:8px;background:var(--accent);color:#fff;border:none;font-size:14px;font-weight:500;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;transition:opacity .15s;white-space:nowrap}
-.submit-btn:hover{opacity:.88}
-
-/* FEED — previous card style */
-.feed{flex:1;overflow-y:auto}
-.post{padding:18px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
-.post:hover{background:var(--bg2)}
-.post-top{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.post-cat{font-size:11px;font-weight:600;letter-spacing:.08em;padding:3px 10px;border-radius:20px;font-family:'IBM Plex Mono',monospace}
-.post-title{font-size:16px;font-weight:600;color:var(--text1);line-height:1.35;margin-bottom:6px;transition:color .12s}
-.post:hover .post-title{color:var(--accent)}
-.post-preview{font-size:14px;color:var(--text3);line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.post-bottom{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.post-tags{display:flex;gap:5px;flex-wrap:wrap;flex:1}
-.tlp{font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
-.tlp-WHITE{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}
-.tlp-GREEN{background:var(--green-bg);color:var(--green-txt)}
-.tlp-AMBER{background:var(--amber-bg);color:var(--amber-txt)}
-.tlp-RED{background:var(--red-bg);color:var(--red-txt)}
-.mtag{font-size:11px;padding:2px 8px;border-radius:4px;background:var(--bg3);color:var(--text3);border:1px solid var(--border);font-family:'IBM Plex Mono',monospace}
-.def-tag{font-size:11px;padding:2px 8px;border-radius:4px;background:var(--green-bg);color:var(--green-txt);border:1px solid var(--border);font-family:'IBM Plex Mono',monospace}
-.post-meta-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3);flex-shrink:0;font-family:'IBM Plex Mono',monospace}
-.vbadge{display:inline-flex;width:13px;height:13px;background:var(--accent);border-radius:50%;align-items:center;justify-content:center;font-size:8px;color:#fff}
-.stat{cursor:pointer;transition:color .12s}
-.stat:hover{color:var(--text1)}
-.empty-state{padding:50px 20px;text-align:center;color:var(--text3);font-size:15px}
-
-/* BADGE TYPES */
-.badge-ioc{background:var(--red-bg);color:var(--red-txt)}
-.badge-cve{background:var(--amber-bg);color:var(--amber-txt)}
-.badge-det{background:var(--green-bg);color:var(--green-txt)}
-.badge-ttp{background:var(--blue-bg);color:var(--blue-txt)}
-.badge-tool{background:var(--purple-bg);color:var(--purple-txt)}
-.badge-def{background:var(--green-bg);color:var(--green-txt)}
-
-/* DETAIL PAGE — full width, proper scroll */
-.detail-view{flex:1;background:var(--bg)}
-.detail-inner{padding:24px 32px}
-.detail-back{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--accent);cursor:pointer;margin-bottom:20px;padding:0;border:none;background:none;font-family:'IBM Plex Sans',sans-serif}
-.detail-back:hover{opacity:.75}
-.detail-title{font-size:22px;font-weight:600;color:var(--text1);line-height:1.3;margin-bottom:12px}
-.detail-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
-.detail-author{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
-.av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;font-family:'IBM Plex Mono',monospace}
-.av-blue{background:var(--blue-bg);color:var(--blue-txt)}
-.av-green{background:var(--green-bg);color:var(--green-txt)}
-.av-purple{background:var(--purple-bg);color:var(--purple-txt)}
-.av-amber{background:var(--amber-bg);color:var(--amber-txt)}
-.detail-actions{display:flex;gap:6px;margin-left:auto}
-.abtn{padding:6px 14px;border-radius:7px;border:1px solid var(--border2);background:var(--bg);color:var(--text2);font-size:13px;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;transition:all .12s}
-.abtn:hover{background:var(--bg3)}
-.abtn.primary{background:var(--accent);color:#fff;border-color:transparent}
-.abtn.primary:hover{opacity:.88}
-.abtn.green{background:var(--green-bg);color:var(--green-txt);border-color:var(--border)}
-.abtn.green:hover{opacity:.85}
-
-/* DETAIL TABS */
-.detail-tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:24px}
-.dtab{padding:8px 16px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;font-family:'IBM Plex Sans',sans-serif;background:none;border-top:none;border-left:none;border-right:none}
-.dtab:hover{color:var(--text1)}
-.dtab.active{color:var(--accent);border-bottom-color:var(--accent)}
-
-.ds-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--border);font-family:'IBM Plex Mono',monospace}
-.ds{margin-bottom:22px}
-.plain-box{background:var(--blue-bg);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:14px 16px;font-size:15px;color:var(--text1);line-height:1.7}
-.impact-box{background:var(--red-bg);border-left:3px solid var(--red-txt);border-radius:0 8px 8px 0;padding:14px 16px;font-size:14px;color:var(--text2);line-height:1.7}
-.code-wrap{position:relative}
-.code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--text2);word-break:break-all;line-height:1.7;white-space:pre-wrap}
-.copy-code-btn{position:absolute;top:8px;right:8px;padding:3px 9px;border-radius:5px;border:1px solid var(--border2);background:var(--bg);color:var(--text3);font-size:11px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif}
-.copy-code-btn:hover{background:var(--bg3)}
-.fg{display:grid;grid-template-columns:130px 1fr;gap:8px 14px;font-size:14px}
-.fk{color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;padding-top:1px}
-.fv{color:var(--text1)}
-.linked-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .12s;margin-bottom:7px;background:var(--bg)}
-.linked-card:hover{background:var(--bg2);border-color:var(--accent)}
-.lc-icon{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
-.lc-title{font-size:14px;font-weight:500;color:var(--text1)}
-.lc-sub{font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
-.no-item{padding:14px;background:var(--bg2);border-radius:8px;font-size:14px;color:var(--text3);border:1px dashed var(--border)}
-
-/* INLINE GRAPH in detail */
-.detail-graph-container{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:8px}
-.detail-graph-canvas{width:100%;display:block}
-.detail-graph-detail{padding:10px 14px;border-top:1px solid var(--border);background:var(--bg2);font-size:13px;color:var(--text3);min-height:44px}
-
-/* CHAT */
-.chat-rules-bar{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--amber-bg);border:1px solid var(--amber-txt);border-radius:7px;margin-bottom:14px;font-size:13px;color:var(--amber-txt);line-height:1.5}
-.chat-messages{display:flex;flex-direction:column;gap:14px;margin-bottom:18px}
-.cmsg{display:flex;gap:9px}
-.cmsg-body{flex:1}
-.cmsg-hdr{display:flex;align-items:center;gap:7px;margin-bottom:3px}
-.cmsg-author{font-size:13px;font-weight:600;color:var(--text1)}
-.cmsg-time{font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
-.cmsg-text{font-size:14px;color:var(--text2);line-height:1.6}
-.cmsg-code{background:var(--code-bg);border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--text2);margin-top:5px;word-break:break-all}
-.chat-compose{border:1px solid var(--border2);border-radius:9px;overflow:hidden}
-.chat-compose-hdr{padding:8px 12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text3);background:var(--bg2);font-family:'IBM Plex Mono',monospace}
-.chat-ta{width:100%;padding:12px;border:none;background:var(--bg);color:var(--text1);font-size:14px;font-family:'IBM Plex Sans',sans-serif;resize:none;outline:none;min-height:80px}
-.chat-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-top:1px solid var(--border);background:var(--bg2)}
-.chat-hint{font-size:11px;color:var(--text3)}
-.chat-post{padding:6px 16px;border-radius:7px;background:var(--accent);color:#fff;border:none;font-size:13px;font-weight:500;font-family:'IBM Plex Sans',sans-serif;cursor:pointer}
-.chat-post:hover{opacity:.88}
-
-/* GRAPH VIEW */
-.graph-wrap{flex:1;overflow-y:auto;padding:18px}
-.graph-container{border:1px solid var(--border);border-radius:9px;overflow:hidden}
-.graph-controls{display:flex;gap:7px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg2);flex-wrap:wrap;align-items:center}
-.gpill{padding:5px 11px;border-radius:20px;border:1px solid var(--border2);color:var(--text2);font-size:12px;cursor:pointer;background:var(--bg);transition:all .12s;font-family:'IBM Plex Sans',sans-serif}
-.gpill:hover{background:var(--bg3)}
-.gpill.on{background:var(--blue-bg);color:var(--blue-txt);border-color:transparent;font-weight:500}
-.gpill.on-g{background:var(--green-bg);color:var(--green-txt);border-color:transparent;font-weight:500}
-.glegend{margin-left:auto;display:flex;gap:12px;font-size:11px;color:var(--text3);align-items:center}
-.gld{display:flex;align-items:center;gap:4px}
-.grdot{width:8px;height:8px;border-radius:2px}
-.graph-canvas{width:100%;display:block}
-.graph-bottom{padding:12px 14px;border-top:1px solid var(--border);background:var(--bg2);font-size:13px;color:var(--text3);min-height:52px}
-.graph-dt{font-size:14px;font-weight:600;color:var(--text1);margin-bottom:3px}
-.gdb{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500}
-
-/* RIGHT PANEL */
-.rightpanel{background:var(--bg2);border-left:1px solid var(--border);overflow-y:auto;padding:18px 14px}
-.ptitle{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px;font-family:'IBM Plex Mono',monospace}
-.psec{margin-bottom:22px}
-.trend-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--text2);cursor:pointer}
-.trend-item:hover{color:var(--text1)}
-.trend-item:last-child{border-bottom:none}
-.tdot{width:7px;height:7px;border-radius:50%}
-.tcount{margin-left:auto;font-size:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
-.srow{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:14px}
-.srow:last-child{border-bottom:none}
-.slabel{color:var(--text3)}
-.sval{color:var(--text1);font-weight:600;font-family:'IBM Plex Mono',monospace}
-.infobox{background:var(--bg3);border-radius:8px;padding:12px;font-size:13px;color:var(--text2);line-height:1.7}
-.infobox strong{color:var(--text1);display:block;margin-bottom:5px;font-size:14px}
-
-/* MODALS */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
-.modal-overlay.open{display:flex}
-.modal{background:var(--bg);border:1px solid var(--border);border-radius:11px;width:100%;max-width:560px;box-shadow:var(--shadow-md);max-height:90vh;overflow-y:auto}
-.mhdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:1}
-.mtitle{font-size:17px;font-weight:600;color:var(--text1)}
-.mclose{font-size:22px;color:var(--text3);cursor:pointer;padding:3px 7px;border-radius:5px;border:none;background:none;line-height:1}
-.mclose:hover{background:var(--bg3);color:var(--text1)}
-.mtabs{display:flex;gap:3px;padding:12px 18px 0;border-bottom:1px solid var(--border)}
-.mtab{padding:7px 14px;border-radius:7px 7px 0 0;font-size:13px;font-weight:500;cursor:pointer;color:var(--text3);border:1px solid transparent;transition:all .12s;font-family:'IBM Plex Sans',sans-serif;background:transparent}
-.mtab.active{color:var(--accent);border-color:var(--border);border-bottom-color:var(--bg);background:var(--bg);margin-bottom:-1px}
-.mbody{padding:18px;display:flex;flex-direction:column;gap:14px}
-.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.flabel{font-size:13px;font-weight:500;color:var(--text2);display:block;margin-bottom:5px}
-.fhint{font-size:11px;color:var(--text3);margin-top:3px}
-.finput,.fselect,.ftextarea{width:100%;padding:9px 11px;border:1px solid var(--border2);border-radius:7px;background:var(--bg2);color:var(--text1);font-size:14px;font-family:'IBM Plex Sans',sans-serif;outline:none;transition:border-color .12s}
-.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--accent)}
-.ftextarea{resize:vertical;min-height:90px;font-family:'IBM Plex Mono',monospace;font-size:13px}
-.mfooter{padding:14px 18px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
-.btn-cancel{padding:8px 18px;border-radius:7px;border:1px solid var(--border2);background:var(--bg);color:var(--text2);font-size:14px;font-family:'IBM Plex Sans',sans-serif;cursor:pointer}
-.btn-cancel:hover{background:var(--bg3)}
-.btn-sub{padding:8px 18px;border-radius:7px;background:var(--accent);color:#fff;border:none;font-size:14px;font-weight:500;font-family:'IBM Plex Sans',sans-serif;cursor:pointer}
-.btn-sub:hover{opacity:.88}
-.github-note{display:flex;align-items:center;gap:9px;padding:9px 12px;background:var(--blue-bg);border-radius:7px;font-size:13px;color:var(--blue-txt)}
-.pre-fill-note{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--green-bg);border-radius:7px;font-size:13px;color:var(--green-txt)}
-
-/* SHARE MODAL */
-.share-url{background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--text2);word-break:break-all;margin-bottom:10px}
-.share-opts{display:flex;flex-direction:column;gap:7px}
-.share-opt{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .12s;background:var(--bg)}
-.share-opt:hover{background:var(--bg2);border-color:var(--accent)}
-.so-icon{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.so-label{font-size:14px;font-weight:500;color:var(--text1)}
-.so-sub{font-size:12px;color:var(--text3)}
-
-.toast{position:fixed;bottom:22px;right:22px;background:var(--text1);color:var(--bg);padding:10px 18px;border-radius:7px;font-size:13px;font-family:'IBM Plex Mono',monospace;opacity:0;transition:opacity .2s;pointer-events:none;z-index:200}
-.toast.show{opacity:1}
-::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.mobile-filter-select{display:none;width:100%;padding:.5rem .75rem;font-family:var(--mono);font-size:.75rem;border:1px solid var(--rule);border-radius:2px;background:#fff;color:var(--ink);outline:none;cursor:pointer}
+.scroll-top-btn{position:fixed;bottom:1.5rem;right:1.5rem;width:42px;height:42px;background:#0a0f1a;color:#fff;border:none;border-radius:2px;font-size:1.1rem;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:200;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:opacity .2s}
+.scroll-top-btn.visible{display:flex}
+.scroll-top-btn:hover{background:#1a4fa0}
 </style>
 </head>
 <body>
-<div class="layout">
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-  <div class="sidebar-header">
-    <div class="logo">
-      <div class="logo-text">Argus<span>X</span></div>
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Cybersecurity Analysis Portfolio</div>
+    <div class="mast-name">Yana Ivanov</div>
+    <div class="mast-title">Information Assurance &amp; CMMC Compliance Analyst</div>
+    <p class="mast-bio">Targeting CT defense contractors with hands-on security lab work, published threat analysis, and open-source tooling. CompTIA Security+ in progress · CMMC-RP · MS Information Systems · 15 years enterprise technology. Built to make complex compliance requirements actionable for non-technical defense contractor leadership.</p>
+    <div class="mast-links">
+      <a href="https://linkedin.com/in/yanaivanov" target="_blank" class="mast-link">LinkedIn</a>
+      <a href="resume.html" class="mast-link">Resume</a>
     </div>
-    <div class="logo-tagline">Intel in. Defense out.</div>
-    <button class="theme-toggle" onclick="toggleTheme()"><span id="themeIcon">🌙</span><span id="themeLabel">Dark mode</span></button>
   </div>
-  <div class="sidebar-nav">
-    <div class="nav-section">Feed</div>
-    <div class="nav-item active" onclick="setFilter('all',this)">All posts</div>
-    <div class="nav-item" onclick="setFilter('verified',this)">Verified only</div>
-    <div class="nav-section">By type</div>
-    <div class="nav-item" onclick="setFilter('IOC',this)"><span class="nav-dot" style="background:#dc2626"></span>IOC</div>
-    <div class="nav-item" onclick="setFilter('TTP',this)"><span class="nav-dot" style="background:#2563eb"></span>TTP</div>
-    <div class="nav-item" onclick="setFilter('Detection',this)"><span class="nav-dot" style="background:#16a34a"></span>Detection</div>
-    <div class="nav-item" onclick="setFilter('CVE',this)"><span class="nav-dot" style="background:#d97706"></span>CVE</div>
-    <div class="nav-item" onclick="setFilter('Defense',this)"><span class="nav-dot" style="background:#0891b2"></span>Defense</div>
-    <div class="nav-section">Campaign</div>
-    <div class="nav-item" onclick="setFilter('nation-state',this)">Nation-state</div>
-    <div class="nav-item" onclick="setFilter('phishing',this)">Phishing</div>
-    <div class="nav-item" onclick="setFilter('malware',this)">Malware</div>
-  </div>
-  <div class="sidebar-footer">ArgusX · Infosec Community Feed<br>v0.1 prototype · argusx.dev</div>
 </div>
 
-<!-- MAIN -->
-<div class="main" id="mainArea">
-
-  <!-- FEED VIEW -->
-  <div id="feedView" style="display:flex;flex-direction:column;height:100%;overflow:hidden">
-    <div class="topbar">
-      <button class="tab-btn active" onclick="switchTab('intel',this)">Intel</button>
-      <button class="tab-btn" onclick="switchTab('defense',this)">Defense</button>
-      <button class="tab-btn" onclick="switchTab('graph',this)">Relationship Graph</button>
-      <div class="tab-sep"></div>
-      <div class="filter-pill active" onclick="setTLP('all',this)">All TLP</div>
-      <div class="filter-pill" onclick="setTLP('WHITE',this)">TLP:WHITE</div>
-      <div class="filter-pill" onclick="setTLP('GREEN',this)">TLP:GREEN</div>
-      <div class="filter-pill" onclick="setTLP('AMBER',this)">TLP:AMBER</div>
-      <button class="submit-btn" onclick="openModal(null)">+ Submit</button>
+<div class="filter-bar">
+  <div class="filter-inner">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Search reports, topics, threat actors..." oninput="updateLatestReportCard();filterPortfolio()">
     </div>
-    <div class="feed" id="feed"></div>
-    <div id="graphWrap" class="graph-wrap" style="display:none">
-      <div class="graph-container">
-        <div class="graph-controls">
-          <button class="gpill on" onclick="gfAll(this)">All</button>
-          <button class="gpill" onclick="gfType('intel',this)">Intel</button>
-          <button class="gpill" onclick="gfType('defense',this)">Defense</button>
-          <button class="gpill" onclick="gfCamp('Gamaredon',this)">Gamaredon</button>
-          <button class="gpill" onclick="gfCamp('ValleyRAT',this)">ValleyRAT</button>
-          <div class="glegend">
-            <div class="gld"><div class="grdot" style="background:#E24B4A"></div>Intel</div>
-            <div class="gld"><div class="grdot" style="background:#1D9E75"></div>Defense</div>
-            <div class="gld"><div class="grdot" style="background:#BA7517"></div>CVE</div>
+    <div class="filter-chips-row">
+      <div class="filter-chips">
+        <button class="chip active" data-filter="all" onclick="setFilter('all',this)">All</button>
+        <button class="chip" data-filter="threat-analysis" onclick="setFilter('threat-analysis',this)">Threat Analysis</button>
+        <button class="chip" data-filter="nation-state" onclick="setFilter('nation-state',this)">Nation-State</button>
+        <button class="chip" data-filter="infrastructure" onclick="setFilter('infrastructure',this)">Infrastructure</button>
+        <button class="chip" data-filter="supply-chain" onclick="setFilter('supply-chain',this)">Supply Chain</button>
+        <button class="chip" data-filter="cmmc" onclick="setFilter('cmmc',this)">CMMC</button>
+        <button class="chip" data-filter="training" onclick="setFilter('training',this)">Training</button>
+        <button class="chip" data-filter="identity" onclick="setFilter('identity',this)">Identity & Credentials</button>
+        <button class="chip" data-filter="tools" onclick="setFilter('tools',this)">Tools</button>
+        <button class="chip" data-filter="lab" onclick="setFilter('lab',this)">Lab Logs</button>
+        <button class="chip" data-filter="fieldnotes" onclick="setFilter('fieldnotes',this)">Field Notes</button>
+      </div>
+      <select class="mobile-filter-select" onchange="setFilter(this.value, null)">
+        <option value="all">All</option>
+        <option value="threat-analysis">Threat Analysis</option>
+        <option value="nation-state">Nation-State</option>
+        <option value="infrastructure">Infrastructure</option>
+        <option value="supply-chain">Supply Chain</option>
+        <option value="cmmc">CMMC</option>
+        <option value="training">Training</option>
+        <option value="identity">Identity & Credentials</option>
+        <option value="tools">Tools</option>
+        <option value="lab">Lab Logs</option>
+        <option value="fieldnotes">Field Notes</option>
+      </select>
+      <div class="results-count" id="resultsCount">loading...</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- THREAT ANALYSIS -->
+  <div class="section-group" id="group-analysis">
+    <div class="section-header">
+      <div class="section-label">Analysis Reports</div>
+      <div class="section-title">Threat Intelligence & Policy Research</div>
+    </div>
+    <div class="card-grid">
+
+      <!-- newest → oldest -->
+
+      <!-- 60 SECONDS — UNC1069 axios npm supply chain attack -->
+
+      <a href="analysis/sixty_seconds.html" class="card card-featured portfolio-item" id="latest-report-card"
+         data-tags="threat-analysis nation-state supply-chain"
+         data-title="waveshaper unc1069 bluenoroff lazarus axios npm supply chain north korea rat c2 beacon developer tools">
+        <div class="card-accent red" style="width:4px;height:auto;min-height:100%"></div>
+        <div class="card-body">
+          <div class="card-featured-badge">Latest Report</div>
+          <div class="card-category red">Threat Analysis · Nation-State · Supply Chain</div>
+          <div class="card-title">60 Seconds — How North Korea Hijacked a Library Used by 100 Million Developers</div>
+          <div class="card-desc">UNC1069 (BlueNoroff/Lazarus) compromised the axios npm maintainer account and injected WAVESHAPER.V2 — a cross-platform RAT — into two releases with 100M+ weekly downloads. Three hours. 60-second beacon interval. IE8/WinXP User-Agent. This report reconstructs the attack traffic, explains the four detection gaps, and challenges the assumption that UNC1069 and TeamPCP operated independently.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">UNC1069</span><span class="card-tag">North Korea</span><span class="card-tag">npm</span><span class="card-tag">Supply Chain</span><span class="card-tag">RAT</span></div>
+            <div class="card-arrow">→</div>
           </div>
         </div>
-        <canvas id="gc" class="graph-canvas" height="360"></canvas>
-        <div class="graph-bottom" id="gd"><span style="color:var(--text3)">Click node for details · Double-click to open post</span></div>
-      </div>
+      </a>
+
+      <!-- TEAMPCP SERIES — Part 1, Part 2, Part 3 -->
+
+      <a href="analysis/telnyx_supply_chain_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis supply-chain"
+         data-title="telnyx supply chain teampcp wav steganography credential chain trivy litellm pypi nine days lapsus vect defense contractor cmmc">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Supply Chain</div>
+          <div class="card-series">Series · Part 1 of 3</div>
+          <div class="card-title">The Trusted Channel — TeamPCP's Nine-Day Credential Chain and the WAV Steganography Attack</div>
+          <div class="card-desc">How TeamPCP poisoned the Telnyx Python package using WAV audio steganography — the final link in a nine-day credential chain running Trivy → LiteLLM → Telnyx. 500,000+ corporate identities stolen, 6-hour exposure window, direct implications for defense contractors on PyPI. Part 1 of a 3-part series. Continues in <em>The Blast Radius</em> and <em>The New Recruit</em>.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">TeamPCP</span><span class="card-tag">Steganography</span><span class="card-tag">Supply Chain</span><span class="card-tag">CMMC</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/telnyx_blast_radius.html" class="card portfolio-item"
+         data-tags="threat-analysis supply-chain"
+         data-title="telnyx blast radius teampcp vect lapsus ransomware insurance ai infrastructure litellm youth cybercrime criminal ecosystem">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Supply Chain</div>
+          <div class="card-series">Series · Part 2 of 3</div>
+          <div class="card-title">The Blast Radius — Criminal Ecosystems, AI Infrastructure, and the Cost of Looking Away</div>
+          <div class="card-desc">What the TeamPCP campaign reveals about the ransomware payment paradox, the insurance industry's role in funding criminal networks, the AI infrastructure single point of failure, and why a financially motivated criminal group is more alarming than a nation-state actor. Part 2 of 3 — continues in <em>The New Recruit</em>.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">TeamPCP</span><span class="card-tag">Ransomware</span><span class="card-tag">AI Infrastructure</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/telnyx_new_recruit.html" class="card portfolio-item"
+         data-tags="threat-analysis supply-chain"
+         data-title="new recruit gaming cybercrime pipeline youth recruitment roblox discord vr lapsus scattered spider home network defense contractor social engineering">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Supply Chain</div>
+          <div class="card-series">Series · Part 3 of 3</div>
+          <div class="card-title">The New Recruit — How Criminal Networks Build Their Next Generation of Attackers in Plain&nbsp;Sight</div>
+          <div class="card-desc">How criminal and state-sponsored groups use gaming platforms, influencer impersonation, and challenge-based talent scouting as deliberate recruitment infrastructure — and how that pipeline creates a direct attack surface against defense contractor home networks. Part 3 of 3.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Social Engineering</span><span class="card-tag">Youth Pipeline</span><span class="card-tag">Home Network</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/data-breach-exposure-analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis identity"
+         data-title="data breach exposure analysis credential stuffing mitre attack cloud identity sso google azure entra id 38 breaches haveibeenpwned">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Identity & Credentials</div>
+          <div class="card-title">38 Breaches, One Email Address — Anatomy of a Credential Attack Surface</div>
+          <div class="card-desc">A SOC analyst case study mapping 13 years of personal data breach exposure to attacker methodology, threat actor profiles, and cloud identity risk. Covers credential stuffing attack chains, Everest ransomware, infostealer operators, MITRE ATT&CK mapping, and the SSO single-point-of-failure risk that mirrors Azure Entra ID vulnerabilities at enterprise scale. Includes live pwned password checker.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">MITRE ATT&CK</span><span class="card-tag">Credential Stuffing</span><span class="card-tag">Cloud Identity</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/water_infrastructure_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis infrastructure"
+         data-title="water infrastructure open tap weapon scada ics new york city nyc critical">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Critical Infrastructure</div>
+          <div class="card-title">The Open Tap — When Water Becomes a Weapon</div>
+          <div class="card-desc">Wake-up call analysis of water infrastructure cybersecurity. Ukraine confirmed attacks, Oldsmar Florida proof of concept, and a full scenario against NYC's 9-million-person unfiltered water supply.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">ICS/SCADA</span><span class="card-tag">Water</span><span class="card-tag">Infrastructure</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/signal_whatsapp_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis nation-state"
+         data-title="signal whatsapp russia encryption social engineering defense contractor cmmc">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Russia</div>
+          <div class="card-title">The Encryption Illusion — Russia's Signal Campaign</div>
+          <div class="card-desc">How Russian intelligence bypassed Signal and WhatsApp without breaking encryption — exploiting the human layer instead. CMMC implications for defense contractors using personal messaging apps.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Russia</span><span class="card-tag">Social Engineering</span><span class="card-tag">CMMC</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/The_Cascade_Analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis infrastructure"
+         data-title="the cascade when america goes dark coordinated infrastructure attack china russia">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Infrastructure</div>
+          <div class="card-title">The Cascade — When America Goes Dark</div>
+          <div class="card-desc">Coordinated infrastructure attack scenario analysis examining how simultaneous failures in communications, power grid, and transportation create cascading societal collapse. Explores the dependency stack that transforms three technical failures into an uncontestable national security crisis.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Nation-State</span><span class="card-tag">Infrastructure</span><span class="card-tag">Supply Chain</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/CMMC_Supply_Chain.html" class="card portfolio-item"
+         data-tags="cmmc"
+         data-title="cmmc supply chain weakest link morsecorp fca cost sharing mandatory training">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Policy Analysis · CMMC</div>
+          <div class="card-title">The Weakest Link — CMMC Supply Chain</div>
+          <div class="card-desc">Analysis of how CMMC compliance gaps in small subcontractors expose entire defense programs. Covers the MORSECORP $4.6M FCA settlement and the case for mandatory structured training.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">CMMC</span><span class="card-tag">FCA</span><span class="card-tag">MORSECORP</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/Volt_Typhoon_Analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis nation-state"
+         data-title="volt typhoon china living off the land lotl audit log infrastructure">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · APT</div>
+          <div class="card-title">Volt Typhoon — Living Off the Land</div>
+          <div class="card-desc">Deep analysis of China's Volt Typhoon campaign targeting US critical infrastructure using LOTL techniques. Covers audit log deletion and years-long persistence inside defended networks.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">China</span><span class="card-tag">LOTL</span><span class="card-tag">Critical Infrastructure</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/stryker_threat_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis nation-state"
+         data-title="stryker corporation wiper attack handala 200000 devices credential mfa">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Case Study</div>
+          <div class="card-title">Stryker Corporation — The Wiper Attack</div>
+          <div class="card-desc">Analysis of the Handala threat actor's wiper attack that remotely destroyed 200,000 devices across 79 countries via a single admin credential lacking MFA.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Handala</span><span class="card-tag">Wiper</span><span class="card-tag">MFA</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/homoglyph_bec_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis supply-chain"
+         data-title="unicode homoglyph business email compromise BEC domain spoofing wire fraud cyrillic">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Business Email Compromise</div>
+          <div class="card-title">The Identical Lie — Unicode Homoglyph Attacks & BEC</div>
+          <div class="card-desc">How attackers use visually identical Unicode characters to register spoofed domains and steal millions through fraudulent wire transfers. $55.5 billion lost over the past decade. The one defense that stops it unconditionally costs nothing.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">BEC</span><span class="card-tag">Homoglyph</span><span class="card-tag">Wire Fraud</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/glassworm_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis supply-chain"
+         data-title="glassworm invisible unicode supply chain attack blockchain c2 github npm defense contractor">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Supply Chain</div>
+          <div class="card-title">The Invisible Threat — Glassworm & Unicode Supply Chain Attack</div>
+          <div class="card-desc">How Glassworm hid malicious payloads in invisible Unicode characters across 151+ GitHub repositories, npm packages, and VS Code extensions — undetectable by human code review. Active campaign as of March 2026.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Glassworm</span><span class="card-tag">Supply Chain</span><span class="card-tag">Unicode</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/hiring_trap_analysis.html" class="card portfolio-item"
+         data-tags="threat-analysis"
+         data-title="hiring trap job search browser extension jobright manifest permissions national security surveillance defense contractor">
+        <div class="card-accent amber"></div>
+        <div class="card-body">
+          <div class="card-category amber">Threat Analysis · Privacy</div>
+          <div class="card-title">The Hiring Trap — How Job Search Tools Became a National Security Exposure</div>
+          <div class="card-desc">First-person analysis of how a broken hiring process pushes job seekers — including defense industry professionals — into installing browser extensions with surveillance-level access to their entire digital life. Includes live manifest.json permission scanner.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Browser Extensions</span><span class="card-tag">Supply Chain</span><span class="card-tag">Permissions</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/linkedin_open_door.html" class="card portfolio-item"
+         data-tags="identity"
+         data-title="linkedin verification gap national security identity trust social engineering defense contractor open door">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Identity &amp; Credentials</div>
+          <div class="card-title">The Open Door — LinkedIn's Verification Gap and the National Security Cost of Profit Over Trust</div>
+          <div class="card-desc">How LinkedIn's deliberate choice not to verify professional credentials has turned the world's largest professional network into an open-door attack surface — with direct national security implications for defense contractors and cleared personnel.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">LinkedIn</span><span class="card-tag">Identity</span><span class="card-tag">National Security</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/github_domain_trust_analysis.html" class="card portfolio-item"
+         data-tags="supply-chain"
+         data-title="github domain trust supply chain typosquatting dependency confusion open source security">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Threat Analysis · Supply Chain</div>
+          <div class="card-title">The Domain That Cried Wolf — GitHub's Domain Trust Problem</div>
+          <div class="card-desc">Analysis of how GitHub's implicit domain trust model enables supply chain attacks through typosquatting, dependency confusion, and spoofed repository signals — and why defenders have been trained to ignore the warnings.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">GitHub</span><span class="card-tag">Supply Chain</span><span class="card-tag">Domain Trust</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
     </div>
   </div>
 
-  <!-- DETAIL VIEW -->
-  <div id="detailView" style="display:none;height:100%;overflow-y:auto">
-    <div class="detail-view">
-      <div class="detail-inner" id="detailContent"></div>
+  <!-- TRAINING -->
+  <div class="section-group" id="group-training">
+    <div class="section-header">
+      <div class="section-label">Training & Education</div>
+      <div class="section-title">Self-Study Resources</div>
+    </div>
+    <div class="card-grid">
+
+      <a href="training/CMMC_Training.html" class="card portfolio-item"
+         data-tags="training"
+         data-title="cmmc cybersecurity awareness training 14 module self study guide defense contractor">
+        <div class="card-accent green"></div>
+        <div class="card-body">
+          <div class="card-category green">Self-Study Guide · CMMC</div>
+          <div class="card-title">CMMC Cybersecurity Awareness — 14-Module Self-Study Guide</div>
+          <div class="card-desc">Interactive self-study guide covering CMMC awareness topics for defense supply chain employees. 14 modules, scenario-based quizzes, real case studies. Completion record included.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Interactive</span><span class="card-tag">14 Modules</span><span class="card-tag">Certificate</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
     </div>
   </div>
+
+  <!-- TOOLS -->
+  <div class="section-group" id="group-tools">
+    <div class="section-header">
+      <div class="section-label">Interactive Tools</div>
+      <div class="section-title">Analyst Toolkit</div>
+    </div>
+    <div class="card-grid">
+
+      <a href="tools/zeek_triage_tool.html" class="card portfolio-item"
+           data-tags="tools zeek automation blue-team"
+           data-title="zeek triage tool pcap analysis ioc threat detection browser interactive">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Interactive Tool · Zeek Analysis</div>
+          <div class="card-title">Zeek Triage — pcap IOC Analyzer</div>
+          <div class="card-desc">Upload a .pcap file and get an automated IOC threat report — HTTP, TLS, DHCP, and data-volume analysis with severity scoring. Runs entirely in your browser. No data leaves your machine. Built on the zeek_triage.py workflow from Lab Log 006.</div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag">Zeek</span>
+              <span class="card-tag">IOC Detection</span>
+              <span class="card-tag">Browser</span>
+              <span class="card-tag">Training Only</span>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+      <a href="tools/aes_tool.html" class="card portfolio-item"
+         data-tags="tools encryption security"
+         data-title="aes 256 file encryption decryption browser tool gcm web crypto security">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Interactive Tool · Encryption</div>
+          <div class="card-title">AES-256 File Encryption & Decryption</div>
+          <div class="card-desc">Encrypt and decrypt any file using AES-256-GCM — the same standard used to protect classified government data. Random key generation, integrity verification via GCM authentication tag. Runs entirely in your browser. No file ever leaves your machine.</div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag">AES-256-GCM</span>
+              <span class="card-tag">Web Crypto API</span>
+              <span class="card-tag">Client-Side</span>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="tools/cvss_calculator.html" class="card portfolio-item"
+         data-tags="tools vulnerability security"
+         data-title="cvss 3.1 score calculator vulnerability severity soc analyst security plus">
+        <div class="card-accent amber"></div>
+        <div class="card-body">
+          <div class="card-category amber">Interactive Tool · Vulnerability Scoring</div>
+          <div class="card-title">CVSS 3.1 Score Calculator</div>
+          <div class="card-desc">Calculate the severity of any vulnerability using the industry-standard Common Vulnerability Scoring System. Eight metric questions, live score calculation, plain-language explanations of each factor. Used for every CVE published by NIST.</div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag">CVSS 3.1</span>
+              <span class="card-tag">Vulnerability</span>
+              <span class="card-tag">SOC Analyst</span>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="tools/glassworm_detector.html" class="card portfolio-item"
+         data-tags="tools supply-chain security"
+         data-title="glassworm detector invisible unicode supply chain attack blockchain c2 scanner">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-category red">Interactive Tool · Supply Chain Security</div>
+          <div class="card-title">Glassworm Detector</div>
+          <div class="card-desc">Scan source code files for invisible Unicode payloads and detect blockchain C2 connections. Identifies Glassworm PUA codepoints that render as blank space in every editor but carry malicious execution payloads. Runs entirely in your browser.</div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag">Unicode</span>
+              <span class="card-tag">Supply Chain</span>
+              <span class="card-tag">Blockchain C2</span>
+              <span class="card-tag">Glassworm</span>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="tools/bookmark-organizer.html" class="card portfolio-item"
+         data-tags="tools security writing"
+         data-title="bookmark organizer analyzer http https homoglyph unicode threat detection dead links ai categorization browser security hygiene">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Interactive Tool · Browser Security</div>
+          <div class="card-title">Bookmark Organizer/Analyzer</div>
+          <div class="card-desc">Audit, organize, and sanitize Chrome, Firefox, or Safari bookmark exports. Detects HTTP links, Unicode homoglyph attacks, dead links, and malicious domain signatures. AI-powered categorization with a learning system that adapts to user corrections. Runs entirely in your browser.</div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag">HTTP Audit</span>
+              <span class="card-tag">Homoglyph</span>
+              <span class="card-tag">Dead Links</span>
+              <span class="card-tag">AI Classifier</span>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="tools/email-threat-analyzer.html" class="card portfolio-item"
+         data-tags="tools security cmmc phishing"
+         data-title="email threat analyzer phishing detection ai gmail oauth mitre attck glassworm cmmc security awareness training defense contractor">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Interactive Tool · Email Security · CMMC</div>
+          <div class="card-title">Email Threat Analyzer</div>
+          <div class="card-desc">AI-powered phishing detection tool for security awareness training. Connects to Gmail via OAuth, analyzes emails for BEC, credential phishing, ransomware delivery, and Glassworm Unicode payloads. Maps findings to MITRE ATT&CK. Includes 6 defense contractor phishing scenarios for live workshops. Built for CMMC AT.2.056 training documentation.</div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag">Phishing Detection</span>
+              <span class="card-tag">MITRE ATT&CK</span>
+              <span class="card-tag">CMMC</span>
+              <span class="card-tag">Gmail OAuth</span>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="tools/youtube-purge.html" class="card portfolio-item"
+         data-tags="tools automation security privacy"
+         data-title="youtube subscription cleaner channel audit bulk unsubscribe privacy cleanup browser tool oauth">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Interactive Tool · Privacy & Hygiene</div>
+          <div class="card-title">YouTube Subscription Cleaner</div>
+          <div class="card-desc">Audit and bulk-manage your YouTube subscriptions via the YouTube Data API. Filter by activity, subscriber count, and upload frequency. Identify dormant channels and unsubscribe in bulk. Reduces your digital footprint and cleans up your recommendation algorithm. Runs in your browser via OAuth.</div>
+          <div class="card-footer">
+            <div class="card-tags">
+              <span class="card-tag">YouTube API</span>
+              <span class="card-tag">OAuth</span>
+              <span class="card-tag">Privacy</span>
+              <span class="card-tag">Automation</span>
+            </div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+  <div class="section-group" id="group-labs">
+    <div class="section-header">
+      <div class="section-label">Hands-On Security Work</div>
+      <div class="section-title">Lab Logs</div>
+    </div>
+    <div class="card-grid">
+
+      <a href="labs/lab_log_001.html" class="card portfolio-item"
+         data-tags="lab reconnaissance blue-team"
+         data-title="lab log 001 network reconnaissance nmap port scan kali linux">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 001 · Reconnaissance</div>
+          <div class="card-title">Network Reconnaissance — What an Attacker Sees First</div>
+          <div class="card-desc">Nmap SYN scan of a Docker host from Kali Linux. Full port enumeration, service detection, and analysis of two open RPC services mapped to NIST 800-171 controls.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Nmap</span><span class="card-tag">Kali</span><span class="card-tag">NIST</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_002.html" class="card portfolio-item"
+         data-tags="lab traffic-analysis blue-team tcpdump"
+         data-title="lab log 002 network traffic analysis tcpdump packet capture tcp syn">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 002 · Traffic Analysis</div>
+          <div class="card-title">Network Traffic Analysis — Reading the Language of Packets</div>
+          <div class="card-desc">tcpdump packet capture of a live Nmap scan. TCP SYN/RST handshake breakdown, Nmap behavioral fingerprints visible in raw traffic, defender detection methodology.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">tcpdump</span><span class="card-tag">TCP/IP</span><span class="card-tag">Blue Team</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_003.html" class="card portfolio-item"
+         data-tags="lab malware-analysis wireshark blue-team"
+         data-title="lab log 003 wireshark malware analysis c2 beaconing infected host dhcp kerberos">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 003 · Malware Analysis</div>
+          <div class="card-title">Wireshark Malware Analysis — Identifying an Infected Host</div>
+          <div class="card-desc">Real malware pcap analysis using Wireshark. DHCP and Kerberos triage workflow to identify infected machine and user. C2 beaconing pattern detection — 264 POST requests at 60-second intervals confirmed.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Wireshark</span><span class="card-tag">C2</span><span class="card-tag">Beaconing</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_004.html" class="card portfolio-item"
+         data-tags="lab malware-analysis wireshark lumma-stealer blue-team"
+         data-title="lab log 004 wireshark profile lumma stealer credential theft tls exfiltration">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 004 · Custom Profile + Malware</div>
+          <div class="card-title">Custom Wireshark Profile & Lumma Stealer Analysis</div>
+          <div class="card-desc">Built a purpose-configured SOC analyst Wireshark profile with color rules and one-click filter buttons. Independent analysis of Lumma Stealer — browser fingerprinting, dual Chrome/Edge infection, TLS credential exfiltration to whitepepper.su.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Lumma Stealer</span><span class="card-tag">TLS</span><span class="card-tag">Exfiltration</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_005.html" class="card portfolio-item"
+         data-tags="lab zeek malware-analysis blue-team automation"
+         data-title="lab log 005 zeek network analysis automated log generation lumma stealer">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 005 · Zeek Analysis</div>
+          <div class="card-title">Zeek Network Analysis — Automated Log Generation & Threat Discovery</div>
+          <div class="card-desc">Installed and ran Zeek 8.1.1 against the Lumma Stealer pcap. Five-command triage workflow producing structured logs. ssl.log revealed four additional C2 domains invisible to Wireshark — 1.67MB exfiltration confirmed.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Zeek</span><span class="card-tag">ssl.log</span><span class="card-tag">C2 Discovery</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_006.html" class="card portfolio-item"
+         data-tags="lab python automation zeek blue-team"
+         data-title="lab log 006 python triage script zeek automated threat detection lumma stealer">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 006 · Python Automation</div>
+          <div class="card-title">zeek_triage.py — Automated Threat Detection with Python</div>
+          <div class="card-desc">Python script automating the full Zeek triage workflow — DHCP, Kerberos, HTTP, TLS, and data volume analysis in one command. Color-coded output, severity scoring, validated against two real malware families. Zero external dependencies.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Python</span><span class="card-tag">Automation</span><span class="card-tag">ANSI Colors</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_007.html" class="card portfolio-item"
+         data-tags="lab python automation zeek blue-team"
+         data-title="lab log 007 ioc detection severity scoring dynamic dns confirmed malicious">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 007 · IOC Detection</div>
+          <div class="card-title">Confirmed IOC Matching & Severity Scoring Correction</div>
+          <div class="card-desc">Added confirmed malicious domain matching and dynamic DNS detection to the triage script. Corrected severity scoring flaw — a confirmed C2 beacon always scores CRITICAL regardless of data volume. Validated against two malware families.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">IOC Matching</span><span class="card-tag">Dynamic DNS</span><span class="card-tag">Severity Logic</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_008.html" class="card portfolio-item"
+         data-tags="lab threat-analysis blue-team wireshark"
+         data-title="lab log 008 seven days scans probes web traffic server wireshark apache syn scan eicar">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 008 · Internet-Facing Server Analysis</div>
+          <div class="card-title">Seven Days Under Attack — Analyzing a Live Web Server's Traffic</div>
+          <div class="card-desc">Analysis of 313,968 packets across seven days of real internet traffic hitting an exposed Apache server. Four attack vectors identified — SYN port scan, backup exfiltration attempt, EICAR web shell upload probe, and RADIUS auth scan. All attacks blocked. Server banner disclosure identified as the critical passive risk.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Wireshark</span><span class="card-tag">Apache</span><span class="card-tag">SYN Scan</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+
+      <a href="labs/lab_log_009.html" class="card portfolio-item"
+         data-tags="lab threat-analysis nation-state supply-chain blue-team wireshark"
+         data-title="lab log 009 waveshaper unc1069 north korea axios npm rat c2 beacon wireshark detection">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 009 · Part 1 of 3 · WAVESHAPER.V2 Detection</div>
+          <div class="card-title">Catching a North Korean RAT in Wireshark</div>
+          <div class="card-desc">Behavioral detection of WAVESHAPER.V2 C2 traffic using a synthetic training pcap built from public GTIG IOCs. Four Wireshark filters applied in sequence — large packets, beaconing, HTTP External, and IE8/WinXP User-Agent. Demonstrates why behavioral rules catch unknown variants before signatures exist.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Wireshark</span><span class="card-tag">UNC1069</span><span class="card-tag">North Korea</span><span class="card-tag">RAT</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_009b.html" class="card portfolio-item"
+         data-tags="lab threat-analysis blue-team docker python tool-build"
+         data-title="lab log 009 waveshaper docker flask python automation detection tool">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 009 · Part 2 of 3 · Tool Build</div>
+          <div class="card-title">Containerizing WAVESHAPER.V2 Detection</div>
+          <div class="card-desc">Automating the Part 1 detection workflow with a Python script packaged in Docker with a Flask web interface. Pivot from file upload to pre-baked demo scenarios — three clickable cards showing the real triage output by attack stage.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Python</span><span class="card-tag">Docker</span><span class="card-tag">Flask</span><span class="card-tag">Detection</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_009c.html" class="card portfolio-item"
+         data-tags="lab threat-analysis blue-team red-team meterpreter wireshark live-lab"
+         data-title="lab log 009 meterpreter c2 traffic wireshark kali windows live lab reverse shell">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 009 · Part 3 of 3 · Live Lab</div>
+          <div class="card-title">Live C2 Traffic — Meterpreter in Wireshark</div>
+          <div class="card-desc">Two VMs on an isolated host-only network. Kali as attacker, Windows 11 as victim. Meterpreter session established after 11 attempts blocked by Defender. 67MB of real C2 traffic captured — the RST/ACK blocking pattern and the live session side by side.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Meterpreter</span><span class="card-tag">Wireshark</span><span class="card-tag">Kali</span><span class="card-tag">C2</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_010.html" class="card portfolio-item"
+         data-tags="lab tool-build python flask detection document-security"
+         data-title="lab log 010 ladon document security analyzer python flask polyglot pdf malware detection">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 010 · Tool Build · Python</div>
+          <div class="card-title">Building Ladon — A Document Security Analyzer</div>
+          <div class="card-desc">How Ladon was built — seven detection modules covering polyglot detection, URI extraction, barcode analysis, steganography, metadata, ICS calendar analysis, and threat scoring. Flask backend, Railway deployment, AI-assisted development process documented transparently.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Python</span><span class="card-tag">Flask</span><span class="card-tag">Polyglot</span><span class="card-tag">Detection</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="labs/lab_log_011.html" class="card portfolio-item"
+         data-tags="lab field-analysis threat-intelligence malware polyglot gamaredon valleyrat nation-state"
+         data-title="lab log 011 ladon in the wild malware analysis polyglot gamaredon valleyrat silverfox facebook phishing job scam pdf exe">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Lab Log 011 · Field Analysis · Threat Intelligence</div>
+          <div class="card-title">Ladon in the Wild — Five Malicious PDFs, Analyzed</div>
+          <div class="card-desc">Ladon validated against five real-world malicious PDFs — Gamaredon (Russian APT), ValleyRAT/SilverFox (Chinese APT), Facebook credential phishing, an unknown dropper, and a live job scam caught in the wild. Every file passed Gmail. Every file had a Windows PE executable hidden inside.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Polyglot</span><span class="card-tag">Gamaredon</span><span class="card-tag">ValleyRAT</span><span class="card-tag">Nation-State</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- FIELD NOTES -->
+  <div class="section-group" id="group-fieldnotes">
+    <div class="section-header">
+      <div class="section-label">Field Notes</div>
+      <div class="section-title">Observations from the Real World</div>
+    </div>
+    <div class="card-grid">
+
+      <a href="writing/ladon-field-notes.html" class="card portfolio-item"
+         data-tags="fieldnotes threat-analysis cmmc"
+         data-title="ladon document security analyzer pdf malware polyglot steganography gamaredon valleyrat cmmc nist static analysis">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Field Notes · Document Security · CMMC</div>
+          <div class="card-title">The Document You Trusted Is Not Always What It Contains</div>
+          <div class="card-desc">How I built Ladon — a static document security analyzer — and tested it against four real MalwareBazaar samples including a Gamaredon APT PDF and a ValleyRAT dropper with a live C2 URL. Four samples. Zero misses. Zero files executed.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Polyglot</span><span class="card-tag">Gamaredon</span><span class="card-tag">ValleyRAT</span><span class="card-tag">CMMC</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="writing/email-threat-analyzer-field-notes.html" class="card portfolio-item"
+         data-tags="fieldnotes cmmc"
+         data-title="email threat analyzer phishing detection ai gmail oauth mitre cmmc security awareness defense contractor">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Field Notes · Tools · CMMC</div>
+          <div class="card-title">The Email That Could Cost a Defense Contract</div>
+          <div class="card-desc">How I built an AI-powered phishing detection tool, ran it against my real inbox, and discovered that marketing platforms use the same invisible Unicode technique as Glassworm malware. Includes CMMC AT.2.056 mapping and a phishing simulation use case for defense contractors.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Phishing</span><span class="card-tag">CMMC</span><span class="card-tag">Glassworm</span><span class="card-tag">AI</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="writing/youtube-to-alertdesk-field-notes.html" class="card portfolio-item"
+         data-tags="fieldnotes"
+         data-title="youtube subscription cleaner alertdesk soc triage ai classification groq log analysis defense contractor">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Field Notes · Tools</div>
+          <div class="card-title">From 1,000 Subscriptions to a SOC Triage Tool</div>
+          <div class="card-desc">How cleaning up 1,900 YouTube subscriptions — accumulated over five years by my twin sons — led to building AlertDesk, an AI-powered SIEM log triage tool. The same pattern of volume, classification, and human judgment applies directly to SOC analyst work.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">SOC Triage</span><span class="card-tag">AI Classification</span><span class="card-tag">AlertDesk</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="writing/bookmark-security-article.html" class="card portfolio-item"
+         data-tags="fieldnotes threat-analysis"
+         data-title="bookmarks security risk http https homoglyph domain hijacking browser audit expired domains">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Security Hygiene · Field Notes</div>
+          <div class="card-title">Your Bookmarks Are a Security Risk</div>
+          <div class="card-desc">Why your browser's bookmark bar is a forgotten attack surface — 947 bookmarks audited, 737 unencrypted HTTP links found. Covers domain hijacking, expired domain exploitation, Unicode homoglyph attacks, and how to audit your own collection.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">HTTP Audit</span><span class="card-tag">Homoglyph</span><span class="card-tag">Domain Hijacking</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="writing/accidental-security-analyst.html" class="card portfolio-item"
+         data-tags="fieldnotes"
+         data-title="accidental security analyst career ux design cybersecurity fbi bookmarks wireshark national defense cmmc">
+        <div class="card-accent blue"></div>
+        <div class="card-body">
+          <div class="card-category blue">Field Notes · Career</div>
+          <div class="card-title">The Accidental Security Analyst</div>
+          <div class="card-desc">What 23 years of bookmarks, a Wireshark session, and two law enforcement examinations nobody knew about say about a career that was always pointing toward security.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">Career</span><span class="card-tag">UX × Security</span><span class="card-tag">CMMC</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">◎</div>
+    <div class="empty-text">No matching items — try a different search or filter</div>
+  </div>
+
 </div>
 
-<!-- RIGHT PANEL -->
-<div class="rightpanel">
-  <div class="psec">
-    <div class="ptitle">Trending</div>
-    <div class="trend-item"><span class="tdot" style="background:#dc2626"></span>React2Shell<span class="tcount">142</span></div>
-    <div class="trend-item"><span class="tdot" style="background:#dc2626"></span>Gamaredon<span class="tcount">89</span></div>
-    <div class="trend-item"><span class="tdot" style="background:#2563eb"></span>ValleyRAT<span class="tcount">67</span></div>
-    <div class="trend-item"><span class="tdot" style="background:#d97706"></span>CVE-2025-55182<span class="tcount">54</span></div>
-    <div class="trend-item"><span class="tdot" style="background:#16a34a"></span>Polyglot PDF<span class="tcount">41</span></div>
-  </div>
-  <div class="psec">
-    <div class="ptitle">Community</div>
-    <div class="srow"><span class="slabel">Posts today</span><span class="sval" id="sPosts">6</span></div>
-    <div class="srow"><span class="slabel">IOCs shared</span><span class="sval">1,204</span></div>
-    <div class="srow"><span class="slabel">Verified analysts</span><span class="sval">89</span></div>
-    <div class="srow"><span class="slabel">Discussions</span><span class="sval">14</span></div>
-  </div>
-  <div class="psec">
-    <div class="ptitle">Rules</div>
-    <div class="infobox"><strong>Discussion standards</strong>Stay on-topic. Evidence required. Defanged IOCs only. Verified analysts prioritized. Violations = warning then ban.</div>
-  </div>
-</div>
-</div>
+<footer>
+  <span>Yana Ivanov · Information Assurance & CMMC Compliance · 2026</span>
+  <span>Independent analysis · For educational use</span>
+</footer>
 
-<!-- SUBMIT MODAL -->
-<div class="modal-overlay" id="modal" onclick="closeModalOutside(event)">
-  <div class="modal">
-    <div class="mhdr"><div class="mtitle">Submit to ArgusX</div><button class="mclose" onclick="closeModal()">×</button></div>
-    <div class="mtabs">
-      <button class="mtab active" onclick="switchMTab('intel',this)">Intel / IOC</button>
-      <button class="mtab" onclick="switchMTab('defense',this)">Defense / Rule</button>
-    </div>
-    <div class="mbody">
-      <div class="github-note">🔒 GitHub login required. Your handle is attached to every post.</div>
-      <div id="prefillNote" style="display:none" class="pre-fill-note">🔗 Pre-filled from post context — you can edit or clear.</div>
-      <div class="fg-row">
-        <div><label class="flabel">Type</label><select class="fselect" id="fType"><option>IOC</option><option>TTP</option><option>Detection</option><option>CVE</option><option>Tool</option></select></div>
-        <div><label class="flabel">TLP</label><select class="fselect" id="fTlp"><option>WHITE</option><option>GREEN</option><option>AMBER</option><option>RED</option></select></div>
-      </div>
-      <div><label class="flabel">Title *</label><input class="finput" id="fTitle" placeholder="Short descriptive title"></div>
-      <div><label class="flabel">Description *</label><textarea class="ftextarea" id="fBody" placeholder="Describe the threat, IOC, or finding..."></textarea></div>
-      <div><label class="flabel">IOC / Hash / Code</label><input class="finput" id="fCode" placeholder="SHA256, IP, domain, Sigma rule..."></div>
-      <div id="defenseExtra" style="display:none">
-        <label class="flabel">Responds to (Intel post)</label>
-        <select class="fselect" id="fLinksTo"><option value="">-- Link to Intel post --</option></select>
-        <div class="fhint">Links this defense to the threat it addresses — shows in the relationship graph.</div>
-      </div>
-      <div id="relatedExtra" style="display:none">
-        <label class="flabel">Related threat (optional)</label>
-        <select class="fselect" id="fRelated"><option value="">-- Link to related Intel --</option></select>
-        <div class="fhint">If this Intel is related to an existing post, link them. Both posts will show the connection.</div>
-      </div>
-      <div class="fg-row">
-        <div><label class="flabel">Source URL *</label><input class="finput" id="fSource" placeholder="https://..."></div>
-        <div><label class="flabel">MITRE ATT&CK</label><input class="finput" id="fMitre" placeholder="T1566.001"></div>
-      </div>
-    </div>
-    <div class="mfooter">
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="btn-sub" onclick="submitPost()">Submit →</button>
-    </div>
-  </div>
-</div>
-
-<!-- SHARE MODAL -->
-<div class="modal-overlay" id="shareModal" onclick="if(event.target===this)closeShare()">
-  <div class="modal" style="max-width:420px">
-    <div class="mhdr"><div class="mtitle">Share post</div><button class="mclose" onclick="closeShare()">×</button></div>
-    <div class="mbody">
-      <div class="share-url" id="shareUrl"></div>
-      <div class="share-opts">
-        <div class="share-opt" onclick="copyShareUrl()"><div class="so-icon" style="background:var(--blue-bg)">🔗</div><div><div class="so-label">Copy link</div><div class="so-sub">Direct link to this post</div></div></div>
-        <div class="share-opt" onclick="shareSlack()"><div class="so-icon" style="background:#4a154b22">💬</div><div><div class="so-label">Share to Slack</div><div class="so-sub">Post to your security team channel</div></div></div>
-        <div class="share-opt" onclick="exportIOC()"><div class="so-icon" style="background:var(--green-bg)">📋</div><div><div class="so-label">Export IOCs</div><div class="so-sub">Copy defanged IOCs to clipboard</div></div></div>
-        <div class="share-opt" onclick="exportReport()"><div class="so-icon" style="background:var(--amber-bg)">📄</div><div><div class="so-label">Download report</div><div class="so-sub">Plain-text report file</div></div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
+<button class="scroll-top-btn" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
 
 <script>
-const posts=[
-  {id:1,author:'ArtemisHex',initials:'YI',av:'av-blue',verified:true,time:'2 min ago',source:'MalwareBazaar',
-   category:'intel',type:'IOC',tlp:'WHITE',campaign:['phishing','malware'],
-   title:'Live Polyglot PDF — Job Scam Phishing',
-   preview:'Windows PE hidden at offset 10,303 inside a PDF. Gmail passed it. Addressed by name. Personal Gmail sender.',
-   body:'Live polyglot PDF dropper — Windows PE at offset 10,303. Gmail passed it. Delivered as fake job offer from aminclaudette14[at]gmail[.]com.',
-   code:'SHA256: 4a8f2c1d...d9e1b7\nType: PDF/PE polyglot · Offset: 10303\nSender: aminclaudette14[at]gmail[.]com',
-   mitre:['T1566.001','T1204.002'],
-   plainEnglish:'A job offer PDF arrived that looked completely legitimate — Gmail scanned it and gave it a clean pass. Inside, hidden from any PDF viewer, was a Windows executable that would run silently the moment the file was opened. The sender used a personal Gmail account and addressed the target by name to appear credible.',
-   impact:'Silent execution of a Windows payload with no visible warning. Malware runs in the background immediately on file open.',
-   upvotes:24,linksTo:null,related:null,
-   chat:[
-     {author:'sec_owl',initials:'SO',av:'av-green',verified:true,time:'1 min ago',text:'Same sender pattern on 3 other samples last week — all personal Gmail, all addressed by name. Looks like scraped LinkedIn.'},
-     {author:'mal_kova',initials:'MK',av:'av-purple',verified:false,time:'just now',text:'Hash matches MalwareBazaar generic dropper tag. PE at 10303 is consistent across the batch.',code:'VT hits: 0/72 at submission\nFirst seen: 2026-04-05'}
-   ]},
-  {id:2,author:'s_reichert',initials:'SR',av:'av-green',verified:true,time:'18 min ago',source:'Honeypot',
-   category:'intel',type:'CVE',tlp:'GREEN',campaign:['nation-state'],
-   title:'React2Shell CVE-2025-55182 Active Scanning',
-   preview:'Nuclei UA across 3 honeypots, 400+ hits/hr. Patch Next.js 15.x/16.x now. CVSS 10.0 unauthenticated RCE.',
-   body:'React2Shell (CVE-2025-55182) scanning uptick. Nuclei UA in logs across 3 honeypots. CVSS 10.0 unauthenticated RCE via single crafted POST.',
-   code:'User-Agent: Nuclei - CVE-2025-55182\nPOST /__rsc · 400+ hits/hr',
-   mitre:['T1190'],
-   plainEnglish:'A critical flaw in React/Next.js lets attackers fully take over a server with one web request — no password needed. Nation-state actors are actively scanning for vulnerable servers right now.',
-   impact:'Full server compromise without authentication on any unpatched Next.js 15.x or 16.x deployment.',
-   upvotes:89,linksTo:null,related:null,
-   chat:[
-     {author:'hex_triage',initials:'HT',av:'av-amber',verified:true,time:'15 min ago',text:'Second scanner also active — Chrome 60 UA: React2ShellScanner/1.0.0. Two separate actors simultaneously.',code:'React2ShellScanner/1.0.0 — 180 hits/hr'},
-     {author:'s_reichert',initials:'SR',av:'av-green',verified:true,time:'10 min ago',text:'@hex_triage Chrome 60 scanner is more targeted — prioritizing government ASNs first based on our data.'}
-   ]},
-  {id:3,author:'mal_kova',initials:'MK',av:'av-purple',verified:false,time:'1 hr ago',source:'Internal honeypot',
-   category:'intel',type:'Detection',tlp:'AMBER',campaign:['nation-state','malware'],
-   title:'Gamaredon VBS Dropper via PDF Reader',
-   preview:'FSB-linked Russian APT. wscript.exe spawned from AcroRd32. Sigma rule validated on 3 samples, 0 FP over 48hr production.',
-   body:'Gamaredon VBS dropper — wscript.exe spawned from PDF reader. 3 confirmed samples, 0 FP in 48hr production.',
-   code:"Image|endswith: '\\wscript.exe'\nParentImage|contains: 'AcroRd32'",
-   mitre:['T1059.005','G0047'],
-   plainEnglish:'Russian government hackers (Gamaredon, FSB-linked) are hiding malicious scripts in PDFs. Opening the PDF in Adobe Reader silently launches a script engine that installs malware.',
-   impact:'Backdoor or wiper on any Windows machine opening the document. Targets Ukrainian government, military, NATO orgs.',
-   upvotes:41,linksTo:null,related:null,
-   chat:[
-     {author:'ArtemisHex',initials:'YI',av:'av-blue',verified:true,time:'45 min ago',text:'Ladon catches the polyglot layer pre-execution. Sigma rule handles behavioral detection if it does run. Good layered coverage.'},
-     {author:'mal_kova',initials:'MK',av:'av-purple',verified:false,time:'30 min ago',text:'Exactly — static + behavioral = two independent detection chances. Worth deploying the Sigma rule broadly beyond Gamaredon.'}
-   ]},
-  {id:4,author:'ArtemisHex',initials:'YI',av:'av-blue',verified:true,time:'4 hr ago',source:'Ladon · MalwareBazaar',
-   category:'defense',type:'Defense',tlp:'WHITE',campaign:['phishing','malware','nation-state'],
-   title:'Ladon — Static Polyglot Detection for PDFs',
-   preview:'Free tool catches Windows PE inside PDFs before opening. Validated on 5 real malicious PDFs. Gmail passed all 5. Ladon caught all 5.',
-   body:'Ladon static analysis catches polyglot PDFs before they execute. Validated on 5 real samples: job scam, Gamaredon, ValleyRAT, Facebook phishing, unknown dropper.',
-   code:'# Detection\nMZ header scan at any offset > 50\nOutput: CRITICAL — Windows PE at offset N',
-   mitre:['T1027','T1204.002'],
-   plainEnglish:'A free tool that checks any suspicious PDF before you open it. Drag the file in — reads raw bytes, tells you in plain English if an executable is hidden inside. Catches files that pass Gmail, Outlook, and most antivirus.',
-   impact:'Prevents polyglot PDF execution before the user opens the file. 0 false positives across 5 real malicious samples.',
-   upvotes:34,linksTo:[1,3],related:null,
-   chat:[
-     {author:'sec_owl',initials:'SO',av:'av-green',verified:true,time:'3 hr ago',text:'Can this be deployed as a gateway scanner — scan all incoming PDFs before mailbox delivery?'},
-     {author:'ArtemisHex',initials:'YI',av:'av-blue',verified:true,time:'2 hr ago',text:'@sec_owl Not yet — web UI only for now. API endpoint on the roadmap so you could pipe it into email gateway or SOAR.'}
-   ]},
-  {id:5,author:'s_reichert',initials:'SR',av:'av-green',verified:true,time:'5 hr ago',source:'Vercel security bulletin',
-   category:'defense',type:'Defense',tlp:'GREEN',campaign:['nation-state'],
-   title:'React2Shell Patch — Update Next.js Now',
-   preview:'Update to Next.js 16.1+. Run npx fix-react2shell-next. Rotate all app secrets after patching. WAF rules alone are not sufficient.',
-   body:'Patch for CVE-2025-55182. Update Next.js to 16.1+. Rotate all app secrets. WAF rules (Cloudflare, AWS, Vercel) are partial protection only.',
-   code:'npx fix-react2shell-next   # check version\nnpm install next@latest     # update\n# Rotate all secrets after patching',
-   mitre:['T1190'],
-   plainEnglish:'If your site runs Next.js, update it right now. One command fixes the flaw. After updating, change all application secrets and API keys.',
-   impact:'Fully eliminates the React2Shell attack surface. WAF rules alone do not fix the underlying flaw.',
-   upvotes:112,linksTo:[2],related:null,
-   chat:[
-     {author:'hex_triage',initials:'HT',av:'av-amber',verified:true,time:'4 hr ago',text:'Docker containers need a full image rebuild — npm update alone won\'t fix it if you built the image before Dec 3 2025.'},
-     {author:'s_reichert',initials:'SR',av:'av-green',verified:true,time:'4 hr ago',text:'Critical point — vendored Next.js bundle in the container is still vulnerable even after npm update in a running container.'}
-   ]}
-];
+let activeFilter = 'all';
+const GRID_TOP = document.querySelector('.main');
 
-const GNODES=[
-  {id:1,label:['Polyglot PDF','Job Scam'],type:'intel',x:90,y:80,campaign:'Generic',tlp:'WHITE',desc:'Live phishing — PE at offset 10,303.',links:[4]},
-  {id:2,label:['ValleyRAT','Dropper'],type:'intel',x:280,y:60,campaign:'ValleyRAT',tlp:'WHITE',desc:'Chinese APT. Live Tencent C2.',links:[4]},
-  {id:3,label:['Gamaredon','Loader'],type:'intel',x:470,y:80,campaign:'Gamaredon',tlp:'WHITE',desc:'FSB-linked. Clean PDF layer.',links:[4]},
-  {id:4,label:['CVE-2025','55182'],type:'cve',x:660,y:80,campaign:'Generic',tlp:'WHITE',desc:'CVSS 10.0 unauthenticated RCE.',links:[5]},
-  {id:5,label:['Ladon','Polyglot Rule'],type:'defense',x:200,y:260,campaign:'Generic',tlp:'WHITE',desc:'Catches PE at any offset inside PDF.',links:[1,2,3]},
-  {id:6,label:['React2Shell','Patch'],type:'defense',x:560,y:260,campaign:'Generic',tlp:'GREEN',desc:'Update Next.js to 16.1+.',links:[4]},
-];
-const GEDGES=[{a:1,b:5},{a:2,b:5},{a:3,b:5},{a:4,b:6}];
-const GCOL={intel:'#E24B4A',defense:'#1D9E75',cve:'#BA7517'};
-const GBGC={intel:'rgba(226,75,74,.13)',defense:'rgba(29,158,117,.13)',cve:'rgba(186,117,23,.13)'};
-const GTLPC={WHITE:'#888',GREEN:'#1D9E75',AMBER:'#BA7517',RED:'#E24B4A'};
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTopBtn').classList.toggle('visible', window.scrollY > 400);
+});
 
-let upvotes={},activeFilter='all',activeTLP='all',activeTab='intel',isDark=false;
-let gVis=new Set(GNODES.map(n=>n.id)),gSel=null,gHov=null,gInit=false;
-let sharePostId=null,modalTab='intel',prefillContext=null;
-let activeDetailTab='overview',activeDetailId=null;
-let dgInit=false,dgSel=null,dgHov=null;
-posts.forEach(p=>upvotes[p.id]=p.upvotes);
-
-function badgeClass(t){return{IOC:'badge-ioc',CVE:'badge-cve',Detection:'badge-det',TTP:'badge-ttp',Tool:'badge-tool',Defense:'badge-def'}[t]||'badge-ioc'}
-function badgeFull(t){return`<span class="post-cat ${badgeClass(t)}">${t}</span>`}
-
-function renderFeed(){
-  const feed=document.getElementById('feed');
-  const isDef=activeTab==='defense';
-  let filtered=posts.filter(p=>{
-    if(p.category!==(isDef?'defense':'intel'))return false;
-    if(activeFilter==='verified'&&!p.verified)return false;
-    if(['IOC','TTP','Detection','CVE','Defense','Tool'].includes(activeFilter)&&p.type!==activeFilter)return false;
-    if(['nation-state','phishing','malware'].includes(activeFilter)&&!p.campaign.includes(activeFilter))return false;
-    if(activeTLP!=='all'&&p.tlp!==activeTLP)return false;
-    return true;
+function setFilter(filter, el) {
+  activeFilter = filter;
+  document.querySelectorAll('.chip').forEach(c => {
+    c.className = 'chip';
+    if (c.dataset.filter === filter) c.className = 'chip active';
   });
-  if(!filtered.length){feed.innerHTML='<div class="empty-state">No posts match this filter.</div>';return;}
-  feed.innerHTML=filtered.map(p=>{
-    const defs=posts.filter(x=>x.linksTo&&x.linksTo.includes(p.id)).length;
-    return `<div class="post" onclick="openDetail(${p.id})">
-      <div class="post-top">
-        ${badgeFull(p.type)}
-        <span class="tlp tlp-${p.tlp}">TLP:${p.tlp}</span>
-        ${p.mitre.map(m=>`<span class="mtag">${m}</span>`).join('')}
-        ${defs>0?`<span class="def-tag">🛡 ${defs} defense${defs>1?'s':''}</span>`:''}
-      </div>
-      <div class="post-title">${p.title}</div>
-      <div class="post-preview">${p.preview}</div>
-      <div class="post-bottom">
-        <div class="post-meta-row">
-          <span class="vbadge" style="${p.verified?'':'display:none'}" title="Verified">✓</span>
-          <span>${p.author}</span>·<span>${p.time}</span>·<span>${p.source}</span>
-        </div>
-        <div class="post-meta-row" onclick="event.stopPropagation()">
-          <span class="stat" onclick="upvote(${p.id})">▲ <span id="upc-${p.id}">${upvotes[p.id]}</span></span>
-          <span>💬 ${p.chat.length}</span>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+  const sel = document.querySelector('.mobile-filter-select');
+  if (sel) sel.value = filter;
+  updateLatestReportCard();
+  filterPortfolio();
+  // Scroll so cards are visible below sticky filter bar
+  const filterBar = document.querySelector('.filter-bar');
+  const filterBarH = filterBar ? filterBar.offsetHeight : 0;
+  const mainTop = GRID_TOP ? GRID_TOP.getBoundingClientRect().top + window.scrollY - filterBarH : 0;
+  window.scrollTo({top: mainTop, behavior:'smooth'});
 }
 
-function openDetail(id){
-  activeDetailId=id;activeDetailTab='overview';dgInit=false;dgSel=null;dgHov=null;
-  document.getElementById('feedView').style.display='none';
-  document.getElementById('detailView').style.display='block';
-  renderDetail();
-}
-
-function renderDetail(){
-  const p=posts.find(x=>x.id===activeDetailId);
-  if(!p)return;
-
-  const linkedIntel=(p.linksTo||[]).map(lid=>{const lp=posts.find(x=>x.id===lid);return lp?
-    `<div class="linked-card" onclick="openDetail(${lp.id})">
-      <div class="lc-icon" style="background:var(--red-bg)">⚠️</div>
-      <div><div class="lc-title">${lp.title}</div><div class="lc-sub">${lp.type} · TLP:${lp.tlp} · ${lp.time}</div></div>
-    </div>`:''}).join('');
-
-  const linkedDefs=posts.filter(x=>x.linksTo&&x.linksTo.includes(activeDetailId)).map(d=>
-    `<div class="linked-card" onclick="openDetail(${d.id})">
-      <div class="lc-icon" style="background:var(--green-bg)">🛡</div>
-      <div><div class="lc-title">${d.title}</div><div class="lc-sub">${d.type} · TLP:${d.tlp} · ${d.time}</div></div>
-    </div>`).join('');
-
-  const chatHtml=p.chat.map(c=>`
-    <div class="cmsg">
-      <div class="av ${c.av}" style="width:28px;height:28px;font-size:10px;flex-shrink:0">${c.initials}</div>
-      <div class="cmsg-body">
-        <div class="cmsg-hdr">
-          <span class="cmsg-author">${c.author}${c.verified?'<span class="vbadge" style="margin-left:3px">✓</span>':''}</span>
-          <span class="cmsg-time">${c.time}</span>
-        </div>
-        <div class="cmsg-text">${c.text}</div>
-        ${c.code?`<div class="cmsg-code">${c.code}</div>`:''}
-      </div>
-    </div>`).join('');
-
-  const overviewHTML=`
-    <div class="ds"><div class="ds-title">Plain English — what this means</div><div class="plain-box">${p.plainEnglish}</div></div>
-    <div class="ds"><div class="ds-title">Impact if exploited</div><div class="impact-box">${p.impact}</div></div>
-    ${p.code?`<div class="ds"><div class="ds-title">Technical findings / IOC</div>
-      <div class="code-wrap"><div class="code-block">${p.code}</div><button class="copy-code-btn" onclick="copyToClip(\`${p.code}\`)">Copy</button></div>
-    </div>`:''}
-    <div class="ds"><div class="ds-title">Details</div>
-      <div class="fg">
-        <div class="fk">Author</div><div class="fv">${p.author}${p.verified?' ✓':''}</div>
-        <div class="fk">Source</div><div class="fv">${p.source}</div>
-        <div class="fk">TLP</div><div class="fv">${p.tlp}</div>
-        <div class="fk">MITRE</div><div class="fv">${p.mitre.join(', ')}</div>
-        <div class="fk">Campaign</div><div class="fv">${p.campaign.join(', ')}</div>
-      </div>
-    </div>
-    ${linkedIntel?`<div class="ds"><div class="ds-title">Linked Intel</div>${linkedIntel}</div>`:''}
-    <div class="ds"><div class="ds-title">Defenses (${posts.filter(x=>x.linksTo&&x.linksTo.includes(activeDetailId)).length})</div>
-      ${linkedDefs||`<div class="no-item">No defenses submitted yet. <span style="color:var(--accent);cursor:pointer" onclick="openModal(${activeDetailId},'defense')">Submit one →</span></div>`}
-    </div>`;
-
-  const graphHTML=`
-    <div class="ds"><div class="ds-title">Relationship Graph</div>
-      <div class="detail-graph-container">
-        <canvas id="dgc" class="detail-graph-canvas" height="300"></canvas>
-        <div class="detail-graph-detail" id="dgd"><span style="color:var(--text3)">Click node · Double-click to open post</span></div>
-      </div>
-    </div>`;
-
-  const chatHTML=`
-    <div class="ds">
-      <div class="chat-rules-bar">⚠️ <div><strong style="display:block;margin-bottom:2px">Discussion rules</strong>Stay on-topic. Evidence required for claims. Defanged IOCs only. Off-topic = removal.</div></div>
-      <div class="chat-messages" id="chatMsgs-${p.id}">${chatHtml}</div>
-      <div class="chat-compose">
-        <div class="chat-compose-hdr">Replying as You · GitHub login required in production</div>
-        <textarea class="chat-ta" id="chatIn-${p.id}" placeholder="Add technical context, corroborate findings, or share related IOCs. Stay on topic."></textarea>
-        <div class="chat-footer">
-          <span class="chat-hint">Min 20 chars. Must be relevant to this post.</span>
-          <button class="chat-post" onclick="submitChat(${p.id})">Post reply</button>
-        </div>
-      </div>
-    </div>`;
-
-  const tabContent={overview:overviewHTML,graph:graphHTML,chat:chatHTML};
-
-  document.getElementById('detailContent').innerHTML=`
-    <button class="detail-back" onclick="closeDetail()">← Back to feed</button>
-    <div class="detail-title">${p.title}</div>
-    <div class="detail-meta">
-      <div class="detail-author">
-        <div class="av ${p.av}">${p.initials}</div>
-        <span>${p.author}${p.verified?'<span class="vbadge" style="margin-left:3px">✓</span>':''}</span>
-        <span style="color:var(--text3)">· ${p.time} · ${p.source}</span>
-      </div>
-      <span class="post-cat ${badgeClass(p.type)}">${p.type}</span>
-      <span class="tlp tlp-${p.tlp}">TLP:${p.tlp}</span>
-      <div class="detail-actions">
-        <button class="abtn" onclick="upvote(${p.id})">▲ <span id="upcd-${p.id}">${upvotes[p.id]}</span></button>
-        <button class="abtn green" onclick="openModal(${p.id},'defense')">🛡 Submit defense</button>
-        <button class="abtn green" onclick="openModal(${p.id},'related')">🔗 Link related threat</button>
-        <button class="abtn" onclick="openShare(${p.id})">↗ Share</button>
-      </div>
-    </div>
-    <div class="detail-tabs">
-      <button class="dtab ${activeDetailTab==='overview'?'active':''}" onclick="switchDetailTab('overview',this)">Overview</button>
-      <button class="dtab ${activeDetailTab==='graph'?'active':''}" onclick="switchDetailTab('graph',this)">Relationship Graph</button>
-      <button class="dtab ${activeDetailTab==='chat'?'active':''}" onclick="switchDetailTab('chat',this)">Discussion (${p.chat.length})</button>
-    </div>
-    <div id="detailTabContent">${tabContent[activeDetailTab]}</div>
-  `;
-
-  if(activeDetailTab==='graph') setTimeout(initDetailGraph,50);
-}
-
-function switchDetailTab(tab,el){
-  activeDetailTab=tab;dgInit=false;
-  document.querySelectorAll('.dtab').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-  const p=posts.find(x=>x.id===activeDetailId);
-  const chatHtml=p.chat.map(c=>`<div class="cmsg"><div class="av ${c.av}" style="width:28px;height:28px;font-size:10px;flex-shrink:0">${c.initials}</div><div class="cmsg-body"><div class="cmsg-hdr"><span class="cmsg-author">${c.author}</span><span class="cmsg-time">${c.time}</span></div><div class="cmsg-text">${c.text}</div>${c.code?`<div class="cmsg-code">${c.code}</div>`:''}</div></div>`).join('');
-  const views={
-    overview:`<div class="ds"><div class="ds-title">Plain English</div><div class="plain-box">${p.plainEnglish}</div></div><div class="ds"><div class="ds-title">Impact</div><div class="impact-box">${p.impact}</div></div>${p.code?`<div class="ds"><div class="ds-title">Technical / IOC</div><div class="code-wrap"><div class="code-block">${p.code}</div><button class="copy-code-btn" onclick="copyToClip(\`${p.code}\`)">Copy</button></div></div>`:''}<div class="ds"><div class="ds-title">Details</div><div class="fg"><div class="fk">Author</div><div class="fv">${p.author}</div><div class="fk">Source</div><div class="fv">${p.source}</div><div class="fk">MITRE</div><div class="fv">${p.mitre.join(', ')}</div></div></div>${(p.linksTo||[]).length?`<div class="ds"><div class="ds-title">Linked Intel</div>${(p.linksTo||[]).map(lid=>{const lp=posts.find(x=>x.id===lid);return lp?`<div class="linked-card" onclick="openDetail(${lp.id})"><div class="lc-icon" style="background:var(--red-bg)">⚠️</div><div><div class="lc-title">${lp.title}</div><div class="lc-sub">${lp.type} · ${lp.time}</div></div></div>`:''}).join('')}</div>`:''}<div class="ds"><div class="ds-title">Defenses</div>${posts.filter(x=>x.linksTo&&x.linksTo.includes(activeDetailId)).map(d=>`<div class="linked-card" onclick="openDetail(${d.id})"><div class="lc-icon" style="background:var(--green-bg)">🛡</div><div><div class="lc-title">${d.title}</div><div class="lc-sub">${d.type} · ${d.time}</div></div></div>`).join('')||`<div class="no-item">No defenses yet. <span style="color:var(--accent);cursor:pointer" onclick="openModal(${activeDetailId},'defense')">Submit one →</span></div>`}</div>`,
-    graph:`<div class="ds"><div class="ds-title">Relationship Graph</div><div class="detail-graph-container"><canvas id="dgc" class="detail-graph-canvas" height="300"></canvas><div class="detail-graph-detail" id="dgd"><span style="color:var(--text3)">Click node · Double-click to open post</span></div></div></div>`,
-    chat:`<div class="ds"><div class="chat-rules-bar">⚠️ <div><strong style="display:block;margin-bottom:2px">Discussion rules</strong>Stay on-topic. Evidence required. Defanged IOCs only.</div></div><div class="chat-messages" id="chatMsgs-${p.id}">${chatHtml}</div><div class="chat-compose"><div class="chat-compose-hdr">Replying as You · GitHub login required in production</div><textarea class="chat-ta" id="chatIn-${p.id}" placeholder="Add technical context, corroborate findings, or share related IOCs."></textarea><div class="chat-footer"><span class="chat-hint">Min 20 chars. Must be relevant.</span><button class="chat-post" onclick="submitChat(${p.id})">Post reply</button></div></div></div>`
-  };
-  document.getElementById('detailTabContent').innerHTML=views[tab];
-  if(tab==='graph') setTimeout(initDetailGraph,50);
-}
-
-function closeDetail(){activeDetailId=null;document.getElementById('detailView').style.display='none';document.getElementById('feedView').style.display='flex';renderFeed();}
-
-function submitChat(postId){
-  const input=document.getElementById('chatIn-'+postId);
-  const text=input.value.trim();
-  if(!text||text.length<20){showToast('Reply too short — add more context');return;}
-  const p=posts.find(x=>x.id===postId);
-  p.chat.push({author:'You',initials:'YO',av:'av-blue',verified:false,time:'just now',text});
-  input.value='';
-  const c=document.getElementById('chatMsgs-'+postId);
-  const el=document.createElement('div');el.className='cmsg';
-  el.innerHTML=`<div class="av av-blue" style="width:28px;height:28px;font-size:10px;flex-shrink:0">YO</div><div class="cmsg-body"><div class="cmsg-hdr"><span class="cmsg-author">You</span><span class="cmsg-time">just now</span></div><div class="cmsg-text">${text}</div></div>`;
-  c.appendChild(el);el.scrollIntoView({behavior:'smooth'});showToast('Reply posted');
-}
-
-function upvote(id){
-  const p=posts.find(x=>x.id===id);if(!p||p._voted)return;p._voted=true;upvotes[id]++;
-  ['upc-','upcd-'].forEach(pfx=>{const el=document.getElementById(pfx+id);if(el)el.textContent=upvotes[id];});
-}
-
-function switchTab(tab,el){
-  activeTab=tab;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');
-  const f=document.getElementById('feed'),g=document.getElementById('graphWrap');
-  if(tab==='graph'){f.style.display='none';g.style.display='block';setTimeout(initGraph,50);}
-  else{f.style.display='block';g.style.display='none';renderFeed();}
-}
-function setFilter(f,el){activeFilter=f;document.querySelectorAll('.sidebar .nav-item').forEach(i=>i.classList.remove('active'));el.classList.add('active');if(activeDetailId){activeDetailId=null;document.getElementById('detailView').style.display='none';document.getElementById('feedView').style.display='flex';}if(activeTab==='graph'){activeTab='intel';document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===0));document.getElementById('feed').style.display='block';document.getElementById('graphWrap').style.display='none';}renderFeed();}
-function setTLP(t,el){activeTLP=t;document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');if(activeDetailId){activeDetailId=null;document.getElementById('detailView').style.display='none';document.getElementById('feedView').style.display='flex';}renderFeed();}
-function toggleTheme(){isDark=!isDark;document.documentElement.setAttribute('data-theme',isDark?'dark':'');document.getElementById('themeIcon').textContent=isDark?'☀️':'🌙';document.getElementById('themeLabel').textContent=isDark?'Light mode':'Dark mode';if(gInit)drawGraph();if(dgInit)drawDetailGraph();}
-
-// MODAL — context-aware prefill
-function openModal(fromPostId, intent){
-  prefillContext={fromPostId,intent};
-  populateLinks();
-  const dn=document.getElementById('defenseExtra'),rn=document.getElementById('relatedExtra'),pn=document.getElementById('prefillNote');
-  dn.style.display='none';rn.style.display='none';pn.style.display='none';
-  if(intent==='defense'){
-    switchMTab('defense',document.querySelectorAll('.mtab')[1]);
-    if(fromPostId){document.getElementById('fLinksTo').value=fromPostId;pn.style.display='flex';}
-    dn.style.display='block';
-  } else if(intent==='related'){
-    switchMTab('intel',document.querySelectorAll('.mtab')[0]);
-    if(fromPostId){document.getElementById('fRelated').value=fromPostId;pn.style.display='flex';}
-    rn.style.display='block';
+function updateLatestReportCard() {
+  const card = document.getElementById('latest-report-card');
+  if (!card) return;
+  const isAll = activeFilter === 'all' && document.getElementById('searchInput').value.trim() === '';
+  const accent = card.querySelector('.card-accent');
+  const badge = card.querySelector('.card-featured-badge');
+  if (isAll) {
+    card.classList.add('card-featured');
+    if (accent) { accent.style.width = '4px'; accent.style.height = 'auto'; accent.style.minHeight = '100%'; }
+    if (badge) badge.style.display = '';
   } else {
-    switchMTab('intel',document.querySelectorAll('.mtab')[0]);
+    card.classList.remove('card-featured');
+    if (accent) { accent.style.width = ''; accent.style.height = ''; accent.style.minHeight = ''; }
+    if (badge) badge.style.display = 'none';
   }
-  document.getElementById('modal').classList.add('open');
-}
-function closeModal(){document.getElementById('modal').classList.remove('open');}
-function closeModalOutside(e){if(e.target===document.getElementById('modal'))closeModal();}
-
-function switchMTab(tab,el){
-  modalTab=tab;document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));el.classList.add('active');
-  const ts=document.getElementById('fType'),de=document.getElementById('defenseExtra'),re=document.getElementById('relatedExtra');
-  if(tab==='defense'){ts.innerHTML='<option>Defense</option><option>Detection</option><option>Tool</option>';de.style.display='block';re.style.display='none';}
-  else{ts.innerHTML='<option>IOC</option><option>TTP</option><option>Detection</option><option>CVE</option><option>Tool</option>';de.style.display='none';re.style.display='block';}
 }
 
-function populateLinks(){
-  [document.getElementById('fLinksTo'),document.getElementById('fRelated')].forEach(sel=>{
-    sel.innerHTML='<option value="">-- Select --</option>';
-    posts.filter(p=>p.category==='intel').forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.title;sel.appendChild(o);});
+function filterPortfolio() {
+  const query = document.getElementById('searchInput').value.toLowerCase().trim();
+  const items = document.querySelectorAll('.portfolio-item');
+  const groups = document.querySelectorAll('.section-group');
+  let visible = 0;
+
+  const isFiltering = activeFilter !== 'all' || query.length > 0;
+
+  items.forEach(item => {
+    const tags = (item.dataset.tags || '').toLowerCase();
+    const title = (item.dataset.title || '').toLowerCase();
+    const cardText = item.textContent.toLowerCase();
+    const isSoon = item.classList.contains('card-soon');
+    const matchesFilter = activeFilter === 'all' || tags.includes(activeFilter);
+    const matchesSearch = !query || title.includes(query) || tags.includes(query) || cardText.includes(query);
+
+    if (isSoon) {
+      item.classList.toggle('hidden', !(matchesFilter && matchesSearch && !query) && !(activeFilter === 'all' && !query));
+    } else if (matchesFilter && matchesSearch) {
+      item.classList.remove('hidden');
+      visible++;
+    } else {
+      item.classList.add('hidden');
+    }
   });
-}
 
-function submitPost(){
-  const title=document.getElementById('fTitle').value.trim();
-  const body=document.getElementById('fBody').value.trim();
-  const source=document.getElementById('fSource').value.trim();
-  if(!title){showToast('Title required');return;}
-  if(!body){showToast('Description required');return;}
-  if(!source){showToast('Source URL required');return;}
-  const linksVal=document.getElementById('fLinksTo').value;
-  const relVal=document.getElementById('fRelated').value;
-  const np={id:Date.now(),author:'You',initials:'YO',av:'av-blue',verified:false,time:'just now',source:'Submitted',
-    category:modalTab==='defense'?'defense':'intel',type:document.getElementById('fType').value,
-    tlp:document.getElementById('fTlp').value,campaign:[],title,
-    preview:body.substring(0,120)+(body.length>120?'...':''),body,
-    code:document.getElementById('fCode').value.trim(),
-    mitre:document.getElementById('fMitre').value.trim().split(',').map(m=>m.trim()).filter(Boolean),
-    plainEnglish:body,impact:'Analysis pending.',
-    upvotes:0,linksTo:linksVal?[parseInt(linksVal)]:null,
-    related:relVal?parseInt(relVal):null,chat:[]};
-  posts.unshift(np);upvotes[np.id]=0;
-  document.getElementById('sPosts').textContent=posts.length;
-  ['fTitle','fBody','fCode','fSource','fMitre'].forEach(id=>document.getElementById(id).value='');
-  closeModal();activeTab=np.category;
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',['intel','defense','graph'][i]===activeTab));
-  document.getElementById('feed').style.display='block';document.getElementById('graphWrap').style.display='none';
-  renderFeed();showToast('Post submitted');
-}
-
-function openShare(id){sharePostId=id;document.getElementById('shareUrl').textContent=`https://argusx.dev/post/${id}`;document.getElementById('shareModal').classList.add('open');}
-function closeShare(){document.getElementById('shareModal').classList.remove('open');}
-function copyShareUrl(){copyToClip(`https://argusx.dev/post/${sharePostId}`);showToast('Link copied');closeShare();}
-function shareSlack(){copyToClip(`https://argusx.dev/post/${sharePostId}`);showToast('Link copied — paste into Slack');closeShare();}
-function exportIOC(){const p=posts.find(x=>x.id===sharePostId);if(p?.code){copyToClip(p.code);showToast('IOCs copied');closeShare();}}
-function exportReport(){
-  const p=posts.find(x=>x.id===sharePostId);if(!p)return;
-  const txt=`ARGUSX INTEL REPORT\n${'='.repeat(40)}\nTitle: ${p.title}\nType: ${p.type} | TLP:${p.tlp}\nAuthor: ${p.author} | ${p.time}\nSource: ${p.source}\nMITRE: ${p.mitre.join(', ')}\n\nSUMMARY\n${p.plainEnglish}\n\nIMPACT\n${p.impact}\n\nTECHNICAL\n${p.code||'N/A'}\n\nArgusX · argusx.dev · Intel in. Defense out.`;
-  const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(txt);a.download=`argusx-report-${p.id}.txt`;a.click();closeShare();showToast('Report downloaded');
-}
-function copyToClip(t){navigator.clipboard.writeText(t).catch(()=>{});}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
-
-// MAIN GRAPH
-const cv=document.getElementById('gc'),cx=cv.getContext('2d');
-let dpr=1;
-function initGraph(){
-  if(gInit)return;gInit=true;dpr=window.devicePixelRatio||1;
-  const w=cv.getBoundingClientRect().width||800;cv.width=w*dpr;cv.height=360*dpr;cx.scale(dpr,dpr);
-  cv.addEventListener('mousemove',e=>{const{x,y}=gxy(e,cv);const prev=gHov;gHov=gAt(GNODES,x,y,gVis);cv.style.cursor=gHov?'pointer':'default';if(gHov!==prev)drawGraph();});
-  cv.addEventListener('click',e=>{const{x,y}=gxy(e,cv);const n=gAt(GNODES,x,y,gVis);gSel=(gSel&&n&&gSel.id===n.id)?null:n;showGD(gSel,document.getElementById('gd'));drawGraph();});
-  cv.addEventListener('dblclick',e=>{const{x,y}=gxy(e,cv);const n=gAt(GNODES,x,y,gVis);if(n&&posts.find(x=>x.id===n.id))openDetail(n.id);});
-  drawGraph();
-}
-function drawGraph(){drawGCanvas(cx,cv.width/dpr,cv.height/dpr,GNODES,GEDGES,gVis,gSel,gHov);}
-
-// DETAIL GRAPH
-function initDetailGraph(){
-  const dc=document.getElementById('dgc');if(!dc||dgInit)return;dgInit=true;
-  const ddpr=window.devicePixelRatio||1;
-  const w=dc.getBoundingClientRect().width||600;dc.width=w*ddpr;dc.height=300*ddpr;
-  const dx=dc.getContext('2d');dx.scale(ddpr,ddpr);
-  dc.addEventListener('mousemove',e=>{const{x,y}=gxy(e,dc);const prev=dgHov;dgHov=gAt(GNODES,x,y,new Set(GNODES.map(n=>n.id)));dc.style.cursor=dgHov?'pointer':'default';if(dgHov!==prev)drawDetailGraph();});
-  dc.addEventListener('click',e=>{const{x,y}=gxy(e,dc);const n=gAt(GNODES,x,y,new Set(GNODES.map(n=>n.id)));dgSel=(dgSel&&n&&dgSel.id===n.id)?null:n;showGD(dgSel,document.getElementById('dgd'));drawDetailGraph();});
-  dc.addEventListener('dblclick',e=>{const{x,y}=gxy(e,dc);const n=gAt(GNODES,x,y,new Set(GNODES.map(n=>n.id)));if(n&&posts.find(x=>x.id===n.id))openDetail(n.id);});
-  drawDetailGraph();
-}
-function drawDetailGraph(){
-  const dc=document.getElementById('dgc');if(!dc)return;
-  const ddpr=window.devicePixelRatio||1;
-  const dx=dc.getContext('2d');
-  // Scale nodes to fit smaller canvas
-  const scaleX=dc.width/(ddpr*760);const scaleY=dc.height/(ddpr*360);
-  const scaledNodes=GNODES.map(n=>({...n,x:n.x*scaleX*1.1+20,y:n.y*scaleY*1.1+20}));
-  drawGCanvas(dx,dc.width/ddpr,dc.height/ddpr,scaledNodes,GEDGES,new Set(GNODES.map(n=>n.id)),dgSel,dgHov);
-}
-
-// SHARED GRAPH RENDER
-function gxy(e,canvas){const r=canvas.getBoundingClientRect();const d=window.devicePixelRatio||1;return{x:(e.clientX-r.left)*(canvas.width/d/r.width),y:(e.clientY-r.top)*(canvas.height/d/r.height)};}
-function gAt(nodes,mx,my,vis){
-  return nodes.find(n=>{
-    if(!vis.has(n.id))return false;
-    const lines=n.label;const nw=Math.max(...lines.map(l=>l.length))*7.5+28;const nh=lines.length*18+18;
-    return mx>=n.x-nw/2&&mx<=n.x+nw/2&&my>=n.y-nh/2&&my<=n.y+nh/2;
+  groups.forEach(group => {
+    const anyVisible = Array.from(group.querySelectorAll('.portfolio-item')).some(
+      item => !item.classList.contains('hidden')
+    );
+    const header = group.querySelector('.section-header');
+    if (anyVisible) {
+      group.classList.remove('hidden-group');
+      if (isFiltering) { if (header) header.style.display = 'none'; }
+      else { if (header) header.style.display = ''; }
+    } else {
+      group.classList.add('hidden-group');
+      if (header) header.style.display = 'none';
+    }
   });
-}
-function drawGCanvas(ctx,W,H,nodes,edges,vis,sel,hov){
-  const txt=isDark?'#e6edf3':'#0d1117';const bg=isDark?'#161b24':'#ffffff';
-  const lc=isDark?'rgba(255,255,255,.15)':'rgba(0,0,0,.15)';const lac=isDark?'rgba(255,255,255,.5)':'rgba(0,0,0,.4)';
-  ctx.clearRect(0,0,W,H);
-  edges.forEach(e=>{
-    const a=nodes.find(n=>n.id===e.a),b=nodes.find(n=>n.id===e.b);
-    if(!a||!b||!vis.has(a.id)||!vis.has(b.id))return;
-    const act=sel&&(sel.id===a.id||sel.id===b.id);
-    ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo((a.x+b.x)/2,(a.y+b.y)/2-25,b.x,b.y);
-    ctx.strokeStyle=act?lac:lc;ctx.lineWidth=act?2:1;ctx.setLineDash(act?[]:[4,3]);ctx.stroke();ctx.setLineDash([]);
-  });
-  nodes.forEach(n=>{
-    if(!vis.has(n.id))return;
-    const isH=hov&&hov.id===n.id,isS=sel&&sel.id===n.id;
-    const lines=n.label;const nw=Math.max(...lines.map(l=>l.length))*7.5+28;const nh=lines.length*18+18;
-    const rx=n.x-nw/2,ry=n.y-nh/2,r=7;
-    ctx.fillStyle=isS||isH?GBGC[n.type]:bg;ctx.strokeStyle=GCOL[n.type];ctx.lineWidth=isS?2.5:1.5;
-    ctx.beginPath();ctx.moveTo(rx+r,ry);ctx.lineTo(rx+nw-r,ry);ctx.quadraticCurveTo(rx+nw,ry,rx+nw,ry+r);
-    ctx.lineTo(rx+nw,ry+nh-r);ctx.quadraticCurveTo(rx+nw,ry+nh,rx+nw-r,ry+nh);ctx.lineTo(rx+r,ry+nh);
-    ctx.quadraticCurveTo(rx,ry+nh,rx,ry+nh-r);ctx.lineTo(rx,ry+r);ctx.quadraticCurveTo(rx,ry,rx+r,ry);
-    ctx.closePath();ctx.fill();ctx.stroke();
-    ctx.fillStyle=GCOL[n.type];ctx.beginPath();ctx.moveTo(rx,ry+r);ctx.lineTo(rx,ry+nh-r);
-    ctx.quadraticCurveTo(rx,ry+nh,rx+r,ry+nh);ctx.lineTo(rx+5,ry+nh);ctx.lineTo(rx+5,ry);ctx.lineTo(rx+r,ry);
-    ctx.quadraticCurveTo(rx,ry,rx,ry+r);ctx.fill();
-    ctx.textAlign='center';ctx.fillStyle=txt;
-    lines.forEach((line,i)=>{ctx.font=`${i===0?'600':'400'} 11px 'IBM Plex Mono',monospace`;ctx.fillText(line,n.x+3,n.y-(lines.length-1)*9+i*18);});
-    ctx.font='400 8px system-ui';ctx.fillStyle=GTLPC[n.tlp]||'#888';ctx.fillText('TLP:'+n.tlp,n.x,n.y+nh/2+11);
-  });
+
+  document.getElementById('resultsCount').textContent = visible + (visible === 1 ? ' item' : ' items');
+  document.getElementById('emptyState').classList.toggle('visible', visible === 0);
 }
 
-function showGD(n,el){
-  if(!n){el.innerHTML='<span style="color:var(--text3)">Click node · Double-click to open post</span>';return;}
-  const tl={intel:'Intel',defense:'Defense',cve:'CVE'}[n.type];
-  const linked=n.links.map(id=>{const rn=GNODES.find(x=>x.id===id);return rn?`<span style="color:var(--accent);cursor:pointer;text-decoration:underline" onclick="gSelById(${id})">${rn.label.join(' ')}</span>`:''}).filter(Boolean).join(' · ');
-  const hasFull=posts.find(x=>x.id===n.id);
-  el.innerHTML=`<div class="graph-dt">${n.label.join(' ')}${hasFull?` <span style="font-size:12px;color:var(--accent);cursor:pointer;margin-left:8px" onclick="openDetail(${n.id})">[open post]</span>`:''}</div>
-  <div style="display:flex;gap:5px;margin-bottom:4px"><span class="gdb" style="background:${GBGC[n.type]};color:${GCOL[n.type]}">${tl}</span><span class="gdb" style="background:var(--bg3);color:var(--text3)">TLP:${n.tlp}</span></div>
-  <div style="font-size:13px">${n.desc}${linked?` · Linked: ${linked}`:''}</div>`;
-}
-function gSelById(id){gSel=GNODES.find(n=>n.id===id);showGD(gSel,document.getElementById('gd'));drawGraph();}
+// Run on load
+updateLatestReportCard();
+filterPortfolio();
 
-function gfAll(el){gVis=new Set(GNODES.map(n=>n.id));gres(el,'on');gSel=null;showGD(null,document.getElementById('gd'));drawGraph();}
-function gfType(t,el){gVis=new Set(GNODES.filter(n=>n.type===t).map(n=>n.id));gres(el,t==='defense'?'on-g':'on');gSel=null;showGD(null,document.getElementById('gd'));drawGraph();}
-function gfCamp(c,el){gVis=new Set(GNODES.filter(n=>n.campaign===c||n.campaign==='Generic').map(n=>n.id));gres(el,'on');gSel=null;showGD(null,document.getElementById('gd'));drawGraph();}
-function gres(el,cls){document.querySelectorAll('.gpill').forEach(p=>p.classList.remove('on','on-g'));el.classList.add(cls);}
-window.gSelById=gSelById;window.gfAll=gfAll;window.gfType=gfType;window.gfCamp=gfCamp;
-window.openDetail=openDetail;window.closeDetail=closeDetail;window.openModal=openModal;
-window.addEventListener('resize',()=>{if(gInit){cx.resetTransform();gInit=false;initGraph();}});
-renderFeed();
 </script>
 </body>
 </html>
