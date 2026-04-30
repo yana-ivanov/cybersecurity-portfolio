@@ -446,10 +446,24 @@ footer span{color:#94a3b8}
 
       <div class="test-result">
         <div>
-          <div class="test-result-label">ValleyRAT (e2b75bae…) — confirmed malicious</div>
-          <div class="test-result-sub">Re-tested after fix. PE at offset 4,937 still detected correctly. No regression.</div>
+          <div class="test-result-label">ValleyRAT (e2b75bae…) — confirmed malicious · re-tested April 30, 2026</div>
+          <div class="test-result-sub">PE at offset 4,937 still detected correctly after fix. All original findings intact. No regression.</div>
         </div>
         <div class="test-result-verdict verdict-critical">CRITICAL ✓</div>
+      </div>
+
+      <div class="callout callout-red" style="margin:.75rem 0 1rem 0;padding:1rem 1.25rem">
+        <p style="font-family:'JetBrains Mono',monospace;font-size:.68rem;line-height:1.7;color:var(--ink2);margin:0"><strong style="color:var(--ink)">Re-test output — 2026-04-30 21:24 UTC</strong><br>
+        File: e2b75baeb7ed21fb8f27984f941286770d1c3c0b60fce8d7fa5b167bd24ba6dc.pdf · 158.4 KB · Severity: CRITICAL<br><br>
+        <strong style="color:#e8374a">Polyglot Detection — 1 finding</strong><br>
+        [CRITICAL] Windows PE (EXE) signature found at offset 4937 inside PDF file<br><br>
+        <strong style="color:#e8374a">PDF Structure Analysis — 6 issues</strong><br>
+        [Critical] /URI detected (20×) — External URI reference<br>
+        [Warning] https://6-1321729461.cos.ap-guangzhou.myqcloud.com/lnstaller.msi<br>
+        [Warning] https://00-1321729461.cos.ap-guangzhou.myqcloud.com/24-12-13uninstall.exe<br>
+        [Warning] http://www.baidu.com<br><br>
+        <strong style="color:var(--ink2)">URL Analysis — 13 suspicious URLs</strong><br>
+        Tencent Cloud COS domains (cos.ap-guangzhou.myqcloud.com) flagged MEDIUM — live Chinese APT C2 infrastructure confirmed at time of original analysis. Note: URL scoring for Chinese cloud infrastructure is a known improvement area — these domains warrant CRITICAL given attribution context.</p>
       </div>
 
       <div class="test-result">
@@ -490,7 +504,26 @@ footer span{color:#94a3b8}
       </div>
 
       <div class="callout callout-blue" style="margin-top:1.25rem">
-        <p><strong>On the BlueNoroff campaign context:</strong> The fake Zoom test case was modeled on a documented active campaign. Arctic Wolf reported in April 2026 that BlueNoroff — a Lazarus sub-group tied to North Korea's Reconnaissance General Bureau — was using Calendly invites that later swap to typosquatted Zoom or Teams links to deliver second-stage malware via a fake SDK update prompt. The fix correctly allows legitimate Calendly scheduling through while catching the attacker-controlled destination domain substitution.</p>
+        <p><strong>On the BlueNoroff campaign context:</strong> The fake Zoom test case was modeled on a documented active campaign. Arctic Wolf reported in April 2026 that BlueNoroff — a Lazarus sub-group tied to North Korea's Reconnaissance General Bureau — was using Calendly invites that later swap to typosquatted Zoom or Teams links to deliver second-stage malware via a fake SDK update prompt. The campaign was independently covered by <a href="https://www.govinfosecurity.com/crypto-targeting-north-koreans-wield-fake-zoom-meetings-a-31516" target="_blank">GovInfoSecurity</a>, Dark Reading, Infosecurity Magazine, and CyberSecurityNews between April 17–28, 2026, and is tracked under UNC1069 and Sapphire Sleet. The fix correctly allows legitimate Calendly scheduling through while catching the attacker-controlled destination domain substitution.</p>
+      </div>
+
+      <h3 style="margin-top:1.75rem">Active Campaign IOCs — April 2026</h3>
+      <p style="font-size:.88rem;color:var(--ink3);margin-bottom:1rem">The following indicators were submitted to ThreatFox on April 8, 2026 and are consistent with the BlueNoroff/UNC1069 fake Zoom campaign. Domains are defanged — brackets replace dots to prevent accidental navigation. These domains would trigger Ladon's ICS analysis if embedded in a calendar invite LOCATION or DESCRIPTION field.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:40%">Defanged Indicator</th><th style="width:20%">Type</th><th style="width:40%">Pattern</th></tr></thead>
+          <tbody>
+            <tr><td class="code">usz00mczyiee[.]store</td><td><span class="chip chip-critical">DOMAIN</span></td><td>Zero substitution in "zoom" — usz<strong>00</strong>m vs zoom</td></tr>
+            <tr><td class="code">zoominviteeees[.]de</td><td><span class="chip chip-critical">DOMAIN</span></td><td>Extra characters appended to "zoom" + unusual TLD</td></tr>
+            <tr><td class="code">googlemeet[.]emilychart[.]xyz</td><td><span class="chip chip-critical">DOMAIN</span></td><td>"googlemeet" as subdomain of unrelated domain + .xyz TLD</td></tr>
+            <tr><td class="code">simplicity-w[.]pages[.]dev</td><td><span class="chip chip-high">URL</span></td><td>Cloudflare Pages abuse — legitimate infrastructure, malicious content</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-amber" style="margin-top:1.25rem">
+        <p><strong>What Ladon catches vs. where its boundary is:</strong> If any of these domains appeared in a calendar invite LOCATION or DESCRIPTION field, Ladon would flag CRITICAL — suspicious TLD, platform keyword in wrong domain, or typosquat pattern. What Ladon does not catch is the browser-based payload delivery stage: the fake meeting room rendering pre-recorded video, the fake audio failure, and the ClickFix "SDK Update" prompt that delivers the actual malware. That stage happens in the browser after the user clicks the link. Ladon is a pre-click triage tool — it catches the lure before it is opened. Detecting the browser-based stage requires endpoint behavioral detection or DNS-layer blocking, not static file analysis.</p>
       </div>
     </div>
   </div>
