@@ -80,7 +80,9 @@ td.code{font-family:var(--mono);font-size:.78rem;color:var(--blue);white-space:n
 .chip-high{background:rgba(240,120,64,.15);color:#f07840}
 .chip-medium{background:rgba(240,192,64,.15);color:#f0c040}
 .chip-low{background:rgba(45,212,160,.15);color:#2dd4a0}
-.chip-pass{background:rgba(20,90,50,.12);color:#145a32}
+.chip-missed{background:rgba(232,55,74,.12);color:#e8374a;font-weight:600}
+.chip-partial{background:rgba(240,120,64,.12);color:#f07840;font-weight:600}
+/* column widths */
 .col-sample{width:24%}
 .col-attr{width:18%}
 .col-sev{width:12%}
@@ -109,27 +111,12 @@ td.code{font-family:var(--mono);font-size:.78rem;color:var(--blue);white-space:n
 .tag-critical{background:var(--red-dim);color:var(--red)}
 .tag-high{background:var(--amber-dim);color:var(--amber)}
 .tag-pass{background:var(--green-dim);color:var(--green)}
+.tag-attribution{background:rgba(139,0,0,.12);color:#7f1d1d;letter-spacing:.04em}
 .finding-text{font-size:.88rem;color:var(--ink3);line-height:1.65}
 .finding-text strong{color:var(--ink)}
 .finding-text code{font-family:var(--mono);font-size:.78rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px}
 .sample-verdict{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--rule);font-size:.88rem;color:var(--ink3);line-height:1.7}
 .sample-verdict strong{color:var(--ink)}
-
-.improvement-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
-.improvement-header{background:#0a0f1a;padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
-.improvement-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:#e2e8f0;font-weight:600}
-.improvement-date{font-family:var(--mono);font-size:.62rem;color:#60a5fa;letter-spacing:.06em}
-.improvement-body{padding:1.5rem}
-.improvement-body p{font-size:.9rem;margin-bottom:.9rem}
-.improvement-body p:last-child{margin-bottom:0}
-
-.test-result{background:#f8fafc;border:1px solid var(--rule);border-radius:2px;padding:1rem 1.25rem;margin:.75rem 0;display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center}
-.test-result-label{font-family:var(--mono);font-size:.72rem;color:var(--ink2);font-weight:600}
-.test-result-sub{font-size:.78rem;color:var(--ink3);margin-top:.2rem;font-family:var(--serif)}
-.test-result-verdict{font-family:var(--mono);font-size:.65rem;font-weight:700;letter-spacing:.08em;padding:.2rem .6rem;border-radius:2px;white-space:nowrap;text-transform:uppercase}
-.verdict-pass{background:var(--green-dim);color:var(--green)}
-.verdict-critical{background:var(--red-dim);color:var(--red)}
-.verdict-clean{background:rgba(45,212,160,.12);color:#0d6e4a}
 
 .mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
 .mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#f8fafc}
@@ -159,7 +146,6 @@ footer span{color:#94a3b8}
   h2{font-size:1.55rem}
   footer{flex-direction:column;text-align:center;padding:1.5rem}
   .sample-header{flex-direction:column;align-items:flex-start;gap:.5rem}
-  .test-result{grid-template-columns:1fr;gap:.5rem}
 }
 </style>
 </head>
@@ -175,10 +161,10 @@ footer span{color:#94a3b8}
     <div class="mast-meta">
       <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
       <div class="meta-item"><div class="label">Published</div><div class="value">April 2026</div></div>
-      <div class="meta-item"><div class="label">Updated</div><div class="value">April 30, 2026</div></div>
+      <div class="meta-item"><div class="label">Category</div><div class="value">Lab Log · Field Analysis</div></div>
       <div class="meta-item"><div class="label">Tool</div><div class="value">Ladon · document_triage.py</div></div>
       <div class="meta-item"><div class="label">Samples</div><div class="value">5 PDFs · All Malicious</div></div>
-      <div class="meta-item"><div class="label">Read Time</div><div class="value">15 minutes</div></div>
+      <div class="meta-item"><div class="label">Read Time</div><div class="value">12 minutes</div></div>
     </div>
   </div>
   <div class="mast-bar">
@@ -203,6 +189,8 @@ footer span{color:#94a3b8}
   <div class="callout callout-red">
     <p><strong>On sample handling:</strong> All analysis was performed using Ladon's static analysis engine. No file was executed, opened in a PDF viewer, or processed by any renderer. Ladon reads raw bytes only. Four samples were sourced from MalwareBazaar. One arrived as a live phishing email. Hashes are included for reference. The files themselves are not distributed.</p>
   </div>
+
+
 </div>
 
 <!-- SECTION 02 -->
@@ -212,7 +200,8 @@ footer span{color:#94a3b8}
 
   <p>Each sample is presented with its Ladon report findings, what those findings mean in practice, and what a non-technical user would have experienced if they had opened the file.</p>
 
-  <!-- SAMPLE 1 -->
+  <!-- SAMPLE 1 — Unknown Dropper -->
+
   <div class="sample-card">
     <div class="sample-header high">
       <div class="sample-num high">Sample 01 · Unknown Origin</div>
@@ -220,21 +209,25 @@ footer span{color:#94a3b8}
     </div>
     <div class="sample-body">
       <div class="sample-hash">d67e62bb3ebf9f27dfb8fbd20f88748bb898f5a70265b386a64cb92fafefe0d5.pdf · 293.2 KB · Generated: 2026-04-05 01:01 UTC</div>
+
       <div class="finding-row">
         <div class="finding-tag tag-critical">CRITICAL</div>
         <div class="finding-text"><strong>Polyglot — Windows PE at offset 36,700.</strong> The deepest offset in the sample set — the executable signature is buried past the bulk of the PDF content. This maximizes the distance between the file header (which scanners check) and the payload (which scanners with byte-limit cutoffs may never reach).</div>
       </div>
+
       <div class="finding-row">
         <div class="finding-tag tag-high">HIGH</div>
         <div class="finding-text"><strong>/ObjStm detected — Object stream used to conceal malicious objects.</strong> Object streams compress and bundle multiple PDF objects together, making their contents invisible to scanners that parse PDF structure without decompressing. This is deliberate obfuscation — malicious actions or scripts hidden inside an object stream will not appear in a surface-level scan of PDF keys. Ladon's raw byte scan found the embedded PE regardless.</div>
       </div>
+
       <div class="sample-verdict">
-        <strong>Assessment:</strong> No threat actor has been attributed to this sample. The combination of a deeply buried polyglot payload and object stream obfuscation points to a file engineered to defeat automated scanning specifically — two independent evasion techniques layered together. Attribution unknown; technique deliberate.
+        <strong>Assessment:</strong> No threat actor has been attributed to this sample. The combination of a deeply buried polyglot payload and object stream obfuscation points to a file engineered to defeat automated scanning specifically — two independent evasion techniques layered together. The PE offset of 36,700 bytes and the use of <code>/ObjStm</code> suggest the author understood how common scanners work and built around their limitations. Attribution unknown; technique deliberate.
       </div>
     </div>
   </div>
 
-  <!-- SAMPLE 2 -->
+  <!-- SAMPLE 2 — ValleyRAT / SilverFox -->
+
   <div class="sample-card">
     <div class="sample-header critical">
       <div class="sample-num critical">Sample 02 · Chinese APT · ValleyRAT / SilverFox</div>
@@ -242,29 +235,35 @@ footer span{color:#94a3b8}
     </div>
     <div class="sample-body">
       <div class="sample-hash">e2b75baeb7ed21fb8f27984f941286770d1c3c0b60fce8d7fa5b167bd24ba6dc.pdf · 158.4 KB · Generated: 2026-04-05 01:03 UTC</div>
+
       <div class="finding-row">
         <div class="finding-tag tag-critical">CRITICAL</div>
-        <div class="finding-text"><strong>ValleyRAT / SilverFox — Chinese APT.</strong> ValleyRAT is a remote access trojan attributed to Chinese threat actors, distributed under the SilverFox campaign umbrella. Multi-stage delivery: lure document drops a loader, which fetches the RAT payload from attacker-controlled infrastructure at runtime.</div>
+        <div class="finding-text"><strong>ValleyRAT / SilverFox — Chinese APT.</strong> ValleyRAT is a remote access trojan attributed to Chinese threat actors, distributed under the SilverFox campaign umbrella. It targets Windows systems and is known for multi-stage delivery: an initial lure document drops a loader, which fetches the RAT payload from attacker-controlled infrastructure at runtime. The use of Chinese cloud storage (Tencent COS) as C2 infrastructure is a documented characteristic of this campaign.</div>
       </div>
+
       <div class="finding-row">
         <div class="finding-tag tag-critical">CRITICAL</div>
-        <div class="finding-text"><strong>Polyglot — Windows PE at offset 4,937.</strong> The earliest offset in the sample set — the executable signature appears just 4,937 bytes into the file, leaving minimal PDF structure before the payload begins.</div>
+        <div class="finding-text"><strong>Polyglot — Windows PE at offset 4,937.</strong> The earliest offset in the sample set — the executable signature appears just 4,937 bytes into the file, leaving minimal PDF structure before the payload begins. This suggests a thin PDF wrapper constructed primarily to conceal and deliver the executable.</div>
       </div>
+
       <div class="finding-row">
         <div class="finding-tag tag-high">HIGH</div>
-        <div class="finding-text"><strong>/URI detected 20 times — External URI references.</strong> Twenty embedded URI references fire automatically when the document renders, tracking every interaction and staging the multi-stage download chain.</div>
+        <div class="finding-text"><strong>/URI detected 20 times — External URI references.</strong> Twenty embedded URI references fire automatically when the document renders. At this volume the PDF functions as a network beacon, tracking every interaction with precision and staging the multi-stage download chain.</div>
       </div>
+
       <div class="finding-row">
         <div class="finding-tag tag-critical">CRITICAL</div>
-        <div class="finding-text"><strong>Live C2 URLs — <code>.msi</code> and <code>.exe</code> hosted on Tencent Cloud, active at time of analysis.</strong> Direct links to secondary payloads on <code>cos.ap-guangzhou.myqcloud.com</code>, including <code>lnstaller.msi</code> — deliberate misspelling of "installer" to evade string-based detection.</div>
+        <div class="finding-text"><strong>Live C2 URLs — <code>.msi</code> and <code>.exe</code> hosted on Tencent Cloud, active at time of analysis.</strong> The PDF embeds direct links to secondary stage payloads on <code>cos.ap-guangzhou.myqcloud.com</code> (Tencent Cloud Object Storage, Guangzhou region), including <code>lnstaller.msi</code> — note the deliberate misspelling of "installer" to evade string-based detection — and <code>24-12-13uninstall.exe</code>. These URLs were live and resolving at the time of analysis. Opening the PDF would have fetched and executed these payloads automatically.</div>
       </div>
+
       <div class="sample-verdict">
-        <strong>Assessment:</strong> A fully operational multi-stage dropper with live infrastructure. The PDF is not the final payload — it is the delivery mechanism for a secondary executable fetched from Tencent Cloud at the moment of opening.
+        <strong>Assessment:</strong> A fully operational multi-stage dropper with live infrastructure. The PDF is not the final payload — it is the delivery mechanism for a secondary executable fetched from Tencent Cloud at the moment of opening. The timestamp in the filename (<code>24-12-13</code> — December 13, 2024) dates the campaign to late 2024. The deliberate misspelling of "installer" is a common string-evasion technique. A user who opened this file would have immediately beaconed to the attacker's infrastructure across 20 URI callbacks, then had two additional executables silently fetched and staged for execution — all before seeing any document content.
       </div>
     </div>
   </div>
 
-  <!-- SAMPLE 3 -->
+  <!-- SAMPLE 3 — Facebook Phishing -->
+
   <div class="sample-card">
     <div class="sample-header critical">
       <div class="sample-num critical">Sample 03 · Unknown Actor · Credential Harvesting</div>
@@ -272,29 +271,35 @@ footer span{color:#94a3b8}
     </div>
     <div class="sample-body">
       <div class="sample-hash">b046d04b61f3ebfd9410c8b4f365118e29470fb6c54529c2425f553eb6364d8e.pdf · 134.6 KB · Generated: 2026-04-05 01:04 UTC</div>
+
       <div class="finding-row">
         <div class="finding-tag tag-critical">CRITICAL</div>
-        <div class="finding-text"><strong>Polyglot — Windows PE at offset 18,238.</strong> Embedded executable inside an otherwise valid PDF. Opens normally in any viewer, payload invisible to the recipient.</div>
+        <div class="finding-text"><strong>Polyglot — Windows PE at offset 18,238.</strong> Embedded executable inside an otherwise valid PDF. Passes all file type checks, opens normally in any viewer, payload invisible to the recipient.</div>
       </div>
+
       <div class="finding-row">
         <div class="finding-tag tag-critical">CRITICAL</div>
-        <div class="finding-text"><strong>/AA detected 6 times — Additional Actions (auto-execute).</strong> The <code>/AA</code> key triggers code execution automatically on page open, page close, or document print — no user interaction required beyond opening the file.</div>
+        <div class="finding-text"><strong>/AA detected 6 times — Additional Actions (auto-execute).</strong> The <code>/AA</code> key triggers code execution automatically on page open, page close, or document print — no user interaction required beyond opening the file. Six occurrences across the document means multiple trigger points. Code fires the moment the PDF renders.</div>
       </div>
+
       <div class="finding-row">
         <div class="finding-tag tag-high">HIGH</div>
         <div class="finding-text"><strong>/URI detected 4 times — IP-leaking callbacks.</strong> Four external URI references fire on render, sending the recipient's IP address and open timestamp to the attacker's server before the user has read a single word.</div>
       </div>
+
       <div class="finding-row">
         <div class="finding-tag tag-high">HIGH</div>
-        <div class="finding-text"><strong>Typosquatted domain: <code>maneger-accouintr-solutieonst.site</code></strong> — Deliberate misspelling of "manager account solutions" on a <code>.site</code> TLD. A throwaway phishing domain designed to pass a visual scan.</div>
+        <div class="finding-text"><strong>Typosquatted domain: <code>maneger-accouintr-solutieonst.site</code></strong> — Deliberate misspelling of "manager account solutions" on a <code>.site</code> TLD. A throwaway phishing domain designed to pass a visual scan. The <code>.site</code> TLD is inexpensive, disposable, and commonly associated with credential harvesting infrastructure.</div>
       </div>
+
       <div class="sample-verdict">
-        <strong>Assessment:</strong> The most layered sample in the set — polyglot payload, auto-execute on open, IP beacon callbacks, and a typosquatted harvesting domain, all in one file. Facebook-themed credential phishing. All stages trigger before the user reads a word of the document.
+        <strong>Assessment:</strong> This is the most layered sample in the set — polyglot payload, auto-execute on open, IP beacon callbacks, and a typosquatted harvesting domain, all in one file. The actor is unknown but the campaign type is clear: Facebook-themed credential phishing. A user who opened this file would have (1) immediately sent their IP and timestamp to the attacker via URI callbacks; (2) triggered auto-execute code from the <code>/AA</code> actions; and (3) had the embedded PE staged for extraction. The typosquatted domain would have been the landing page for harvested credentials. All before reading a word of the document.
       </div>
     </div>
   </div>
 
-  <!-- SAMPLE 4 -->
+  <!-- SAMPLE 4 — Gamaredon -->
+
   <div class="sample-card">
     <div class="sample-header high">
       <div class="sample-num high">Sample 04 · MalwareBazaar · Gamaredon / ACT-32</div>
@@ -302,25 +307,30 @@ footer span{color:#94a3b8}
     </div>
     <div class="sample-body">
       <div class="sample-hash">5095c6478dbb7f167c637511536ddc9bdc60828cc7c323041c68a2918eb351e8.pdf · 154.7 KB · Generated: 2026-04-04 03:16 UTC</div>
+
       <div class="finding-row">
         <div class="finding-tag tag-critical">CRITICAL</div>
-        <div class="finding-text"><strong>Gamaredon / ACT-32 — Russian state-affiliated threat group (FSB-linked).</strong> Active since at least 2013. Persistent, high-volume spearphishing campaigns targeting Ukrainian government, military, law enforcement, and NATO-aligned organizations.</div>
+        <div class="finding-text"><strong>Gamaredon / ACT-32 — Russian state-affiliated threat group (FSB-linked).</strong> Gamaredon (also tracked as Primitive Bear, UAC-0010, Shuckworm, and Trident Ursa) is a Russian APT group assessed to operate on behalf of the FSB, active since at least 2013. The group runs persistent, high-volume spearphishing campaigns targeting Ukrainian government, military, law enforcement, and NATO-aligned organizations. This sample is tagged on MalwareBazaar as a Gamaredon loader — part of a delivery chain for Gamawiper and VBS-based Trojan Downloaders. Gamaredon is known for using document-based lures with minimal technical complexity, relying on delivery volume and social engineering over elaborate obfuscation.</div>
       </div>
+
       <div class="finding-row">
         <div class="finding-tag tag-critical">CRITICAL</div>
         <div class="finding-text"><strong>Polyglot — Windows PE at offset 18,385.</strong> Single finding. No other PDF structure anomalies — no JavaScript, no auto-execute, no callbacks, no suspicious URLs. The PDF layer is completely inert. The only threat is the embedded executable.</div>
       </div>
+
       <div class="finding-row">
         <div class="finding-tag tag-pass">PASS</div>
         <div class="finding-text"><strong>PDF structure clean.</strong> No dangerous PDF keys detected. No active content of any kind. A scanner that checks only PDF structure finds nothing.</div>
       </div>
+
       <div class="sample-verdict">
-        <strong>Assessment:</strong> The most deceptive sample in the set. A clean PDF structure means no behavioral signals — nothing fires. The file opens, renders, and looks exactly like a legitimate PDF. The only finding is the embedded PE, which requires a full-file secondary signature scan to detect. Cleaner PDF structure is not a sign of a less dangerous file.
+        <strong>Assessment:</strong> The most deceptive sample in the set, and the most instructive. A clean PDF structure means no behavioral signals — no auto-execute to trigger heuristics, no callbacks to flag on network monitoring, no suspicious URLs to catch in a threat feed. Nothing fires. The file opens, renders, and looks exactly like a legitimate PDF. The only finding is the embedded PE, which requires a full-file secondary signature scan to detect. Without polyglot detection, this file passes every common check. That restraint is consistent with Gamaredon's operational style — the lure does not need to be sophisticated if the target opens it. The payload is just there, waiting.
       </div>
     </div>
   </div>
 
-  <!-- SAMPLE 5 -->
+  <!-- SAMPLE 5 — Live Job Scam -->
+
   <div class="sample-card">
     <div class="sample-header high">
       <div class="sample-num high">Sample 05 · Live Phishing · Caught in Inbox</div>
@@ -328,17 +338,21 @@ footer span{color:#94a3b8}
     </div>
     <div class="sample-body">
       <div class="sample-hash">Opportunity_OverviewNY921.pdf · 340.1 KB · Generated: 2026-04-05 21:58 UTC</div>
+
       <div class="finding-row">
         <div class="finding-tag tag-critical">CRITICAL</div>
         <div class="finding-text"><strong>Polyglot — Windows PE at offset 10,303.</strong> A Windows executable signature (<code>MZ</code> header) embedded inside a structurally valid PDF. Opens and renders normally in any viewer. No file extension or header-only scanner will find the payload.</div>
       </div>
+
       <div class="finding-row">
         <div class="finding-tag tag-pass">PASS</div>
         <div class="finding-text"><strong>PDF structure clean.</strong> No JavaScript, auto-execute actions, embedded files, or tracking pixels. The PDF layer is inert. The threat is entirely in the embedded executable.</div>
       </div>
+
       <div class="sample-verdict">
         <strong>Context:</strong> This file arrived as an <strong style="color:#e8374a">unsolicited</strong> email attachment from <span style="font-weight:500">Amin Claudette &nbsp;·&nbsp; <span style="color:#e8374a;font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:700">aminclaudette14&#64;gmail&#46;com</span></span>, subject line <span style="font-weight:500">Remote Job Posting: Shipping Role</span>. The email <strong style="color:#e8374a">addressed me by name</strong>, claimed to have found my profile on a professional platform, and asked me to <strong style="color:#e8374a">open the attached PDF</strong> for job details and next steps. The sender used a <strong style="color:#e8374a">personal Gmail address, not a business domain</strong>. <strong style="color:#e8374a">Gmail's scanner did not flag the attachment.</strong>
-        <br><br>This is the sample that validated the intended use case for Ladon — a real phishing email, a real target, a payload that passed Gmail. Ladon caught it on first scan.
+
+        <br><br>The social engineering is textbook: unsolicited job offer, professional framing, name personalization, urgent next steps in an attachment. A job seeker who opened this file would have executed a Windows PE payload with no warning and no visible indication that anything had happened. This is the sample that validated the intended use case for Ladon — a real phishing email, a real target, a payload that passed Gmail. Ladon caught it on first scan.
       </div>
     </div>
   </div>
@@ -348,6 +362,10 @@ footer span{color:#94a3b8}
     <div class="figure-body"><img src="img/011/job_scam_polyglot.png" alt="Ladon analysis report showing HIGH severity, polyglot PE at offset 10303, clean PDF structure"></div>
     <div class="figure-caption">Ladon's output for the live phishing catch. Severity: HIGH. Polyglot module detected a Windows PE executable at offset 10,303. PDF structure module passed clean — the threat is entirely in the embedded executable layer, invisible to a standard PDF viewer and to Gmail's attachment scanner.</div>
   </div>
+
+  <!-- placeholder closing div needed -->
+  <div class="finding-row" style="display:none"></div>
+
 </div>
 
 <!-- SECTION 03 -->
@@ -355,7 +373,7 @@ footer span{color:#94a3b8}
   <div class="section-num">Section 03</div>
   <h2>The Pattern Across All Five</h2>
 
-  <p>Every sample in this set is a polyglot. That is not a coincidence — it is a reflection of how effective the technique is. A PDF that contains a Windows PE executable will pass file extension checks, pass magic byte checks, open normally in any PDF viewer, and show readable content to the recipient. The executable is not visible. It makes no noise. The only way to find it is to scan the entire file for secondary signatures — which is exactly what Ladon does.</p>
+  <p>Every sample in this set is a polyglot. That is not a coincidence — it is a reflection of how effective the technique is. A PDF that contains a Windows PE executable will pass file extension checks (it ends in <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">.pdf</code>), pass magic byte checks (the first four bytes are <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">%PDF</code>), open normally in any PDF viewer, and show readable content to the recipient. The executable is not visible. It makes no noise. The only way to find it is to scan the entire file for secondary signatures — which is exactly what Ladon does.</p>
 
   <div class="tbl-wrap">
     <table>
@@ -370,35 +388,35 @@ footer span{color:#94a3b8}
           <td><span class="chip chip-high">HIGH</span></td>
           <td class="code">36,700</td>
           <td>/ObjStm — hides objects from scanners</td>
-        </tr>
+          </tr>
         <tr>
           <td><strong>e2b75bae…</strong><br><span style="font-size:.75rem;color:#94a3b8">ValleyRAT / SilverFox</span></td>
           <td>Chinese APT</td>
           <td><span class="chip chip-critical">CRITICAL</span></td>
           <td class="code">4,937</td>
           <td>/URI ×20, live Tencent Cloud .msi + .exe C2</td>
-        </tr>
+          </tr>
         <tr>
           <td><strong>b046d04b…</strong><br><span style="font-size:.75rem;color:#94a3b8">Facebook phishing</span></td>
           <td>Unknown</td>
           <td><span class="chip chip-critical">CRITICAL</span></td>
           <td class="code">18,238</td>
           <td>/AA ×6 auto-execute, /URI ×4, typosquatted .site domain</td>
-        </tr>
+          </tr>
         <tr>
           <td><strong>5095c647…</strong><br><span style="font-size:.75rem;color:#94a3b8">Gamaredon loader</span></td>
           <td>Russian APT (FSB)</td>
           <td><span class="chip chip-high">HIGH</span></td>
           <td class="code">18,385</td>
           <td>None — clean PDF layer</td>
-        </tr>
+          </tr>
         <tr>
           <td><strong>Opportunity_<wbr>OverviewNY921</strong><br><span style="font-size:.75rem;color:#94a3b8">Job scam · live catch</span></td>
           <td>Unknown</td>
           <td><span class="chip chip-high">HIGH</span></td>
           <td class="code">10,303</td>
           <td>None — clean PDF layer</td>
-        </tr>
+          </tr>
       </tbody>
     </table>
   </div>
@@ -406,7 +424,7 @@ footer span{color:#94a3b8}
   <p>Three of the five samples would have been entirely missed by a scanner that only checks PDF structure. Two would have been partially flagged — the auto-execute actions and suspicious URLs in samples 2 and 3 would have triggered something. But the embedded executable in every case would have gone undetected without a full-file secondary signature scan.</p>
 
   <div class="callout callout-amber">
-    <p><strong>On the clean PDF layer in samples 4 and 5:</strong> The absence of active PDF content is worth noting. An attacker who embeds a PE executable and adds no JavaScript, no auto-execute actions, and no suspicious URLs produces a file that is specifically harder to detect — it generates no behavioral signals, no network callbacks, nothing that heuristics can catch. Cleaner PDF structure is not a sign of a less dangerous file. The Gamaredon sample makes this point with state-sponsored precision.</p>
+    <p><strong>On the clean PDF layer in samples 4 and 5:</strong> The absence of active PDF content is worth noting. An attacker who embeds a PE executable and adds no JavaScript, no auto-execute actions, and no suspicious URLs produces a file that is specifically harder to detect — it generates no behavioral signals, no network callbacks, nothing that heuristics can catch. The payload is inert inside the PDF until it is extracted and run by whatever mechanism the attacker has arranged. Cleaner PDF structure is not a sign of a less dangerous file. The Gamaredon sample makes this point with state-sponsored precision — the lure does not need to be sophisticated if the target opens it.</p>
   </div>
 </div>
 
@@ -417,135 +435,19 @@ footer span{color:#94a3b8}
 
   <p>The detection methodology in Ladon was built from reading threat reports and file format specifications. These five samples are the first test against files that weren't constructed to test the tool. The results hold.</p>
 
-  <p>Every sample triggered the polyglot detection module correctly. The severity scoring separated the two CRITICAL samples from the three HIGH samples. The URL analysis module correctly flagged the live Tencent Cloud C2 URLs in sample 2 and the typosquatted domain in sample 3. The PDF structure module correctly identified the auto-execute actions in sample 3 and the object stream obfuscation in sample 1.</p>
+  <p>Every sample triggered the polyglot detection module correctly. The severity scoring separated the two CRITICAL samples — ValleyRAT and the Facebook phishing file, both with multiple compounding findings — from the three HIGH samples where the polyglot was the only or primary finding. The URL analysis module correctly flagged the live Tencent Cloud C2 URLs in sample 2 and the typosquatted domain in sample 3. The PDF structure module correctly identified the auto-execute actions in sample 3 and the object stream obfuscation in sample 1 — the unknown dropper.</p>
 
-  <p>The live phishing sample is the most meaningful data point. It was not sourced from a malware repository. It was not constructed to test anything. It was a real phishing email sent to a real target. Gmail did not flag the attachment. Ladon caught the embedded PE at offset 10,303 on the first scan.</p>
+  <p>The live phishing sample — the job scam that arrived in my inbox — is the most meaningful data point. It was not sourced from a malware repository. It was not constructed to test anything. It was a real phishing email sent to a real target. Gmail did not flag the attachment. Ladon caught the embedded PE at offset 10,303 on the first scan.</p>
 
   <div class="callout callout-green">
     <p><strong>The intended use case, validated:</strong> Ladon was designed for a specific scenario — a non-technical employee at a defense contractor or small business who receives an unexpected PDF and has no way to know if it is safe to open. The job scam email is exactly that scenario. The file looked like a PDF, opened like a PDF, and passed Gmail's scanner. The only thing that identified it as malicious was reading the raw bytes — which is exactly what Ladon does, automatically, before anyone opens anything.</p>
   </div>
-</div>
 
-<!-- SECTION 05 — NEW -->
-<div class="section">
-  <div class="section-num">Section 05</div>
-  <h2>Detection Improvements — April 30, 2026</h2>
-
-  <p>Following the original publication of this lab, two issues were identified through continued testing and addressed with updates to <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">document_triage.py</code>. Both fixes are documented here with validation results.</p>
-
-  <!-- FIX 1 — PE Validation -->
-  <div class="improvement-card">
-    <div class="improvement-header">
-      <div class="improvement-title">Fix 01 — PE Validation · False Positives on Large PDFs</div>
-      <div class="improvement-date">Committed April 30, 2026</div>
-    </div>
-    <div class="improvement-body">
-      <p><strong>The problem:</strong> Ladon's polyglot detection searched for the two-byte <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">MZ</code> signature (<code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">4D 5A</code>) anywhere in the file after offset 50. Those two bytes appear naturally inside embedded fonts, images, and ICC color profiles in legitimate PDFs — particularly large corporate documents. A 40MB threat intelligence report from Crowdstrike or Flashpoint contains thousands of embedded objects, and random binary data inside them would occasionally produce <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">MZ</code> bytes — triggering a false CRITICAL finding on a clean file.</p>
-
-      <p><strong>The fix:</strong> Full PE header validation now required before any finding is reported. A hit only fires when all five checks pass: MZ header present, a valid <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">e_lfanew</code> pointer in the DOS header (64 bytes to 1MB range), <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">PE\0\0</code> signature at the address that pointer references, a valid machine type from the known set (x86, x64, ARM64, IA64), and a section count between 1 and 96. Random binary noise fails at least one of these checks. A real embedded Windows executable passes all five.</p>
-
-      <div class="test-result">
-        <div>
-          <div class="test-result-label">ValleyRAT (e2b75bae…) — confirmed malicious · re-tested April 30, 2026</div>
-          <div class="test-result-sub">PE at offset 4,937 still detected correctly after fix. All original findings intact. No regression.</div>
-        </div>
-        <div class="test-result-verdict verdict-critical">CRITICAL ✓</div>
-      </div>
-
-      <div class="callout callout-red" style="margin:.75rem 0 1rem 0;padding:1rem 1.25rem">
-        <p style="font-family:'JetBrains Mono',monospace;font-size:.68rem;line-height:1.7;color:var(--ink2);margin:0"><strong style="color:var(--ink)">Re-test output — 2026-04-30 21:24 UTC</strong><br>
-        File: e2b75baeb7ed21fb8f27984f941286770d1c3c0b60fce8d7fa5b167bd24ba6dc.pdf · 158.4 KB · Severity: CRITICAL<br><br>
-        <strong style="color:#e8374a">Polyglot Detection — 1 finding</strong><br>
-        [CRITICAL] Windows PE (EXE) signature found at offset 4937 inside PDF file<br><br>
-        <strong style="color:#e8374a">PDF Structure Analysis — 6 issues</strong><br>
-        [Critical] /URI detected (20×) — External URI reference<br>
-        [Warning] https://6-1321729461.cos.ap-guangzhou.myqcloud.com/lnstaller.msi<br>
-        [Warning] https://00-1321729461.cos.ap-guangzhou.myqcloud.com/24-12-13uninstall.exe<br>
-        [Warning] http://www.baidu.com<br><br>
-        <strong style="color:var(--ink2)">URL Analysis — 13 suspicious URLs</strong><br>
-        Tencent Cloud COS domains (cos.ap-guangzhou.myqcloud.com) flagged MEDIUM — live Chinese APT C2 infrastructure confirmed at time of original analysis. Note: URL scoring for Chinese cloud infrastructure is a known improvement area — these domains warrant CRITICAL given attribution context.</p>
-      </div>
-
-      <div class="test-result">
-        <div>
-          <div class="test-result-label">Large legitimate PDF (40MB+ corporate document)</div>
-          <div class="test-result-sub">Previously flagged false CRITICAL. After fix: polyglot module passes clean.</div>
-        </div>
-        <div class="test-result-verdict verdict-clean">CLEAN ✓</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- FIX 2 — Calendar -->
-  <div class="improvement-card">
-    <div class="improvement-header">
-      <div class="improvement-title">Fix 02 — Calendar Analysis · Scheduling Platform False Positives</div>
-      <div class="improvement-date">Committed April 30, 2026</div>
-    </div>
-    <div class="improvement-body">
-      <p><strong>The problem:</strong> Ladon's ICS calendar analysis was incorrectly flagging two categories of legitimate calendar invites as CRITICAL meeting platform spoofs. First, Calendly invites — a calendar event with <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">calendly.com</code> in the LOCATION field for a Zoom meeting contains the word "zoom" in its context but routes through Calendly, not zoom.us — triggering a false spoof alert. Second, corporate email security gateways rewrite URLs before delivery. A legitimate Zoom link routed through Proofpoint becomes <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">urldefense.proofpoint.com/...</code> — Ladon would see an unrecognized domain and flag it as a spoof.</p>
-
-      <p><strong>The fix:</strong> Two new allowlists added to the ICS analysis module. A scheduling platform allowlist (Calendly, cal.com, Hubspot, Eventbrite) that skips spoof checking entirely for known legitimate scheduling services. A URL rewriting gateway allowlist (Proofpoint URLDefense, Microsoft SafeLinks, Mimecast) that skips checking for known corporate email security proxies. The platform keyword check was also tightened — it now only fires when the platform name appears in the domain itself, not in the URL path, preventing substring matches like "meet" inside "meeting".</p>
-
-      <div class="test-result">
-        <div>
-          <div class="test-result-label">Legitimate Calendly invite (calendly.com/john-smith/30min)</div>
-          <div class="test-result-sub">Previously flagged false CRITICAL. After fix: calendar module passes clean, severity LOW.</div>
-        </div>
-        <div class="test-result-verdict verdict-clean">CLEAN ✓</div>
-      </div>
-
-      <div class="test-result">
-        <div>
-          <div class="test-result-label">BlueNoroff-style fake Zoom lure (zoom-us.meeting-secure.site)</div>
-          <div class="test-result-sub">Modeled on the April 2026 BlueNoroff/Lazarus campaign using typosquatted Zoom domains. After fix: still detected correctly as CRITICAL spoof.</div>
-        </div>
-        <div class="test-result-verdict verdict-critical">CRITICAL ✓</div>
-      </div>
-
-      <div class="callout callout-blue" style="margin-top:1.25rem">
-        <p><strong>On the BlueNoroff campaign context:</strong> The fake Zoom test case was modeled on a documented active campaign. Arctic Wolf reported in April 2026 that BlueNoroff — a Lazarus sub-group tied to North Korea's Reconnaissance General Bureau — was using Calendly invites that later swap to typosquatted Zoom or Teams links to deliver second-stage malware via a fake SDK update prompt. The campaign was independently covered by <a href="https://www.govinfosecurity.com/crypto-targeting-north-koreans-wield-fake-zoom-meetings-a-31516" target="_blank">GovInfoSecurity</a>, Dark Reading, Infosecurity Magazine, and CyberSecurityNews between April 17–28, 2026, and is tracked under UNC1069 and Sapphire Sleet. The fix correctly allows legitimate Calendly scheduling through while catching the attacker-controlled destination domain substitution.</p>
-      </div>
-
-      <h3 style="margin-top:1.75rem">Active Campaign IOCs — April 2026</h3>
-      <p style="font-size:.88rem;color:var(--ink3);margin-bottom:1rem">The following indicators were submitted to ThreatFox on April 8, 2026 and are consistent with the BlueNoroff/UNC1069 fake Zoom campaign. Domains are defanged — brackets replace dots to prevent accidental navigation. These domains would trigger Ladon's ICS analysis if embedded in a calendar invite LOCATION or DESCRIPTION field.</p>
-
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr><th style="width:40%">Defanged Indicator</th><th style="width:20%">Type</th><th style="width:40%">Pattern</th></tr></thead>
-          <tbody>
-            <tr><td class="code">usz00mczyiee[.]store</td><td><span class="chip chip-critical">DOMAIN</span></td><td>Zero substitution in "zoom" — usz<strong>00</strong>m vs zoom</td></tr>
-            <tr><td class="code">zoominviteeees[.]de</td><td><span class="chip chip-critical">DOMAIN</span></td><td>Extra characters appended to "zoom" + unusual TLD</td></tr>
-            <tr><td class="code">googlemeet[.]emilychart[.]xyz</td><td><span class="chip chip-critical">DOMAIN</span></td><td>"googlemeet" as subdomain of unrelated domain + .xyz TLD</td></tr>
-            <tr><td class="code">simplicity-w[.]pages[.]dev</td><td><span class="chip chip-high">URL</span></td><td>Cloudflare Pages abuse — legitimate infrastructure, malicious content</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="callout callout-amber" style="margin-top:1.25rem">
-        <p><strong>What Ladon catches vs. where its boundary is:</strong> If any of these domains appeared in a calendar invite LOCATION or DESCRIPTION field, Ladon would flag CRITICAL — suspicious TLD, platform keyword in wrong domain, or typosquat pattern. What Ladon does not catch is the browser-based payload delivery stage: the fake meeting room rendering pre-recorded video, the fake audio failure, and the ClickFix "SDK Update" prompt that delivers the actual malware. That stage happens in the browser after the user clicks the link. Ladon is a pre-click triage tool — it catches the lure before it is opened. Detecting the browser-based stage requires endpoint behavioral detection or DNS-layer blocking, not static file analysis.</p>
-      </div>
-    </div>
-  </div>
-
-  <p>Both fixes are committed to the <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">main</code> branch. The commits are visible in the repository history dated April 30, 2026. All five original malicious samples re-tested and confirmed unaffected — zero false negatives introduced by either change.</p>
-</div>
-
-<!-- SECTION 06 -->
-<div class="section">
-  <div class="section-num">Section 06</div>
-  <h2>The Full Picture</h2>
-
-  <p>Across both the original analysis and the April 30 improvements, Ladon's detection posture is zero false negatives on confirmed malicious files and zero false positives on the clean files tested. The PE validation fix closes the most common source of noise for users who scan large corporate documents. The calendar fix closes the most common source of noise for users who scan calendar invites from scheduling platforms or corporate email environments.</p>
-
-  <p>The tool does not execute anything. It does not require network access. It reads raw bytes and reports what it finds — which is exactly what is needed before anyone opens an unexpected file.</p>
-
-  <div style="padding:1.5rem 0 2rem 0;">
-    <a href="mailto:yana@sitewavestudio.com?subject=Ladon Demo Request" style="font-family:var(--mono);font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;background:#1a4fa0;color:#fff;padding:.75rem 1.75rem;border-radius:2px;text-decoration:none;display:inline-block;text-align:center;">REQUEST A LIVE DEMO<br><span style="font-size:.62rem;letter-spacing:.04em;color:#94a3b8;font-weight:400;text-transform:none;display:block;text-align:center;">available upon request</span></a>
-  </div>
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">Ladon is a static analysis tool — it reads file structure and content without executing anything. All analysis runs server-side on Railway infrastructure. No files are stored after analysis. Four samples were sourced from MalwareBazaar; one arrived via live phishing email. The tool is currently in private testing. SiteWave Studio LLC · Built by Yana Ivanov · April 2026</p>
 </div>
 
 </div></div>
+
 
 <footer>
   <span>Lab Log 011 &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; April 2026 &nbsp;·&nbsp; Educational use only</span>
