@@ -324,9 +324,16 @@ footer a:hover{color:#93c5fd}
     <div class="section-num">Open Source</div>
     <h2>Open Source Security Contributions</h2>
 
-    <h3 class="work-title"><a href="https://github.com/sublime-security/sublime-rules/pull/4267">Sublime Security · sublime-rules</a> · 2026</h3>
-    <p>Authored two detection rules submitted to Sublime Security's open-source rule repository: Unicode homoglyph BEC detection (Cyrillic/Greek confusables combined with financial-urgency language and Punycode IDN handling) and Glassworm invisible Unicode payload detection (covering all confirmed PUA codepoint ranges across email body and text-based attachments). Both rules backed by independent threat analysis published on this portfolio. Currently in active review with a Sublime engineer; pending logic refinements and false-positive testing before merge to production ruleset.</p>
-    <p style="margin-top:.5rem;font-size:.9rem"><a href="https://github.com/sublime-security/sublime-rules/pull/4267">PR #4267</a> · <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/analysis/homoglyph_bec_analysis.html">Homoglyph BEC analysis</a> · <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/analysis/glassworm_analysis.html">Glassworm analysis</a></p>
+    <div class="portfolio-grid">
+      <div class="portfolio-card">
+        <a href="https://github.com/sublime-security/sublime-rules/pull/4267">Sublime Security · sublime-rules — Detection Rules (PR #4267)</a>
+        <div class="p-desc">Authored two detection rules submitted to Sublime's open-source rule repository: Unicode homoglyph BEC detection and Glassworm invisible Unicode payload detection. Currently in active review with a Sublime engineer; pending logic refinements and false-positive testing before merge to production ruleset. Backed by independent threat analysis published on portfolio.</div>
+      </div>
+      <div class="portfolio-card">
+        <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/labs/lab_log_011.html">Ladon · document_triage.py — Static Analysis Tool</a>
+        <div class="p-desc">Authored static-analysis tool for pre-click PDF and calendar-invite triage. Detects polyglot payloads, auto-execute actions, typosquatted domains, and meeting-platform spoofs. Validated against 5 confirmed malicious samples including ValleyRAT (Chinese APT), Gamaredon (Russian FSB-linked), and a live phishing email that bypassed Gmail. Zero false negatives, zero false positives. Published IOCs to ThreatFox during April 2026 BlueNoroff/UNC1069 campaign.</div>
+      </div>
+    </div>
   </div>
 
   <div class="section">
