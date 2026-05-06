@@ -147,16 +147,16 @@ footer span{color:#94a3b8}
     <h1 class="title">Building ArgusX<br><span>What Happens When You Stop Waiting for Someone Else to Build It</span></h1>
     <div class="mast-meta">
       <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
-      <div class="meta-item"><div class="label">Published</div><div class="value">April 2026</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">April 2026 · Updated May 2026</div></div>
       <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Field Notes</div></div>
       <div class="meta-item"><div class="label">Topic</div><div class="value">Threat Intelligence · Community Platform</div></div>
       <div class="meta-item"><div class="label">Read Time</div><div class="value">10 minutes</div></div>
-      <div class="meta-item"><div class="label">Platform</div><div class="value">argusx.dev — Live Beta</div></div>
+      <div class="meta-item"><div class="label">Status</div><div class="value">Active development · Private collaboration</div></div>
     </div>
   </div>
   <div class="mast-bar">
     <div class="mast-bar-dot"></div>
-    LIVE BETA · 407 POSTS INGESTED · 61,511 RELATIONSHIPS AUTO-DETECTED · 7 INTEL SOURCES · BUILT IN WEEKS
+    INDEPENDENT BUILD · COMMUNITY-FIRST PLATFORM · 14+ INTEL SOURCES · BUILT IN WEEKS · UNDER ACTIVE DEVELOPMENT
   </div>
 </div>
 
@@ -171,7 +171,7 @@ footer span{color:#94a3b8}
 
   <p>And everywhere I listened, the same frustration surfaced. <strong>The signal is scattered.</strong> A critical IOC lands on Twitter and disappears in six hours. A Sigma rule gets buried in a GitHub thread. Someone connects a new malware sample to an existing campaign on Mastodon and nobody sees it because they follow different people. The intelligence exists. The people who care exist. The connective tissue does not.</p>
 
-  <p>I am not a seasoned analyst with a decade of incident response behind me. I am someone who made a career pivot into security, is actively studying for Security+, CMMC, and Azure Cloud certifications, and has spent the last year listening — deeply — to the people who live this work every day. What I heard was not a complaint. It was an opening.</p>
+  <p>I am not a seasoned analyst with a decade of incident response behind me. I am someone who made a career pivot into security earlier this year, is actively studying for CompTIA Security+, and has spent these months listening — deeply — to the people who live this work every day. What I heard was not a complaint. It was an opening.</p>
 
   <div class="callout callout-blue">
     <p><strong>The gap I kept seeing:</strong> Threat intelligence is being generated constantly by a passionate, skilled, generous community — and then dispersed across platforms that weren't designed to connect it. No structure. No relationships. No way for a defense post to find the threat it addresses.</p>
@@ -185,32 +185,50 @@ footer span{color:#94a3b8}
 
   <p>What if every threat post could be linked to the defense that addressed it? What if an IOC from MalwareBazaar could automatically surface its relationship to a CVE from CISA — and that CVE could surface the Sigma rule someone wrote to detect it? What if the community's collective intelligence was <em>structured</em> rather than scattered?</p>
 
-  <p>That's ArgusX. A community-driven threat intelligence platform where intel and defense are two sides of the same coin — always connected, always visible, always searchable.</p>
+  <p>That's ArgusX. A community-driven threat intelligence platform where defenders share what they find, learn from each other, and grow together.</p>
 
   <p>The name comes from Argus Panoptes — the hundred-eyed giant of Greek mythology who never sleeps. Every eye watching. Nothing missed. That felt right for a platform designed to surface what existing tools let fall through the cracks.</p>
 
-  <div style="font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin:2rem 0 1rem">Figure 1 — The Core Relationship ArgusX Is Built Around</div>
-  <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:0;margin:0 0 2rem">
+  <div style="font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin:2rem 0 1rem">Figure 1 — The Asymmetry ArgusX Is Trying to Fix</div>
+  <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;gap:0;margin:0 0 2rem">
     <div style="border:1px solid var(--rule);border-top:3px solid var(--red);border-radius:4px;padding:1.5rem;background:#fef2f2;box-shadow:var(--shadow)">
-      <div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:.5rem">Intel Post</div>
-      <div style="font-family:var(--display-clean);font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3">Threat detected</div>
-      <div style="font-size:.8rem;color:var(--ink3);line-height:1.6">IOC, TTP, CVE — what the threat is, where it came from, who it targets</div>
+      <div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:.5rem">The Underground</div>
+      <div style="font-family:var(--display-clean);font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3">Organized. Coordinated. Free.</div>
+      <div style="font-size:.8rem;color:var(--ink3);line-height:1.6">Threat actors share tools, zero-days, victim lists, and TTPs in real time. No fees, no membership committees, no gatekeeping. The offensive ecosystem works.</div>
     </div>
-    <div style="font-size:1.5rem;color:#94a3b8;padding:0 1.25rem;text-align:center">→</div>
+    <div style="font-size:1.5rem;color:#94a3b8;padding:0 1.25rem;text-align:center;display:flex;align-items:center;justify-content:center">vs</div>
     <div style="border:1px solid var(--rule);border-top:3px solid var(--blue);border-radius:4px;padding:1.5rem;background:#eff6ff;box-shadow:var(--shadow)">
-      <div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:.5rem">Relationship</div>
-      <div style="font-family:var(--display-clean);font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3">Auto-detected or analyst-confirmed</div>
-      <div style="font-size:.8rem;color:var(--ink3);line-height:1.6">Shared hash, same C2, same CVE, same malware family, same MITRE technique</div>
-    </div>
-    <div style="font-size:1.5rem;color:#94a3b8;padding:0 1.25rem;text-align:center">→</div>
-    <div style="border:1px solid var(--rule);border-top:3px solid var(--green);border-radius:4px;padding:1.5rem;background:#f0fdf4;box-shadow:var(--shadow)">
-      <div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:.5rem">Defense Post</div>
-      <div style="font-family:var(--display-clean);font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3">Mitigation mapped</div>
-      <div style="font-size:.8rem;color:var(--ink3);line-height:1.6">Sigma rule, YARA, patch, detection logic — links back to the threat it addresses</div>
+      <div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:.5rem">The Defenders</div>
+      <div style="font-family:var(--display-clean);font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3">Fragmented. Gated. Expensive.</div>
+      <div style="font-size:.8rem;color:var(--ink3);line-height:1.6">ISACs cost thousands. Threat intel platforms are enterprise-only. Independent analysts, students, and small teams have nowhere structured to share what they find.</div>
     </div>
   </div>
 
-  <p>The relationship graph makes that connection visible. Not as a list. As a network — where you can see which threats share infrastructure, which campaigns are connected, which defenses address which threats. Pattern recognition at scale, for a community that currently does it manually in their heads.</p>
+  <p>That asymmetry is not acceptable when the stakes are this high. ArgusX is the open infrastructure layer for defenders who are currently isolated by design — modeled on what works in open-source software (GitHub, npm, PyPI), where contributors share freely and reputation is earned through contribution.</p>
+</div>
+
+<!-- SECTION 02b — COMMUNITY MODEL -->
+<div class="section">
+  <div class="section-num">Section 02b</div>
+  <h2>Built Around the Community, Not the Engine</h2>
+
+  <p>Most threat intel platforms are built engine-first — the value is the data and the analytics, the user is incidental. ArgusX is built community-first. The data only matters because of the people contributing it, learning from it, and using it to defend the things that matter.</p>
+
+  <p>That means the structure of the community is the most important design decision in the platform. Not the algorithms. Not the visualizations. The <strong>shape of how people enter, contribute, mentor, and progress</strong>.</p>
+
+  <h3>A path, not a wall</h3>
+
+  <p>The biggest mistake I could make would be to gate the platform behind credentials and connections — exactly the friction that made me build this in the first place. ArgusX is a vetted community, but never an elitist one. The application path is transparent and meritocratic. Someone with no credentials but real drive should be able to walk in and find the road forward, the same way I did when I started.</p>
+
+  <p>Tiers exist not as status symbols but as a structure for trust. Read access opens broadly. Posting and contribution access requires light verification. Mentorship and access to sensitive intelligence requires demonstrated contribution and community trust — earned through participation, not purchased.</p>
+
+  <h3>Mentorship is built into the architecture</h3>
+
+  <p>This is the part that matters most to me personally. The reason I struggled to break into security wasn't a lack of resources online — it was the lack of a guide. The cost of a mentor in this field, when you can find one, is often years of social capital you don't have when you're starting.</p>
+
+  <p>ArgusX makes mentorship a first-class feature, not an afterthought. Senior analysts can opt in to mentor. New analysts can apply for mentorship through a structured submission process. Matching is bias-free by design — mentors don't get to filter mentees on demographics, only on objective compatibility (timezone, technical focus area, learning goals). Every mentor commits to the same standard: open to all matched mentees, in good faith.</p>
+
+  <p>This isn't charity work. It's how the community sustains itself. The seniors of tomorrow are the juniors who got brought along today.</p>
 </div>
 
 <!-- SECTION 03 -->
@@ -220,25 +238,25 @@ footer span{color:#94a3b8}
 
   <p>This is the part I am genuinely proud of. Not because the technology is novel — it isn't. But because of what it demonstrates about what is possible when you combine a clear problem, the right tools, and a willingness to just start.</p>
 
-  <p>ArgusX went from idea to live beta in weeks. Not months. Weeks. Built entirely by one person, with no dedicated engineering budget, using a stack that costs almost nothing to run.</p>
+  <p>ArgusX went from idea to a working platform in weeks. Not months. Weeks. Built entirely by one person, with no dedicated engineering budget, using a stack that costs almost nothing to run.</p>
 
   <div class="mat-card">
-    <div class="mat-card-title">Figure 2 — What's Running Right Now</div>
+    <div class="mat-card-title">Figure 2 — What's Running</div>
     <div class="stat-grid">
       <div class="stat-item stat-blue">
-        <div class="stat-num">407</div>
-        <div class="stat-label">Posts<br>Ingested</div>
-        <div class="stat-sub">Growing every<br>5 minutes</div>
+        <div class="stat-num">14+</div>
+        <div class="stat-label">Live Intel<br>Sources</div>
+        <div class="stat-sub">Continuously<br>aggregated</div>
       </div>
       <div class="stat-item stat-red">
-        <div class="stat-num">61K+</div>
-        <div class="stat-label">Relationships<br>Auto-Detected</div>
-        <div class="stat-sub">Cross-referenced<br>across 6 link types</div>
+        <div class="stat-num">10K+</div>
+        <div class="stat-label">Threat Posts<br>Catalogued</div>
+        <div class="stat-sub">Growing every<br>5 minutes</div>
       </div>
       <div class="stat-item stat-amber">
-        <div class="stat-num">7</div>
-        <div class="stat-label">Live Intel<br>Sources</div>
-        <div class="stat-sub">CISA, abuse.ch,<br>OTX AlienVault</div>
+        <div class="stat-num">~5min</div>
+        <div class="stat-label">Ingestion<br>Cadence</div>
+        <div class="stat-sub">Pulls overnight<br>at higher volume</div>
       </div>
       <div class="stat-item stat-green">
         <div class="stat-num">~$5</div>
@@ -248,12 +266,12 @@ footer span{color:#94a3b8}
     </div>
   </div>
 
-  <p>The backend is a Python ingestion script running on Railway — a cron job that fires every five minutes, pulls from seven free threat intelligence APIs, deduplicates, cross-references, and inserts into Supabase. During off-hours, between 1am and 8am, it pulls aggressively — 100 records per source instead of 25. It runs while I sleep.</p>
+  <p>The backend is a Python ingestion script running on Railway — a cron job that fires every five minutes, pulls from over a dozen public threat intelligence APIs, deduplicates, and inserts into Supabase. During off-hours, between 1am and 8am, it pulls aggressively. It runs while I sleep.</p>
 
-  <p>The frontend is vanilla HTML, CSS, and JavaScript. No framework. No build step. Hosted on GitHub Pages with a custom domain through Cloudflare. The relationship graph is rendered on an HTML5 canvas with a force-directed layout and 61,000+ edges computed from auto-detected relationships.</p>
+  <p>The frontend is vanilla HTML, CSS, and JavaScript. No framework. No build step. The platform is designed to be lean enough that one person can maintain it indefinitely while the community grows around it.</p>
 
   <div class="callout callout-amber">
-    <p><strong>The AI layer:</strong> Every new post is classified by Claude Haiku at insert time — campaign type, threat actor attribution, origin country, severity reasoning, additional tags. Estimated cost at current volume: $0.27 per month. The intelligence gets smarter with every post ingested.</p>
+    <p><strong>The AI layer:</strong> Every new post is classified at insert time using Anthropic's Claude — campaign type, threat actor attribution, origin country, severity reasoning, additional tags. The intelligence gets smarter with every post ingested, and the cost remains a small fraction of monthly infrastructure spend.</p>
   </div>
 </div>
 
@@ -268,18 +286,18 @@ footer span{color:#94a3b8}
         <tr><th>Layer</th><th>Technology</th><th>Cost</th><th>Why</th></tr>
       </thead>
       <tbody>
-        <tr><td><strong>Frontend</strong></td><td>Vanilla HTML/CSS/JS — no build step, no framework</td><td class="green">Free</td><td>Ships instantly. Zero dependencies. Anyone can read the source.</td></tr>
-        <tr><td><strong>Hosting</strong></td><td>GitHub Pages + Cloudflare DNS</td><td class="green">Free</td><td>CDN included. Custom domain. Zero ops overhead.</td></tr>
+        <tr><td><strong>Frontend</strong></td><td>Vanilla HTML/CSS/JS — no build step, no framework</td><td class="green">Free</td><td>Ships instantly. Zero dependencies. One person can maintain it.</td></tr>
+        <tr><td><strong>Hosting</strong></td><td>Static hosting + Cloudflare DNS</td><td class="green">Free</td><td>CDN included. Custom domain. Zero ops overhead.</td></tr>
         <tr><td><strong>Database</strong></td><td>Supabase Postgres</td><td class="green">Free tier</td><td>Managed Postgres with real-time, auth, RLS, and REST API built in.</td></tr>
-        <tr><td><strong>Auth</strong></td><td>Supabase + GitHub OAuth</td><td class="green">Free</td><td>GitHub identity = security community identity. Natural fit.</td></tr>
-        <tr><td><strong>Ingestion</strong></td><td>Python 3 on Railway cron</td><td class="amber">~$5/mo</td><td>Runs every 5 minutes. Handles 7 APIs, dedup, cross-reference, AI classification.</td></tr>
-        <tr><td><strong>AI Classification</strong></td><td>Claude Haiku via Anthropic API</td><td class="green">~$0.27/mo</td><td>Classifies every new post. Campaign type, threat actor, severity.</td></tr>
-        <tr><td><strong>Intel Sources</strong></td><td>CISA KEV, MalwareBazaar, ThreatFox, URLhaus, Feodo, SSLBL, OTX</td><td class="green">Free</td><td>All public APIs. All free. All running simultaneously.</td></tr>
+        <tr><td><strong>Auth</strong></td><td>Supabase + GitHub OAuth</td><td class="green">Free</td><td>GitHub identity = security community identity. Natural fit for a defender community.</td></tr>
+        <tr><td><strong>Ingestion</strong></td><td>Python 3 on Railway cron</td><td class="amber">~$5/mo</td><td>Runs every 5 minutes. Handles a dozen+ APIs, dedup, and AI classification.</td></tr>
+        <tr><td><strong>AI Classification</strong></td><td>Claude (Anthropic API)</td><td class="green">Pennies/mo</td><td>Classifies every new post. Campaign type, threat actor, severity reasoning.</td></tr>
+        <tr><td><strong>Intel Sources</strong></td><td>Public threat intelligence APIs (government, abuse-tracking, vulnerability registries, news)</td><td class="green">Free</td><td>All public. All free. All running simultaneously.</td></tr>
       </tbody>
     </table>
   </div>
 
-  <p>The total monthly cost to run ArgusX at current scale — ingesting hundreds of posts per day, maintaining a live relationship graph, classifying with AI — is approximately five dollars. That number will stay low for a long time. The Supabase free tier holds 500MB. At roughly 3KB per post, that is room for tens of thousands of posts before any cost scales.</p>
+  <p>The total monthly cost to run ArgusX at current scale — ingesting hundreds of posts per day, classifying with AI, supporting community features — is approximately five dollars. That number will stay low for a long time. The Supabase free tier holds 500MB. At roughly 3KB per post, that is room for tens of thousands of posts before any cost scales.</p>
 </div>
 
 <!-- SECTION 05 -->
@@ -294,26 +312,30 @@ footer span{color:#94a3b8}
   <p>ArgusX is free for individual analysts. That is not a trial tier. That is the model. The people doing the actual work — the ones who write the detection rules, analyze the samples, share the IOCs — they should never have to pay to access or contribute intelligence. The platform exists because of them. It belongs to them.</p>
 
   <div class="callout callout-blue">
-    <p><strong>The goal that keeps me building:</strong> 100 active analysts using ArgusX is the proof of concept for every conversation that matters — with investors, with potential partners, with anyone who needs to understand what this platform can become. If you are reading this and you work in this field, that number includes you.</p>
+    <p><strong>The principles that guide every decision:</strong></p>
+    <ul style="margin:.75rem 0 0;padding-left:1.5rem;line-height:1.8">
+      <li><strong>Evidence over opinion.</strong> No FUD. IOCs must be real. Claims must be verifiable.</li>
+      <li><strong>Respect over hierarchy.</strong> Tier doesn't make you better than anyone — just trusted with more responsibility.</li>
+      <li><strong>Defense over noise.</strong> The platform is for actual work, not chatter.</li>
+      <li><strong>Mentorship without bias.</strong> Mentors open to all matched mentees, in good faith.</li>
+      <li><strong>Built by defenders, for defenders.</strong> The people doing the work are the ones who own the platform.</li>
+    </ul>
   </div>
 
   <h3>What This Demonstrates About Building</h3>
 
   <p>I want to say one more thing about the process, because it matters beyond ArgusX specifically. We are at a moment where a single person with a clear problem, access to AI tools, and the willingness to learn in public can build things that would have required a funded team three years ago.</p>
 
-  <p>I did not know how to write a force-directed graph renderer when I started. I did not know how to build a cross-reference engine. I did not know how to structure a trust model based on GitHub OAuth scoring. I figured it out — iteratively, with help, in public — and the result is a live platform that ingests real threat intelligence from seven sources, auto-detects tens of thousands of relationships, and classifies new posts with AI for less than a dollar a month.</p>
+  <p>I did not know how to build a community platform from scratch when I started. I did not know how to architect a tier-based trust system. I did not know how to integrate AI classification into an ingestion pipeline. I figured it out — iteratively, with help, in public — and the result is a working platform with a real architecture and a real community model behind it.</p>
 
   <p><strong>When there is a will and the right tools, there is absolutely a way.</strong> That is the lesson I want this build to demonstrate. Not that I am exceptional. That the barrier is lower than you think, and the only thing between an idea and a working product is starting.</p>
 
   <div class="callout callout-green">
-    <p><strong>ArgusX is live.</strong> The console is open. The brief is public. If you work in threat intelligence, defensive security, or detection engineering — I would genuinely love your perspective. Request access, submit an IOC, write a defense rule, poke at the graph. Tell me what is missing. This platform gets better with every person who uses it.</p>
-    <div style="display:flex;gap:1rem;margin-top:1.25rem;flex-wrap:wrap">
-      <a href="https://argusx.dev" style="display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.25rem;background:var(--green);color:#fff;border-radius:4px;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-decoration:none;text-transform:uppercase;font-weight:600;box-shadow:var(--shadow-md);transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">↗ argusx.dev</a>
-      <a href="https://argusx.dev/console" style="display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.25rem;background:#145a32;color:#fff;border-radius:4px;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-decoration:none;text-transform:uppercase;font-weight:600;box-shadow:var(--shadow-md);transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">→ MVP Platform</a>
-    </div>
+    <p><strong>ArgusX is currently in active development.</strong> The platform is in private collaboration with a small team — engineering, research, methodology — focused on stabilizing the data pipeline and building out the rules and mentorship layers before broader access. If you work in threat intelligence, defensive security, detection engineering, or community-building for security analysts, and you'd like to learn more or follow the build, I'd genuinely love to hear from you.</p>
+    <p style="margin-top:1rem;font-size:.85rem;color:var(--ink2)">Reach out via the contact channels on my portfolio.</p>
   </div>
 
-  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">These are honest field notes from a platform currently in live beta. Stats reflect actual data as of April 2026. The platform is under active development — features, architecture, and numbers will continue to change. The mission will not.</p>
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">These are honest field notes from a platform under active development. Originally published April 2026; updated May 2026 to reflect the current collaboration phase. The platform's architecture and feature set are evolving — but the mission remains: defenders helping defenders, free for the people who do the work, structured for the community that actually exists.</p>
 </div>
 
 </div></div>
@@ -322,15 +344,15 @@ footer span{color:#94a3b8}
   <div class="bio-avatar">YI</div>
   <div>
     <div class="bio-name">Yana Ivanov</div>
-    <div class="bio-title">Security Analyst · UX/UI Designer · SiteWave Studio LLC</div>
-    <p class="bio-text">Yana Ivanov is a security analyst and UX designer based in Connecticut. With 15 years of enterprise technology experience and an MS in Information Systems, she is currently pursuing CompTIA Security+, CMMC, and Azure Cloud certifications — and building the tools she wishes existed while doing it. ArgusX is her first platform build — designed, engineered, and shipped independently.</p>
+    <div class="bio-title">Security Analyst · Connecticut</div>
+    <p class="bio-text">Yana Ivanov is a security analyst based in Connecticut, focused on cybersecurity risk and CMMC compliance for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Information Systems, she brings a practitioner perspective to threat intelligence analysis and has built CMMC-aligned training and tooling. She is currently pursuing CompTIA Security+ certification. ArgusX is her first platform build — designed and built independently, now in active development with a small collaboration team.</p>
     <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">← Portfolio</a></p>
   </div>
 </div>
 
 <footer>
-  <span>Building ArgusX · Field Notes · Yana Ivanov · April 2026</span>
-  <span>Independent build · Live beta · argusx.dev</span>
+  <span>Building ArgusX · Field Notes · Yana Ivanov · April 2026 · Updated May 2026</span>
+  <span>Independent build · Active development</span>
 </footer>
 
 </body>
