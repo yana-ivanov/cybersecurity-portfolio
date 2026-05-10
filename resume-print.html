@@ -94,22 +94,23 @@ body { font-family: 'Open Sans', sans-serif; font-size: 10.5pt; color: var(--tex
   </div>
   <div class="main">
     <div class="section-title">Professional Summary</div>
-    <p class="summary-text">Security analyst transitioning into defense supply chain cybersecurity, with 15+ years of enterprise technology experience and an MS in Information Systems. Currently pursuing CompTIA Security+ certification with a planned path through CMMC Registered Practitioner. Focused on NIST 800-171, CUI handling, DFARS compliance, and FCA liability considerations for the Connecticut defense industrial base. Combines hands-on network security lab work, published threat analysis, and the ability to translate complex compliance requirements into actionable guidance for non-technical leadership.</p>
-    <div class="callout">Most compliance professionals understand the frameworks. Few can analyze a live Lumma Stealer pcap, identify C2 beaconing, and write a threat brief a program manager will act on. I bridge that gap.</div>
+    <p class="summary-text">Cybersecurity professional focused on threat intelligence and detection content development, with 15+ years of enterprise technology experience and an MS in Information Systems. Currently building <strong>ArgusX</strong>, an independent threat intelligence platform aggregating, classifying, and correlating threat data from 20+ public and vendor research sources to enable predictive threat analysis. Combines hands-on threat analysis with AI-augmented development workflow — architecting systems, designing detection logic, and shipping working tools while using modern AI assistants for implementation. Russian/English bilingual; CompTIA Security+ scheduled June 2026.</p>
+    <div class="callout">Most candidates studying for Security+ have a homelab. I have a working threat intelligence platform ingesting 1,000+ posts/day, classifying threats by category, and tracking nation-state actors. The work itself is the credential.</div>
 
     <div class="section-title">Professional Experience</div>
 
     <div class="exp-block">
       <div class="exp-role-line">
-        <span class="exp-role">Founder &amp; CMMC Compliance Consultant</span>
+        <span class="exp-role">Founder &amp; Independent Security Researcher</span>
         <span class="exp-dates">2023 – Present</span>
       </div>
-      <div class="exp-company">SiteWave Studio · Milford, CT</div>
+      <div class="exp-company">SiteWave Studio LLC · Milford, CT</div>
       <ul class="exp-bullets">
-        <li>Developed 14-module CMMC cybersecurity awareness training covering all CMMC 2.0 domains — scenario-based quizzes, real case studies, and completion certificate designed for defense contractor workforce onboarding</li>
-        <li>Published professional-grade threat analysis reports on Volt Typhoon, CMMC supply chain FCA liability, and coordinated infrastructure attack scenarios as independent contributions to the defense community</li>
-        <li>Built open-source security tools: browser-based pcap analyzer, CVSS calculator, Glassworm detector, and zeek_triage.py automated IOC detection script with zero external dependencies</li>
-        <li>Conducted hands-on malware traffic analysis using Wireshark and Zeek — identified Lumma Stealer C2 infrastructure, confirmed 2.27MB credential exfiltration, and mapped TLS-encrypted domains invisible to standard filters</li>
+        <li>Operating LLC as parent entity for independent security research, threat intelligence platform development, and detection content authoring</li>
+        <li>Building <strong>ArgusX</strong> — independent threat intelligence platform aggregating threat data from 20+ public and vendor research sources. Methodology focuses on capability commodification analysis and trigger-based threat forecasting. Live system; demo available under NDA</li>
+        <li>Published threat analyses spanning nation-state operations (Volt Typhoon, Apple Watch attack surface, UNC1069/Lazarus npm supply chain), criminal infrastructure (TeamPCP Telnyx, Glassworm, Lumma Stealer), and identity research (38 breaches study, LinkedIn verification gap)</li>
+        <li>Authored open-source detection content: two PRs to Sublime Security's detection rule repository (Glassworm, homoglyph BEC); Ladon static analysis tool validated against Gamaredon (Russian APT), ValleyRAT (Chinese APT), and live phishing</li>
+        <li>Hands-on malware traffic analysis using Wireshark and Zeek — Lumma Stealer C2 infrastructure mapped, TLS-encrypted domains identified, IOCs published to ThreatFox</li>
       </ul>
     </div>
 
@@ -134,7 +135,7 @@ body { font-family: 'Open Sans', sans-serif; font-size: 10.5pt; color: var(--tex
       <ul class="exp-bullets">
         <li>Accelerated project delivery 30%+ by establishing reusable design framework adopted across full product team</li>
         <li>Led complex B2B analytics product design from discovery through developer handoff for media measurement clients making multi-million dollar advertising decisions</li>
-        <li>Translated technical constraints into user decisions — directly transferable to making CMMC and NIST requirements actionable for non-technical stakeholders</li>
+        <li>Translated technical constraints into user decisions — directly transferable to making security findings and threat intelligence actionable for non-technical stakeholders</li>
       </ul>
     </div>
 
@@ -154,39 +155,34 @@ body { font-family: 'Open Sans', sans-serif; font-size: 10.5pt; color: var(--tex
     <div class="section-title">Published Research &amp; Security Tools</div>
 
     <div class="portfolio-item">
-      <div class="p-title">Sublime Security · sublime-rules — Open Source Detection Rules</div>
-      <div class="p-url">github.com/sublime-security/sublime-rules/pull/4267</div>
-      <div class="p-desc">Authored two detection rules in active review for merge into Sublime's open-source production ruleset: Unicode homoglyph BEC detection and Glassworm invisible Unicode payload detection. Both backed by independent threat analysis published on portfolio.</div>
+      <div class="p-title">ArgusX — Threat Intelligence Platform Build</div>
+      <div class="p-url">yanaivanov.com/writing/argusx-field-notes.html</div>
+      <div class="p-desc">Field notes on building independent threat intel platform from scratch. Multi-source ingestion, AI classification at $0.27/month, 61,000+ auto-detected relationships. Solo build with no engineering budget.</div>
     </div>
     <div class="portfolio-item">
-      <div class="p-title">Ladon · document_triage.py — Static Analysis Tool</div>
-      <div class="p-url">yana-ivanov.github.io/cybersecurity-portfolio/labs/lab_log_011.html</div>
-      <div class="p-desc">Authored static-analysis tool for pre-click PDF and calendar-invite triage. Validated against 5 confirmed malicious samples including ValleyRAT (Chinese APT), Gamaredon (Russian FSB), and live phishing that bypassed Gmail. Zero false negatives, zero false positives. Published IOCs to ThreatFox.</div>
+      <div class="p-title">Apple Watch as Nation-State Attack Surface</div>
+      <div class="p-url">yanaivanov.com/analysis/apple_watch_threat_analysis.html</div>
+      <div class="p-desc">Original threat research on nation-state actors exploiting Apple Watch always-on radio stack and inherited Wi-Fi trust relationships. Three documented attack chains with MITRE ATT&amp;CK mapping. Identifies policy gap leaving boardrooms unprotected.</div>
+    </div>
+    <div class="portfolio-item">
+      <div class="p-title">60 Seconds — North Korean npm Supply Chain Hijack</div>
+      <div class="p-url">yanaivanov.com/analysis/sixty_seconds.html</div>
+      <div class="p-desc">UNC1069 (BlueNoroff/Lazarus) compromised the axios npm maintainer account, injecting WAVESHAPER.V2 cross-platform RAT into releases with 100M+ weekly downloads. Three-hour exposure window. Attack reconstruction and four detection gaps analyzed.</div>
+    </div>
+    <div class="portfolio-item">
+      <div class="p-title">Sublime Security · Open Source Detection Rules</div>
+      <div class="p-url">github.com/sublime-security/sublime-rules/pull/4267</div>
+      <div class="p-desc">Two detection rules authored for Sublime's open-source production ruleset: Unicode homoglyph BEC detection and Glassworm invisible Unicode payload detection. Currently in active review with Sublime engineer.</div>
+    </div>
+    <div class="portfolio-item">
+      <div class="p-title">Ladon · Document Security Analyzer</div>
+      <div class="p-url">yanaivanov.com/labs/lab_log_011.html</div>
+      <div class="p-desc">Static analysis tool for PDF and calendar invite triage. Validated against 5 malicious samples including ValleyRAT (Chinese APT), Gamaredon (Russian FSB-linked APT), and live phishing that bypassed Gmail. Zero false negatives. IOCs published to ThreatFox.</div>
     </div>
     <div class="portfolio-item">
       <div class="p-title">Volt Typhoon — Living Off the Land</div>
-      <div class="p-url">yana-ivanov.github.io/cybersecurity-portfolio/analysis/Volt_Typhoon_Analysis.html</div>
-      <div class="p-desc">China's APT campaign: years-long LOTL persistence inside US critical infrastructure. Attack chain analysis, detection gaps, and defensive recommendations.</div>
-    </div>
-    <div class="portfolio-item">
-      <div class="p-title">The Weakest Link — CMMC Supply Chain Analysis</div>
-      <div class="p-url">yana-ivanov.github.io/cybersecurity-portfolio/analysis/CMMC_Supply_Chain.html</div>
-      <div class="p-desc">MORSECORP $4.6M FCA settlement analysis, C3PAO cost data, 50/50 cost-sharing model, mandatory training recommendation for CT defense subcontractors.</div>
-    </div>
-    <div class="portfolio-item">
-      <div class="p-title">Lab Log 004 — Lumma Stealer Malware Analysis</div>
-      <div class="p-url">yana-ivanov.github.io/cybersecurity-portfolio/labs/lab_log_004.html</div>
-      <div class="p-desc">Custom Wireshark SOC profile. Browser fingerprinting, TLS credential exfiltration to .su C2 domain. 2.27MB confirmed exfiltrated. Zeek ssl.log revealed 4 additional C2 domains.</div>
-    </div>
-    <div class="portfolio-item">
-      <div class="p-title">zeek_triage.py — Automated IOC Detection</div>
-      <div class="p-url">yana-ivanov.github.io/cybersecurity-portfolio/labs/lab_log_006.html</div>
-      <div class="p-desc">Python automation for pcap triage. DHCP/Kerberos/HTTP/TLS analysis, KNOWN_BAD_DOMAINS matching, severity scoring. Zero external dependencies.</div>
-    </div>
-    <div class="portfolio-item">
-      <div class="p-title">CMMC Cybersecurity Awareness — 14-Module Training Tool</div>
-      <div class="p-url">yana-ivanov.github.io/cybersecurity-portfolio/training/CMMC_Training.html</div>
-      <div class="p-desc">Interactive employee training covering all CMMC 2.0 awareness domains. Scenario-based quizzes, real case studies, completion certificate.</div>
+      <div class="p-url">yanaivanov.com/analysis/Volt_Typhoon_Analysis.html</div>
+      <div class="p-desc">China's APT campaign targeting US critical infrastructure using LOTL techniques. Years-long persistence, audit log deletion patterns, detection gaps in standard SIEM rules, defensive recommendations.</div>
     </div>
 
   </div>
@@ -207,15 +203,6 @@ body { font-family: 'Open Sans', sans-serif; font-size: 10.5pt; color: var(--tex
       <div class="cert-name">CompTIA Security+<br>SY0-701</div>
       <div class="cert-status progress">In Progress</div>
     </div>
-    <div class="cert-item">
-      <div class="cert-name">Azure Fundamentals<br>AZ-900</div>
-      <div class="cert-status progress">In Progress</div>
-    </div>
-    <div class="cert-item">
-      <div class="cert-name">Azure Security Engineer<br>AZ-500</div>
-      <div class="cert-status planned">Planned</div>
-    </div>
-
     <div class="section-title">Education</div>
     <div class="cert-item">
       <div class="cert-name">MS Information Systems &amp; Management</div>
@@ -226,45 +213,55 @@ body { font-family: 'Open Sans', sans-serif; font-size: 10.5pt; color: var(--tex
       <div class="cert-status earned">Fashion Institute of Technology</div>
     </div>
 
-    <div class="section-title">Compliance &amp; Frameworks</div>
+    <div class="section-title">Threat Intelligence</div>
     <ul class="skill-list">
-      <li>CMMC 2.0</li>
-      <li>NIST 800-171</li>
-      <li>CUI / DFARS / SPRS</li>
-      <li>FCA liability</li>
-      <li>Supply chain risk</li>
-      <li>DoD 8570 / 8140</li>
-      <li>RMF awareness</li>
+      <li>IOC enrichment</li>
+      <li>Threat classification</li>
+      <li>MITRE ATT&amp;CK</li>
+      <li>OSINT</li>
+      <li>Threat actor attribution</li>
+      <li>Capability commodification</li>
     </ul>
 
-    <div class="section-title">Cloud &amp; Identity</div>
+    <div class="section-title">Detection &amp; Analysis</div>
     <ul class="skill-list">
-      <li>Azure fundamentals</li>
-      <li>FedRAMP</li>
-      <li>IAM / M365 security</li>
-      <li>Cloud security concepts</li>
+      <li>Detection content design</li>
+      <li>Behavioral patterns</li>
+      <li>Malware traffic analysis</li>
+      <li>pcap parsing</li>
+      <li>Log analysis</li>
+      <li>Executive briefing</li>
     </ul>
 
-    <div class="section-title">Security Tools</div>
+    <div class="section-title">AI-Augmented Development</div>
     <ul class="skill-list">
+      <li>Prompt engineering</li>
+      <li>System architecture</li>
+      <li>Code validation</li>
+      <li>AI-directed implementation</li>
+    </ul>
+
+    <div class="section-title">Tools &amp; Data</div>
+    <ul class="skill-list">
+      <li>SQL / PostgreSQL</li>
+      <li>Supabase</li>
       <li>Wireshark / Zeek</li>
       <li>Nmap / tcpdump</li>
       <li>Docker / Kali Linux</li>
       <li>Linux CLI / GPG</li>
-      <li>Python automation</li>
-      <li>pcap analysis</li>
+      <li>Python (read/modify/validate)</li>
+      <li>JavaScript / Git</li>
     </ul>
 
-    <div class="section-title">Target Employers</div>
+    <div class="section-title">Targeting Roles</div>
     <ul class="target-list">
-      <li>Electric Boat / GD</li>
-      <li>Pratt &amp; Whitney / RTX</li>
-      <li>Sikorsky / Lockheed</li>
-      <li>Peraton / SAIC / Leidos</li>
-      <li>Curtiss-Wright</li>
-      <li>CMMC C3PAO firms</li>
+      <li>Threat Intelligence Analyst</li>
+      <li>Detection Content Developer</li>
+      <li>Threat Researcher</li>
+      <li>SOC Analyst (Tier 2)</li>
+      <li>Security Researcher</li>
     </ul>
-    <div class="target-note">Seeking clearance sponsorship and team-based learning environment.</div>
+    <div class="target-note">Open to remote, hybrid CT/NY, or CT defense industrial base. Available for clearance sponsorship.</div>
 
     <div class="section-title">Languages</div>
     <ul class="skill-list">

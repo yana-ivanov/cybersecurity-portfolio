@@ -232,9 +232,9 @@ footer a:hover{color:#93c5fd}
   <div class="section summary">
     <div class="section-num">Profile</div>
     <h2>Professional Summary</h2>
-    <p>Security analyst transitioning into defense supply chain cybersecurity, with 15+ years of enterprise technology experience and an MS in Information Systems. Currently pursuing CompTIA Security+ certification with a planned path through CMMC Registered Practitioner. Focused on NIST 800-171, CUI handling, DFARS compliance, and FCA liability considerations for the Connecticut defense industrial base. Combines hands-on network security lab work with published threat analysis and the ability to translate complex compliance requirements into actionable guidance for non-technical leadership. Seeking a role at a CT defense contractor with a path to security clearance sponsorship.</p>
+    <p>Cybersecurity professional focused on threat intelligence and detection content development, with 15+ years of enterprise technology experience and an MS in Information Systems. Currently building <strong>ArgusX</strong>, an independent threat intelligence platform aggregating, classifying, and correlating threat data from 20+ public and vendor research sources to enable predictive threat analysis. Combines hands-on threat analysis with AI-augmented development workflow — architecting systems, designing detection logic, and shipping working tools while using modern AI assistants for implementation. Russian/English bilingual; CompTIA Security+ scheduled June 2026.</p>
     <div class="callout">
-      <p>Most compliance professionals understand the frameworks. Few can analyze a live Lumma Stealer pcap, identify C2 beaconing, and write a threat brief a program manager will act on. I bridge that gap.</p>
+      <p>Most candidates studying for Security+ have a homelab. I have a working threat intelligence platform ingesting 1,000+ posts/day, classifying threats by category, and tracking nation-state actors. The work itself is the credential.</p>
     </div>
   </div>
 
@@ -250,14 +250,6 @@ footer a:hover{color:#93c5fd}
         <span class="cert-status-text progress">In Progress · Target June 2026</span>
       </li>
       <li>
-        <span class="cert-name-text">Azure Fundamentals AZ-900</span>
-        <span class="cert-status-text progress">In Progress</span>
-      </li>
-      <li>
-        <span class="cert-name-text">Azure Security Engineer AZ-500</span>
-        <span class="cert-status-text planned">Planned</span>
-      </li>
-      <li>
         <span class="cert-name-text">MS Information Systems &amp; Management — Golden Gate University</span>
         <span class="cert-status-text earned">Graduate</span>
       </li>
@@ -270,24 +262,28 @@ footer a:hover{color:#93c5fd}
     <h3 style="font-family:var(--mono);font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);font-weight:600;margin-bottom:1rem">Technical Skills</h3>
 
     <div class="skill-block">
-      <div class="skill-cat">Compliance &amp; Frameworks</div>
-      <div class="skill-val">CMMC 2.0 · NIST 800-171 · CUI · DFARS · SPRS · FCA liability · supply chain risk · DoD 8570/8140 · RMF awareness</div>
+      <div class="skill-cat">Threat Intelligence</div>
+      <div class="skill-val">IOC enrichment · threat classification · MITRE ATT&amp;CK · OSINT · threat actor attribution · capability commodification analysis · trigger-based forecasting</div>
     </div>
     <div class="skill-block">
-      <div class="skill-cat">Cloud &amp; Identity</div>
-      <div class="skill-val">Azure fundamentals · FedRAMP · IAM · M365 security · cloud security concepts</div>
+      <div class="skill-cat">Detection &amp; Analysis</div>
+      <div class="skill-val">Detection content design · rules logic · behavioral patterns · malware traffic analysis · log analysis · pcap parsing · executive briefing</div>
+    </div>
+    <div class="skill-block">
+      <div class="skill-cat">AI-Augmented Development</div>
+      <div class="skill-val">Prompt engineering · system architecture · code validation · AI-directed implementation · ships production tools using AI development assistants</div>
+    </div>
+    <div class="skill-block">
+      <div class="skill-cat">Data &amp; Tooling</div>
+      <div class="skill-val">SQL/PostgreSQL · Supabase · Python (read/modify/validate) · JavaScript · Git · RSS/API ingestion · data classification taxonomy</div>
     </div>
     <div class="skill-block">
       <div class="skill-cat">Security Tools</div>
       <div class="skill-val">Wireshark · Zeek · Nmap · tcpdump · GPG · Linux CLI · Docker · Kali Linux</div>
     </div>
     <div class="skill-block">
-      <div class="skill-cat">Analysis</div>
-      <div class="skill-val">Threat intelligence · malware traffic analysis · IOC detection · executive briefing · compliance gap analysis</div>
-    </div>
-    <div class="skill-block">
-      <div class="skill-cat">Development</div>
-      <div class="skill-val">Python automation · AI-assisted development · pcap parsing · network log analysis</div>
+      <div class="skill-cat">Languages</div>
+      <div class="skill-val">English (native) · Russian (native) — relevant for nation-state actor analysis and threat research</div>
     </div>
   </div>
 
@@ -298,20 +294,24 @@ footer a:hover{color:#93c5fd}
 
     <div class="portfolio-featured">
       <div class="portfolio-card">
+        <a href="writing/argusx-field-notes.html">ArgusX — Threat Intelligence Platform Build</a>
+        <div class="p-desc">Field notes on building an independent threat intelligence platform from scratch. Multi-source ingestion, AI-driven classification at $0.27/month, 61,000+ auto-detected relationships. Solo build documenting methodology, architectural decisions, and what it takes to ship a working threat intel system without an engineering budget.</div>
+      </div>
+      <div class="portfolio-card">
+        <a href="analysis/apple_watch_threat_analysis.html">The Trusted Device in the Room — Apple Watch as Nation-State Attack Surface</a>
+        <div class="p-desc">Original threat research analyzing how nation-state actors targeting AI/ML intellectual property could exploit Apple Watch's always-on radio stack, inherited Wi-Fi trust relationships, and iCloud persistence layer. Three documented attack chains with MITRE ATT&amp;CK mapping. Identifies the policy gap that leaves boardrooms unprotected where SCIFs are not.</div>
+      </div>
+      <div class="portfolio-card">
+        <a href="analysis/sixty_seconds.html">60 Seconds — How North Korea Hijacked a Library Used by 100M Developers</a>
+        <div class="p-desc">UNC1069 (BlueNoroff/Lazarus) compromised the axios npm maintainer account and injected WAVESHAPER.V2 — a cross-platform RAT — into two releases with 100M+ weekly downloads. Three-hour exposure window. This report reconstructs the attack traffic, explains four detection gaps, and challenges assumptions about UNC1069 and TeamPCP operational separation.</div>
+      </div>
+      <div class="portfolio-card">
         <a href="analysis/Volt_Typhoon_Analysis.html">Volt Typhoon — Living Off the Land</a>
-        <div class="p-desc">China's APT campaign: years-long LOTL persistence inside US critical infrastructure. Attack chain analysis, detection gaps, and defensive recommendations.</div>
+        <div class="p-desc">China's APT campaign targeting US critical infrastructure using LOTL techniques. Years-long persistence inside defended networks. Audit log deletion patterns, detection gaps in standard SIEM rules, and defensive recommendations for organizations facing similar threats.</div>
       </div>
       <div class="portfolio-card">
-        <a href="analysis/CMMC_Supply_Chain.html">The Weakest Link — CMMC Supply Chain Analysis</a>
-        <div class="p-desc">MORSECORP $4.6M FCA settlement analysis, C3PAO cost data, 50/50 cost-sharing model, mandatory training recommendation for CT defense subcontractors.</div>
-      </div>
-      <div class="portfolio-card">
-        <a href="labs/lab_log_004.html">Lab Log 004 — Lumma Stealer Malware Analysis</a>
-        <div class="p-desc">Custom Wireshark SOC profile built from scratch. Browser fingerprinting, TLS credential exfiltration to .su C2 domain. 2.27MB confirmed exfiltrated. Zeek ssl.log revealed 4 additional C2 domains invisible to Wireshark.</div>
-      </div>
-      <div class="portfolio-card">
-        <a href="training/CMMC_Training.html">CMMC Cybersecurity Awareness — 14-Module Training Tool</a>
-        <div class="p-desc">Interactive employee training covering all CMMC 2.0 awareness domains. Scenario-based quizzes, real case studies, completion certificate. Designed for defense contractor workforce onboarding.</div>
+        <a href="labs/lab_log_011.html">Lab Log 011 — Ladon Validated Against Real-World Malware</a>
+        <div class="p-desc">Document security analyzer validated against five malicious PDFs — Gamaredon (Russian APT), ValleyRAT/SilverFox (Chinese APT), Facebook credential phishing, an unknown dropper, and a live job scam. Every file passed Gmail. Every file had a Windows PE executable hidden inside. Polyglot detection in practice.</div>
       </div>
     </div>
 
@@ -343,15 +343,17 @@ footer a:hover{color:#93c5fd}
 
     <div class="exp-item">
       <div class="exp-header">
-        <h3>Founder &amp; CMMC Compliance Consultant</h3>
+        <h3>Founder &amp; Independent Security Researcher</h3>
         <span class="exp-dates">2023 – Present</span>
       </div>
-      <div class="exp-company">SiteWave Studio · Milford, CT</div>
+      <div class="exp-company">SiteWave Studio LLC · Milford, CT</div>
       <ul class="exp-bullets">
-        <li>Developed 14-module CMMC cybersecurity awareness training covering all CMMC 2.0 domains — scenario-based quizzes, real case studies, and completion certificate designed for defense contractor workforce onboarding</li>
-        <li>Published professional-grade threat analysis reports on Volt Typhoon, CMMC supply chain FCA liability, and coordinated infrastructure attack scenarios as independent contributions to the defense community</li>
-        <li>Built open-source security tools: browser-based pcap analyzer, CVSS calculator, Glassworm detector, and zeek_triage.py automated IOC detection script with zero external dependencies</li>
-        <li>Conducted hands-on malware traffic analysis using Wireshark and Zeek — identified Lumma Stealer C2 infrastructure, confirmed 2.27MB credential exfiltration, and mapped TLS-encrypted domains invisible to standard filters</li>
+        <li>Operating LLC as parent entity for independent security research, threat intelligence platform development, detection content authoring, and small business digital advisory work</li>
+        <li>Building <strong>ArgusX</strong> — independent threat intelligence platform aggregating, classifying, and correlating threat data from 20+ public and vendor research sources. Methodology focuses on capability commodification analysis (tracking how nation-state tools cascade to criminal use) and trigger-based threat forecasting. Live system; architecture and demo available under NDA during interview process</li>
+        <li>Published threat analyses spanning nation-state operations (Volt Typhoon LOTL, Apple Watch as nation-state attack surface, UNC1069/Lazarus npm supply chain), criminal infrastructure (TeamPCP Telnyx steganography, Glassworm Unicode supply chain, Lumma Stealer), and identity/credential research (38 breaches study, LinkedIn verification gap)</li>
+        <li>Authored open-source detection content: two pull requests to Sublime Security's detection rule repository (Glassworm Unicode payload, homoglyph BEC); document_triage.py / Ladon static analysis tool validated against five confirmed malicious samples including Gamaredon (Russian FSB-linked APT), ValleyRAT/SilverFox (Chinese APT), and a live phishing campaign that bypassed Gmail</li>
+        <li>Conducted hands-on malware traffic analysis using Wireshark and Zeek — identified Lumma Stealer C2 infrastructure, confirmed 2.27MB credential exfiltration, mapped TLS-encrypted C2 domains invisible to standard filters</li>
+        <li>Maintains web design and digital advisory services for small business clients as separate revenue stream</li>
       </ul>
     </div>
 
@@ -376,7 +378,7 @@ footer a:hover{color:#93c5fd}
       <ul class="exp-bullets">
         <li>Accelerated project delivery 30%+ by establishing reusable design framework adopted across the full product team</li>
         <li>Led complex B2B analytics product design from discovery through developer handoff for media measurement clients making multi-million dollar advertising decisions</li>
-        <li>Translated technical constraints into user decisions — directly transferable to making CMMC and NIST requirements actionable for non-technical stakeholders</li>
+        <li>Translated technical constraints into user decisions — directly transferable to making security findings and threat intelligence actionable for non-technical stakeholders</li>
       </ul>
     </div>
 
