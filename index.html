@@ -1032,9 +1032,20 @@ function updateLatestReportCard() {
   const isAll = activeFilter === 'all' && document.getElementById('searchInput').value.trim() === '';
   const accent = card.querySelector('.card-accent');
   const badge = card.querySelector('.card-featured-badge');
+  const isMobile = window.innerWidth <= 680;
   if (isAll) {
     card.classList.add('card-featured');
-    if (accent) { accent.style.width = '4px'; accent.style.height = 'auto'; accent.style.minHeight = '100%'; }
+    if (accent) {
+      if (isMobile) {
+        accent.style.width = '100%';
+        accent.style.height = '3px';
+        accent.style.minHeight = '';
+      } else {
+        accent.style.width = '4px';
+        accent.style.height = 'auto';
+        accent.style.minHeight = '100%';
+      }
+    }
     if (badge) badge.style.display = '';
   } else {
     card.classList.remove('card-featured');
