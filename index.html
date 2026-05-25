@@ -1067,7 +1067,9 @@ function filterPortfolio() {
     const title = (item.dataset.title || '').toLowerCase();
     const cardText = item.textContent.toLowerCase();
     const isSoon = item.classList.contains('card-soon');
-    const matchesFilter = activeFilter === 'all' || tags.split(/\s+/)[0] === activeFilter;
+    const SECTION_FILTERS = ['threat-analysis', 'tools', 'lab', 'fieldnotes', 'training'];
+    const isSectionFilter = SECTION_FILTERS.includes(activeFilter);
+    const matchesFilter = activeFilter === 'all' || (isSectionFilter ? tags.split(/\s+/)[0] === activeFilter : tags.includes(activeFilter));
     const matchesSearch = !query || title.includes(query) || tags.includes(query) || cardText.includes(query);
 
     if (isSoon) {
