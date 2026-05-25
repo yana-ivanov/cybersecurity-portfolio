@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShinyHunters Operational Lifecycle — A Threat Actor as a Process | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT GRID ── */
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper)}
+.stat-num-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-num-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-num-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── ATTACK CHAIN ── */
+.attack-chain{margin:1rem 0;display:flex;flex-direction:column;gap:0}
+.chain-step{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;align-items:start;position:relative;padding-bottom:1.25rem}
+.chain-step:last-child{padding-bottom:0}
+.chain-step::before{content:'';position:absolute;left:1.2rem;top:2.5rem;bottom:0;width:2px;background:var(--rule)}
+.chain-step:last-child::before{display:none}
+.chain-num{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.chain-normal .chain-num{background:var(--bg);border:2px solid var(--rule);color:var(--ink3)}
+.chain-warning .chain-num{background:var(--amber-dim);border:2px solid var(--amber);color:var(--amber)}
+.chain-danger .chain-num{background:var(--red-dim);border:2px solid var(--red);color:var(--red)}
+.chain-body{padding-top:.4rem}
+.chain-label{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.25rem;letter-spacing:.02em}
+.chain-warning .chain-label{color:var(--amber)}
+.chain-danger .chain-label{color:var(--red)}
+.chain-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── SPLIT VISUAL ── */
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+
+/* ── TIMELINE ── */
+.timeline{margin:1.5rem 0;position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:.45rem;top:0;bottom:0;width:2px;background:var(--rule)}
+.tl-item{position:relative;margin-bottom:1.25rem;padding-left:1.25rem}
+.tl-item::before{content:'';position:absolute;left:-1.6rem;top:.4rem;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tl-date{font-family:var(--mono);font-size:.62rem;color:var(--red);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem}
+.tl-title{font-weight:700;color:var(--ink);font-size:.9rem;margin-bottom:.2rem;font-family:var(--display)}
+.tl-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── FINDINGS LIST ── */
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--amber);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--amber-dim);color:var(--amber)}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .split-visual{grid-template-columns:1fr}
+  .figure-body{padding:1.25rem 1rem}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .figure-body{padding:1rem .85rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.62rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-num-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .tbl-wrap{font-size:.75rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<header class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-kicker">Threat Intelligence Analysis · Operational Lifecycle</div>
+
+    <h1 class="title">A Threat Actor as a Process — <em>The ShinyHunters Operational Lifecycle</em></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">May 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Actor Cluster</div><div class="value">UNC6040 / UNC6240</div></div>
+      <div class="meta-item"><div class="label">Active Campaign</div><div class="value">Apr–May 2026</div></div>
+      <div class="meta-item"><div class="label">Severity</div><div class="value">High · Active</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    39 mentions in 8 weeks · 8+ industries · US · UK · Canada · EU · Australia hit · FBI PSA issued May 15
+  </div>
+</header>
+
+<!-- SECTION 01 — EXECUTIVE SUMMARY -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>Between April and May 2026, the threat actor known as ShinyHunters compromised organizations across at least eight different industries in eight weeks. The victim list spans the English-speaking world and beyond: 7-Eleven, Vimeo, Medtronic, ADT, Udemy, Rockstar Games, McGraw Hill, Vercel, Aura Identity Protection, Grafana, Zara, and Instructure — the parent company of Canvas, the learning management system used by over 9,000 educational institutions in the United States, United Kingdom, Canada, Australia, New Zealand, and parts of Europe. Adjacent public reporting documents additional major targets including the European Commission (350 GB exfiltrated), TELUS Digital in Canada (claimed at 1 petabyte), Harvard's Alumni Affairs office (November 2025), Coinbase, and Australian carrier Qantas. By May 15, the FBI had issued a Public Service Announcement specifically naming the group. By May 12, Instructure had reportedly reached a ransom agreement to prevent the leak of 3.65TB of stolen data.</p>
+
+  <p>Across 39 mainstream news articles tracking the campaign in my dataset, the word "extortion" appears 14 times. The word "OAuth" appears zero times. The phrase "Data Loader" appears zero times. The mechanism that makes every one of these attacks possible — OAuth Device Flow abuse against cloud SaaS platforms — is invisible in the coverage of the attacks it enables.</p>
+
+  <p>What follows is an attempt to reconstruct the operational lifecycle of ShinyHunters as a process — not as a series of breaches, but as a repeatable methodology that explains why the attacks work, why they are accelerating, and why traditional security controls miss them.</p>
+
+  <div class="stat-num-grid">
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">39</div>
+      <div class="stat-num-label">Posts in 8 weeks</div>
+      <div class="stat-num-sub">April – May 2026 · primary data sample</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">8+</div>
+      <div class="stat-num-label">Industries Hit</div>
+      <div class="stat-num-sub">Retail · Edu · Tech · Healthcare · Gaming · Media · Insurance · Security</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">14 / 0</div>
+      <div class="stat-num-label">Extortion vs OAuth Mentions</div>
+      <div class="stat-num-sub">News coverage explains outcomes, not mechanisms</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">3.65 TB</div>
+      <div class="stat-num-label">Canvas Ransom Paid</div>
+      <div class="stat-num-sub">Instructure agreement May 12 · largest education breach on record</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 02 — BACKGROUND -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>From Forum Crew to SaaS Extortion Brand</h2>
+
+  <p>ShinyHunters first appeared in May 2020, posting over 200 million stolen user records for sale on cybercrime forums in a roughly two-week period. The targets included Tokopedia — an Indonesian e-commerce giant — and Unacademy, an Indian education platform. The group's avatar on those forums was a shiny Umbreon, a rare variant of a Pokémon. The name is believed to be derived from "shiny hunting," the practice in the Pokémon video game franchise of seeking out rare colored variants of common creatures. The cultural reference dates the operators: people who were kids in the late 1990s and early 2000s, now in their twenties and thirties.</p>
+
+  <p>For their first four years, ShinyHunters operated within a traditional cybercrime model — breach, exfiltrate, sell. Datasets appeared on Raid Forums and later BreachForums. Buyers were other cybercriminals. The group accumulated an extensive victim list including Microsoft (claimed but disputed), AT&T, Wattpad, and the University of Pennsylvania.</p>
+
+  <p>In 2024, the operational model changed. The pivot was not toward more sophisticated malware. It was toward a different attack surface entirely: enterprise SaaS platforms accessed through social engineering. The new model dropped malware almost entirely. There was no encryption payload. There was no traditional exploit. There was a phone call, an OAuth flow, and a trojanized version of a legitimate cloud administration tool.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Analyst note:</strong> The 2024 pivot was not random. It tracked the maturity gap between cloud SaaS adoption (which accelerated rapidly during and after the pandemic) and cloud-specific security maturity (which did not keep pace). Companies bought Salesforce, Snowflake, Workday, and similar platforms quickly. Security teams stayed focused on the traditional perimeter: endpoint protection, firewalls, network monitoring. The SaaS attack surface was largely unguarded. ShinyHunters moved into the gap.</p>
+  </div>
+
+  <h3>The Brand-vs-Group Reality</h3>
+
+  <p>One of the most important things to understand about ShinyHunters in 2026 is that "ShinyHunters" is no longer a fixed group. It is a brand. Google's Threat Intelligence Group (GTIG) tracks the relevant activity under at least two cluster names — UNC6040 for the initial-access operations and UNC6240 for the extortion follow-on. Google has not confirmed whether these clusters are operated by the same individuals. The ShinyHunters name appears to function as a marketing layer applied to operations that may be coordinated, may be loosely affiliated, or may simply share the brand for the pressure it generates.</p>
+
+  <p>In April 2026, a breach of the development platform Vercel was carried out by an entity claiming to be ShinyHunters. The leadership associated with the original ShinyHunters denied involvement. Anyone can claim the brand. The brand carries weight because the underlying operations have produced enough damage that victims take any extortion email signed "ShinyHunters" seriously.</p>
+
+  <p>This matters analytically because attribution at the group level is less meaningful than attribution at the ecosystem level. The operators behind any given ShinyHunters-branded campaign may belong to multiple overlapping crews within a broader English-speaking cybercrime subculture commonly referred to as "The Com." Public reporting documents membership overlap and operational collaboration between ShinyHunters, Scattered Spider, and the remnants of LAPSUS$. Brian Krebs grouped them together in an April 8, 2026 piece titled "Please Don't Feed the Scattered Lapsus ShinyHunters." That framing is not casual. It reflects the operational reality. EclecticIQ analysts have separately reported that the operator known as ShinyCorp — alleged ShinyHunters leadership — has recruited cybercriminals through Scattered Spider affiliates and other Com-ecosystem actors, with members reportedly operating interchangeably across multiple cybercrime groups.</p>
+
+  <p>The targeting scope has also expanded internationally. While early 2020-2023 ShinyHunters activity hit Western targets opportunistically, the 2024-2026 campaigns have produced confirmed or claimed breaches against organizations headquartered in the United States, United Kingdom, Canada (TELUS Digital, claimed at 1 petabyte), the European Union (the European Commission itself, 350 GB), and Australia (Qantas). The English-speaking attribution holds at the operator level. The victim scope is the entire English-speaking world plus EU institutions where English is the working language.</p>
+
+  <h3>The Timeline From 2020 to Now</h3>
+
+  <div class="figure">
+    <div class="figure-title">Figure 1 — ShinyHunters Evolution · 2019 to May 2026</div>
+    <div class="figure-body">
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-date">2019 — Origins</div>
+          <div class="tl-title">Group forms on cybercrime forums</div>
+          <div class="tl-desc">Operators meet on Raid Forums and adjacent English-speaking cybercrime communities. The Pokémon-themed branding signals the demographic and cultural origin.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">May 2020 — Breakout</div>
+          <div class="tl-title">200 million records posted in two weeks</div>
+          <div class="tl-desc">Tokopedia, Unacademy, and over a dozen other companies are listed for sale. ShinyHunters becomes a recognized brand in cybercrime markets.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">2020 – 2023 — Accumulation</div>
+          <div class="tl-title">Traditional breach-and-sell model</div>
+          <div class="tl-desc">Microsoft (claimed/disputed), AT&T, Wattpad, and other major brands appear in the ShinyHunters victim portfolio. Datasets sold on BreachForums and successors. The model is data theft followed by direct sale or auction.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">2022 — First arrest</div>
+          <div class="tl-title">Sébastien Raoult extradited to US</div>
+          <div class="tl-desc">A French national linked to ShinyHunters activity is arrested in Morocco, extradited to the United States, and ultimately sentenced to 3 years and $5 million in restitution in January 2024. The arrest does not disrupt operations. The brand continues.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">2024 — The pivot</div>
+          <div class="tl-title">Shift to cloud SaaS extortion</div>
+          <div class="tl-desc">The operating model changes from data sale to victim extortion. Voice phishing replaces phishing emails. OAuth abuse replaces credential theft. Salesforce becomes the primary target platform. Luxury goods, airlines, insurance, and e-commerce sectors are hit. AT&T is breached with over 110 million customer records stolen — a ransom is ultimately paid, demonstrating the new model works.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">June 2025 — Four more arrests</div>
+          <div class="tl-title">French law enforcement detains additional affiliates</div>
+          <div class="tl-desc">Four additional individuals are arrested in France. The pattern of Western European arrests continues. Operations again do not pause.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">September 2025 — Aura Campaign begins</div>
+          <div class="tl-title">Mass exploitation of Salesforce Experience Cloud misconfigurations</div>
+          <div class="tl-desc">A campaign exploiting misconfigured Salesforce Experience Cloud guest user profiles begins. The campaign runs quietly until March 2026, when public disclosure occurs. Approximately 300-400 organizations are eventually affected. The campaign weaponizes AuraInspector — a defensive tool released by Mandiant in January 2026 specifically to help administrators find these misconfigurations.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">April 2026 — Active campaign accelerates</div>
+          <div class="tl-title">Multiple major breaches in rapid succession</div>
+          <div class="tl-desc">Rockstar Games (78.6 million records via cloud analytics platform), McGraw Hill (13.5 million accounts via Salesforce misconfiguration), ADT, Medtronic, Vimeo, Udemy, Aura Identity Protection. The cascade structure is visible: one upstream SaaS compromise enables multiple downstream victim impacts.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">May 2026 — Federal response</div>
+          <div class="tl-title">FBI PSA, congressional testimony, and ransom payment</div>
+          <div class="tl-desc">Canvas login portals are defaced at 330 educational institutions on May 7. Instructure reaches a reported ransom agreement by May 12. Congress requests testimony. The FBI issues PSA I-051526-PSA on May 15 specifically naming ShinyHunters and warning of harassment tactics including threatening calls to victims' families.</div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Reconstructed from public reporting across security journalism, vendor analyses, and government disclosures.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 03 — THE ATTACK CHAIN -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>The Operational Lifecycle</h2>
+
+  <p>Most documented ShinyHunters operations in the 2024-2026 era follow a consistent post-compromise playbook. The entry point varies — voice phishing, supply-chain token theft, misconfiguration scanning — but once access is established, the remaining steps are stable enough that they can be described as a single repeatable lifecycle.</p>
+
+  <p>Reading the steps below, the natural reaction is: I would never fall for this. That reaction is correct in one sense and dangerously wrong in another. Most people would not fall for it. But Salesforce administrators at large companies are not most people. They authorize connected apps routinely as part of their normal job. They receive IT support calls that reference real internal projects, real names, real technical problems. By the time the malicious code is entered, the call has been indistinguishable from legitimate IT support for ninety seconds. The red flag never appears because nothing about the procedure is technically wrong. Only the person on the phone is wrong, and that is invisible.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 2 — Operational Lifecycle · OAuth Device Flow Abuse Path (MITRE T1539 · T1598 · T1078 · T1567)</div>
+    <div class="figure-body">
+      <div class="attack-chain">
+        <div class="chain-step chain-normal">
+          <div class="chain-num">01</div>
+          <div class="chain-body">
+            <div class="chain-label">Passive Reconnaissance</div>
+            <div class="chain-desc">Public information is collected from LinkedIn, job postings, company press releases, support forums, and breach databases. Target Salesforce administrators are identified by role. Internal IT staff names are mapped. Recent technical projects are inferred from job postings and conference talks. The reconnaissance phase does not touch the target's systems and produces no logs to detect.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">02</div>
+          <div class="chain-body">
+            <div class="chain-label">Vishing Call with Authority Pretext</div>
+            <div class="chain-desc">A voice phishing call is placed to the target administrator. The caller impersonates internal IT support, uses the names of real IT staff and recent project references gathered during reconnaissance, and frames the call as routine troubleshooting. The script is calibrated for a Salesforce administrator who receives similar calls legitimately.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">03</div>
+          <div class="chain-body">
+            <div class="chain-label">OAuth Device Flow Initiated by Attacker</div>
+            <div class="chain-desc">In parallel with the call, the attacker initiates an OAuth Device Authorization Flow from their own infrastructure. A short eight-character code is generated. This is the same authentication pattern used legitimately by smart TVs, GitHub CLI, and Microsoft device authentication — the brain pattern-matches it as routine.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">04</div>
+          <div class="chain-body">
+            <div class="chain-label">Victim Authorizes the Malicious App</div>
+            <div class="chain-desc">The administrator is directed to Salesforce's own legitimate connected app authorization page at login.salesforce.com/setup/connect. They enter the eight-character code provided over the phone. The authorization screen displays the app name "Data Loader" — Salesforce's real bulk-data tool. The administrator clicks Allow. From Salesforce's perspective, an admin authorized a Connected App. This happens routinely. There is nothing to flag.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">05</div>
+          <div class="chain-body">
+            <div class="chain-label">Persistent OAuth Token Issued</div>
+            <div class="chain-desc">Salesforce issues an access token to the attacker's instance. The token carries the administrator's full API permissions. Critically, the token does not expire when the administrator's browser session ends. It persists. The attacker can now read, export, and manipulate Salesforce data from anywhere, at any time, as long as the token remains valid. This step is the actual MFA bypass: the attack circumvents authentication entirely by targeting the authorization phase that occurs after login.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">06</div>
+          <div class="chain-body">
+            <div class="chain-label">Bulk Data Exfiltration via Legitimate API</div>
+            <div class="chain-desc">Customer records, sales pipeline data, contact lists, account information, and any other data the administrator could access are exported in bulk using Salesforce's official Data Loader API. The exfiltration uses legitimate authenticated API calls. From the platform's perspective, the activity looks like a normal Data Loader job run by an authorized admin. The exfiltration phase can move millions of records in minutes.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">07</div>
+          <div class="chain-body">
+            <div class="chain-label">Deliberate Gap Period</div>
+            <div class="chain-desc">Nothing happens publicly for weeks to months. The gap is not accidental — it is operationally deliberate. The delay cools logs, dilutes institutional memory of any related anomalies, and ensures that by the time extortion arrives, the technical evidence trail has aged past most organizations' retention windows. This is also when the data is sorted, classified, and prepared for monetization.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">08</div>
+          <div class="chain-body">
+            <div class="chain-label">Extortion Contact with 72-Hour Deadline</div>
+            <div class="chain-desc">An extortion email arrives, signed ShinyHunters. Contact channels include Tutanota email accounts (shinycorp@tuta.com, shinygroup@tuta.com) and Tox for ongoing negotiation. A small sample of the stolen data is provided as proof. Payment is demanded in Bitcoin within 72 hours. The 72-hour timeline is consistent across documented victims.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">09</div>
+          <div class="chain-body">
+            <div class="chain-label">Public Pressure and Harassment Escalation</div>
+            <div class="chain-desc">If payment does not arrive within the deadline, the data is posted on the ShinyHunters-branded data leak site. In documented escalations, attackers also contact employees directly via text and phone, harass family members, and in some cases conduct swatting attacks. The FBI's May 15, 2026 PSA specifically warned about these harassment tactics.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Lifecycle reconstructed from GTIG, Mandiant, Mitiga, Varonis, Vorlon, and Salesforce vendor reporting. Specific TTPs map to MITRE ATT&CK techniques T1598 (Phishing for Information), T1539 (Steal Web Session Cookie / OAuth Token), T1078 (Valid Accounts), T1567 (Exfiltration Over Web Service), T1530 (Data from Cloud Storage), T1557 (Adversary-in-the-Middle).</div>
+  </div>
+
+  <h3>The Aura Campaign Variant</h3>
+
+  <p>Not every ShinyHunters operation begins with a phone call. The Aura Campaign — running quietly since September 2025 before public disclosure in March 2026 — used a different entry path. The attackers scanned the internet for misconfigured Salesforce Experience Cloud guest user profiles. Where they found exposure, they weaponized a tool called AuraInspector to enumerate accessible data.</p>
+
+  <p>The detail worth pausing on is that AuraInspector is not an attacker tool by origin. Mandiant — Google's threat intelligence and incident response subsidiary — released AuraInspector in January 2026 specifically to help administrators find these misconfigurations and fix them before attackers did. Within months, the same tool was running on the attacker side. The defensive instrument and the offensive instrument were the same instrument. The difference was the speed at which each side moved.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The defender's dilemma:</strong> The Aura Campaign affected an estimated 300-400 organizations between September 2025 and March 2026. Mandiant's defensive tool was available in January 2026. The misconfigurations were findable by either side. Defenders moved on quarterly review cycles. Attackers moved on hours.</p>
+  </div>
+
+  <h3>The Supply Chain Cascade Variant</h3>
+
+  <p>The third variant is supply-chain-mediated. Rather than attacking victims directly, the operators compromise a SaaS platform that holds authentication tokens for many downstream customers. The April 2026 compromise of Anodot — a business analytics platform — provided access to at least thirteen large corporate customers including Snowflake, Rockstar Games, and Canvas Instructure. The Anodot incident is the same structural pattern that drove the Salesloft/Drift token abuse of August 2025 (roughly 760 downstream Salesforce customer organizations) and the Gainsight token abuse of November 2025 (more than 200 potentially impacted Salesforce instances).</p>
+
+  <p>The pattern is consistent enough to name. One upstream compromise generates many downstream victim incidents over the following weeks. The downstream victims often do not realize the original compromise was elsewhere — they see anomalous activity in their own environment and respond as if they were the primary target.</p>
+
+  <h3>The Canvas Variant — A Different Path</h3>
+
+  <p>Not every ShinyHunters operation in 2026 followed the OAuth-and-vishing playbook. The April-May 2026 Canvas breaches of Instructure used a different mechanism entirely: cross-site scripting vulnerabilities in the platform's Free-For-Teacher account program, which allowed account creation without institutional verification. The attackers escalated from there to administrative access and exfiltrated approximately 3.6 terabytes of data spanning roughly 275 million users at nearly 9,000 institutions. The second intrusion on May 7 defaced Canvas login portals at roughly 330 institutions including Harvard, Princeton, and the University of Pennsylvania, taking the platform offline during final exam periods at numerous universities.</p>
+
+  <p>The Canvas breaches matter for this analysis because they show that the ShinyHunters brand encompasses operators using different technical methods against different platforms. The OAuth Device Flow abuse playbook is the operational signature for Salesforce-class targets. Against Canvas, the attackers used a web application vulnerability in a poorly-secured account program. What stayed consistent across both attack paths was everything after exfiltration: the 72-hour deadline, the Bitcoin demand, the public defacement when negotiations stalled, the eventual ransom agreement. The post-compromise playbook is more stable than the entry technique.</p>
+
+</div>
+</div>
+
+<!-- SECTION 04 — KEY FINDINGS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>Key Findings</h2>
+
+  <p>Three findings emerged from the analysis that are worth foregrounding separately from the narrative reconstruction. Each is grounded either in the empirical pattern visible across the source coverage, in the cross-reference against the threat actor reference work I have been compiling, or in the structural reality of how the operations work.</p>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">Authentication Manipulation Has Replaced Malware as the Primary Attack Vector</div>
+        <div class="finding-desc">Across the documented ShinyHunters operations of 2024-2026, no malware is deployed on victim endpoints. There is no encryption payload. There is no traditional exploit. The compromise is achieved through OAuth Device Flow abuse, persistent token theft, and the operational use of legitimate SaaS administrative tools. Traditional security stacks — endpoint detection and response, antivirus, network intrusion prevention — are designed to catch malware and exploitation. ShinyHunters' methodology produces neither. The endpoint stays clean throughout the lifecycle. The detection burden shifts entirely to identity, OAuth grant monitoring, and SaaS-layer telemetry, which most organizations do not have at the depth that would catch this attack pattern.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">News Coverage Documents Outcomes But Not Mechanisms</div>
+        <div class="finding-desc">Across 39 mainstream news articles documenting the April-May 2026 ShinyHunters campaign in my source sample, the term "extortion" appears 14 times and "Canvas" or "Instructure" appears 13 times. The technical mechanism — "OAuth," "Data Loader," "device flow," "MFA bypass" — appears zero times in any article body. Coverage tells readers what happened (a major company was extorted) without explaining how the attack was possible (an administrator was tricked into authorizing a malicious OAuth Connected App via Salesforce's own legitimate authorization workflow). This creates a public understanding gap. Readers conclude that the attacks are mysterious or sophisticated when the actual mechanism is operationally simple and structurally documented. The gap matters for defenders because the executives who fund security programs read the same news coverage. They cannot prioritize what they do not understand.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+    <div class="finding fn-medium">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">Discovery-Driven Targeting Makes Any SaaS-Dependent Organization a Potential Victim</div>
+        <div class="finding-desc">The eight-plus industries hit during the April-May 2026 campaign — retail, education, technology, healthcare, gaming, media, insurance, consumer security services — share no common sector profile. The targeting pattern is not selected, it is discovered. Operators scan opportunistically across Salesforce instances, SaaS provider customer lists, and exposed cloud configurations. Whoever happens to be exploitable becomes the next victim. The implication is that the question is not whether an organization is interesting enough to attract this kind of attack. The question is whether its Salesforce or equivalent SaaS administration practices are visible enough to attract opportunistic discovery. For most organizations, that visibility is determined by configurations they have not reviewed in years.</div>
+        <span class="finding-tag">MEDIUM</span>
+      </div>
+    </div>
+  </div>
+
+  <p><strong>The empirical signature.</strong> Pulling the techniques most distinctive to this operational pattern from public reporting gives a five-technique cluster: T1539 (Steal Web Session Cookie), T1598 (Phishing for Information), T1078 (Valid Accounts), T1567 (Exfiltration Over Web Service), and T1530 (Data from Cloud Storage). Cross-referencing this cluster against MITRE ATT&CK's public group profiles, the authentication-manipulation pattern is operationally rare across documented threat actors. Among the actors I have compiled structured reference data on so far, only Scattered Spider has T1556 (Modify Authentication Process) in its MITRE profile, and only APT29 has T1528 (Steal Application Access Token). Both mappings are verifiable through MITRE ATT&CK at attack.mitre.org/groups/. The combination of social engineering, OAuth abuse, and cloud-native bulk exfiltration is concentrated in a small number of related crews within the English-speaking cybercrime ecosystem that Brian Krebs and others have referred to as "The Com." ShinyHunters is the most operationally active member of that ecosystem in 2026.</p>
+
+</div>
+</div>
+
+<!-- SECTION 05 — METHODOLOGY -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>How I Approached the Analysis</h2>
+
+  <p>For other analysts working through similar exercises — particularly those early in their cybersecurity journey — this section documents the methodology I used. It is the part I think is most useful as a learning artifact.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Started with what I did not know</div>
+        <div class="step-content-desc">My first move was not analysis. It was establishing baseline knowledge. The available coverage of ShinyHunters is fragmented across vendor blogs, security press, academic threat intelligence, and government advisories. Before forming any analytical view, I synthesized what is publicly known about the group across roughly twenty independent sources — origin, evolution, attribution disputes, current methodology, and documented victims. Skipping this step would have produced an analysis colored by whichever source I read most recently.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Pulled my own primary data</div>
+        <div class="step-content-desc">Working from a sample of 39 posts across 12 English-language sources spanning April 8 to May 20, 2026, anchors the analysis in observable patterns rather than secondary summarization. The sample produced empirical findings — the extortion-vs-OAuth mention gap, the source distribution, the temporal acceleration — that would not have been visible from any single article.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">Cross-referenced against my structured actor reference work</div>
+        <div class="step-content-desc">Alongside the post sample, I have been compiling a manually validated reference set of threat actors with structured TTP, malware, and attribution data — each entry hand-reviewed against MITRE ATT&CK and MISP source material. ShinyHunters is not yet in the reference set, which is part of why this analysis exists: producing the documentation that would justify an entry. Cross-referencing the empirical ShinyHunters TTPs against the existing entries revealed how unusual the technique cluster is. Only Scattered Spider, among the actors I have compiled to date, shares the authentication-manipulation pattern. This finding is what positioned ShinyHunters as a member of an emerging threat category rather than a variation on existing ones.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">Tested the attribution assumptions</div>
+        <div class="step-content-desc">My initial instinct on attribution was wrong. Pattern-matching cybercrime to Russia is common because Russian-speaking groups dominate ransomware. ShinyHunters is not Russian. The English-language vishing requirement, the Western European arrests, the absence of CIS targeting restrictions, the Pokémon-derived branding, and the source ecosystem all point to the English-speaking criminal subculture. I document this in the piece because the attribution-testing process matters as much as the conclusion. Defenders who assume Russian origin will look for Russian operational patterns and miss the actual ones.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-content-label">Documented the limitations honestly</div>
+        <div class="step-content-desc">This analysis draws on public reporting and a sample of posts from my own threat intelligence ingestion work covering the April-May 2026 active campaign window. It does not include insider intelligence, non-English sources, or law enforcement disclosures beyond what has been made public. Several incidents referenced in the timeline — including the AT&T Wireless breach of 2024, the November 2025 Harvard Alumni Affairs incident, and the September 2025 Salesloft/Drift token compromise — fall outside the active sample window and were sourced from public reporting for historical context. The analytical pattern is real. The limitations are also real. Both deserve to be named.</div>
+      </div>
+    </div>
+  </div>
+
+  <p><strong>Note on tooling:</strong> The analysis used a personal threat intelligence aggregation pipeline I have been building — documented at a high level in <a href="https://yanaivanov.com/writing/argusx-field-notes.html">my field notes on ArgusX</a>. Every conclusion drawn here is based on publicly available source material.</p>
+
+</div>
+</div>
+
+<!-- SECTION 06 — IMPLICATIONS FOR DEFENDERS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>Why This Matters for Defenders</h2>
+
+  <p>The current model of cybersecurity defense in most organizations is built around the assumption that attacks involve malicious code running somewhere — on an endpoint, in a network, on a server. The ShinyHunters lifecycle violates that assumption completely. The attack uses legitimate authentication flows, legitimate cloud applications, and legitimate API operations from start to finish. The only thing illegitimate is the person on the phone, and that is not something an endpoint detection tool will catch.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">OAuth Connected App authorization needs to be governed, not democratic</div>
+        <div class="step-content-desc">In many Salesforce environments, any administrator with appropriate permissions can authorize any connected app. The technical control to require pre-approval for new connected apps exists in Salesforce. It is rarely enforced because enforcement creates friction with legitimate integrations. The ShinyHunters lifecycle exists in the gap. Implementing connected app allowlisting — requiring an explicit administrative approval workflow before any new OAuth Connected App can be authorized — closes the critical step in the attack chain.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Out-of-band verification protocols matter for IT support calls</div>
+        <div class="step-content-desc">Generic security awareness training that warns users about phishing emails does not prepare a Salesforce administrator for a vishing call that references real internal projects by name. The specific defensive habit that works is the callback. If IT support calls and asks an employee to authorize anything, the employee should end the call and call IT support back through a known internal number. This single behavior breaks the attack. It is also rare because it creates social friction with what feels like a routine internal request.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">SaaS telemetry needs the same depth as endpoint telemetry</div>
+        <div class="step-content-desc">Most organizations have endpoint logs going back months or years. Salesforce Event Monitoring, equivalent logging in Snowflake, Workday audit logs, and similar SaaS telemetry are often not enabled at the depth required to reconstruct an OAuth abuse event after the fact. The retention window matters because ShinyHunters operations include a deliberate weeks-to-months gap between exfiltration and extortion specifically to age past typical log retention. Long-retention SaaS telemetry is the only defensible audit position for this attack class.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">Compliance frameworks have a gap here</div>
+        <div class="step-content-desc">NIST 800-171 and CMMC controls heavily emphasize endpoint protection, network monitoring, and traditional access controls. The controls relevant to OAuth governance, SaaS-specific identity protections, and cloud application allowlisting exist in adjacent frameworks (FedRAMP, SOC 2 with cloud extensions) but are not foregrounded in the DoD-aligned compliance regime that the defense industrial base operates under. Organizations meeting CMMC requirements can still be fully vulnerable to the ShinyHunters lifecycle because the lifecycle attacks the SaaS layer that CMMC was not designed around. This is a gap that should inform the next revision of the framework, not a reason to deprioritize CMMC compliance — but defenders should not assume CMMC compliance is sufficient defense against this attack class.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>What Existing Security Tools Miss</h3>
+
+  <div class="split-visual">
+    <div class="split-panel left">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">check_circle</span> What traditional security catches</div>
+      <p><strong>Malware execution:</strong> Endpoint detection and antivirus tools see binaries running on devices.</p>
+      <p><strong>Network exploitation:</strong> Intrusion prevention systems see exploit attempts against perimeter services.</p>
+      <p><strong>Credential phishing:</strong> Email security tools see phishing emails with malicious links and attachments.</p>
+      <p><strong>Lateral movement:</strong> Network monitoring sees east-west traffic and credential reuse.</p>
+    </div>
+    <div class="split-panel right">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">warning</span> What the ShinyHunters lifecycle hides</div>
+      <p><strong>No malware execution:</strong> The endpoint is never compromised. There is nothing to detect.</p>
+      <p><strong>No network exploitation:</strong> Salesforce is never attacked. The OAuth flow is legitimate.</p>
+      <p><strong>No phishing emails:</strong> The attack vector is voice. Email security tools see nothing.</p>
+      <p><strong>No lateral movement:</strong> All activity is from the attacker's external infrastructure to Salesforce's API, indistinguishable from normal Data Loader usage.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 07 — WHAT'S NEXT -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 07</div>
+  <h2>What I Am Trying to Figure Out Next</h2>
+
+  <p>This analysis is the second observation in a developing investigation into cascade structure across modern cyber threats. The first observation was the <a href="cpanel-cascade-analysis.html">cPanel CVE-2026-41940 cascade</a>, published earlier this month. Three actor tiers — sophisticated zero-day operator, opportunistic ransomware, infrastructure-abuse botnet — converged on the same vulnerability in three days. The structure was striking enough that I treated it as an observation, not a pattern.</p>
+
+  <p>The ShinyHunters operational lifecycle suggests a related but distinct cascade structure. One upstream SaaS compromise (Anodot, Salesloft/Drift, Gainsight) enables many downstream victim incidents over the following weeks. The actors are coordinated rather than independently arriving on the same vulnerability. The cascade is sequential within a single operational ecosystem rather than convergent across multiple independent operators. Two observations of cascade structure — in different attack contexts and against different target classes — is still not a pattern. It is now closer to a hypothesis worth testing.</p>
+
+  <p>Several questions remain open.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">A</div>
+      <div>
+        <div class="step-content-label">Does the cascade hypothesis hold in supply chain compromise contexts?</div>
+        <div class="step-content-desc">The next planned analysis is the Shai-Hulud npm supply chain worm campaign of April-May 2026. The structural pattern looks similar — sophisticated initial campaign, source code release, opportunistic actor arrival, ecosystem-wide impact — but the threat class is different. If the cascade structure recurs in a third independent context, the hypothesis strengthens. If it does not, the structure may be specific to particular attack types.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">B</div>
+      <div>
+        <div class="step-content-label">Can ShinyHunters operations be predicted from upstream signals?</div>
+        <div class="step-content-desc">The April-May 2026 campaign was preceded by months of Aura Campaign activity and at least two upstream SaaS provider compromises. Each of those upstream events produced observable signals before the downstream victim incidents began. Whether those signals are reliable enough to give defenders advance warning is a methodological question worth investigating with longer-window data.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">C</div>
+      <div>
+        <div class="step-content-label">What is the actual relationship between ShinyHunters, Scattered Spider, and LAPSUS$?</div>
+        <div class="step-content-desc">Public reporting consistently groups these three. The empirical co-occurrence in my data supports the grouping. But the operational nature of the relationship — shared leadership, shared affiliates, shared infrastructure, or simply shared brand culture — is not publicly clear. Better resolution of the relationship would clarify whether disruption of one node affects the others, which has direct implications for law enforcement strategy.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">D</div>
+      <div>
+        <div class="step-content-label">How should ShinyHunters be represented in structured actor reference data?</div>
+        <div class="step-content-desc">The structured actor reference work I have been compiling treats threat actors as discrete entities with defined attribution. ShinyHunters does not fit that model cleanly because the brand is more durable than the operators behind it. Representing a brand-collective hybrid requires deciding on schema choices that the existing framework was not designed for. The same problem will apply to Scattered Spider and other Com-ecosystem actors. The schema question is real and worth resolving.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 08 — CONCLUSION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 08</div>
+  <h2>Conclusion</h2>
+
+  <p>The 2024 pivot was the inflection point. Before 2024, ShinyHunters operated within a familiar cybercrime model — breach, exfiltrate, sell. After 2024, the operating model changed to something genuinely new. No malware. No traditional exploit. No encryption payload. Just a phone call, an OAuth flow, and a trojanized version of a tool the victim's own platform vendor had built. The attack was indistinguishable from legitimate cloud administration until the data was already gone.</p>
+
+  <p>Eight industries hit in eight weeks. An FBI Public Service Announcement issued specifically about them. Congressional testimony requested. A 3.65 terabyte ransom paid by a Fortune 500 company. And across thirty-nine mainstream news articles covering it all, the technical mechanism that makes every attack possible — mentioned zero times.</p>
+
+  <p>What this analysis is pointing at is not a claim that ShinyHunters is uniquely sophisticated. It is closer to the opposite. The operations are repeatable enough to be described as a lifecycle. The technique cluster is rare enough in the broader threat actor population to constitute a real signature. The targeting is opportunistic enough that any SaaS-dependent organization with imperfect identity governance is a potential victim. The reason traditional security tools miss this is not that the attackers are extraordinarily skilled. It is that the attack happens in a layer most security programs were not built to defend.</p>
+
+  <p>If the cascade hypothesis from the cPanel analysis generalizes — if the structure of how threats unfold is more predictable than the chaos of any individual incident suggests — then ShinyHunters is the second data point. The work ahead is testing whether the pattern holds across a third independent observation, and the fourth, and the fifth. The question is whether defenders are fighting unpredictable adversaries or fighting predictable patterns that look unpredictable because no one has named the structure yet.</p>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis is based entirely on publicly available reporting from security journalism, government advisories, threat intelligence platforms, and community sources. All findings reflect the author's independent analysis. The investigation continues.</p>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap">
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &amp; Detection &nbsp;·&nbsp; Connecticut</div>
+    <p class="bio-text">Yana Ivanov is a security analyst transitioning into threat intelligence and detection engineering after 15 years in enterprise UX and product design. She holds an MS in Information Systems and is currently pursuing CompTIA Security+ certification. This analysis was produced independently as a contribution to the security community's understanding of vulnerability cascade dynamics. The methodology described here is part of ongoing research into whether vulnerability cascades follow predictable patterns.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>A Threat Actor as a Process &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; May 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+</body>
+</html>
