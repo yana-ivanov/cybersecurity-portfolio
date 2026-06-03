@@ -54,7 +54,7 @@ h1.title em{color:#ef4444;font-style:normal}
 /* ── LAYOUT ── */
 .wrap{max-width:900px;margin:0 auto;padding:0 3rem}
 .section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
-.section:last-of-type{border-bottom:none}
+.section:last-of-type{border-bottom:none;padding-bottom:0}
 .section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
 h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
 h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
@@ -156,14 +156,23 @@ td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
 .step-content-label{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);font-weight:700;margin-bottom:.4rem}
 .step-content-desc{font-size:.92rem;line-height:1.7;color:var(--ink3)}
 
-/* ── BIO + FOOTER ── */
-.bio{max-width:900px;margin:3rem auto 1rem;padding:2rem 3rem;border-top:1px solid var(--rule);display:grid;grid-template-columns:4rem 1fr;gap:1.5rem;align-items:start}
-.bio-avatar{width:4rem;height:4rem;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--display-clean);font-size:1.2rem;font-weight:700}
-.bio-name{font-weight:700;color:var(--ink);font-size:1rem;margin-bottom:.25rem}
-.bio-title{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;margin-bottom:.85rem}
-.bio-text{font-size:.88rem;line-height:1.7;color:var(--ink3)}
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+.bio-text a{color:#60a5fa}
+.bio .back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#60a5fa;text-transform:uppercase;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
+.bio .back-nav-link::before{content:'←';font-size:.75rem}
+.bio .back-nav-link:hover{color:#93c5fd}
 
-footer{max-width:900px;margin:0 auto;padding:2rem 3rem 3rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem;border-top:1px solid var(--rule);font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase}
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
 
 @media (max-width:768px){
   .wrap,.mast-inner,.bio,footer{padding-left:1.5rem;padding-right:1.5rem}
@@ -866,17 +875,18 @@ footer{max-width:900px;margin:0 auto;padding:2rem 3rem 3rem;display:flex;justify
 </div>
 </div>
 
-<!-- BIO + FOOTER -->
+<!-- BIO -->
 <div class="bio">
   <div class="bio-avatar">YI</div>
   <div>
     <div class="bio-name">Yana Ivanov</div>
     <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &amp; Detection &nbsp;·&nbsp; Connecticut</div>
-    <p class="bio-text">Yana Ivanov is a security analyst transitioning into threat intelligence and detection engineering after 15 years in enterprise UX and product design. She holds an MS in Information Systems and is currently pursuing CompTIA Security+ certification. This analysis was produced independently as a contribution to the security community's understanding of vulnerability cascade dynamics. The methodology described here is part of ongoing research into whether cyber campaigns follow predictable patterns.</p>
+    <p class="bio-text">Yana Ivanov is a security analyst transitioning into threat intelligence and detection engineering after 15 years in enterprise UX and product design. She holds an MS in Information Systems and is currently pursuing CompTIA Security+ certification. This analysis was produced independently as a contribution to the security community's understanding of vulnerability cascade dynamics. The methodology described here is part of ongoing research into whether vulnerability cascades follow predictable patterns.</p>
     <p class="bio-text" style="margin-top:.75rem"><a href="https://yanaivanov.com/" class="back-nav-link">Portfolio</a></p>
   </div>
 </div>
 
+<!-- FOOTER -->
 <footer>
   <span>The Shai-Hulud Cascade &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; June 2026</span>
   <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
