@@ -235,7 +235,7 @@ footer span{color:#94a3b8}
   <div class="section-num">Section 01</div>
   <h2>The Worm That Was Already Moving</h2>
 
-  <p>I've been building a threat intelligence platform that tracks active cyber campaigns in real time. For six weeks — from late April through early June 2026 — one campaign dominated my feed: Shai-Hulud, a self-propagating worm moving through the npm software ecosystem, stealing developer credentials wherever it touched.</p>
+  <p>I've spent the past six weeks tracking one campaign across the npm software ecosystem: Shai-Hulud, a self-propagating worm stealing developer credentials wherever it touched. From late April through early June 2026, the campaign moved through hundreds of compromised packages, recognizable victims, and an unmistakable escalation pattern.</p>
 
   <p>In Frank Herbert's <em>Dune</em>, "Shai-Hulud" is the name for the giant sandworms of Arrakis — creatures that move through the desert in massive, unstoppable patterns, consuming everything they cross. The attackers who named their worm chose the metaphor carefully. Between April 24 and June 2, 2026, their tool moved through the software ecosystem the same way: massive, unstoppable, consuming developer credentials wherever it touched.</p>
 
@@ -251,7 +251,7 @@ footer span{color:#94a3b8}
     <div class="stat-num-item stat-red">
       <div class="stat-num">46</div>
       <div class="stat-num-label">Threat Feeds Tracked</div>
-      <div class="stat-num-sub">ArgusX feed · April – June 2026</div>
+      <div class="stat-num-sub">Tracked April – June 2026</div>
     </div>
     <div class="stat-num-item stat-red">
       <div class="stat-num">600+</div>
@@ -324,7 +324,7 @@ footer span{color:#94a3b8}
 
   <p>Supply chain attacks aren't new. They're 16 years old in their modern form. What changed in 2026 is the scale and speed, not the underlying pattern.</p>
 
-  <p>The threat intelligence dataset I've been building contains supply chain attacks going back to 2010. Reading them in order reveals a trajectory worth naming before discussing Shai-Hulud specifically.</p>
+  <p>Public threat intelligence reporting on supply chain attacks goes back to 2010. Reading the documented incidents in order reveals a trajectory worth naming before discussing Shai-Hulud specifically.</p>
 
   <div class="tbl-wrap">
     <table>
@@ -519,7 +519,7 @@ footer span{color:#94a3b8}
         </div>
       </div>
     </div>
-    <div class="figure-caption">Phase reconstruction based on ArgusX platform tracking of 46 source-attributed posts across npm, PyPI, Packagist ecosystems and primary security reporting from BleepingComputer, Dark Reading, Security Week, The Hacker News, OTX AlienVault, ThreatFox, MalwareBazaar, and SANS Internet Storm Center.</div>
+    <div class="figure-caption">Phase reconstruction based on 46 source-attributed posts across npm, PyPI, Packagist ecosystems and primary security reporting from BleepingComputer, Dark Reading, Security Week, The Hacker News, OTX AlienVault, ThreatFox, MalwareBazaar, and SANS Internet Storm Center.</div>
   </div>
 
   <h3>What the Phases Reveal About the Attackers</h3>
@@ -655,7 +655,7 @@ footer span{color:#94a3b8}
     </div>
   </div>
 
-  <p><strong>The cascade hypothesis update.</strong> The cPanel cascade analysis I published two weeks ago documented three actor tiers converging on a single vulnerability in predictable order. The Shai-Hulud campaign shows a related but distinct cascade structure — a single sophisticated operator releasing tooling that creates rapid downstream exploitation by less-skilled actors. Two cascade patterns in different attack contexts suggest the broader phenomenon is real: cyber campaigns aren't chaotic events but predictable patterns that compress in time. The work ahead is testing this hypothesis against more observations.</p>
+  <p><strong>The cascade observation update.</strong> The cPanel cascade analysis I published two weeks ago documented three actor tiers converging on a single vulnerability in predictable order. The Shai-Hulud campaign shows a related but distinct cascade structure — a single sophisticated operator releasing tooling that creates rapid downstream exploitation by less-skilled actors. Two cascade patterns in different attack contexts suggest the broader phenomenon is real: cyber campaigns aren't chaotic events but predictable patterns that compress in time. Whether the pattern holds in future incidents will be visible over time.</p>
 </div>
 </div>
 
@@ -790,7 +790,7 @@ footer span{color:#94a3b8}
       <div class="step-num">1</div>
       <div>
         <div class="step-content-label">Started with the data, not the narrative</div>
-        <div class="step-content-desc">Pulled 46 source-attributed posts from the ArgusX threat intelligence platform covering April 24 to June 2, 2026. Cross-referenced against 35+ verified IOC hashes from ThreatFox and OTX AlienVault. Anchored every claim in observable evidence rather than secondary summarization.</div>
+        <div class="step-content-desc">Aggregated 46 source-attributed posts from public threat intelligence feeds covering April 24 to June 2, 2026. Cross-referenced against 35+ verified IOC hashes from ThreatFox and OTX AlienVault. Anchored every claim in observable evidence rather than secondary summarization.</div>
       </div>
     </div>
     <div class="step-item">
@@ -818,12 +818,12 @@ footer span{color:#94a3b8}
       <div class="step-num">5</div>
       <div>
         <div class="step-content-label">Documented limitations honestly</div>
-        <div class="step-content-desc">ArgusX ingestion began in April 2026. The platform's historical depth on the campaign is limited to the visible escalation phase. Pre-March 2026 attribution relies on SANS ISC's tracking, which referenced prior report versions suggesting the campaign was observable earlier. The deeper history may exist but isn't fully recoverable from current data.</div>
+        <div class="step-content-desc">My structured collection on this campaign began in April 2026. Historical depth on the campaign is limited to the visible escalation phase. Pre-March 2026 attribution relies on SANS ISC's tracking, which referenced prior report versions suggesting the campaign was observable earlier. The deeper history may exist in other sources but isn't fully recoverable from what's publicly accessible.</div>
       </div>
     </div>
   </div>
 
-  <p><strong>Note on tooling:</strong> The analysis used a personal threat intelligence aggregation platform I have been building — documented at a high level in <a href="https://yanaivanov.com/writing/argusx-field-notes.html">my field notes on ArgusX</a>. Every conclusion drawn here is based on publicly available source material. The platform is in active development with a small team focused on stabilizing the data pipeline and rules layer before broader access.</p>
+  <p><strong>Note on sources:</strong> This analysis draws from publicly available threat intelligence feeds aggregated via ArgusX, my community threat intelligence platform — documented in <a href="https://yanaivanov.com/writing/argusx-field-notes.html">field notes</a>. Source feeds include ThreatFox, OTX AlienVault, MalwareBazaar, SANS Internet Storm Center, and security journalism from BleepingComputer, Dark Reading, Security Week, The Hacker News, and CyberSecurityNews. Every conclusion drawn here is based on publicly available source material.</p>
 </div>
 </div>
 
@@ -837,7 +837,7 @@ footer span{color:#94a3b8}
 
   <p>Three independent contexts. Same underlying structure. Worth naming as a hypothesis worth testing further.</p>
 
-  <p>The forward-looking predictions below are explicit tests of the cascade thesis. Each one will either prove correct, prove incorrect, or prove partially correct. The point isn't to be right — it's to be specific enough to be wrong.</p>
+  <p>The forward-looking observations below are based on the patterns documented above. Each one is specific enough to be wrong, which is the point. Pattern recognition that can't be falsified isn't pattern recognition — it's storytelling.</p>
 
   <h3>Predictions for the Next 60 Days</h3>
 
@@ -849,7 +849,7 @@ footer span{color:#94a3b8}
 
   <p><strong>Prediction 4: The methodology will spread beyond Russian-speaking actors.</strong> Open-source attacker tooling democratizes capability. By late 2026, expect to see Shai-Hulud variants used by criminal groups outside the Russian-speaking ecosystem — possibly Latin American, Southeast Asian, or African-origin operators adapting the tools for regional targets.</p>
 
-  <p>These predictions will be tracked publicly. They serve as a test of whether the cascade thesis enables useful forecasting or whether the pattern recognition is post-hoc rather than predictive.</p>
+  <p>I'll be watching each of these over the next 60 days.</p>
 </div>
 </div>
 
@@ -871,7 +871,7 @@ footer span{color:#94a3b8}
 
   <p>The investigation continues.</p>
 
-  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis is based entirely on publicly available reporting from security journalism, government advisories, threat intelligence platforms, and community sources. ArgusX data referenced is from a personal threat intelligence aggregation platform under active development. All findings reflect the author's independent analysis.</p>
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis is based entirely on publicly available reporting from security journalism, government advisories, threat intelligence feeds, and community sources. All findings reflect the author's independent analysis.</p>
 </div>
 </div>
 
