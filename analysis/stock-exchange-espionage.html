@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Information Is The Only Edge — Stock Exchange Espionage | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem;white-space:nowrap;overflow:hidden}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3);orphans:3;widows:3;text-wrap:pretty}
+p strong{color:var(--ink);font-weight:600}
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.25rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper);display:flex;flex-direction:column;align-items:center}
+.stat-num-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.7rem;font-weight:700;line-height:1;margin-bottom:.9rem;letter-spacing:-.01em}
+.stat-num-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;line-height:1.4;min-height:2.5em;display:flex;align-items:flex-start;justify-content:center;margin-bottom:.75rem;max-width:100%}
+.stat-num-sub{font-size:.72rem;color:#94a3b8;line-height:1.5;font-family:var(--serif);display:flex;align-items:flex-start;justify-content:center;max-width:100%}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.attack-chain{margin:1rem 0;display:flex;flex-direction:column;gap:0}
+.chain-step{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;align-items:start;position:relative;padding-bottom:1.25rem}
+.chain-step:last-child{padding-bottom:0}
+.chain-step::before{content:'';position:absolute;left:1.2rem;top:2.5rem;bottom:0;width:2px;background:var(--rule)}
+.chain-step:last-child::before{display:none}
+.chain-num{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.chain-normal .chain-num{background:var(--bg);border:2px solid var(--rule);color:var(--ink3)}
+.chain-warning .chain-num{background:var(--amber-dim);border:2px solid var(--amber);color:var(--amber)}
+.chain-danger .chain-num{background:var(--red-dim);border:2px solid var(--red);color:var(--red)}
+.chain-body{padding-top:.4rem}
+.chain-label{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.25rem;letter-spacing:.02em}
+.chain-warning .chain-label{color:var(--amber)}
+.chain-danger .chain-label{color:var(--red)}
+.chain-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+.findings{margin:2rem 0}
+.finding{display:grid;grid-template-columns:3rem 1fr;gap:1.25rem;padding:1.5rem;background:var(--paper);border-left:3px solid;margin-bottom:1rem}
+.finding.fn-critical{border-color:var(--red);background:var(--red-dim)}
+.finding.fn-high{border-color:var(--amber);background:var(--amber-dim)}
+.finding.fn-medium{border-color:var(--blue);background:var(--blue-dim)}
+.finding-num{font-family:var(--display-clean);font-size:1.6rem;font-weight:700;color:var(--ink2);line-height:1}
+.fn-critical .finding-num{color:var(--red)}
+.fn-high .finding-num{color:var(--amber)}
+.fn-medium .finding-num{color:var(--blue)}
+.finding-title{font-weight:700;color:var(--ink);margin-bottom:.5rem;font-size:1rem}
+.finding-desc{font-size:.92rem;line-height:1.7;color:var(--ink3);margin-bottom:.5rem}
+.finding-tag{display:inline-block;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.25rem .6rem;background:var(--ink);color:#fff;font-weight:600}
+.fn-critical .finding-tag{background:var(--red)}
+.fn-high .finding-tag{background:var(--amber)}
+.fn-medium .finding-tag{background:var(--blue)}
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;padding:1.25rem 0;border-bottom:1px solid var(--rule)}
+.step-item:last-child{border-bottom:none}
+.step-num{width:2.5rem;height:2.5rem;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.85rem;font-weight:700}
+.step-content-label{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);font-weight:700;margin-bottom:.4rem}
+.step-content-desc{font-size:.92rem;line-height:1.7;color:var(--ink3)}
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+.bio-text a{color:#60a5fa}
+.bio .back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#60a5fa;text-transform:uppercase;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
+.bio .back-nav-link::before{content:'←';font-size:.75rem}
+.bio .back-nav-link:hover{color:#93c5fd}
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+@media(max-width:768px){
+  .wrap,.mast-inner,.bio,footer{padding-left:1.5rem;padding-right:1.5rem}
+  .back-nav,.mast-bar{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr;gap:1rem}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="back-nav">
+  <a href="https://yanaivanov.com/">Portfolio</a>
+</nav>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Threat Intelligence Analysis · Financial Sector Espionage</div>
+    <h1 class="title">Information Is The Only Edge — <em>What A Stock Exchange Inbox Is Worth To A Nation-State</em></h1>
+    <div class="mast-meta">
+      <div class="meta-item">
+        <div class="label">Author</div>
+        <div class="value">Yana Ivanov</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Published</div>
+        <div class="value">June 2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Classification</div>
+        <div class="value">Public · Educational</div>
+      </div>
+    </div>
+    <div class="mast-meta" style="margin-top:0;padding-top:0;border-top:none">
+      <div class="meta-item">
+        <div class="label">Actor</div>
+        <div class="value">Unknown · China-nexus</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Campaign Window</div>
+        <div class="value">Oct 2025 – Mar 2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Dwell Time</div>
+        <div class="value">150 Days</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mast-bar">
+  <div class="mast-bar-dot"></div>
+  <div>150-day dwell time · 10 hashes · 0 on VirusTotal · 9 exfil runs · Dropbox + OneDrive · Full intrusion kit · Attribution unresolved</div>
+</div>
+
+<!-- SECTION 01 — THE HOOK -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>The Only Edge That Matters</h2>
+
+  <p>In the Showtime series <em>Billions</em>, Bobby Axelrod builds his empire on a single principle: information is the only edge that matters. Not capital. Not connections. Information — specifically, knowing what everyone else doesn't know yet.</p>
+
+  <p>The show's central conflict is Chuck Rhoades — starting as U.S. Attorney for the Southern District of New York — trying to prove that Axe's edge comes from somewhere illegal. Expert networks. Planted sources. Corrupted officials. The cat-and-mouse game works because the audience understands the premise intuitively: in financial markets, whoever knows first wins.</p>
+
+  <p>Axe builds his edge the hard way. Sources. Relationships. People who owe him. A network assembled over years, always one step ahead of what's legal and one step ahead of Chuck.</p>
+
+  <p>On October 10, 2025, someone decided that was too much work.</p>
+
+  <p>They didn't need expert networks. They didn't need planted sources. They didn't need to build anything. They just needed one person's inbox — and the patience to read it for five months.</p>
+
+  <div class="stat-num-grid">
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">150</div>
+      <div class="stat-num-label">Days Dwell Time</div>
+      <div class="stat-num-sub">Oct 10, 2025 – Mar 19, 2026</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">9</div>
+      <div class="stat-num-label">Exfiltration Runs</div>
+      <div class="stat-num-sub">Every 2–4 weeks, incremental batches</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">10</div>
+      <div class="stat-num-label">IOC Hashes</div>
+      <div class="stat-num-sub">None found on VirusTotal</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">0</div>
+      <div class="stat-num-label">Alerts Triggered</div>
+      <div class="stat-num-sub">No detection for five months</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 02 — THE HEIST -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>The Heist</h2>
+
+  <p>The target was a senior executive at a major global stock exchange. Their name, their employer, and the exchange itself remain undisclosed. What Broadcom's Symantec and Carbon Black threat-hunting teams published on June 4, 2026 is a technical timeline of one of the most disciplined espionage operations ever documented against a financial institution.</p>
+
+  <p>In <em>Billions</em>, Axe is known for patience. He watches. He waits. He doesn't move until he knows exactly what he's dealing with. The attacker here operated by the same discipline.</p>
+
+  <p>They were already inside by October 10, 2025. Not breaking in — already there. Two processes were running on the executive's managed corporate laptop with SYSTEM-level privileges, disguised as an Adobe Acrobat update service and a OneDrive sync helper. Both names were chosen carefully. Both are services an IT department would legitimately push to a managed device. Both ran silently for 33 days before the attacker made their first move.</p>
+
+  <p>Thirty-three days of watching. Reading the environment. Learning what was worth taking.</p>
+
+  <p>On November 12, 2025, they went active.</p>
+
+  <div class="callout callout-red">
+    <p>Using a custom wrapper around Aspose — a legitimate .NET library for parsing Outlook mailbox files — the attacker converted the executive's entire Outlook archive into a portable PST file covering every email since August 2025. They uploaded it to a Dropbox account via API token. Not the company's Dropbox. Their&nbsp;own.</p>
+  </div>
+
+  <p>Then they waited two to four weeks. And did it again. Nine times total, through February 17, 2026. Each run: only the emails since the last run. Each file: small enough not to trigger volume thresholds. Each upload: encrypted HTTPS to a trusted domain no firewall would block.</p>
+
+  <p>In <em>Billions</em>, the most dangerous plays are the ones nobody notices until it's too late. Small positions. Patient accumulation. No single move large enough to draw attention. This was the same strategy — applied not to a stock but to an inbox. Small batches. Patient accumulation. No single transfer large enough to draw attention.</p>
+
+  <p>The last observed activity was March 19, 2026. A new backdoor was staged but never executed. Symantec's assessment: the attacker likely lost access around that date. By then, they had a near-continuous copy of a senior stock exchange executive's Outlook mailbox spanning seven months.</p>
+
+  <div class="figure">
+    <div class="figure-title">Attack Timeline — October 2025 to March 2026</div>
+    <div class="figure-body">
+      <div class="attack-chain">
+        <div class="chain-step chain-danger">
+          <div class="chain-num">1</div>
+          <div class="chain-body">
+            <div class="chain-label">Oct 10, 2025 — Initial Access Established</div>
+            <div class="chain-desc">Two binaries already running as SYSTEM. armsvc.exe (fake Adobe Acrobat updater) and oneservice.exe (fake OneDrive sync) planted via lateral movement from a previously compromised device. Initial access vector: unknown.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">2</div>
+          <div class="chain-body">
+            <div class="chain-label">Oct 10 – Nov 11 — Reconnaissance Phase</div>
+            <div class="chain-desc">33 days of silence. Attacker reads the environment. Identifies the mailbox as the primary intelligence target. Scheduled task disguised as Lenovo system health check runs every five hours for persistence.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">3</div>
+          <div class="chain-body">
+            <div class="chain-label">Nov 12, 2025 — Active Exfiltration Begins</div>
+            <div class="chain-desc">Dropbox OAuth handshake completed. First OST extraction: all email from August 2025 onward. Files renamed to .tmp extensions to evade file-type detection. Uploaded via curl to attacker-controlled Dropbox account.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">4</div>
+          <div class="chain-body">
+            <div class="chain-label">Nov 2025 – Feb 2026 — Eight More Extraction Runs</div>
+            <div class="chain-desc">Every 2–4 weeks, another incremental batch. OneDrive Personal added as secondary channel Nov 21. Hard-coded Microsoft IP addresses used to avoid DNS lookups. Secondary channel: temp.sh tested Nov 20–21, abandoned.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">5</div>
+          <div class="chain-body">
+            <div class="chain-label">Feb 17, 2026 — Final Exfiltration Run</div>
+            <div class="chain-desc">Last confirmed data collection. New persistence anchor added Feb 27 via onedrivesync.exe. Attacker maintains access for another three weeks with no apparent exfiltration activity.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-normal">
+          <div class="chain-num">6</div>
+          <div class="chain-body">
+            <div class="chain-label">Mar 19, 2026 — Last Observed Activity</div>
+            <div class="chain-desc">New backdoor (te.host.dll in Intel-themed directory) staged but never executed. Symantec's assessment: attacker likely lost access on or around this date. No further malicious activity detected.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Source: Symantec / Carbon Black threat-hunting team report, June 4, 2026. Timeline reconstructed from published indicators.</div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 03 — BEYOND THE MAILBOX -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>Beyond the Mailbox — What ArgusX Found</h2>
+
+  <p>Symantec's report focused on the mailbox stealer. But the tool inventory tells a more complete story.</p>
+
+  <p>ArgusX, the independent threat intelligence platform, ingested the OTX pulse documenting this campaign on June 3, 2026 — one day before Symantec's full report was published. The pulse linked 20 indicators to the campaign and identified three additional tools not prominently covered in mainstream reporting.</p>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">01</div>
+      <div>
+        <div class="finding-title">Aspose-based OST Stealer</div>
+        <div class="finding-desc">Custom wrapper around the legitimate Aspose .NET library. Converts Outlook OST files to PST archives with date-range filtering. SHA256: db59813e3f27fb8608a4876e758f60b69d9700dc22d15237ac095bb3166fb622. Not found on VirusTotal — custom single-use tooling built for this operation.</div>
+        <span class="finding-tag">Primary Objective</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">02</div>
+      <div>
+        <div class="finding-title">SharpDecryptPwd</div>
+        <div class="finding-desc">Credential harvester that recovers saved application passwords from Windows credential stores, browsers, and email clients. The attacker wasn't just reading the mailbox — they were collecting every password saved on that machine. SHA256: 1f385acf11f8ea6673d7295be6492ea9913b525da25dcc037ea49ef4f86a9d58.</div>
+        <span class="finding-tag">Credential Harvesting</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">03</div>
+      <div>
+        <div class="finding-title">Secretsdump (Impacket)</div>
+        <div class="finding-desc">Part of the Impacket framework. Extracts Windows credential hashes remotely — NTLM hashes, Kerberos tickets. Access to everything else on the network. Confirms the scope of compromise extended beyond a single mailbox.</div>
+        <span class="finding-tag">Lateral Movement</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">04</div>
+      <div>
+        <div class="finding-title">FRPC — Fast Reverse Proxy Client</div>
+        <div class="finding-desc">Open-source Chinese tunneling tool used to maintain C2 channels through firewalls. SHA256: 2587217bc685527480c803ddf34a56ae9d9bf02681828a8a2081acc775312cf3. Disproportionately associated with Chinese-nexus APT groups including APT10, APT41, and Earth Lusca in documented cases. Its presence here is the most significant attribution signal in the entire tool inventory.</div>
+        <span class="finding-tag">Attribution Signal</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">05</div>
+      <div>
+        <div class="finding-title">UAC Bypass Tool</div>
+        <div class="finding-desc">Privilege escalation component that bypasses Windows User Account Control silently. Explains how SYSTEM-level execution was achieved without triggering security prompts. Combined with the full toolkit, this is not a mailbox thief — this is a complete intrusion kit.</div>
+        <span class="finding-tag">Privilege Escalation</span>
+      </div>
+    </div>
+  </div>
+
+  <p>In <em>Billions</em>, Axe Capital's edge comes from a network of expert consultants — specialists who provide just enough non-public insight to stay ahead. It requires years of relationship-building, considerable expense, and constant legal risk.</p>
+
+  <p>This actor skipped all of that. No network. No expenses. No legal exposure. Just five tools running silently on one laptop, harvesting everything.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>ArgusX note:</strong> Cross-referencing this campaign against ArgusX threat intelligence feeds — aggregating from 14+ sources including OTX AlienVault, ThreatFox, MalwareBazaar, and CISA — found no prior documented campaigns using FRPC in the ingested data. The tool did not appear in any previously tracked campaign. This absence is consistent with disciplined nation-state actors who operate below commodity threat intelligence visibility.</p>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 04 — THE SYSTEM-LEVEL QUESTION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>The SYSTEM-Level Question Nobody Asked</h2>
+
+  <p>Every published analysis of this breach accepted one detail without questioning it: by October 10, 2025, the attacker had already achieved SYSTEM-level execution on the executive's machine.</p>
+
+  <p>SYSTEM is the highest privilege level in Windows. It is not something a user achieves accidentally. It is not something an executive installs by clicking a phishing link.</p>
+
+  <p>Consider how a managed corporate device at a major global exchange actually works. The executive does not install software. A help desk ticket is how new applications appear. An IT administrator pushes updates remotely via SCCM or Intune. The executive's machine runs what IT approves. Nothing else.</p>
+
+  <div class="callout callout-red">
+    <p><strong>SYSTEM-level execution from day one means one of three things:</strong> a supply chain compromise in a legitimate update, exploitation of a vulnerability in a system service, or — the hypothesis this analysis finds most compelling — a previously compromised IT administrator account.</p>
+  </div>
+
+  <p>The lateral movement confirmation buried in one report is the tell: Symantec noted that initial access came via "lateral movement from a previously compromised device." That device was not the executive's machine. The executive's machine was the destination.</p>
+
+  <p>The real breach started somewhere else, on someone else's computer, weeks or months before October 10. The executive was not the entry point. They were the prize.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Hypothesis</th><th>Evidence For</th><th>Evidence Against</th><th>Confidence</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>IT admin account compromised</strong></td>
+          <td>SYSTEM-level from day one; "lateral movement from prior device" confirmed; Adobe/OneDrive = IT-pushed tools; no exec self-installation plausible</td>
+          <td>IT admin machine not examined in report</td>
+          <td class="amber">High</td>
+        </tr>
+        <tr>
+          <td><strong>Supply chain / update compromise</strong></td>
+          <td>SYSTEM-level immediately; update services = legitimate SYSTEM runners; no user interaction required</td>
+          <td>No compromised update confirmed; Aspose tool is custom, not a poisoned update</td>
+          <td class="amber">Medium</td>
+        </tr>
+        <tr>
+          <td><strong>Vulnerability in system service</strong></td>
+          <td>SYSTEM-level possible via unpatched service exploit</td>
+          <td>No CVE identified; "initial access unknown" suggests no known exploit used</td>
+          <td class="red">Low</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 05 — THE DLP QUESTION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>Why The Security Stack Failed</h2>
+
+  <p>The attacker's choice of Dropbox wasn't accidental. It was engineered for invisibility.</p>
+
+  <p>Traditional DLP cannot read inside encrypted HTTPS traffic without SSL inspection deployed. All Dropbox traffic uses HTTPS on port 443. The corporate network saw outbound HTTPS to dropbox.com — a trusted, approved domain used by employees every day. Without content inspection, DLP sees a destination and a protocol, both legitimate.</p>
+
+  <p>The attacker didn't use the company's Dropbox account. They completed an OAuth handshake to obtain a token for their own account. A CASB distinguishing corporate from personal cloud storage accounts would have flagged this immediately — an API upload to an unregistered, personal Dropbox token is anomalous regardless of the destination domain. CASB was not deployed.</p>
+
+  <p>The volume was kept deliberately small. Each extraction run covered only two to four weeks of email. No single upload triggered thresholds. The file extension was changed to .tmp — evading file-type detection at the network layer. The countermeasure requires magic bytes inspection: reading the actual binary header of a file regardless of its extension. A .tmp file with a PST header is a PST file. That detection was not present.</p>
+
+  <div class="figure">
+    <div class="figure-title">The Six Controls — Any One Would Have Stopped This</div>
+    <div class="figure-body">
+      <div class="attack-chain">
+        <div class="chain-step chain-danger">
+          <div class="chain-num">1</div>
+          <div class="chain-body">
+            <div class="chain-label">Endpoint DLP — Missing</div>
+            <div class="chain-desc">An agent on the device would have flagged PST file creation outside normal mail client paths. Catches the stealer before any upload occurs. Deployment cost: moderate. Detection certainty: high.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">2</div>
+          <div class="chain-body">
+            <div class="chain-label">CASB — Missing</div>
+            <div class="chain-desc">Cloud Access Security Broker would have distinguished corporate Dropbox accounts from personal ones. The attacker used their own OAuth token — not a corporate account. CASB flags personal cloud storage uploads. This is the control most directly suited to this exact attack pattern.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">3</div>
+          <div class="chain-body">
+            <div class="chain-label">UEBA — Missing</div>
+            <div class="chain-desc">User and Entity Behavior Analytics establishes baselines per device and user. 50GB of outbound transfers in incremental patterns over five months is not normal executive laptop behavior. No legitimate user produces this signature.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">4</div>
+          <div class="chain-body">
+            <div class="chain-label">Application Whitelisting — Missing</div>
+            <div class="chain-desc">.tmp file execution in Windows temp directories is not legitimate software behavior. A whitelist policy blocks it unconditionally. The Aspose stealer renamed to ts_9ea0.tmp would never have executed.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">5</div>
+          <div class="chain-body">
+            <div class="chain-label">SSL Inspection — Missing</div>
+            <div class="chain-desc">A corporate proxy decrypting HTTPS would have revealed PST content inside encrypted Dropbox uploads. Complex to deploy and raises privacy considerations — but effective for high-value targets like executive machines.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">6</div>
+          <div class="chain-body">
+            <div class="chain-label">IT Administrator MFA — Missing (inferred)</div>
+            <div class="chain-desc">If the initial access vector was a compromised IT admin account — the most compelling hypothesis — MFA on that account stops lateral movement to the executive's machine entirely. The entire campaign may depend on a single unprotected admin credential.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Six independent controls. Any single one stops the attack. The absence of all six simultaneously is a systemic posture failure, not a gap in one layer.</div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 06 — ATTRIBUTION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>The Attribution Question</h2>
+
+  <p>Symantec and Carbon Black explicitly declined to attribute this campaign to any known threat actor or nation-state. This analysis does not claim to resolve what they could not. The observations below are directional assessments based on tool associations and documented threat actor behavior. They are not definitive attribution claims.</p>
+
+  <h3>The FRPC Signal</h3>
+
+  <p>Fast Reverse Proxy Client is an open-source Chinese tunneling tool. Its appearance in documented cyberattacks is disproportionately associated with Chinese-nexus APT groups. APT10, APT41, and Earth Lusca have all been documented using FRPC as part of their C2 infrastructure. It is not exclusively a Chinese-actor tool, but its presence in this campaign is the strongest single attribution signal available in the public record.</p>
+
+  <h3>The APT41 Parallel</h3>
+
+  <p>ArgusX maintains threat intelligence on APT41, the group FireEye designated "Double Dragon" — a China-nexus actor conducting both state-sponsored espionage and financially-motivated intrusions simultaneously. Their documented profile describes a group that targets industries for "traditional corporate espionage purposes" while also conducting financially-motivated operations in parallel.</p>
+
+  <p>A stock exchange executive's mailbox serves both of APT41's operational objectives. For the state intelligence mission: advance knowledge of regulatory decisions, enforcement actions, listings under review, and market-moving announcements not yet public. For the financial mission: the same intelligence, applied to positions placed through accounts with no traceable connection to the actor.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The Equifax precedent:</strong> In 2017, PLA Unit 54938 spent 76 days quietly extracting 147 million Americans' financial profiles. Not for credit card fraud. For building identity maps of US intelligence officers. The FBI confirmed this explicitly. Patient dwell time, financial sector targeting, no ransomware, pure collection — the stock exchange breach follows the same architecture at 150 days.</p>
+  </div>
+
+  <p>Attribution remains unresolved. The use of public tools and cloud infrastructure specifically prevented attribution to any known group — Symantec's own words. The FRPC association and tool sophistication point directionally toward a Chinese-nexus actor. That is the limit of what the available evidence supports.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Actor</th><th>FRPC Usage</th><th>Financial Targeting</th><th>150-Day Patience</th><th>Custom Tooling</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Chinese-nexus (APT10/41)</strong></td><td class="green">Documented</td><td class="green">Documented</td><td class="green">Consistent</td><td class="green">Consistent</td></tr>
+        <tr><td><strong>Russian-nexus (APT29)</strong></td><td class="red">Not typical</td><td class="amber">Some cases</td><td class="green">Consistent</td><td class="green">Consistent</td></tr>
+        <tr><td><strong>Unknown new actor</strong></td><td class="amber">Possible</td><td class="amber">Possible</td><td class="amber">Possible</td><td class="amber">Possible</td></tr>
+        <tr><td><strong>Financially motivated (non-state)</strong></td><td class="amber">Possible</td><td class="green">Primary motive</td><td class="amber">Less typical</td><td class="red">Unusual</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 07 — THE TRADING QUESTION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 07</div>
+  <h2>The Trading Pattern Question</h2>
+
+  <p>Here is what this analysis cannot confirm, and what the SEC's Market Abuse Unit almost certainly can.</p>
+
+  <p>The exfiltration timeline is precise: nine runs between November 12, 2025 and February 17, 2026, spaced two to four weeks apart. Each run delivered another batch of market-moving intelligence to whoever controlled that Dropbox account. IPO decisions. Enforcement actions before filing. M&A discussions before announcement. Regulatory outcomes before the vote.</p>
+
+  <p>In <em>Billions</em>, the show's most compelling tension isn't the obvious crimes — it's the legal grey zone. The expert networks. The "mosaic theory" of information gathering. The question of where the line is between smart research and insider advantage. Chuck spends seasons trying to find the line Axe crossed.</p>
+
+  <p>There is no grey zone here. An executive's inbox contains non-public information about every market-moving decision their exchange is considering. Reading it for five months, then placing trades based on what you learned, is not a grey zone. It is the clearest possible definition of insider trading — executed from a country where no one can touch you.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>What this analysis examined:</strong> CBOE historical options volume data for exchange-sector stocks (ICE, CBOE, CME, NDAQ) during October 2025 — the month initial access was established. ICE led with 20,282 contracts across CBOE exchanges; CBOE at 13,448; NASDAQ Inc at 12,782; CME Group at 10,795. Without daily breakdowns and historical baselines, volume anomalies cannot be confirmed from monthly aggregate data alone.</p>
+  </div>
+
+  <p>An SEC EDGAR full-text search of 8-K cybersecurity incident filings from October 2025 through June 2026 returned no disclosures from any of the four publicly traded US exchange holding companies — ICE, CBOE, CME, or NASDAQ Inc. The targeted exchange is likely non-US, or the incident did not meet SEC materiality thresholds, or disclosure is still pending.</p>
+
+  <p>If trades were placed using intelligence from this inbox, the pattern would be detectable: unusual options activity on securities affected by exchange decisions, placed two to three days after each exfiltration run, through accounts with no obvious connection to the target. The SEC's surveillance systems are built for exactly this pattern. That investigation, if it exists, will not be public for months or years.</p>
+
+  <p>The question does not go away because we cannot answer it yet.</p>
+</div>
+</div>
+
+<!-- SECTION 08 — METHODOLOGY -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 08</div>
+  <h2>Methodology and Sources</h2>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">ArgusX threat intelligence data</div>
+        <div class="step-content-desc">Cross-referenced this campaign against ArgusX threat intelligence feeds aggregating from 14+ sources including OTX AlienVault, ThreatFox, MalwareBazaar, URLhaus, and CISA. The OTX community pulse documenting this campaign surfaced in ArgusX data the day before Symantec's full technical report published — demonstrating the value of community-driven threat intelligence for early awareness. All 10 IOC hashes were cross-checked against ingested feed data. None had appeared in any prior post, confirming single-use tooling with no prior feed visibility.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">VirusTotal hash lookup</div>
+        <div class="step-content-desc">SHA256 db59813e3f27fb8608a4876e758f60b69d9700dc22d15237ac095bb3166fb622 returned "Item not found." The Aspose stealer binary has never been submitted to VirusTotal by any researcher, vendor, or security team. This absence is itself a significant finding — it confirms custom single-use tooling built for this specific operation.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">SEC EDGAR full-text search</div>
+        <div class="step-content-desc">Searched 8-K filings for "cybersecurity incident" in the financial sector, October 2025 through June 2026. No cybersecurity 8-K was filed by ICE, CBOE, CME, or NASDAQ Inc during this period. The targeted exchange did not file a material cybersecurity incident disclosure with the SEC in this window.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">CBOE historical options volume data</div>
+        <div class="step-content-desc">Analyzed publicly available CBOE options volume data for October 2025 across exchange-sector stocks. Data covers the exact month initial access was established. Monthly aggregate data does not support anomaly detection without daily breakdowns and historical baselines — this limitation is explicitly noted in the analysis.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-content-label">Published threat intelligence and security journalism</div>
+        <div class="step-content-desc">Primary sources: Symantec/Carbon Black technical report (June 4, 2026), SC Media, SecurityWeek, The Hacker News, Security.com, Dark Reading, GBHackers, CyberSecurityNews, TechNadu, and Rescana. The IT admin hypothesis and SYSTEM-level analysis are the author's original observations not present in any of these sources.</div>
+      </div>
+    </div>
+  </div>
+
+  <p><strong>Attribution disclaimer:</strong> FRPC tool associations and historical APT comparisons in this analysis are directional assessments. Symantec and Carbon Black explicitly declined to attribute this campaign to any known threat actor. This analysis does not override that assessment. All attribution language uses directional qualifiers ("associated with," "consistent with," "disproportionately") rather than definitive claims.</p>
+</div>
+</div>
+
+<!-- SECTION 09 — CONCLUSION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 09</div>
+  <h2>Conclusion</h2>
+
+  <p>What is a stock exchange executive's inbox worth to a nation-state?</p>
+
+  <p>It depends on what's in it. Upcoming IPO decisions. Enforcement actions before they're filed. Merger discussions before the press release. Regulatory outcomes before the vote. Seven months of advance intelligence on the mechanisms that move markets.</p>
+
+  <p>In <em>Billions</em>, Bobby Axelrod spends seven seasons evading prosecution for knowing things he wasn't supposed to know — and ultimately walks away free to start a new fund. He had Chuck Rhoades on his case the entire time. Subpoenas. Wiretaps. A federal prosecutor with unlimited resources and a personal vendetta.</p>
+
+  <p>The people who read this inbox have none of that to worry about. They are, in all probability, in a country where the SEC has no jurisdiction, working for an organization whose budget is measured in billions, operating against a target whose security posture was measured in assumptions. No Chuck Rhoades. No subpoenas. No episode of <em>American Greed</em>.</p>
+
+  <p>Just a nation-state, slightly richer in strategic intelligence, and a stock exchange that never knew it was being read.</p>
+
+  <p>The assumption that executives are protected by their position. The assumption that IT controls apply to everyone. The assumption that a managed corporate device is more secure than the person who manages it.</p>
+
+  <p>None of those assumptions held.</p>
+
+  <p>The attacker didn't need sophistication. They needed patience and a target with no monitoring. They had 150 days of both.</p>
+
+  <p>Six security controls. Any single one stops this attack. All six were missing. That's not a gap in one layer — that's a posture.</p>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis is based on publicly available reporting, threat intelligence feeds aggregated via ArgusX, CBOE historical options volume data, and SEC EDGAR public filings. All findings reflect the author's independent analysis. Attribution statements are directional assessments, not definitive claims. ArgusX ingested the OTX pulse documenting this campaign on June 3, 2026, one day before Symantec's full report was published.</p>
+</div>
+</div>
+
+<!-- BIO -->
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &amp; Detection &nbsp;·&nbsp; Connecticut</div>
+    <p class="bio-text">Yana Ivanov is a security analyst transitioning into threat intelligence and detection engineering after 15 years in enterprise UX and product design. She holds an MS in Information Systems and is currently pursuing CompTIA Security+ certification. This analysis was produced independently as a contribution to the security community's understanding of vulnerability cascade dynamics. The methodology described here is part of ongoing research into whether vulnerability cascades follow predictable patterns.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="https://yanaivanov.com/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>Information Is The Only Edge &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; June 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+</body>
+</html>
