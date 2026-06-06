@@ -162,12 +162,6 @@ footer span{color:#94a3b8}
   .test-result{grid-template-columns:1fr;gap:.5rem}
 }
 </style>
-    <!-- Privacy-friendly analytics by Plausible -->
-    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
-    <script>
-      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-      plausible.init()
-    </script>
 </head>
 <body>
 
@@ -512,7 +506,7 @@ footer span{color:#94a3b8}
       </div>
 
       <h3 style="margin-top:1.75rem">Active Campaign IOCs — April 2026</h3>
-      <p style="font-size:.88rem;color:var(--ink3);margin-bottom:1rem">The following indicators are documented in <a href="https://threatfox.abuse.ch/" target="_blank">ThreatFox</a> (community submissions dated April 8, 2026) and are consistent with the BlueNoroff/UNC1069 fake Zoom campaign. Domains are defanged — brackets replace dots to prevent accidental navigation. These domains would trigger Ladon's ICS analysis if embedded in a calendar invite LOCATION or DESCRIPTION field.</p>
+      <p style="font-size:.88rem;color:var(--ink3);margin-bottom:1rem">The following indicators were submitted to ThreatFox on April 8, 2026 and are consistent with the BlueNoroff/UNC1069 fake Zoom campaign. Domains are defanged — brackets replace dots to prevent accidental navigation. These domains would trigger Ladon's ICS analysis if embedded in a calendar invite LOCATION or DESCRIPTION field.</p>
 
       <div class="tbl-wrap">
         <table>
@@ -534,6 +528,40 @@ footer span{color:#94a3b8}
 
   <p>All five original malicious samples were re-tested after both fixes. Zero false negatives — every confirmed malicious file still fires at the correct severity. Zero false positives introduced — clean files that previously triggered incorrectly now pass clean.</p>
 </div>
+
+
+  <!-- FIX 3 — LNK Module -->
+  <div class="improvement-card">
+    <div class="improvement-header">
+      <div class="improvement-title">Fix 03 — LNK Shortcut Analysis · New Module &nbsp;·&nbsp; <span style="color:#60a5fa;font-weight:400">June 5, 2026</span></div>
+    </div>
+    <div class="improvement-body">
+      <p><strong>The addition:</strong> Windows shortcut (.lnk) files are a documented primary delivery mechanism in phishing campaigns — including the calendar-themed BlueNoroff attacks analyzed in this lab. Ladon previously had no support for this file type. A new static analysis module was added that reads the LNK binary structure and checks for suspicious execution patterns without opening or executing the file.</p>
+
+      <p><strong>What it detects:</strong> Living-off-the-land binaries (LOLBINs) — system utilities like <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">forfiles.exe</code>, <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">mshta</code>, <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">certutil</code>, and <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">rundll32</code> that attackers use to execute payloads while evading detection rules tuned for PowerShell. Also detects UNC network paths pointing to attacker infrastructure, double extensions disguising executables as documents, and suspicious target directories.</p>
+
+      <div class="test-result">
+        <div>
+          <div class="test-result-label">b8d97d29… · calendar-stib-com-ua · MalwareBazaar · October 2024</div>
+          <div class="test-result-sub">Real malicious LNK sample tagged with calendar delivery infrastructure. Ladon detected forfiles.exe in the shortcut target path — a documented LOLBIN used specifically to bypass PowerShell-based detection rules. File is 3.2 KB, inert on macOS, analyzed via static byte reading only.</div>
+        </div>
+        <div class="test-result-verdict verdict-critical">HIGH ✓</div>
+      </div>
+
+      <div class="callout callout-red" style="margin:.75rem 0 1rem 0;padding:1rem 1.25rem">
+        <p style="font-family:'JetBrains Mono',monospace;font-size:.68rem;line-height:1.7;color:var(--ink2);margin:0"><strong style="color:var(--ink)">Analysis output — June 5, 2026</strong><br>
+        File: b8d97d29e99e1f96e06836468db56855dc09305e3ed663c720fe700ea4bf6e73.lnk · 3.2 KB · Severity: HIGH<br><br>
+        <strong style="color:#e8374a">LNK Shortcut Analysis — 1 finding</strong><br>
+        [CRITICAL] Forfiles.exe detected — Windows LOLBIN used to execute commands and bypass detection<br><br>
+        <strong style="color:var(--green)">Polyglot Detection — Pass</strong><br>
+        File type consistent — no polyglot indicators. Magic bytes match the declared file extension.</p>
+      </div>
+
+      <div class="callout callout-amber" style="margin-top:1.25rem">
+        <p><strong>On calendar invite testing:</strong> The ICS analysis module was validated using synthetic test cases modeled on documented BlueNoroff campaign IOCs — a Calendly invite to confirm no false positive, and a typosquatted Zoom domain to confirm correct detection. Real malicious ICS lure files are rarely submitted to public malware repositories — attackers submit the payload, not the invite. Synthetic tests validate that the detection logic runs correctly against known patterns. Production validation of the calendar module against real attacker-crafted invites requires a mail flow deployment — the next phase of development.</p>
+      </div>
+    </div>
+  </div>
 
 <!-- SECTION 06 -->
 <div class="section">
