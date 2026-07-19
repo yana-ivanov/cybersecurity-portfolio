@@ -1213,6 +1213,21 @@ body.drawer-open .cipher-wrap {
   gap: 7px;
 }
 
+.cipher-close {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  width: 26px; height: 26px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.cipher-close:hover { color: var(--accent); border-color: var(--accent); }
+
 .cipher-panel-sub {
   font-family: var(--mono);
   font-size: 13px;
@@ -1466,7 +1481,7 @@ body.drawer-open .cipher-wrap {
 
   <!-- HEADER -->
   <div class="page-header">
-    <div class="page-tag">Analysis Tool · Red Team Intelligence</div>
+    <div class="page-tag">Analysis Tool · Phishing Detection</div>
     <h1>Email <span>Threat</span> Analyzer</h1>
     <p class="page-desc">Analyze emails from any provider — Gmail, Outlook, Yahoo, or corporate Exchange. Connect Gmail live or paste any raw email to run AI-powered threat analysis with MITRE ATT&CK mapping and employee training explanations.</p>
   </div>
@@ -1489,6 +1504,21 @@ body.drawer-open .cipher-wrap {
       <div class="step-num">4</div>
       <div><div class="step-label">Review</div><div class="step-sub">Flags & training</div></div>
     </div>
+  </div>
+
+  <!-- V2: HONEST CAPABILITY BOX -->
+  <div class="panel" style="padding:18px 22px;">
+    <div style="display:flex;gap:28px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:260px;">
+        <div style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--green);margin-bottom:8px;">WORKS WELL WITH</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.8;">Full raw source with headers · .eml / .msg / .mbox uploads · Gmail Live · link and attachment analysis · Unicode payload detection</div>
+      </div>
+      <div style="flex:1;min-width:260px;">
+        <div style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--yellow);margin-bottom:8px;">LIMITED RESULTS WITH</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.8;">Pasted body text without headers (content-only verdict, confidence downgraded) · forwarded emails (original routing lost) · image-only phish</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-family:var(--mono);font-size:11px;letter-spacing:.05em;color:var(--muted);border-top:1px solid var(--border);padding-top:10px;">Severity requires an INTENT signal and an INFRASTRUCTURE signal together. Language quality — polished or broken — never decides a verdict.</div>
   </div>
 
   <!-- SOURCE PANEL -->
@@ -1844,10 +1874,11 @@ body.drawer-open .cipher-wrap {
   </div>
   <div class="cipher-panel" id="cipherPanel">
     <div class="cipher-panel-header">
-      <div class="cipher-panel-title">
-        ⬡ CIPHER
+      <div style="display:flex;align-items:baseline;gap:12px;">
+        <div class="cipher-panel-title">⬡ CIPHER</div>
+        <div class="cipher-panel-sub">THREAT ANALYSIS GUIDE</div>
       </div>
-      <div class="cipher-panel-sub">THREAT ANALYSIS GUIDE</div>
+      <button class="cipher-close" onclick="toggleCipher()" title="Close CIPHER" aria-label="Close CIPHER">✕</button>
     </div>
     <div class="cipher-context-bar" id="cipherContext">No email selected — select one to get context-aware help</div>
     <div class="cipher-msgs" id="cipherMsgs">
@@ -2054,31 +2085,51 @@ async function analyzeBatch(emails) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4000,
       messages: [{
         role: 'user',
-        content: `You are a cybersecurity analyst. Analyze each email for threats. Return ONLY a JSON array with one object per email. No markdown, no preamble.
+        content: `You are a phishing detection analyst. Classify each email using a conjunction-based severity rubric. Return ONLY a JSON array, one object per email. No markdown, no preamble.
+
+SIGNAL CATEGORIES — tag every IOC with a category:
+- "intent": what the email asks for — credential requests, payment/wire redirection, gift cards, deadline pressure, authority impersonation, secrecy instructions, requests to install software
+- "infrastructure": how it was sent and where links lead — SPF/DKIM/DMARC failures, Reply-To mismatch, sender/display-name domain mismatch, typosquatting or homoglyph domains, link destinations that do not match the claimed sender, suspicious attachments (double extensions, macros, executables), bulk-mailer headers on a supposedly personal email
+- "language": prose-quality observations only — language NEVER affects severity in either direction
+
+SEVERITY REQUIRES CONJUNCTION (core rule):
+- critical: an intent signal AND an infrastructure signal together (credential ask + spoofed domain; wire redirect + Reply-To mismatch; malware attachment + impersonation)
+- high: strong evidence needing little corroboration (typosquatted/homoglyph domain hosting a login link; explicit credential or payment ask when headers are unavailable to verify)
+- medium: one concrete signal without conjunction (authority + unusual ask but clean infrastructure → advise out-of-band verification)
+- low: minor anomalies, bulk/marketing patterns, unknown but benign-looking senders
+- clean: legitimate mail
+
+FALSE-POSITIVE GUARDRAILS:
+- Urgency alone is NOT phishing. Legitimate email is often urgent — password-expiry notices, invoices due, security alerts, DocuSign deadlines, executive requests. If infrastructure is clean (authenticated real domain, links match the sender), urgency + action request from a plausible sender = clean or low with a verification note, never medium+.
+- Legitimate mail from real company domains (Amazon, Google, Microsoft, banks, DocuSign) with matching link destinations = clean. Google security alerts linking to accounts.google.com = clean. Base64-encoded bodies are standard, not suspicious. Marketing and newsletters = low or clean unless spoofed.
+
+LANGUAGE RULES:
+- Polished, fluent prose is NOT evidence of legitimacy — modern phishing is LLM-written and flawless
+- Poor grammar is NOT evidence of phishing by itself
+- Always include exactly one informational IOC: category "language", type "Language Quality", severity "low", description like "Language quality: polished — fluency is no longer a trust signal" (or: rough/broken — historically a tell, no longer diagnostic)
+
+CONFIDENCE:
+- Full routing/auth headers present → "confidence": "full-headers"
+- Body text only (no Received/Authentication-Results headers) → "confidence": "content-only": infrastructure cannot be verified beyond visible link domains; cap severity at high unless a link or attachment is itself conclusive, and say so in severityRationale
 
 Schema per email:
 {
   "risk": "critical|high|medium|low|clean",
-  "threatType": "Phishing|BEC|Malware Delivery|Social Engineering|Spam|Suspicious|Clean",
-  "summary": "1-2 sentence threat summary",
-  "iocs": [{"type": "Header Anomaly|Domain Spoof|Urgency|Attachment|Link|Impersonation|Data Request|Other", "description": "what was found", "example": "exact text or value", "severity": "high|medium|low"}],
-  "mitre": ["T1566.001 Spearphishing Attachment", "T1598 Phishing for Information"],
-  "training": {"title": "Training tip title", "explanation": "2-3 sentence explanation for employees", "redFlags": ["flag 1", "flag 2", "flag 3"]},
-  "bodyHighlights": "key suspicious phrases from snippet, comma-separated"
+  "threatType": "Phishing|BEC|Malware Delivery|Social Engineering|Spam|Newsletter|Clean",
+  "summary": "1-2 sentence summary. If clean, say why it is legitimate.",
+  "severityRationale": "one sentence naming the conjunction (or its absence) that produced this verdict",
+  "confidence": "full-headers|content-only",
+  "iocs": [{"category": "intent|infrastructure|language", "type": "Header Anomaly|Domain Spoof|Typosquatting|Urgency|Attachment|Link|Impersonation|Data Request|Reply-To Mismatch|Language Quality|Other", "description": "what was found", "example": "exact value from email", "severity": "high|medium|low"}],
+  "mitre": ["T1566.002 Spearphishing Link"],
+  "training": {"title": "Training tip", "explanation": "2-3 sentences for employees", "redFlags": ["flag 1", "flag 2"]},
+  "bodyHighlights": "suspicious phrases only, comma-separated, empty string if clean"
 }
 
-Risk scoring:
-- critical: clear phishing/malware with credential harvesting or payload
-- high: strong indicators (domain spoof, urgency + link, BEC pattern)
-- medium: some red flags but not conclusive
-- low: minor anomalies, likely benign
-- clean: no indicators
-
-Emails to analyze:
+Emails:
 ${emailsStr}`
       }]
     })
@@ -2229,12 +2280,36 @@ function openDrawer(id) {
   document.getElementById('drRiskBadge').innerHTML = `<span class="badge badge-${r}">${riskLabels[r]} — ${esc(a.threatType||'')}</span>`;
   document.getElementById('drSender').textContent = email.from || email.fromAddress || 'Unknown';
   document.getElementById('drSubject').textContent = email.subject || '(no subject)';
-  document.getElementById('drSummary').textContent = a.summary || 'No analysis available.';
+  document.getElementById('drSummary').innerHTML = esc(a.summary || 'No analysis available.') +
+    (a.severityRationale ? `<div style="margin-top:10px;padding:8px 12px;background:var(--surface2);border-left:3px solid var(--accent);font-family:var(--mono);font-size:12px;color:var(--muted);"><span style="letter-spacing:.08em;">WHY THIS SEVERITY —</span> ${esc(a.severityRationale)}</div>` : '') +
+    (a.confidence === 'content-only' ? `<div style="margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--yellow);letter-spacing:.05em;">⚠ CONTENT-ONLY VERDICT — headers absent, infrastructure unverified</div>` : '');
 
   // IOCs
   const iocList = document.getElementById('drIOCs');
   const iocs = a.iocs || [];
-  if (iocs.length) {
+  const CAT_ORDER = ['intent','infrastructure','language'];
+  const CAT_LABELS = { intent:'INTENT — what it asks for', infrastructure:'INFRASTRUCTURE — how it was sent', language:'LANGUAGE — informational only' };
+  const hasCats = iocs.some(i => i.category);
+  const renderIoc = ioc => {
+      const isGlassworm = ioc.source === 'glassworm';
+      const isLang = ioc.category === 'language';
+      const borderColor = isGlassworm ? 'var(--red)' : isLang ? 'var(--border2)' : (ioc.severity==='medium' ? 'var(--yellow)' : ioc.severity==='low' ? 'var(--green)' : 'var(--red)');
+      const badge = isGlassworm ? '<span style="font-family:var(--mono);font-size:13px;background:rgba(232,55,74,0.15);color:var(--red);border:1px solid rgba(232,55,74,0.3);padding:2px 7px;border-radius:3px;margin-left:6px;">GLASSWORM</span>' : '';
+      const dim = isLang ? 'opacity:.75;' : '';
+      return `<div class="ioc-item" style="border-left-color:${borderColor};${dim}">
+        <div class="ioc-type">${esc(ioc.type)}${badge}</div>
+        <div>
+          <div class="ioc-desc">${esc(ioc.description)}</div>
+          ${ioc.example ? '<div class="ioc-example">'+esc(ioc.example)+'</div>' : ''}
+        </div>
+      </div>`;
+  };
+  if (iocs.length && hasCats) {
+    iocList.innerHTML = CAT_ORDER.filter(c => iocs.some(i => (i.category||'infrastructure') === c)).map(c =>
+      `<div style="font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);margin:14px 0 6px;">${CAT_LABELS[c]}</div>` +
+      iocs.filter(i => (i.category||'infrastructure') === c).map(renderIoc).join('')
+    ).join('');
+  } else if (iocs.length) {
     iocList.innerHTML = iocs.map(ioc => {
       const isGlassworm = ioc.source === 'glassworm';
       const borderColor = isGlassworm ? 'var(--red)' : (ioc.severity==='medium' ? 'var(--yellow)' : ioc.severity==='low' ? 'var(--green)' : 'var(--red)');
@@ -2262,11 +2337,13 @@ function openDrawer(id) {
   }
 
   // Body snippet
-  let body = email.snippet || '(no preview available)';
+  // V2: escape the raw email body BEFORE any innerHTML use — real-world
+  // malicious emails contain hostile HTML/JS and must never render live.
+  let body = esc(email.snippet || '(no preview available)');
   if (a.bodyHighlights) {
     const highlights = a.bodyHighlights.split(',').map(s => s.trim()).filter(Boolean);
     highlights.forEach(h => {
-      if (h) body = body.replace(new RegExp(h.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi'),
+      if (h) body = body.replace(new RegExp(esc(h).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi'),
         match => `<span class="highlight-red">${match}</span>`);
     });
   }
@@ -2502,35 +2579,46 @@ async function analyzeBatchPaste(emails) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
+      model: 'claude-sonnet-4-6',
+      max_tokens: 4000,
       messages: [{
         role: 'user',
-        content: `You are a strict cybersecurity analyst. Analyze each email and assign risk accurately — do NOT default to medium when unsure. Most legitimate emails from known companies (Amazon, Netflix, Glassdoor, Nintendo, banks sending receipts) should be LOW or CLEAN. Only flag MEDIUM or above when there are real, specific indicators.
+        content: `You are a phishing detection analyst. Classify each email using a conjunction-based severity rubric. Return ONLY a JSON array, one object per email. No markdown, no preamble.
 
-STRICT RISK RULES:
-- clean: legitimate email from a real company domain, no suspicious indicators whatsoever
-- low: minor anomaly but almost certainly benign (marketing email, newsletter, bulk sender)
-- medium: at least 2 concrete red flags (e.g. urgency + external link, or generic greeting + credential request)
-- high: strong phishing indicators — domain spoof, typosquatting, Reply-To mismatch, fake login link, impersonation of IT/HR/bank
-- critical: clear attack — credential harvesting page, malware attachment, wire transfer fraud, known phishing pattern
+SIGNAL CATEGORIES — tag every IOC with a category:
+- "intent": what the email asks for — credential requests, payment/wire redirection, gift cards, deadline pressure, authority impersonation, secrecy instructions, requests to install software
+- "infrastructure": how it was sent and where links lead — SPF/DKIM/DMARC failures, Reply-To mismatch, sender/display-name domain mismatch, typosquatting or homoglyph domains, link destinations that do not match the claimed sender, suspicious attachments (double extensions, macros, executables), bulk-mailer headers on a supposedly personal email
+- "language": prose-quality observations only — language NEVER affects severity in either direction
 
-KEY RULES:
-- A legitimate Amazon/Netflix/Glassdoor/Nintendo/Google/Microsoft email from their real domain = CLEAN
-- Google security alerts from accounts.google.com links = CLEAN — these are legitimate
-- Base64 encoded body alone is NOT a red flag — it is standard for Google, Apple, and major senders
-- Marketing/promotional email = LOW or CLEAN, never medium unless spoofed
-- "Unknown" sender with no red flags = LOW, not medium
-- Only use medium+ when you can name the specific threat
-- Return ONLY a JSON array, no markdown.
+SEVERITY REQUIRES CONJUNCTION (core rule):
+- critical: an intent signal AND an infrastructure signal together (credential ask + spoofed domain; wire redirect + Reply-To mismatch; malware attachment + impersonation)
+- high: strong evidence needing little corroboration (typosquatted/homoglyph domain hosting a login link; explicit credential or payment ask when headers are unavailable to verify)
+- medium: one concrete signal without conjunction (authority + unusual ask but clean infrastructure → advise out-of-band verification)
+- low: minor anomalies, bulk/marketing patterns, unknown but benign-looking senders
+- clean: legitimate mail
+
+FALSE-POSITIVE GUARDRAILS:
+- Urgency alone is NOT phishing. Legitimate email is often urgent — password-expiry notices, invoices due, security alerts, DocuSign deadlines, executive requests. If infrastructure is clean (authenticated real domain, links match the sender), urgency + action request from a plausible sender = clean or low with a verification note, never medium+.
+- Legitimate mail from real company domains (Amazon, Google, Microsoft, banks, DocuSign) with matching link destinations = clean. Google security alerts linking to accounts.google.com = clean. Base64-encoded bodies are standard, not suspicious. Marketing and newsletters = low or clean unless spoofed.
+
+LANGUAGE RULES:
+- Polished, fluent prose is NOT evidence of legitimacy — modern phishing is LLM-written and flawless
+- Poor grammar is NOT evidence of phishing by itself
+- Always include exactly one informational IOC: category "language", type "Language Quality", severity "low", description like "Language quality: polished — fluency is no longer a trust signal" (or: rough/broken — historically a tell, no longer diagnostic)
+
+CONFIDENCE:
+- Full routing/auth headers present → "confidence": "full-headers"
+- Body text only (no Received/Authentication-Results headers) → "confidence": "content-only": infrastructure cannot be verified beyond visible link domains; cap severity at high unless a link or attachment is itself conclusive, and say so in severityRationale
 
 Schema per email:
 {
   "risk": "critical|high|medium|low|clean",
   "threatType": "Phishing|BEC|Malware Delivery|Social Engineering|Spam|Newsletter|Clean",
   "summary": "1-2 sentence summary. If clean, say why it is legitimate.",
-  "iocs": [{"type": "Header Anomaly|Domain Spoof|Typosquatting|Urgency|Attachment|Link|Impersonation|Data Request|Reply-To Mismatch|Other", "description": "what was found", "example": "exact value from email", "severity": "high|medium|low"}],
-  "mitre": ["T1566.001 Spearphishing Attachment"],
+  "severityRationale": "one sentence naming the conjunction (or its absence) that produced this verdict",
+  "confidence": "full-headers|content-only",
+  "iocs": [{"category": "intent|infrastructure|language", "type": "Header Anomaly|Domain Spoof|Typosquatting|Urgency|Attachment|Link|Impersonation|Data Request|Reply-To Mismatch|Language Quality|Other", "description": "what was found", "example": "exact value from email", "severity": "high|medium|low"}],
+  "mitre": ["T1566.002 Spearphishing Link"],
   "training": {"title": "Training tip", "explanation": "2-3 sentences for employees", "redFlags": ["flag 1", "flag 2"]},
   "bodyHighlights": "suspicious phrases only, comma-separated, empty string if clean"
 }
@@ -2670,6 +2758,90 @@ const DEMO_SAMPLES = [
       bodyHighlights: 'Read More, unsubscribe, limited time, exclusive briefing'
     },
     raw: `From: Defense Procurement Weekly <newsletter@defense-weekly-digest.info>\nTo: employee@meridiandefense.com\nSubject: Defense Procurement Weekly — Your Industry Briefing — April 2026\nDate: Mon, 30 Mar 2026 06:00:00 -0500\nX-Mailer: BulkMailer Pro 9.2\nList-Unsubscribe: <mailto:unsub@defense-weekly-digest.info>\n\nDEFENSE PROCUREMENT WEEKLY\nYour trusted source for defense industry news\n\nTHIS WEEK: CMMC enforcement updates — what contractors must do now\nElectric Boat awards $2.1B submarine component contracts\nPratt & Whitney engine program update: F135 sustainment changes\n\n[ READ FULL BRIEFING ] → https://defense-weekly-digest.info/read?id=meridian-4821\n\nYou are receiving this because your email was registered at a defense industry event.\nTo unsubscribe: https://defense-weekly-digest.info/unsub?id=meridian\n\nDefense Procurement Weekly © 2026`
+  },
+  {
+    id: 'demo7L', label: 'CRITICAL', risk: 'critical',
+    title: '[LEGACY · 2015] Vendor Payment Redirect',
+    desc: 'Era Pair A. The classic-era version of a vendor BEC: broken English, odd phrasing, every tell the old training slides taught. Compare with the 2026 edition — same infrastructure flaws, same verdict.',
+    analysis: {
+      risk: 'critical', threatType: 'BEC', confidence: 'full-headers',
+      summary: 'Vendor payment-redirect fraud impersonating Titan Machining. Requests that all future invoice payments go to a new bank account, sent from a look-alike domain with a personal Gmail Reply-To.',
+      severityRationale: 'CRITICAL because a payment-redirection request (intent) coincides with a look-alike sender domain and personal-Gmail Reply-To (infrastructure). Language quality played no role.',
+      iocs: [
+        {category:'intent', type:'Data Request', description:'Requests all future payments be sent to a new bank account', example:'kindly update our banking detail for all future invoice', severity:'high'},
+        {category:'intent', type:'Urgency', description:'Pressure to update before the next payment run', example:'this must be done before friday payment', severity:'medium'},
+        {category:'infrastructure', type:'Domain Spoof', description:'Sender domain titan-machining-inc.com imitates the real titanmachining.com', example:'accounts@titan-machining-inc.com', severity:'high'},
+        {category:'infrastructure', type:'Reply-To Mismatch', description:'Reply-To points to a personal Gmail address, not the vendor domain', example:'Reply-To: titanaccounts2015@gmail.com', severity:'high'},
+        {category:'language', type:'Language Quality', description:'Language quality: broken — historically the tell, but grammar did not decide this verdict', example:'"kindly update our banking detail"', severity:'low'}
+      ],
+      mitre: ['T1566.002 Spearphishing Link', 'T1534 Internal Spearphishing'],
+      training: {title:'The old tells were never the real evidence', explanation:'This 2015-style email is full of grammar errors, and for years training taught people to stop there. But the reliable evidence was always the plumbing: the look-alike domain and the personal-Gmail Reply-To. Verify any banking change by phone using a number you already have.', redFlags:['Look-alike vendor domain','Reply-To goes to personal Gmail','Banking change requested by email','Deadline pressure before payment run']},
+      bodyHighlights: 'update our banking detail, new account, before friday payment'
+    },
+    raw: `From: Titan Machining Accounts <accounts@titan-machining-inc.com>\nTo: ap@meridiandefense.com\nSubject: banking detail update - urgent\nDate: Tue, 14 Apr 2015 08:12:44 -0500\nReply-To: titanaccounts2015@gmail.com\nX-Mailer: PHPMailer 5.2.1\n\nDear Sir/Madam,\n\nPlease be inform that we have change our bank. kindly update our banking detail for all future invoice payment to the new account below. this must be done before friday payment run to avoid the delay of supplies.\n\nBank: First Continental Bank\nAccount Name: Titan Machining Service LLC\nAccount No: 447198220\nRouting: 067014822\n\ndo not hesitate to contact us if any question. we appreciate your quick corporation.\n\nBest Regard,\nAccounts Dept\nTitan Machining`
+  },
+  {
+    id: 'demo7M', label: 'CRITICAL', risk: 'critical',
+    title: '[MODERN · 2026] Vendor Payment Redirect',
+    desc: 'Era Pair A. The same fraud rewritten by an LLM: flawless, professional, personalized. The infrastructure flaws are identical — and so is the verdict. Fluency is not a trust signal.',
+    analysis: {
+      risk: 'critical', threatType: 'BEC', confidence: 'full-headers',
+      summary: 'Vendor payment-redirect fraud impersonating Titan Machining, written in polished professional English. Identical infrastructure flaws to the legacy version: look-alike domain and personal-Gmail Reply-To.',
+      severityRationale: 'CRITICAL because a payment-redirection request (intent) coincides with a look-alike sender domain and personal-Gmail Reply-To (infrastructure). The polished prose neither raised nor lowered the verdict.',
+      iocs: [
+        {category:'intent', type:'Data Request', description:'Requests all future payments be routed to a new bank account', example:'route all payments dated after April 18 to our updated account', severity:'high'},
+        {category:'intent', type:'Urgency', description:'Ties the change to the current payment cycle to compress verification time', example:'ahead of this week\u2019s payment cycle', severity:'medium'},
+        {category:'infrastructure', type:'Domain Spoof', description:'Sender domain titan-machining-inc.com imitates the real titanmachining.com', example:'a.reeves@titan-machining-inc.com', severity:'high'},
+        {category:'infrastructure', type:'Reply-To Mismatch', description:'Reply-To points to a personal Gmail address, not the vendor domain', example:'Reply-To: areeves.titanfinance@gmail.com', severity:'high'},
+        {category:'language', type:'Language Quality', description:'Language quality: polished — fluency is no longer a trust signal', example:'"Thank you for your continued partnership"', severity:'low'}
+      ],
+      mitre: ['T1566.002 Spearphishing Link', 'T1534 Internal Spearphishing'],
+      training: {title:'This email would pass every grammar check you were trained on', explanation:'Perfect spelling, professional tone, a plausible name and signature block. None of it matters: the sender domain is a look-alike and replies route to personal Gmail. Judge the ask and the plumbing, never the prose. Verify any banking change by phone using a number you already have on file.', redFlags:['Look-alike vendor domain','Reply-To goes to personal Gmail','Banking change requested by email','Change tied to the current payment cycle']},
+      bodyHighlights: 'updated account, route all payments, this week\u2019s payment cycle'
+    },
+    raw: `From: Alicia Reeves | Titan Machining <a.reeves@titan-machining-inc.com>\nTo: ap@meridiandefense.com\nSubject: Updated remittance details — effective this payment cycle\nDate: Tue, 14 Apr 2026 08:12:44 -0500\nReply-To: areeves.titanfinance@gmail.com\nX-Mailer: PHPMailer 6.9.1\n\nHi Meridian AP team,\n\nFollowing our banking transition to First Continental, please route all payments dated after April 18 to our updated account below. We\u2019d appreciate the change being reflected ahead of this week\u2019s payment cycle so open invoices aren\u2019t delayed.\n\nBank: First Continental Bank\nAccount Name: Titan Machining Services LLC\nAccount No: 4471982203\nRouting: 067014822\n\nA confirmation on the W-9 and updated remittance form is available on request. Thank you for your continued partnership.\n\nBest regards,\nAlicia Reeves\nAccounts Receivable, Titan Machining\n(203) 555-0174`
+  },
+  {
+    id: 'demo8L', label: 'CRITICAL', risk: 'critical',
+    title: '[LEGACY · 2015] Mailbox Credential Phish',
+    desc: 'Era Pair B. The vintage "your mailbox is full" credential phish, typos and all. Compare with the 2026 edition — the link tells the truth even when the prose lies badly.',
+    analysis: {
+      risk: 'critical', threatType: 'Phishing', confidence: 'full-headers',
+      summary: 'Credential-harvesting phish claiming the recipient\u2019s mailbox is over quota, linking to a non-company webmail login page.',
+      severityRationale: 'CRITICAL because a credential-entry request (intent) coincides with a login link on an unrelated domain (infrastructure). The broken English was never the real evidence.',
+      iocs: [
+        {category:'intent', type:'Data Request', description:'Directs the user to log in to avoid losing email access', example:'verify you account imediately', severity:'high'},
+        {category:'intent', type:'Urgency', description:'Threatens account closure within 24 hours', example:'you account will be close in 24hours', severity:'medium'},
+        {category:'infrastructure', type:'Link', description:'Login link points to an unrelated .info domain, not the company mail system', example:'http://webmail-quota-service.info/login', severity:'high'},
+        {category:'infrastructure', type:'Header Anomaly', description:'Bulk-mailer fingerprint on a supposed IT system notice', example:'X-Mailer: MassMail 2.4', severity:'medium'},
+        {category:'language', type:'Language Quality', description:'Language quality: broken — historically the tell, but grammar did not decide this verdict', example:'"verify you account imediately"', severity:'low'}
+      ],
+      mitre: ['T1566.002 Spearphishing Link', 'T1078 Valid Accounts'],
+      training: {title:'The link tells the truth', explanation:'Old phish like this one gave themselves away twice: once in the grammar and once in the link. Only the link was ever reliable evidence. Hover before you click — a mail-quota notice that resolves to a .info domain is an attack regardless of how it reads.', redFlags:['Login link on an unrelated domain','24-hour account-closure threat','Bulk mailer sending an \u201cIT notice\u201d','Generic greeting']},
+      bodyHighlights: 'verify you account, will be close in 24hours, click here'
+    },
+    raw: `From: IT HELPDESK <no-reply@mail-server-notice.info>\nTo: employee@meridiandefense.com\nSubject: YOUR MAILBOX IS 98% FULL !!!\nDate: Wed, 03 Jun 2015 04:22:10 -0500\nX-Mailer: MassMail 2.4\n\nDear User,\n\nYou mailbox has exceed the storage limit. you can not send or recieve new mail until you verify you account imediately. if you fail to do this you account will be close in 24hours.\n\nCLICK HERE TO VERIFY: http://webmail-quota-service.info/login\n\nThanks,\nSystem Administrator`
+  },
+  {
+    id: 'demo8M', label: 'CRITICAL', risk: 'critical',
+    title: '[MODERN · 2026] Mailbox Credential Phish',
+    desc: 'Era Pair B. The same credential phish written by an LLM: calm, precise, corporate. Same foreign login link, same verdict. Grammar changed; evidence didn\u2019t.',
+    analysis: {
+      risk: 'critical', threatType: 'Phishing', confidence: 'full-headers',
+      summary: 'Credential-harvesting phish presented as a routine mailbox storage notification in flawless corporate English, linking to a non-company login page.',
+      severityRationale: 'CRITICAL because a credential-entry request (intent) coincides with a login link on an unrelated domain (infrastructure). Polished prose neither raised nor lowered the verdict.',
+      iocs: [
+        {category:'intent', type:'Data Request', description:'Directs the user to sign in to retain mailbox access', example:'sign in to confirm your mailbox settings', severity:'high'},
+        {category:'intent', type:'Urgency', description:'Soft deadline framed as routine policy', example:'accounts not confirmed by Friday will be archived', severity:'medium'},
+        {category:'infrastructure', type:'Link', description:'Login link points to an unrelated domain, not the company mail system', example:'https://mailbox-storage-center.info/sso', severity:'high'},
+        {category:'infrastructure', type:'Header Anomaly', description:'Bulk-mailer fingerprint on a supposed internal IT notice', example:'X-Mailer: MassMail 9.1', severity:'medium'},
+        {category:'language', type:'Language Quality', description:'Language quality: polished — fluency is no longer a trust signal', example:'"as part of scheduled storage maintenance"', severity:'low'}
+      ],
+      mitre: ['T1566.002 Spearphishing Link', 'T1078 Valid Accounts'],
+      training: {title:'Calm and professional is the new urgent and broken', explanation:'Modern phishing reads like it came from your actual IT department: measured tone, plausible policy language, no typos anywhere. The evidence is unchanged: an internal storage notice should never resolve to an outside domain. Check where the link goes, not how the sentence reads.', redFlags:['Login link on an unrelated domain','Soft deadline dressed as policy','Bulk mailer sending an \u201cinternal\u201d notice','No such process announced internally']},
+      bodyHighlights: 'sign in to confirm, archived, storage maintenance'
+    },
+    raw: `From: Meridian IT Services <notifications@mail-server-notice.info>\nTo: employee@meridiandefense.com\nSubject: Scheduled storage maintenance \u2014 action needed by Friday\nDate: Wed, 03 Jun 2026 04:22:10 -0500\nX-Mailer: MassMail 9.1\n\nHello,\n\nAs part of scheduled storage maintenance, mailboxes approaching their allocation are being migrated to updated storage tiers. Your mailbox is currently at 96% of its allocation.\n\nPlease sign in to confirm your mailbox settings and complete the migration: https://mailbox-storage-center.info/sso\n\nAccounts not confirmed by Friday will be archived and restored on request through the service desk, which may take up to 72 hours.\n\nThank you,\nIT Services\nMeridian Defense Solutions`
   }
 ]
 
@@ -2701,14 +2873,15 @@ async function analyzeDemoSelected() {
   document.getElementById('progressWrap').classList.add('show');
   setStep(3); setProgress(10, `Loading ${chosen.length} demo scenario(s)…`);
 
-  const result = chosen.map(s => {
+  const _demoStamp = Date.now();
+  const result = chosen.map((s, _di) => {
     const lines = s.raw.split('\n');
     const get = k => { const l = lines.find(l => l.toLowerCase().startsWith(k.toLowerCase()+':')); return l ? l.slice(k.length+1).trim() : ''; };
     const fromRaw = get('From'); const fm = fromRaw.match(/^(.*?)\s*<(.+?)>$/) || [];
     const bi = lines.findIndex(l => l.trim() === '');
     const body = bi > -1 ? lines.slice(bi+1).join('\n').trim() : s.raw;
     return {
-      id: 'demo-'+s.id+'-'+Date.now(),
+      id: 'demo-'+s.id+'-'+_demoStamp+'-'+_di,
       from: fm[1]?.trim()||fromRaw,
       fromAddress: fm[2]||fromRaw,
       to: get('To'), subject: get('Subject'), date: get('Date'),
@@ -2727,7 +2900,16 @@ async function analyzeDemoSelected() {
   document.getElementById('progressWrap').classList.remove('show');
   setStep(4);
   if (!window.cipherOpen) toggleCipher();
-  setTimeout(() => addCipherMsg(`🎓 Training mode active — analyzed ${result.length} phishing scenario(s) from the Meridian Defense Solutions simulation. Click any flagged email to get a full walkthrough of what makes it dangerous and what to look for.`, 'bot'), 400);
+  setTimeout(() => {
+    const msgs = document.getElementById('cipherMsgs');
+    // Replace any prior training banner instead of stacking a new one each run
+    msgs.querySelectorAll('.training-banner').forEach(el => el.remove());
+    const div = document.createElement('div');
+    div.className = 'cipher-msg bot training-banner';
+    div.textContent = `🎓 Training mode active — analyzed ${result.length} phishing scenario(s). Click any flagged email for a full walkthrough of what makes it dangerous and what to look for.`;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 400);
 }
 
 // ─── FILE UPLOAD ──────────────────────────────────────
@@ -2891,8 +3073,8 @@ const CRYPTO_C2_DOMAINS_SET = new Set([
 ]);
 
 const INSECURE_CHECKS = [
-  { label: 'HTTP (unencrypted) link',       re: /http:\/\/(?!localhost|127\.)/gi,  severity: 'high',
-    desc: 'Link uses HTTP not HTTPS — unencrypted and interceptable.' },
+  { label: 'HTTP (unencrypted) link',       re: /http:\/\/(?!localhost|127\.)/gi,  severity: 'low',
+    desc: 'Link uses HTTP not HTTPS — unencrypted, but not a threat indicator on its own.' },
   { label: 'Typosquatting — brand spoof',   re: /https?:\/\/[^\s"'>]*(?:micros[o0]ft|paypa[l1]|app[l1]e(?!\.com)|g[o0]{2}g[l1]e|amaz[o0]n|faceb[o0]{2}k)[^\s"'>]*/gi, severity: 'high',
     desc: 'Domain uses character substitution (0 for o, 1 for l) to impersonate a trusted brand.' },
   { label: 'Suspicious TLD',               re: /https?:\/\/[^\s"'>]+\.(xyz|top|click|loan|gq|ml|cf|tk|pw|cc|su|icu|work|online)\b/gi, severity: 'medium',
@@ -3166,7 +3348,7 @@ CURRENT EMAIL UNDER REVIEW:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 350,
         messages: [{
           role: 'user',
