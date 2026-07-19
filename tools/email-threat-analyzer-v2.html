@@ -2086,7 +2086,7 @@ async function analyzeBatch(emails) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
-      max_tokens: 2000,
+      max_tokens: 4000,
       messages: [{
         role: 'user',
         content: `You are a phishing detection analyst. Classify each email using a conjunction-based severity rubric. Return ONLY a JSON array, one object per email. No markdown, no preamble.
@@ -2580,7 +2580,7 @@ async function analyzeBatchPaste(emails) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
-      max_tokens: 2000,
+      max_tokens: 4000,
       messages: [{
         role: 'user',
         content: `You are a phishing detection analyst. Classify each email using a conjunction-based severity rubric. Return ONLY a JSON array, one object per email. No markdown, no preamble.
@@ -3073,8 +3073,8 @@ const CRYPTO_C2_DOMAINS_SET = new Set([
 ]);
 
 const INSECURE_CHECKS = [
-  { label: 'HTTP (unencrypted) link',       re: /http:\/\/(?!localhost|127\.)/gi,  severity: 'high',
-    desc: 'Link uses HTTP not HTTPS — unencrypted and interceptable.' },
+  { label: 'HTTP (unencrypted) link',       re: /http:\/\/(?!localhost|127\.)/gi,  severity: 'low',
+    desc: 'Link uses HTTP not HTTPS — unencrypted, but not a threat indicator on its own.' },
   { label: 'Typosquatting — brand spoof',   re: /https?:\/\/[^\s"'>]*(?:micros[o0]ft|paypa[l1]|app[l1]e(?!\.com)|g[o0]{2}g[l1]e|amaz[o0]n|faceb[o0]{2}k)[^\s"'>]*/gi, severity: 'high',
     desc: 'Domain uses character substitution (0 for o, 1 for l) to impersonate a trusted brand.' },
   { label: 'Suspicious TLD',               re: /https?:\/\/[^\s"'>]+\.(xyz|top|click|loan|gq|ml|cf|tk|pw|cc|su|icu|work|online)\b/gi, severity: 'medium',
