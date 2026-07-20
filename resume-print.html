@@ -115,7 +115,7 @@ body { font-family: 'Open Sans', sans-serif; font-size: 10.5pt; color: var(--tex
         <li>Founded LLC operating as parent entity for ArgusX threat intelligence platform, threat research, and detection content authoring</li>
         <li>Built <strong>ArgusX</strong> — independent threat intel platform aggregating data from 20+ public and vendor research sources, processing 1,000+ posts/day. Designed methodology for capability commodification analysis and trigger-based forecasting. Live system; demo available under NDA</li>
         <li>Published 15+ threat analyses on nation-state operations (Volt Typhoon, Apple Watch attack surface, UNC1069/Lazarus npm supply chain), criminal infrastructure (TeamPCP Telnyx, Glassworm, Lumma Stealer), and identity research (38-breach exposure study, LinkedIn verification gap)</li>
-        <li>Authored 2 detection rules submitted to Sublime Security's production ruleset (Glassworm, homoglyph BEC); built Ladon static analysis tool validated against Gamaredon (Russian APT), ValleyRAT (Chinese APT), and live phishing. Zero false negatives</li>
+        <li>Authored 2 detection rules submitted to Sublime Security's production ruleset (Glassworm, homoglyph BEC); built Ladon static analysis tool tested against Gamaredon (Russian APT), ValleyRAT (Chinese APT), and live phishing that bypassed Gmail</li>
         <li>Mapped Lumma Stealer C2 infrastructure via Wireshark/Zeek analysis, identified TLS-encrypted domains invisible to standard filters, published IOCs to ThreatFox</li>
       </ul>
     </div>
@@ -182,7 +182,7 @@ body { font-family: 'Open Sans', sans-serif; font-size: 10.5pt; color: var(--tex
     <div class="portfolio-item">
       <div class="p-title">Ladon · Document Security Analyzer</div>
       <div class="p-url"><a href="https://yanaivanov.com/labs/lab_log_011.html">yanaivanov.com/labs/lab_log_011.html</a></div>
-      <div class="p-desc">Static analysis tool for PDF and calendar invite triage. Validated against 5 malicious samples including ValleyRAT (Chinese APT), Gamaredon (Russian FSB-linked APT), and live phishing that bypassed Gmail. Zero false negatives. IOCs published to ThreatFox.</div>
+      <div class="p-desc">Static analysis tool for PDF and calendar invite triage. Tested against 5 malicious samples including ValleyRAT (Chinese APT), Gamaredon (Russian FSB-linked APT), and live phishing that bypassed Gmail. Flagged malicious indicators across the sample set. IOCs published to ThreatFox.</div>
     </div>
     <div class="portfolio-item">
       <div class="p-title">Volt Typhoon — Living Off the Land</div>
