@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>The Half-Click — Operation RoundPress and the Attack That Needs No Victim | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker: max 2 items, single line */
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+
+/* Red bar — wraps naturally, no overflow hidden */
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT GRID — improved number typography ── */
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper)}
+.stat-num-item:last-child{border-right:none}
+/* Numbers use display-clean (IBM Plex Serif) — clean, data-forward */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-num-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-num-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── ATTACK CHAIN — vertical stepped layout (cleaner than 5-col grid) ── */
+.attack-chain{margin:1rem 0;display:flex;flex-direction:column;gap:0}
+.chain-step{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;align-items:start;position:relative;padding-bottom:1.25rem}
+.chain-step:last-child{padding-bottom:0}
+.chain-step::before{content:'';position:absolute;left:1.2rem;top:2.5rem;bottom:0;width:2px;background:var(--rule)}
+.chain-step:last-child::before{display:none}
+.chain-num{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.chain-normal .chain-num{background:var(--bg);border:2px solid var(--rule);color:var(--ink3)}
+.chain-warning .chain-num{background:var(--amber-dim);border:2px solid var(--amber);color:var(--amber)}
+.chain-danger .chain-num{background:var(--red-dim);border:2px solid var(--red);color:var(--red)}
+.chain-body{padding-top:.4rem}
+.chain-label{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.25rem;letter-spacing:.02em}
+.chain-warning .chain-label{color:var(--amber)}
+.chain-danger .chain-label{color:var(--red)}
+.chain-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── GLYPH DEMO (for homoglyph/domain spoofing reports) ── */
+.glyph-demo{background:#0a0f1a;border-radius:4px;padding:1.75rem 2rem;margin:2rem 0}
+.glyph-demo-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.25rem}
+.glyph-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.25rem}
+.glyph-row:last-child{margin-bottom:0}
+.glyph-pane{padding:1rem 1.25rem;border-radius:3px}
+.glyph-pane.real{background:rgba(20,90,50,.2);border:1px solid rgba(74,222,128,.2)}
+.glyph-pane.fake{background:rgba(192,57,43,.15);border:1px solid rgba(239,68,68,.2)}
+.glyph-pane-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem}
+.glyph-pane.real .glyph-pane-label{color:#4ade80}
+.glyph-pane.fake .glyph-pane-label{color:#ef4444}
+.glyph-domain{font-family:var(--mono);font-size:1.1rem;letter-spacing:.05em;margin-bottom:.4rem}
+.glyph-pane.real .glyph-domain{color:#e2e8f0}
+.glyph-pane.fake .glyph-domain{color:#fca5a5}
+.glyph-unicode{font-family:var(--mono);font-size:.65rem;color:#64748b;line-height:1.6}
+.glyph-pane.fake .glyph-unicode{color:#ef4444}
+
+/* ── SPLIT VISUAL ── */
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+
+/* ── TIMELINE ── */
+.timeline{margin:1.5rem 0;position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:.45rem;top:0;bottom:0;width:2px;background:var(--rule)}
+.tl-item{position:relative;margin-bottom:1.25rem;padding-left:1.25rem}
+.tl-item::before{content:'';position:absolute;left:-1.6rem;top:.4rem;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tl-date{font-family:var(--mono);font-size:.62rem;color:var(--red);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem}
+.tl-title{font-weight:700;color:var(--ink);font-size:.9rem;margin-bottom:.2rem;font-family:var(--display)}
+.tl-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── FINDINGS LIST ── */
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--amber);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--amber-dim);color:var(--amber)}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── TOOL EMBED (for reports with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .split-visual{grid-template-columns:1fr}
+  .figure-body{padding:1.25rem 1rem}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .figure-body{padding:1rem .85rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.62rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-num-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .tbl-wrap{font-size:.75rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<header class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-kicker">Threat Intelligence Analysis · Russia · Nation-State</div>
+
+    <h1 class="title">The Half-Click —<br><em>Operation RoundPress and the Attack That Needs No Victim</em></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">July 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Threat Actors</div><div class="value">TA458 (GRU) · TA488 (Void Blizzard)</div></div>
+      <div class="meta-item"><div class="label">Active Since</div><div class="value">2023 — Escalating 2026</div></div>
+      <div class="meta-item"><div class="label">Severity</div><div class="value">Critical — Active Campaign</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    NSA · FBI · Proofpoint joint disclosure July 23, 2026 &nbsp;·&nbsp; Zero user interaction required &nbsp;·&nbsp; Active campaign
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT — each section in its own .section > .wrap block
+     ════════════════════════════════════════════════════════════ -->
+
+<!-- SECTION 01 — EXECUTIVE SUMMARY -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>In March 2026, I published an analysis of how Russian intelligence bypassed Signal and WhatsApp without breaking their encryption. The attack required something from the victim — a response, a code, a moment of trust misplaced. The human was the vulnerability. I called it the encryption illusion: perfect technology, exploited through imperfect people.</p>
+
+  <p>This is the next chapter. And it is worse.</p>
+
+  <p>On July 23, 2026, Proofpoint published a joint disclosure with the NSA and FBI documenting two Russian-aligned threat actors — TA458 (Operation RoundPress) and TA488 (Void Blizzard) — running active campaigns against government webmail servers using what researchers are calling <strong>half-click exploits</strong>. The name tells you everything. You do not need to click a link. You do not need to open an attachment. You do not need to respond to anything. You open the email. That is all. The attack is already over.</p>
+
+  <p>The targets are not random. Ukrainian government ministries. US nuclear installations. NATO member governments in Albania, Greece, Moldova, and Turkey. Eastern European defense industrial base companies. The organizations that chose to self-host their email specifically because they did not trust commercial cloud providers with sensitive communications. The very decision intended to protect them became the attack surface.</p>
+
+  <div class="stat-num-grid">
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">5+</div>
+      <div class="stat-num-label">Months Undetected</div>
+      <div class="stat-num-sub">TA488 operated against Zimbra servers from July 2025 before discovery. Source: Proofpoint, July 2026.</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">90</div>
+      <div class="stat-num-label">Days of Email Stolen</div>
+      <div class="stat-num-sub">ZimReaper exfiltrated the last 90 days of inbox content from every compromised account.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">6+</div>
+      <div class="stat-num-label">Webmail Platforms<br>Targeted</div>
+      <div class="stat-num-sub">Zimbra, Roundcube, mDaemon, Horde, SOGo, Kerio — each exploited with platform-specific zero-days.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">0</div>
+      <div class="stat-num-label">User Actions Required</div>
+      <div class="stat-num-sub">Opening the email in a vulnerable webmail client is sufficient. No click, no download, no interaction.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 02 — BACKGROUND -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>The Sovereignty Trap — Why the Victims Chose the Vulnerable System</h2>
+
+  <p>To understand why this attack is so damaging, you have to understand why the targets were running Zimbra and Roundcube in the first place. This is not a story about careless organizations making obvious mistakes. It is a story about organizations making a reasonable security decision that Russian intelligence turned into a kill zone.</p>
+
+  <p>Zimbra and Roundcube are open-source, self-hosted webmail platforms. An organization installs them on its own servers, in its own data center, under its own control. No third party has access to the email. No foreign company holds the encryption keys. No US subpoena can reach the server. For a Ukrainian government ministry, a small NATO-member defense contractor, or an Eastern European university handling sensitive research, this is not paranoia — it is exactly the kind of infrastructure sovereignty that responsible governments are supposed to maintain.</p>
+
+  <p>The irony is almost too precise. The organizations most committed to keeping their communications off commercial cloud servers, most careful about foreign access to their data, most deliberate about infrastructure independence — are the exact organizations running the platforms with the widest known attack surface and the least internal capacity to patch them.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Analyst note:</strong> Good intentions are not a defense posture. The decision to self-host email for sovereignty reasons is sound. The failure is what comes after: treating the infrastructure as "set it and forget it" because the threat model was foreign interception, not foreign exploitation. TA458 and TA488 understood this gap. The targeting was not accidental.</p>
+  </div>
+
+  <div class="figure">
+    <div class="figure-title">Figure 1 — Operation RoundPress: Escalation Timeline 2023–2026</div>
+    <div class="figure-body">
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-date">2023 — Initial Operations</div>
+          <div class="tl-title">TA458 Targets Roundcube — Ukraine Focus</div>
+          <div class="tl-desc">APT28-linked actor begins exploiting known XSS vulnerability CVE-2020-35730 in Roundcube webmail. Targets are Ukrainian military personnel and government agencies. CERT-UA and Recorded Future document the campaign. The technique is not new — but the scale and deliberateness of the targeting signals a strategic priority, not opportunistic scanning.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">2024 — Platform Expansion</div>
+          <div class="tl-title">TA458 Adds Horde, mDaemon, Zimbra — First Zero-Day</div>
+          <div class="tl-desc">TA458 expands beyond Roundcube. A zero-day vulnerability in MDaemon Email Server (CVE-2024-11182) is discovered and exploited before the vendor knows it exists. ESET researchers catch it, report it, and it is patched in 14 days — but not before Ukrainian defense companies are compromised. The SpyPress JavaScript malware family is deployed across all four platforms, customized per target.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">July 2025 — New Actor Enters</div>
+          <div class="tl-title">TA488 (Void Blizzard) Begins Zimbra Zero-Day Campaign</div>
+          <div class="tl-desc">A second Russian-aligned actor — TA488, a private contractor working for Russian intelligence per US federal indictments — begins exploiting CVE-2025-66376, an unknown Zimbra vulnerability. Targets include Ukrainian government entities and US nuclear installations. The campaign runs for five months before detection. ZimReaper malware exfiltrates credentials, 2FA codes, and 90 days of email from each victim via DNS tunneling.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Early 2026 — Further Expansion</div>
+          <div class="tl-title">TA458 Adds SOGo and Kerio — Shift to Long-Term Access</div>
+          <div class="tl-desc">TA458 discovers and exploits zero-days in SOGo webmail (CVE-2026-8496) and the legacy Kerio platform. On Roundcube targets, SpyPress evolves — shifting from credential theft to persistent backdoor installation, including a PHP webshell and six fallback persistence mechanisms. The actor is no longer just reading email. They are establishing long-term footholds inside the server itself.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">July 23, 2026 — Public Disclosure</div>
+          <div class="tl-title">NSA, FBI, and Proofpoint Publish Joint Advisory</div>
+          <div class="tl-desc">Coordinated disclosure burns the operations publicly. The NSA and FBI issuing a joint advisory means the intelligence community decided warning defenders was more important than preserving continued observation of the campaigns. That decision is itself a signal about severity.</div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Sources: Proofpoint Threat Insight (July 23, 2026), ESET Research, CERT-UA, NSA/FBI Joint Advisory CSA_RUSSIA_PHISHING_TARGET_ZIMBRA</div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 03 — ATTACK CHAIN -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>How It Works — The Attack That Needs No Victim</h2>
+
+  <p>In the Signal campaign I analyzed earlier this year, Russia needed the victim to do something. Respond to a message. Share a verification code. Scan a QR code. The human was the vulnerability — and humans can be trained, warned, made suspicious.</p>
+
+  <p>Operation RoundPress removed that requirement entirely. The attack I am describing here does not need you to click anything, download anything, or respond to anything. It needs you to open an email. The exploit is embedded in the HTML of the message itself. The moment your vulnerable webmail client renders it, malicious JavaScript executes silently in the background — inheriting your authenticated session, your permissions, your mailbox access.</p>
+
+  <p>The technique is called a <strong>half-click exploit</strong>. Not zero-click, because you did technically open the email. But the threshold between "doing nothing" and "being compromised" has collapsed to the smallest possible human action — one that is automatic, routine, and completely indistinguishable from reading any other email.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The obfuscation technique explained:</strong> TA458 and TA488 hide the exploit by fragmenting HTML tags with fake CSS <code>@import</code> directives. The sanitizer reads <code>scr@import;ipt</code> and strips the @import sequence — leaving <code>script</code>. The browser reassembles the fragments into valid executable markup. What looks like corrupted gibberish to a security filter is a perfectly structured exploit to a browser renderer.</p>
+  </div>
+
+  <div class="figure">
+    <div class="figure-title">Figure 2 — ZimReaper Attack Chain (TA488 / CVE-2025-66376)</div>
+    <div class="figure-body">
+      <div class="attack-chain">
+        <div class="chain-step chain-normal">
+          <div class="chain-num">01</div>
+          <div class="chain-body">
+            <div class="chain-label">Delivery — The Email Arrives</div>
+            <div class="chain-desc">TA488 sends an email from either an adversary-controlled Proton Mail account or a previously compromised legitimate sender account. The content is generic — a cooperation proposal, a meeting request, a news item. The subject line is unremarkable. Nothing about the email flags as suspicious because nothing about it needs to be suspicious. The payload is in the HTML.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">02</div>
+          <div class="chain-body">
+            <div class="chain-label">Rendering — The Victim Opens the Email</div>
+            <div class="chain-desc">The victim opens the email in their Zimbra webmail client — a browser tab running the authenticated session. Zimbra's HTML sanitizer attempts to strip dangerous markup, but the @import tag-splitting obfuscation causes it to miss the payload. The browser reconstructs the fragmented tags and executes the JavaScript. This happens in milliseconds. The victim is still reading the first sentence.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">03</div>
+          <div class="chain-body">
+            <div class="chain-label">Credential Harvest — ZimReaper Takes What It Came For</div>
+            <div class="chain-desc">The JavaScript payload — tracked by Proofpoint as ZimReaper — runs inside the authenticated browser session. It steals the CSRF token, the auto-complete password stored by the browser, and any available 2FA scratch codes. All of this is exfiltrated immediately via DNS queries encoded in Base32 to attacker-controlled domains spoofing Zimbra telemetry services. The exfiltration looks like normal DNS traffic.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">04</div>
+          <div class="chain-body">
+            <div class="chain-label">Persistent Access — The Back Door Is Installed</div>
+            <div class="chain-desc">ZimReaper calls Zimbra's own <code>CreateAppSpecificPasswordRequest</code> API to generate a password named "ZimbraWeb" — a credential that allows IMAP, POP3, or SMTP access without requiring two-factor authentication. The victim's account now has a permanent back door that survives password changes. The attacker can read email, send email as the victim, and use the compromised account to send exploit-laden messages to the next target.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">05</div>
+          <div class="chain-body">
+            <div class="chain-label">Exfiltration — The Last 90 Days Leave the Building</div>
+            <div class="chain-desc">ZimReaper iterates through the last 90 days of email accessible to the compromised user and uses Zimbra's export API to send the full archive to the attacker's C2 server in a TGZ file via HTTP POST. It also walks the Zimbra Global Address List using every possible two-character combination — mapping the entire organization's contact directory. For a Ukrainian defense ministry official, 90 days of email during an active war is an intelligence gold mine.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Based on Proofpoint's July 23, 2026 technical analysis of TA488 ZimReaper campaigns targeting CVE-2025-66376. MITRE ATT&CK: T1566.001 (Spearphishing Attachment), T1059.007 (JavaScript), T1539 (Steal Web Session Cookie), T1048 (Exfiltration Over Alternative Protocol)</div>
+  </div>
+
+  <div class="split-visual">
+    <div class="split-panel left">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">check_circle</span> What Looks Normal</div>
+      <p><strong>The sender:</strong> A Proton Mail address or a known colleague's account — TA488 used compromised accounts to add legitimacy to subsequent waves.</p>
+      <p><strong>The email:</strong> A cooperation proposal from a Belgian foundation. A meeting request. A news summary. Generic, professional, unremarkable.</p>
+      <p><strong>The DNS traffic:</strong> Queries to domains that look like Zimbra telemetry services. Hosted on Cloudflare. Indistinguishable from normal infrastructure traffic.</p>
+      <p><strong>The API calls:</strong> Zimbra's own APIs, called with the user's own session token. A security log shows a user exporting their own mail.</p>
+    </div>
+    <div class="split-panel right">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">warning</span> What Is Actually Happening</div>
+      <p><strong>The sender:</strong> A Russian intelligence contractor with a federal indictment, or an actor who already owns someone else's account.</p>
+      <p><strong>The email:</strong> An exploit delivery vehicle. The content is irrelevant — it just needs to be opened.</p>
+      <p><strong>The DNS traffic:</strong> Base32-encoded credentials, 2FA codes, and session tokens leaving the organization silently in DNS query subdomains.</p>
+      <p><strong>The API calls:</strong> An attacker using the victim's session to install a permanent backdoor and steal 90 days of classified communications.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 04 — FINDINGS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>Key Findings</h2>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">The Patch Gap Is the Attack Surface</div>
+        <div class="finding-desc">CVE-2025-66376 was exploited for at least five months before it was patched. But the vulnerability gap is structural, not situational. Zimbra, Roundcube, mDaemon, SOGo, and Kerio are self-hosted platforms deployed by organizations without dedicated security teams. When a patch is released, someone has to notice it, test it, schedule a maintenance window, and apply it. For a Ukrainian ministry IT team managing dozens of systems during wartime, that process can take months. TA458 has been exploiting this operational reality since 2023 — moving from one webmail platform to the next as patches close individual CVEs, because the patch gap is always there.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">The Sophistication Gap Is Deliberate Targeting</div>
+        <div class="finding-desc">The organizations running Zimbra and Roundcube are not the organizations with CrowdStrike, a 24/7 SOC, and behavioral anomaly detection on DNS. They are the organizations that chose open-source self-hosted infrastructure because it was free, sovereign, and under their control. TA458 and TA488 are not stumbling across these targets — they are specifically hunting for webmail platforms that are widely deployed in resource-constrained government environments and have historically slow patch cycles. The attack is calibrated to operate below the detection threshold of exactly the defenders most likely to be running the targeted software.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">The Attack Bypasses Every Post-Delivery Defense</div>
+        <div class="finding-desc">Traditional email security tools — spam filters, antivirus, attachment scanning — operate on the envelope and attachments of an email. A half-click XSS exploit lives in the HTML body of a message that contains no malicious attachment, no known-bad URL, no suspicious sender, and no file to scan. Once the email reaches the inbox and the victim opens it in a vulnerable webmail client, every post-delivery defense is bypassed by design. SIEM, EDR, and UEBA tools can theoretically detect anomalous behavior after the fact — unusual API calls, DNS exfiltration patterns — but only if those specific behaviors are already being monitored, and only after the credentials are already stolen. The only clean detection window is before delivery.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">4</div>
+      <div>
+        <div class="finding-title">Compromised Accounts Become Weapons Against New Targets</div>
+        <div class="finding-desc">Both TA458 and TA488 used compromised sender accounts to deliver exploit emails to subsequent targets. A Ukrainian government official receiving an exploit email from a known colleague's address has no technical signal to distinguish it from a legitimate message. The trust network of the first victim becomes the attack infrastructure for the next wave. This is why the NSA and FBI coordinated on public disclosure — burning the operation was worth more than continued intelligence collection because the campaign was actively spreading through trusted government communication channels.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">5</div>
+      <div>
+        <div class="finding-title">The Exploit Supply Chain Suggests Intelligence Coordination</div>
+        <div class="finding-desc">Proofpoint notes that TA458 has access to a consistent supply of webmail zero-days — more than a single research team could realistically develop. The working hypothesis is that these exploits are either developed by a GRU-adjacent team and distributed down to operational actors, or procured from a third party. The fact that TA488 used CVE-2025-66376 while TA458 did not — despite TA458's established access to Zimbra exploits — suggests deliberate deconfliction between operations, which implies coordination at a level above individual threat actor groups. Private contractors working for Russian intelligence, as US federal indictments confirm for TA488, operating within a structured intelligence tasking framework.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 05 — RECOMMENDATIONS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>What to Do — and What the Advice Has to Acknowledge</h2>
+
+  <p>The standard security recommendation at this point would be: patch your systems, enable MFA, monitor your logs. That advice is correct. It is also insufficient when the audience is a Ukrainian government ministry with three IT staff managing wartime infrastructure, or a small Eastern European defense contractor that has been running Zimbra since 2015 and considers it stable.</p>
+
+  <p>The realistic defense posture depends on where you are in the resource spectrum. Here is what actually applies at each level.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Migrate Off Self-Hosted Webmail Where Possible</div>
+        <div class="step-content-desc">The most effective mitigation is not a patch — it is moving to a hosted platform where someone else manages the security update cycle. Gmail, Microsoft 365, and Proton Mail for Business all provide automatic security updates. For organizations with sovereignty concerns about US platforms, European-hosted alternatives with strong update practices are a better risk tradeoff than a self-hosted server that will not be patched for months after a CVE drops. The sovereignty argument for self-hosting only holds if the self-hosted system is actually secure — an unpatched Zimbra server in your own data center is less secure than a well-managed hosted service.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">If You Run Zimbra — Audit for ZimReaper Now</div>
+        <div class="step-content-desc">Proofpoint's remediation guidance is specific: review <code>/opt/zimbra/log/audit.log</code> for calls to <code>CreateAppSpecificPassword</code> and look for any entry named "ZimbraWeb." If you find one, the account was compromised. The app-specific password provides persistent access that survives password changes — you must revoke it explicitly, not just reset the user's main password. Also review the last 90 days of your email export API calls for anomalous bulk export activity.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">Block the Known C2 Infrastructure</div>
+        <div class="step-content-desc">Proofpoint published the full list of ZimReaper C2 domains, all spoofing Zimbra telemetry services. Block them at your DNS resolver and firewall. Also block the known TA458 SpyPress C2 domains. These indicators are current as of July 2026 — the actors burned their infrastructure after the Seqrite disclosure in February, but the IOCs are still valid for retrospective investigation and pattern awareness.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">Add an Email Security Layer Before the Webmail Client</div>
+        <div class="step-content-desc">The only clean detection window in this attack chain is before the email reaches the inbox. Email security platforms that sit in the mail flow — analyzing the HTML body of messages before delivery — can detect the @import tag-splitting obfuscation pattern, the <code>svg onload=eval(atob(</code> structure, and known exploit signatures before any webmail client renders them. For organizations that cannot or will not migrate off self-hosted webmail, this is the single highest-leverage mitigation available. Sublime Security's existing rule <code>body_cve_2023_5631.yml</code> already catches one specific Roundcube exploit using this approach. The pattern generalizes.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-content-label">Treat Safe Advice Carefully in Vulnerable Environments</div>
+        <div class="step-content-desc">Standard advice — "view the raw source of suspicious emails to check for malicious HTML" — is dangerous if the person asking is running a vulnerable unpatched Zimbra client. Opening the email to view source triggers the attack. The only safe action in that environment is not opening the email at all until the webmail server is patched. Advise accordingly: patch first, investigate second.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Known IOCs — ZimReaper and SpyPress (July 2026)</h3>
+  <p>All domains defanged. Source: Proofpoint Threat Insight, July 23, 2026.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Indicator</th>
+          <th>Type</th>
+          <th>Actor</th>
+          <th>First Seen</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="code">zmailanalytics[.]com</td><td>C2 Domain</td><td class="red">TA488 ZimReaper</td><td>July 2025</td></tr>
+        <tr><td class="code">zimbra-metadata[.]com</td><td>C2 Domain</td><td class="red">TA488 ZimReaper</td><td>August 2025</td></tr>
+        <tr><td class="code">analyticemailmeter[.]com</td><td>C2 Domain</td><td class="red">TA488 ZimReaper</td><td>September 2025</td></tr>
+        <tr><td class="code">emailanalytics.com[.]ua</td><td>C2 Domain</td><td class="red">TA488 ZimReaper</td><td>September 2025</td></tr>
+        <tr><td class="code">mailnalysis[.]com</td><td>C2 Domain</td><td class="red">TA488 ZimReaper</td><td>November 2025</td></tr>
+        <tr><td class="code">zimbrastat[.]com</td><td>C2 Domain</td><td class="red">TA488 ZimReaper</td><td>December 2025</td></tr>
+        <tr><td class="code">zimbrasoft.com[.]ua</td><td>C2 Domain</td><td class="red">TA488 ZimReaper</td><td>January 2026</td></tr>
+        <tr><td class="code">synacorzimbra[.]nl</td><td>C2 Domain</td><td class="red">TA488 ZimReaper</td><td>February 2026</td></tr>
+        <tr><td class="code">share-ya[.]space</td><td>C2 Domain</td><td class="amber">TA458 SpyPress</td><td>May 2025</td></tr>
+        <tr><td class="code">xwe[.]us</td><td>C2 Domain</td><td class="amber">TA458 SpyPress</td><td>June 2025</td></tr>
+        <tr><td class="code">hgmydr[.]wiki</td><td>C2 Domain</td><td class="amber">TA458 SpyPress</td><td>March 2026</td></tr>
+        <tr><td class="code">c.laurent.ejfa@proton[.]me</td><td>Sender Email</td><td class="red">TA488</td><td>September 2025</td></tr>
+        <tr><td class="code">j.moreau.epsc@proton[.]me</td><td>Sender Email</td><td class="red">TA488</td><td>October 2025</td></tr>
+        <tr><td class="code">zmb_pl_v3_</td><td>JS Script ID</td><td class="red">ZimReaper Marker</td><td>Throughout</td></tr>
+        <tr><td class="code">ZimbraWeb</td><td>App Password Name</td><td class="red">Persistence Indicator</td><td>Throughout</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 06 — CONCLUSION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>The Escalation — From Human Error to Human Irrelevance</h2>
+
+  <p>Earlier this year I wrote about how Russian intelligence bypassed Signal without breaking it. They asked people for their verification codes and people handed them over, believing they were talking to support. The human was the vulnerability. The fix — in theory — was training.</p>
+
+  <p>Operation RoundPress is the next step. The human is no longer the vulnerability in the same way. You cannot train someone out of opening an email. You cannot build a mental model that protects against an attack that requires no suspicious action. The half-click exploit does not need your trust. It does not need your mistake. It needs your email client to render HTML, which is what email clients are designed to do.</p>
+
+  <p>What I find most striking about this campaign is not the technical sophistication — though the @import tag-splitting obfuscation is clever — it is the targeting logic. Russian intelligence did not go after the organizations with the best security tooling. They went after the organizations that made a considered, reasonable decision to self-host their email for sovereignty reasons, and whose IT teams are stretched too thin to maintain the patch cycles that decision requires. The attack is calibrated to the operational reality of the defender, not just the technical vulnerability of the software.</p>
+
+  <p>My assumption — and I want to be clear this is analytical hypothesis, not confirmed reporting — is that AI-assisted vulnerability research is accelerating this cycle. Proofpoint itself notes that LLMs will likely increase TA458's vulnerability discovery rate. If that is true, the window between a new webmail CVE and active exploitation is going to compress further. The defenders who cannot patch in 30 days will not be able to patch in 10. The structural gap gets worse, not better.</p>
+
+  <p>The NSA and FBI chose to burn this operation publicly. That decision is its own signal — the intelligence community decided the defensive value of disclosure outweighed the counterintelligence value of continued observation. When signals agencies make that call, it means the damage was already significant enough that warning others mattered more than watching longer.</p>
+
+  <p>The organizations being targeted are not abstract. They are the people coordinating weapons shipments to Ukraine. The officials managing nuclear facility operations. The defense companies producing the equipment that is physically being used in an active war. The emails stolen from a Ukrainian ministry official's Zimbra inbox over 90 days during active combat are not a data breach in the conventional sense. They are an intelligence collection operation with direct lethal implications.</p>
+
+  <p>The email is still the most reliable attack surface. It always was. This campaign is not a new discovery — it is a confirmation that sophisticated actors have been systematically working through every webmail platform with meaningful government adoption, one zero-day at a time, for three years. And the patch gap they are exploiting is not going to close by itself.</p>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis is based entirely on publicly available information including the Proofpoint Threat Insight blog (July 23, 2026), the NSA/FBI Joint Cybersecurity Advisory on TA488/Void Blizzard, ESET's Operation RoundPress report (May 2025), CERT-UA advisories, and US federal court indictment documents. The paragraph on AI-assisted vulnerability research represents analytical hypothesis based on Proofpoint's own forward assessment — it is not confirmed reporting. A companion Sublime Security detection rule targeting the @import tag-splitting obfuscation pattern described in this report has been submitted to the open-source rule feed and is pending review. This analysis represents the author's independent research and is produced as a contribution to the security community.</p>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap">
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- EDIT: footer spans — report title · author · date on left; classification note on right -->
+<footer>
+  <span>The Half-Click &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; July 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+</body>
+</html>
