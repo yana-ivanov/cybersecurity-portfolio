@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>The Trusted Pass — pkpass Abuse and the Travel Sector's Fastest-Growing Attack Surface | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker: max 2 items, single line */
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+
+/* Red bar — wraps naturally, no overflow hidden */
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT GRID — improved number typography ── */
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper)}
+.stat-num-item:last-child{border-right:none}
+/* Numbers use display-clean (IBM Plex Serif) — clean, data-forward */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-num-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-num-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── ATTACK CHAIN — vertical stepped layout (cleaner than 5-col grid) ── */
+.attack-chain{margin:1rem 0;display:flex;flex-direction:column;gap:0}
+.chain-step{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;align-items:start;position:relative;padding-bottom:1.25rem}
+.chain-step:last-child{padding-bottom:0}
+.chain-step::before{content:'';position:absolute;left:1.2rem;top:2.5rem;bottom:0;width:2px;background:var(--rule)}
+.chain-step:last-child::before{display:none}
+.chain-num{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.chain-normal .chain-num{background:var(--bg);border:2px solid var(--rule);color:var(--ink3)}
+.chain-warning .chain-num{background:var(--amber-dim);border:2px solid var(--amber);color:var(--amber)}
+.chain-danger .chain-num{background:var(--red-dim);border:2px solid var(--red);color:var(--red)}
+.chain-body{padding-top:.4rem}
+.chain-label{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.25rem;letter-spacing:.02em}
+.chain-warning .chain-label{color:var(--amber)}
+.chain-danger .chain-label{color:var(--red)}
+.chain-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── GLYPH DEMO (for homoglyph/domain spoofing reports) ── */
+.glyph-demo{background:#0a0f1a;border-radius:4px;padding:1.75rem 2rem;margin:2rem 0}
+.glyph-demo-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.25rem}
+.glyph-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.25rem}
+.glyph-row:last-child{margin-bottom:0}
+.glyph-pane{padding:1rem 1.25rem;border-radius:3px}
+.glyph-pane.real{background:rgba(20,90,50,.2);border:1px solid rgba(74,222,128,.2)}
+.glyph-pane.fake{background:rgba(192,57,43,.15);border:1px solid rgba(239,68,68,.2)}
+.glyph-pane-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem}
+.glyph-pane.real .glyph-pane-label{color:#4ade80}
+.glyph-pane.fake .glyph-pane-label{color:#ef4444}
+.glyph-domain{font-family:var(--mono);font-size:1.1rem;letter-spacing:.05em;margin-bottom:.4rem}
+.glyph-pane.real .glyph-domain{color:#e2e8f0}
+.glyph-pane.fake .glyph-domain{color:#fca5a5}
+.glyph-unicode{font-family:var(--mono);font-size:.65rem;color:#64748b;line-height:1.6}
+.glyph-pane.fake .glyph-unicode{color:#ef4444}
+
+/* ── SPLIT VISUAL ── */
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+
+/* ── TIMELINE ── */
+.timeline{margin:1.5rem 0;position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:.45rem;top:0;bottom:0;width:2px;background:var(--rule)}
+.tl-item{position:relative;margin-bottom:1.25rem;padding-left:1.25rem}
+.tl-item::before{content:'';position:absolute;left:-1.6rem;top:.4rem;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tl-date{font-family:var(--mono);font-size:.62rem;color:var(--red);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem}
+.tl-title{font-weight:700;color:var(--ink);font-size:.9rem;margin-bottom:.2rem;font-family:var(--display)}
+.tl-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── FINDINGS LIST ── */
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--amber);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--amber-dim);color:var(--amber)}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── TOOL EMBED (for reports with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .split-visual{grid-template-columns:1fr}
+  .figure-body{padding:1.25rem 1rem}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .figure-body{padding:1rem .85rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.62rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-num-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .tbl-wrap{font-size:.75rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<header class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-kicker">Threat Analysis · Social Engineering · Travel Sector</div>
+
+    <h1 class="title">The Trusted Pass —<br><em>pkpass Abuse and the Travel Sector's Fastest-Growing Attack Surface</em></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">July 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Attack Vector</div><div class="value">Email · Apple Wallet · pkpass</div></div>
+      <div class="meta-item"><div class="label">Sector</div><div class="value">Travel · Hospitality · Executive</div></div>
+      <div class="meta-item"><div class="label">Severity</div><div class="value">High — Active Campaign Infrastructure</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    47,318 travel domains registered in May 2026 alone &nbsp;·&nbsp; 1 in 112 already malicious &nbsp;·&nbsp; Zero pkpass coverage in major email security rulesets
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT — each section in its own .section > .wrap block
+     ════════════════════════════════════════════════════════════ -->
+
+<!-- SECTION 01 — EXECUTIVE SUMMARY -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>In May 2026 alone, 47,318 new travel-related domains were registered — a 33% increase from the prior month. One in every 112 was already classified as malicious or suspicious. Three coordinated bulk-registration campaigns were running simultaneously, impersonating American Express, Lloyds Travel Choice, and Fora Travel across hundreds of domains on short-lived TLDs. Check Point Research called it what it is: a deliberate, seasonal intensification targeting an industry that processes enormous volumes of personal and financial data precisely when people are distracted, rushing, and eager to secure a good deal.</p>
+
+  <p>The hospitality and travel sector recorded 2,291 average weekly cyberattacks per organization in May 2026 — a 24% year-over-year increase and a 122% cumulative rise since 2023. The global average across all industries over the same period: 2%. This is not a crime of opportunity. It is a crime of infrastructure.</p>
+
+  <p>Within this surge, one attack vector remains almost entirely undocumented and undetected at the email layer: the abuse of <code>.pkpass</code> files — the Apple Wallet pass format used by airlines, hotels, event venues, and ticketing platforms to deliver boarding passes, hotel keys, loyalty cards, and event tickets directly to a user's phone. This analysis examines how that format is being weaponized, why it is particularly effective against high-value executive targets, and why current email security tooling has no coverage for it.</p>
+
+  <div class="stat-num-grid">
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">122%</div>
+      <div class="stat-num-label">Attack<br>Volume Rise</div>
+      <div class="stat-num-sub">Travel sector cumulative increase since May 2023. Source: Check Point Research, June 2026.</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">47,318</div>
+      <div class="stat-num-label">Malicious<br>Domains</div>
+      <div class="stat-num-sub">New travel-related domains registered in May 2026. 1 in 112 already classified malicious.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">2,291</div>
+      <div class="stat-num-label">Weekly<br>Attacks</div>
+      <div class="stat-num-sub">Average per organization in travel sector, May 2026. Global average: 1,636.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">0</div>
+      <div class="stat-num-label">pkpass<br>Rules</div>
+      <div class="stat-num-sub">Detection rules for .pkpass abuse in major open-source email security rulesets as of July 2026.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 02 — BACKGROUND -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>What a pkpass File Is — and Why Users Trust It Completely</h2>
+
+  <p>A <code>.pkpass</code> file is the format Apple uses for Wallet passes — boarding passes, hotel keys, event tickets, loyalty cards, transit passes, and more. Technically, it is a ZIP archive containing JSON configuration files and PNG images, signed by an Apple Developer certificate. When you receive one in email, iMessage, or Safari, iOS recognizes the MIME type, displays a full-screen Wallet preview, and offers an Add button. The pass syncs to your Apple Watch. It works exactly as expected.</p>
+
+  <p>The format is designed for trust. A boarding pass looks like a boarding pass. A concert ticket looks like a concert ticket. The visual presentation — the airline logo, the seat number, the barcode, the gate information — is indistinguishable from a legitimate pass issued by the real airline or venue. And that trust is the attack surface.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Technical note:</strong> A <code>.pkpass</code> file cannot execute code on your device. Adding one to your wallet does not install malware. The signature proves which Apple Developer team issued the pass — not that the pass is benign. The attack is not in the file itself. The attack is in the email that delivers it, and in the links the pass and email contain.</p>
+  </div>
+
+  <p>The <code>webServiceURL</code> field in a pass tells Apple Wallet to poll a URL for updates. Every time your phone checks for a pass update, it sends your device push token, the pass's authentication token, your IP address, and device metadata to that URL. If the attacker controls the webServiceURL, they have a persistent, legitimate-looking communication channel to your device — one that was opened when you tapped "Add to Wallet" on what looked like your boarding pass.</p>
+
+  <p>More practically: the email delivering the <code>.pkpass</code> file almost always contains a link — "Manage your booking," "Update your seat," "Complete check-in," "Your gate has changed." That link is the payload. The pass is the trust mechanism that makes you believe the email is real.</p>
+
+  <div class="split-visual">
+        <div class="split-panel left">
+          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">check_circle</span> What the Victim Sees</div>
+          <p><strong>The attachment:</strong> A boarding pass with the airline's correct logo, their name, seat number, flight details, and a working barcode. Adds to Wallet instantly. Works on their Apple Watch.</p>
+          <p><strong>The email:</strong> A professional confirmation from what looks like the airline's domain. Correct formatting, correct branding, a link to "manage your booking."</p>
+          <p><strong>The sender:</strong> A display name matching the airline. The email address looks close enough — especially on mobile where the full address is rarely visible.</p>
+        </div>
+        <div class="split-panel right">
+          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">warning</span> What Is Actually Happening</div>
+          <p><strong>The attachment:</strong> A crafted pkpass file signed with a purchased Apple Developer certificate. The webServiceURL points to attacker infrastructure. Every Wallet update poll leaks device metadata.</p>
+          <p><strong>The email:</strong> The "manage your booking" link goes to a phishing page hosted on a travel-lure domain registered days earlier. The page harvests airline credentials, passport details, or payment information.</p>
+          <p><strong>The sender:</strong> A lookalike domain — one character substituted, a hyphen added, a different TLD — registered during one of the coordinated bulk-registration campaigns identified by Check Point Research.</p>
+        </div>
+      </div>
+  <p style="font-size:.78rem;color:#94a3b8;font-family:var(--mono);margin-top:.75rem">Attack model based on documented pkpass format capabilities and Check Point Research travel domain campaign analysis, June 2026.</p>
+
+</div>
+</div>
+
+<!-- SECTION 03 — ATTACK CHAIN -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>The Attack Chain — How pkpass Abuse Works Against High-Value Targets</h2>
+
+  <p>For opportunistic attackers, the pkpass phishing chain is straightforward: register a lookalike travel domain, build a convincing booking confirmation email with a crafted pass attached, and send it at scale during peak travel season. The numbers support the approach — 47,318 new travel domains in May 2026 alone, one in 112 already flagged as malicious. The infrastructure is cheap, the lure is seasonal, and the target pool is enormous.</p>
+
+  <p>For targeted attackers pursuing a specific individual — an executive, a government official, a defense contractor — the chain has a more sophisticated upstream stage that has received almost no public analysis. It begins not with a fake email, but with a genuine one.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Key finding:</strong> The most effective pkpass phishing attack does not require creating a fake booking. It requires compromising the travel agent, corporate travel management platform, or executive assistant who handles real bookings — and inserting a malicious pass or link into an outgoing confirmation that the victim already expects to receive. The email is legitimate. The sender is legitimate. Only the attachment or the link inside it is not.</p>
+  </div>
+
+  <div class="figure">
+    <div class="figure-title">Figure 1 — Targeted pkpass Attack Chain Against Executive Target</div>
+    <div class="figure-body">
+      <div class="attack-chain">
+        <div class="chain-step chain-normal">
+          <div class="chain-num">01</div>
+          <div class="chain-body">
+            <div class="chain-label">Initial Access — The Travel Agent or PA</div>
+            <div class="chain-desc">The attacker's first target is not the executive. It is the person who manages the executive's travel — a personal assistant, a corporate travel manager, or a third-party travel agency. These targets are high-value precisely because they have access to everything: travel schedules, hotel reservations, airline confirmations, passport details, and the executive's communication preferences. A phishing email to the PA, a credential stuffing attack against a travel management platform, or a supply chain compromise of a booking tool gives the attacker visibility into the executive's upcoming travel. Scattered Spider's documented expansion into the airline sector in 2025 used exactly this approach — identity-centric intrusion targeting help desk staff and administrative personnel, not the executive directly.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-normal">
+          <div class="chain-num">02</div>
+          <div class="chain-body">
+            <div class="chain-label">Reconnaissance — Reading the Travel Schedule</div>
+            <div class="chain-desc">With access to the PA's email or the travel management platform, the attacker now knows the executive's complete upcoming itinerary: departure city, destination, airline, flight number, hotel, dates, and — if a corporate travel policy is in use — the traveler's known loyalty numbers, seat preferences, and passport nationality. This intelligence has direct value as espionage and direct value as the raw material for the next stage. The attacker does not need to guess what a believable confirmation looks like — they have the real one.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">03</div>
+          <div class="chain-body">
+            <div class="chain-label">Manipulation — The Malicious Confirmation</div>
+            <div class="chain-desc">The attacker crafts a booking confirmation that matches the real itinerary exactly — correct flight number, correct seat, correct dates, correct hotel — but with one change. The "manage your booking" link in the email goes to an attacker-controlled credential harvesting page. Or the pkpass attachment has been modified: same visual presentation, but the webServiceURL now points to attacker infrastructure. Or both. The email goes out from a lookalike domain or from the compromised PA's actual account. The executive receives a confirmation for a trip they actually have booked, from a sender they recognize, with a pass that adds to their wallet correctly. Nothing feels wrong because nothing looks wrong.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">04</div>
+          <div class="chain-body">
+            <div class="chain-label">Delivery — The Pass Lands in Wallet</div>
+            <div class="chain-desc">The executive taps "Add to Wallet." The pass syncs to their Apple Watch. Every time Apple Wallet polls for updates, the device sends a push token, authentication token, IP address, and device fingerprint to the attacker's webServiceURL. If the executive clicks the "manage your booking" link in the email — and they have every reason to, since they actually have a booking to manage — they land on a phishing page harvesting airline credentials, passport details, or corporate payment information. The pass in their wallet is the artifact that made the email feel legitimate enough to act on.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">05</div>
+          <div class="chain-body">
+            <div class="chain-label">Exploitation — What the Attacker Gains</div>
+            <div class="chain-desc">Depending on what the victim clicks, the attacker acquires: airline credentials enabling access to the executive's full travel history and future bookings; passport details enabling identity fraud or travel disruption; corporate credit card numbers used for bookings; precise real-time location data (the webServiceURL receives the device IP as the executive moves through airports and hotels); and a persistent update channel to the wallet pass that survives the trip and continues polling afterward. For a nation-state actor targeting an executive at a defense contractor or government official, the travel intelligence alone — where they are going, when they are traveling, what hotel they are staying in — has direct operational value.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Attack model synthesized from documented pkpass format capabilities, Check Point Research June 2026 travel campaign analysis, and Scattered Spider aviation targeting (FBI advisory, 2025). No confirmed incident of this specific chain has been publicly documented — this represents an underdocumented but technically validated attack path.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 04 — FINDINGS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>Key Findings</h2>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">The pkpass Format Has No Detection Coverage at the Email Layer</div>
+        <div class="finding-desc">A search of major open-source email security rulesets reveals zero detection rules targeting <code>.pkpass</code> file abuse as of July 2026. The same rulesets contain 25+ rules for QR code abuse — a related attack vector that receives extensive coverage. The gap is structural: pkpass files are treated as benign attachments by every email security tool that does not specifically analyze their internal structure and embedded URLs. A malicious boarding pass attachment will pass every standard email security check because nothing in those checks looks inside a pkpass file.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">The Travel Sector's Attack Surge Creates the Delivery Infrastructure</div>
+        <div class="finding-desc">The 47,318 travel-related domains registered in May 2026 — one in 112 already malicious — represent the bulk-registration infrastructure that makes pkpass phishing at scale operationally viable. Three coordinated campaigns identified by Check Point Research were already impersonating American Express travel rewards, Lloyds Travel Choice, and Fora Travel across hundreds of domains. These domains are the sender addresses and landing pages for phishing emails carrying pkpass attachments. The infrastructure was built before summer travel season peaked. It is not waiting to be built — it is running.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">The webServiceURL Creates a Persistent Post-Delivery Channel</div>
+        <div class="finding-desc">Unlike a standard phishing email, a pkpass file with a malicious webServiceURL establishes a persistent channel that continues operating after the initial delivery. Apple Wallet polls the webServiceURL for pass updates automatically — sending device push tokens, authentication tokens, and IP addresses each time. For a targeted attack against a traveling executive, this provides real-time location intelligence as the victim moves through airports, hotels, and meeting venues. The pass in the victim's wallet continues to report even if the phishing email is eventually identified and deleted.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">4</div>
+      <div>
+        <div class="finding-title">The Travel Agent Compromise Path Has No Publicly Documented Incidents — Yet</div>
+        <div class="finding-desc">The upstream attack chain described in this analysis — compromising a travel management platform, corporate travel agent, or executive assistant to insert a malicious pass into a legitimate booking confirmation — has not been publicly documented in any threat intelligence report reviewed for this analysis. This is not evidence it has not happened. It is evidence that if it has happened, it was not detected or not disclosed. The technique requires no novel capability beyond what Scattered Spider and similar identity-centric threat actors already deploy routinely. The absence of documentation is the gap, not the reassurance.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+    <div class="finding fn-medium">
+      <div class="finding-num">5</div>
+      <div>
+        <div class="finding-title">Detection Is Possible at the Email Delivery Layer</div>
+        <div class="finding-desc">A <code>.pkpass</code> attachment arriving from an unsolicited sender, combined with urgency language and a link to a recently registered or suspicious TLD domain, is detectable before delivery. The email security platform sits at exactly the right point in the chain — before the victim sees the pass, before they tap Add to Wallet, before the webServiceURL begins polling. The detection rule does not need to analyze the pass's internal structure. The combination of attachment type, sender profile, and link destination is sufficient signal for a high-confidence detection at the email layer.</div>
+        <span class="finding-tag">MEDIUM</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 05 — RECOMMENDATIONS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>Recommendations</h2>
+
+  <p>The pkpass threat operates at the intersection of two gaps: a format that is trusted by default and a detection category that does not exist yet. The following recommendations address both layers.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Treat pkpass Attachments from Unsolicited Senders as Suspicious</div>
+        <div class="step-content-desc">A <code>.pkpass</code> file from an airline, hotel, or event venue that you have an existing relationship with is expected and benign. A pkpass from a sender you have no prior relationship with — or from a domain that does not match the travel company's known infrastructure — should be treated with the same suspicion as any other unexpected attachment. Before tapping Add to Wallet, verify the sender domain character by character. On mobile, where the full email address is often hidden behind a display name, view the full headers before acting.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Do Not Click Booking Management Links in Email — Go Direct</div>
+        <div class="step-content-desc">The most reliable defense against the pkpass phishing chain is the same as the defense against any travel phishing: type the airline or hotel URL directly into your browser rather than following links in email. If you receive a notification about a booking change, seat assignment, or gate update, go to the travel company's website directly and log in. Do not follow the link in the email even if the email appears completely legitimate — because in the targeted version of this attack, it may be legitimate except for the link.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">For High-Value Targets: Audit Travel Management Access</div>
+        <div class="step-content-desc">If an executive's travel is managed by an assistant, a corporate travel agency, or a travel management platform, that access chain is an attack surface. Review who has access to travel booking platforms and executive itineraries. Apply MFA to all travel management accounts. Monitor for unusual access — login from unexpected locations or devices, bulk itinerary exports, changes to contact information for confirmation delivery. The upstream attack described in this analysis does not require a technical exploit — it requires access to one account with visibility into executive travel.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">For Security Teams: Add pkpass Detection to Email Security Rules</div>
+        <div class="step-content-desc">Email security platforms operating at the delivery layer have a clean detection opportunity. A rule targeting <code>.pkpass</code> attachments from unsolicited senders, combined with urgency language and links to newly registered or suspicious TLD domains, catches the opportunistic version of this attack before delivery. The targeted version — where the email comes from a compromised legitimate sender — is harder to detect at the email layer but can be flagged through anomaly detection on sender behavior and booking confirmation patterns. A companion detection rule is in development and will be submitted to Sublime Security's open-source rule feed.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-content-label">Review Passes Already in Your Wallet</div>
+        <div class="step-content-desc">If you have added passes from sources you no longer recognize, or from trips that have concluded, remove them. A pass with a malicious webServiceURL continues polling for updates indefinitely — it does not expire when the trip ends. In iOS, open Wallet, tap any pass, and scroll to the bottom to remove it. This is particularly relevant for loyalty cards, event tickets, and other long-lived passes that may have been added from sources you no longer remember.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>MITRE ATT&CK Mapping</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Technique</th><th>ID</th><th>Stage</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Phishing: Spearphishing Attachment</td><td class="code">T1566.001</td><td class="amber">Delivery</td><td>pkpass attachment as phishing vehicle</td></tr>
+        <tr><td>Phishing: Spearphishing Link</td><td class="code">T1566.002</td><td class="amber">Delivery</td><td>Malicious booking management link in email body</td></tr>
+        <tr><td>Compromise Accounts: Email Accounts</td><td class="code">T1586.002</td><td class="red">Initial Access</td><td>Travel agent / PA account compromise in targeted variant</td></tr>
+        <tr><td>Gather Victim Identity Information</td><td class="code">T1589</td><td class="red">Reconnaissance</td><td>Passport details, loyalty numbers, travel schedule</td></tr>
+        <tr><td>Web Service: Dead Drop Resolver</td><td class="code">T1102.001</td><td class="red">C2</td><td>webServiceURL as persistent device polling channel</td></tr>
+        <tr><td>Steal Web Session Cookie</td><td class="code">T1539</td><td class="red">Credential Access</td><td>Airline / hotel credential harvesting via phishing page</td></tr>
+        <tr><td>System Location Discovery</td><td class="code">T1614</td><td class="red">Discovery</td><td>Real-time IP-based location tracking via webServiceURL polls</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 06 — CONCLUSION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>The Format That Bypassed the Question</h2>
+
+  <p>Email security tooling has invested heavily in QR code detection — 25+ rules in major open-source rulesets, computer vision analysis, screenshot-based URL extraction from images. The investment is justified. QR code phishing has been a documented, high-volume attack vector for years. The tooling followed the threat.</p>
+
+  <p>The pkpass format shares the QR code's core mechanism — a barcode or QR code embedded in a visually convincing document that the victim trusts implicitly — but adds three capabilities that QR code phishing does not have: a persistent update channel via webServiceURL, a direct path into the most trusted app on a user's phone, and a format that has never been treated as a threat vector by any email security rule.</p>
+
+  <p>The travel sector's attack surge in 2026 — 122% cumulative growth, 47,318 malicious domains in a single month, three coordinated bulk-registration campaigns running simultaneously — is the delivery infrastructure for this vector at scale. The opportunistic version is already running. The targeted version, upstream-compromising a travel agent or PA to insert a malicious pass into a legitimate booking confirmation, has not been publicly documented. That absence is not a reason for confidence.</p>
+
+  <p>Artificial intelligence is accelerating every layer of this threat. The three coordinated bulk-registration campaigns Check Point identified — 210+ sequential hotel-lure domains, 108 Fora Travel domains across different TLDs — reflect automated infrastructure that would have required significant manual effort two years ago. AI-generated phishing copy makes the emails that deliver pkpass files grammatically perfect and contextually personalized at scale. AI image generation makes convincing fake boarding passes trivial to produce. And AI voice cloning — already documented in travel-sector vishing campaigns in 2025 and 2026 — means the follow-up call confirming a "booking issue" can sound exactly like the airline's real support staff. The human who manages an executive's travel is not failing when they are deceived by this. They are operating against an adversary whose tools have fundamentally changed while the awareness training has not.</p>
+
+  <p>The detection window is the email layer — before delivery, before the victim sees the pass, before Add to Wallet is tapped. That window closes the moment the pass lands in the inbox. What happens after that — the webServiceURL polling, the persistent location tracking, the credential harvest if the victim clicks the booking link — is difficult to catch and difficult to undo. The rule that catches this before delivery is simpler to write than the forensics required afterward.</p>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis is based on publicly available information including Check Point Research's June 2026 travel phishing report, Apple's published pkpass format specification, FBI advisory on Scattered Spider aviation sector targeting (2025), and Polyswarm's aviation and aerospace threat landscape report (May 2026). The upstream travel agent compromise attack chain described in Section 3 represents a technically validated but publicly undocumented threat model — it is analytical synthesis, not confirmed incident reporting. A companion Sublime Security detection rule targeting pkpass attachment abuse is in development and will be submitted to the open-source rule feed when complete. This analysis represents independent research produced as a contribution to the security community.</p>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap">
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- EDIT: footer spans — report title · author · date on left; classification note on right -->
+<footer>
+  <span>The Trusted Pass &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; July 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+</body>
+</html>
