@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>After the Half-Click — What Persistent Mailbox Access Makes Possible | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker: max 2 items, single line */
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+
+/* Red bar — wraps naturally, no overflow hidden */
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT GRID — improved number typography ── */
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper)}
+.stat-num-item:last-child{border-right:none}
+/* Numbers use display-clean (IBM Plex Serif) — clean, data-forward */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-num-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-num-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── ATTACK CHAIN — vertical stepped layout (cleaner than 5-col grid) ── */
+.attack-chain{margin:1rem 0;display:flex;flex-direction:column;gap:0}
+.chain-step{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;align-items:start;position:relative;padding-bottom:1.25rem}
+.chain-step:last-child{padding-bottom:0}
+.chain-step::before{content:'';position:absolute;left:1.2rem;top:2.5rem;bottom:0;width:2px;background:var(--rule)}
+.chain-step:last-child::before{display:none}
+.chain-num{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.chain-normal .chain-num{background:var(--bg);border:2px solid var(--rule);color:var(--ink3)}
+.chain-warning .chain-num{background:var(--amber-dim);border:2px solid var(--amber);color:var(--amber)}
+.chain-danger .chain-num{background:var(--red-dim);border:2px solid var(--red);color:var(--red)}
+.chain-body{padding-top:.4rem}
+.chain-label{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.25rem;letter-spacing:.02em}
+.chain-warning .chain-label{color:var(--amber)}
+.chain-danger .chain-label{color:var(--red)}
+.chain-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── GLYPH DEMO (for homoglyph/domain spoofing reports) ── */
+.glyph-demo{background:#0a0f1a;border-radius:4px;padding:1.75rem 2rem;margin:2rem 0}
+.glyph-demo-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.25rem}
+.glyph-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.25rem}
+.glyph-row:last-child{margin-bottom:0}
+.glyph-pane{padding:1rem 1.25rem;border-radius:3px}
+.glyph-pane.real{background:rgba(20,90,50,.2);border:1px solid rgba(74,222,128,.2)}
+.glyph-pane.fake{background:rgba(192,57,43,.15);border:1px solid rgba(239,68,68,.2)}
+.glyph-pane-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem}
+.glyph-pane.real .glyph-pane-label{color:#4ade80}
+.glyph-pane.fake .glyph-pane-label{color:#ef4444}
+.glyph-domain{font-family:var(--mono);font-size:1.1rem;letter-spacing:.05em;margin-bottom:.4rem}
+.glyph-pane.real .glyph-domain{color:#e2e8f0}
+.glyph-pane.fake .glyph-domain{color:#fca5a5}
+.glyph-unicode{font-family:var(--mono);font-size:.65rem;color:#64748b;line-height:1.6}
+.glyph-pane.fake .glyph-unicode{color:#ef4444}
+
+/* ── SPLIT VISUAL ── */
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+
+/* ── TIMELINE ── */
+.timeline{margin:1.5rem 0;position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:.45rem;top:0;bottom:0;width:2px;background:var(--rule)}
+.tl-item{position:relative;margin-bottom:1.25rem;padding-left:1.25rem}
+.tl-item::before{content:'';position:absolute;left:-1.6rem;top:.4rem;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tl-date{font-family:var(--mono);font-size:.62rem;color:var(--red);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem}
+.tl-title{font-weight:700;color:var(--ink);font-size:.9rem;margin-bottom:.2rem;font-family:var(--display)}
+.tl-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── FINDINGS LIST ── */
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--amber);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--amber-dim);color:var(--amber)}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── TOOL EMBED (for reports with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .split-visual{grid-template-columns:1fr}
+  .figure-body{padding:1.25rem 1rem}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .figure-body{padding:1rem .85rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.62rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-num-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .tbl-wrap{font-size:.75rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<header class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-kicker">Threat Intelligence Analysis · Russia · Nation-State</div>
+    <div class="mast-kicker" style="color:#ef4444;margin-top:.3rem">Series · Part 2 of 2</div>
+
+    <h1 class="title">After the Half-Click —<br><em>What Persistent Mailbox Access Makes Possible</em></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">August 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Threat Actors</div><div class="value">TA458 (GRU) · TA488 · Lyceum</div></div>
+      <div class="meta-item"><div class="label">Attack Type</div><div class="value">Post-Compromise · Persistence · C2</div></div>
+      <div class="meta-item"><div class="label">Severity</div><div class="value">Critical — Post-Compromise</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    HOLLOWGRAPH disclosed July 20, 2026 &nbsp;·&nbsp; Calendar events dated 2050 as C2 dead drops &nbsp;·&nbsp; 60-day forecast included
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT — each section in its own .section > .wrap block
+     ════════════════════════════════════════════════════════════ -->
+
+<!-- SECTION 01 — EXECUTIVE SUMMARY -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p><a href="roundpress_analysis.html">Part 1 of this series</a> documented the half-click exploit — the moment a Ukrainian government official opens a routine email in a vulnerable Zimbra client and, in the time it takes to read the first sentence, loses their credentials, their 2FA codes, and ninety days of email to Russian intelligence. That is where most analyses of Operation RoundPress stop.</p>
+
+  <p>This is the part that comes after.</p>
+
+  <p>The credential theft documented by Proofpoint, NSA, and FBI is not the end of the attack. It is the beginning of an access relationship. ZimReaper installs an app-specific password named "ZimbraWeb" — a credential that survives password resets, bypasses two-factor authentication, and provides persistent IMAP, POP3, and SMTP access to the victim's mailbox indefinitely. SpyPress goes further, installing a PHP webshell and six fallback persistence mechanisms directly on the mail server. The actor is not leaving. They are moving in.</p>
+
+  <p>What persistent mailbox access enables has received almost no public analysis. This report examines five post-compromise capabilities — silent MFA interception, timing attacks using stolen behavioral intelligence, calendar-based C2 infrastructure, hidden mailbox rule manipulation, and compromised-account lateral spread — and closes with a datestamped 60-day forecast of where this campaign goes next.</p>
+
+  <div class="stat-num-grid">
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">∞</div>
+      <div class="stat-num-label">Persistence<br>Duration</div>
+      <div class="stat-num-sub">ZimbraWeb app password survives password resets. Access continues until explicitly revoked.</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">12</div>
+      <div class="stat-num-label">HOLLOWGRAPH<br>Victims</div>
+      <div class="stat-num-sub">Group-IB confirmed 12 infected systems using M365 calendars as C2. Active June 3 — July 9, 2026.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">2050</div>
+      <div class="stat-num-label">Event Date<br>Used</div>
+      <div class="stat-num-sub">HOLLOWGRAPH schedules C2 calendar events for May 13, 2050 to keep them out of the victim's view.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">60</div>
+      <div class="stat-num-label">Day Forecast<br>Window</div>
+      <div class="stat-num-sub">Datestamped predictions based on observed actor behavior patterns. Published August 1, 2026.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 02 — POST-COMPROMISE CAPABILITIES -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>What the Access Enables — Five Capabilities That Start After the Half-Click</h2>
+
+  <p>The ZimbraWeb app password and the SpyPress PHP webshell are not the goal. They are the infrastructure for what comes next. Persistent mailbox access gives an attacker capabilities that go far beyond reading the victim's email — and most of them are not detectable by the victim, their organization, or standard security tooling.</p>
+
+  <div class="findings">
+
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">Silent MFA Interception</div>
+        <div class="finding-desc">Email-based multi-factor authentication — "Was this you? Click yes or no" — is widely deployed across government and enterprise systems as a second layer of account security. It assumes the email inbox is trustworthy. Once an attacker has persistent read and delete access to a compromised mailbox, that assumption collapses. The attacker reads the MFA confirmation email before the victim does, clicks approve, and deletes the notification from the inbox. On desktop email clients where MFA notifications arrive in the background, the victim may never see the push notification at all. The attack is timed to behavioral patterns learned from 90 days of stolen email — late at night, during a known meeting, while the victim is traveling. The ZimReaper exfiltration includes calendar data and email metadata that tells the attacker exactly when the victim is least likely to be watching their inbox.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">Calendar-Based C2 — The HOLLOWGRAPH Technique</div>
+        <div class="finding-desc">On July 20, 2026, Group-IB disclosed HOLLOWGRAPH — a Windows backdoor attributed with high confidence to the Cavern framework, likely Iranian-nexus Lyceum, that uses a compromised Microsoft 365 mailbox's calendar as a two-way command-and-control dead drop. The malware authenticates to the Microsoft Graph API using valid credentials from the compromised account. Operator instructions arrive as encrypted calendar event attachments. Stolen files leave the same way. Every malicious event is scheduled for May 13, 2050 — a date far enough in the future that it never appears on the victim's actual calendar view. The secondary channel uses DNS tunneling via IPv6 AAAA queries to refresh credentials. The entire operation blends into legitimate Microsoft cloud traffic and leaves no obvious artifact for traditional network security tools. This technique is not uniquely Iranian. Any actor with persistent mailbox access — including TA458 and TA488 following a RoundPress compromise — can deploy calendar-based C2 against any mail platform that exposes a calendar API.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+
+    <div class="finding fn-critical">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">Hidden Mailbox Rule Manipulation</div>
+        <div class="finding-desc">Every major webmail platform — Zimbra, Roundcube, Microsoft 365, Gmail — allows users to create inbox rules that automatically filter, forward, delete, or redirect incoming email. An attacker with persistent mailbox access can create hidden rules that operate silently without the victim's knowledge. Documented uses include: silently forwarding all incoming email to an attacker-controlled address; auto-deleting security notifications before the victim sees them; redirecting financial communications to a secondary folder the attacker monitors; and suppressing MFA alerts, breach notifications, and IT security warnings. These rules survive password changes and, in some implementations, persist even through account recovery. Microsoft documented this technique in 2022 in the context of BEC attacks. In the RoundPress post-compromise context, the same capability is available to any actor that has established persistent mailbox access via ZimbraWeb or an equivalent mechanism.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+
+    <div class="finding fn-high">
+      <div class="finding-num">4</div>
+      <div>
+        <div class="finding-title">Lateral Spread via Trusted Sender</div>
+        <div class="finding-desc">Both TA458 and TA488 used previously compromised legitimate sender accounts to deliver exploit emails to subsequent targets — documented in the <a href="roundpress_analysis.html">Proofpoint Part 1 disclosure</a>. With persistent mailbox access, this capability is available indefinitely, not just for the initial campaign wave. A compromised Ukrainian ministry official's mailbox becomes a persistent launch platform for delivering half-click exploit emails to the official's contacts — colleagues, counterparts in allied governments, contractors, international partners. The recipient has every reason to open an email from a known, trusted colleague. The exploit fires the moment they do. The trust network of each compromised account becomes the attack infrastructure for the next wave. This is the mechanism by which a targeted campaign against twelve individuals in June 2026 becomes a much broader intelligence collection operation by September.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+
+    <div class="finding fn-high">
+      <div class="finding-num">5</div>
+      <div>
+        <div class="finding-title">Outgoing Email Modification</div>
+        <div class="finding-desc">Server-level access — which SpyPress establishes via PHP webshell — enables modification of outgoing email before it is signed by DKIM. An attacker operating from inside the compromised Zimbra server can insert tracking pixels into outgoing email signatures, replacing the legitimate logo with an externally-hosted image that beacons to attacker infrastructure when the email is opened by the recipient. Every time the compromised official sends an email, the attacker learns who read it, when, and from what IP address. This maps the victim's contact network in real time, identifies active communication partners, and provides geolocation intelligence on counterparts in other organizations. Unlike the initial compromise — which required delivering a malicious email to the victim — this capability requires no further action from either the victim or their contacts. The attacker is now passively collecting intelligence through every email the compromised official sends.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 03 — HOLLOWGRAPH DEEP DIVE -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>HOLLOWGRAPH — The Calendar as a Weapon</h2>
+
+  <p>The HOLLOWGRAPH disclosure deserves its own section because it represents the clearest documented example of what post-compromise mailbox access enables at the infrastructure level. It was disclosed by Group-IB on July 20, 2026 — three days before the Proofpoint RoundPress advisory — and the two reports together describe a complete picture of how nation-state actors are using compromised email infrastructure as operational backbone, not just intelligence collection.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Attribution note:</strong> Group-IB attributes HOLLOWGRAPH with high confidence to the Cavern modular backdoor framework, citing matching command syntax and architecture. Researchers identified several technical similarities with the Iranian-nexus threat actor Lyceum. This is not a Russian actor — but the technique is platform-agnostic. Any actor with persistent mailbox access, including TA458 and TA488, can deploy calendar-based C2 using the same Microsoft Graph API mechanism. The technique, not the actor, is the finding.</p>
+  </div>
+
+  <div class="figure">
+    <div class="figure-title">Figure 1 — HOLLOWGRAPH Calendar C2 Operation</div>
+    <div class="figure-body">
+      <div class="attack-chain">
+        <div class="chain-step chain-normal">
+          <div class="chain-num">01</div>
+          <div class="chain-body">
+            <div class="chain-label">Initial Access — Compromised Microsoft 365 Account</div>
+            <div class="chain-desc">The attacker obtains credentials for a Microsoft 365 account — either through phishing, credential stuffing, or purchase on criminal markets. This account, observed by Group-IB as linked to Israel, becomes the operational infrastructure for the campaign. HOLLOWGRAPH is deployed as a .NET NativeAOT-compiled DLL that masquerades as a Brotli compression library on disk, loaded by a separate orchestrator component on the victim host. The malware never contacts an attacker-owned server for any command or payload traffic.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-normal">
+          <div class="chain-num">02</div>
+          <div class="chain-body">
+            <div class="chain-label">C2 Channel Establishment — The Calendar Dead Drop</div>
+            <div class="chain-desc">HOLLOWGRAPH authenticates to the Microsoft Graph API using valid credentials from the compromised M365 account. The malware supports exactly two commands: "get" for retrieving operator instructions, and "send" for exfiltrating stolen files. Instructions arrive as encrypted attachments to calendar events. Stolen files leave the same way. Every malicious event is dated May 13, 2050 — far enough in the future that it never appears on the mailbox owner's active calendar view. The entire operation looks like legitimate Microsoft cloud API traffic because it is authenticated against a real account using real credentials.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">03</div>
+          <div class="chain-body">
+            <div class="chain-label">Credential Refresh — DNS Tunneling via IPv6</div>
+            <div class="chain-desc">HOLLOWGRAPH maintains a secondary channel using DNS tunneling through IPv6 AAAA record queries against the attacker's domain <code>cloudlanecdn[.]com</code>. This channel is used to retrieve updated Microsoft Entra ID credentials — tenant ID, client ID, client secret, and target mailbox — which are saved locally in a file disguised as a log file. When the M365 credentials expire or are rotated, HOLLOWGRAPH refreshes them via DNS without any direct contact with attacker infrastructure. The use of IPv6 AAAA records adds an additional layer of obscurity — many organizations monitor IPv4 DNS traffic closely but have less visibility into IPv6 DNS queries.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">04</div>
+          <div class="chain-body">
+            <div class="chain-label">Selective Engagement — Disciplined Operational Security</div>
+            <div class="chain-desc">Group-IB identified 12 infected systems but observed only 3 actively communicating with the attacker during the observation window. The earliest communication was June 3, 2026; the most recent was July 9. The selective interaction pattern indicates deliberate operational discipline — the attacker is engaging only with intended targets at intended times, not running automated bulk collection. This mirrors the TA458 and TA488 behavioral pattern from <a href="roundpress_analysis.html">Part 1</a>: campaigns that are highly targeted rather than opportunistic, calibrated to the specific intelligence value of each victim.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Source: Group-IB Threat Intelligence, "HOLLOWGRAPH: Turning Microsoft 365 Calendars into Covert Command-and-Control Channels," July 20, 2026. MITRE ATT&CK: T1102.001 (Web Service: Dead Drop Resolver), T1048 (Exfiltration Over Alternative Protocol), T1071.004 (DNS)</div>
+  </div>
+
+  <div class="callout callout-amber">
+    <p><strong>The Zimbra parallel:</strong> HOLLOWGRAPH uses Microsoft 365 calendar APIs. Zimbra has a calendar API. Roundcube has calendar functionality. SOGo was originally designed as a groupware and calendar platform. Every webmail platform targeted by RoundPress has some equivalent of the calendar API that HOLLOWGRAPH exploits. The technique does not require Microsoft infrastructure — it requires persistent authenticated access to any mailbox with a calendar API. TA458 has that access in the organizations they have already compromised.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 04 — DETECTION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>What Can Be Detected — and Where the Gaps Are</h2>
+
+  <p>The post-compromise capabilities described in Section 02 are harder to detect than the initial half-click exploit — because they use legitimate platform features, authenticated credentials, and normal API traffic. But they are not undetectable. The gap is not technical capability — it is operational configuration and awareness.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th>Detection Method</th>
+          <th>Tool Layer</th>
+          <th>Availability</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>ZimbraWeb persistence</strong></td>
+          <td>Audit <code>/opt/zimbra/log/audit.log</code> for <code>CreateAppSpecificPassword</code> events named "ZimbraWeb"</td>
+          <td class="amber">SIEM / Log Analysis</td>
+          <td>Available now — requires log monitoring configuration</td>
+        </tr>
+        <tr>
+          <td><strong>Silent MFA interception</strong></td>
+          <td>Monitor for MFA approvals that occur during unusual hours or when the user is known to be unavailable; correlate with email delete events in the same window</td>
+          <td class="amber">UEBA / SIEM</td>
+          <td>Requires behavioral baseline — not available in self-hosted Zimbra without additional tooling</td>
+        </tr>
+        <tr>
+          <td><strong>Calendar C2 (HOLLOWGRAPH)</strong></td>
+          <td>Monitor Microsoft Graph API calls from non-interactive service accounts; alert on calendar events with attachment creation outside business hours or dated far in future</td>
+          <td class="amber">SIEM / M365 Defender</td>
+          <td>M365 Defender detects this natively — self-hosted Zimbra calendar API requires custom monitoring</td>
+        </tr>
+        <tr>
+          <td><strong>Hidden mailbox rules</strong></td>
+          <td>Periodic audit of all inbox rules across accounts; alert on rules created by non-standard processes or outside business hours; specifically look for rules that forward, delete, or suppress security notifications</td>
+          <td class="amber">SIEM / Exchange Admin</td>
+          <td>Native in Exchange Online — requires manual audit process in self-hosted deployments</td>
+        </tr>
+        <tr>
+          <td><strong>Outgoing email modification</strong></td>
+          <td>DKIM validation on outbound mail at the sending server; monitor for signature image URLs that don't match approved domain list; network monitoring for unusual outbound HTTP requests from mail server</td>
+          <td class="red">NDR / Mail Gateway</td>
+          <td>Rarely configured — requires deliberate deployment</td>
+        </tr>
+        <tr>
+          <td><strong>Lateral spread via trusted sender</strong></td>
+          <td>Email security platform at the delivery layer — detect exploit payload patterns in emails regardless of sender reputation; sender profile alone is insufficient when the account is legitimately compromised</td>
+          <td class="red">Email Security</td>
+          <td>Detection rule targeting @import tag-splitting pattern submitted to Sublime Security's open-source rule feed (<a href="https://github.com/sublime-security/sublime-rules/pull/4981" target="_blank">PR #4981</a>, July 2026)</td>
+        </tr>
+        <tr>
+          <td><strong>DNS tunneling (IPv6 AAAA)</strong></td>
+          <td>Monitor DNS query volume per host for IPv6 AAAA records; alert on high-frequency AAAA queries to low-reputation or newly registered domains; specifically flag base32/base64-encoded subdomains</td>
+          <td class="amber">NDR / DNS Monitoring</td>
+          <td>Requires DNS logging at the resolver level — often absent in smaller government IT environments</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-red">
+    <p><strong>The structural problem remains:</strong> The organizations most targeted by these campaigns — self-hosted Zimbra and Roundcube deployments in Eastern European government agencies and defense contractors — are the least likely to have SIEM, UEBA, NDR, or any of the monitoring capabilities listed above. The detection methods exist. The operational capacity to deploy and monitor them does not, in most target organizations. This is not a solvable problem at the individual organization level without external support.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 05 — 60-DAY FORECAST -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>60-Day Forecast — What the Pattern Suggests Next</h2>
+
+  <p>The following predictions are analytical hypotheses based on observed actor behavior, platform targeting patterns, and post-disclosure timing. They are not confirmed intelligence. They are published here with a datestamp of August 1, 2026 — to be revisited in 60 days against what actually occurred.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Methodology note:</strong> These forecasts are based on three observed patterns: (1) TA458's documented behavior after previous public disclosures — burning infrastructure and rebuilding with new CVEs within 45-60 days; (2) the platform targeting progression from Roundcube to Zimbra to mDaemon to SOGo to Kerio, suggesting a systematic survey of self-hosted webmail platforms; and (3) the convergence of Russian and Iranian actors on the same post-compromise technique (calendar C2), which historically precedes broader adoption across threat actor communities. All predictions are the author's independent analytical assessment.</p>
+  </div>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">TA458 Rebuilds with New CVEs — 45 to 60 Day Window</div>
+        <div class="step-content-desc">The July 23 NSA/FBI/Proofpoint joint disclosure burned the operation publicly. TA458's documented behavior after the ESET RoundPress disclosure in May 2025 was to pause, rebuild infrastructure, and return with new CVEs within approximately 60 days. Prediction: by late September 2026, new TA458 activity will be observed against a webmail platform not yet covered by the known CVE list — most likely Horde (which appeared in the 2026 target list but has received less public scrutiny) or a legacy enterprise webmail platform still widely deployed in Eastern Europe. The @import tag-splitting obfuscation technique is likely to evolve — expect a new obfuscation layer that bypasses the detection rules published in response to the July 2026 disclosure.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Calendar C2 Adoption Spreads Beyond Lyceum</div>
+        <div class="step-content-desc">HOLLOWGRAPH demonstrates a technique — using a compromised mailbox calendar as a C2 dead drop — that is low-cost, highly evasive, and platform-agnostic. When one nation-state actor demonstrates a technique this effective, others adopt it. Prediction: within 60 days, a second threat actor will be observed using calendar-based C2 against a different target set. Russian GRU-adjacent actors, who already have persistent mailbox access in compromised Zimbra servers from the RoundPress campaigns, are the most likely candidates for early adoption — because they already have the access the technique requires.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">Lateral Spread Becomes Primary Campaign Vector</div>
+        <div class="step-content-desc">The use of compromised legitimate sender accounts to deliver exploit emails — documented in the Proofpoint disclosure and in the HOLLOWGRAPH campaign — is likely to become the primary delivery mechanism for the next campaign wave. Cold-email delivery from attacker-controlled accounts is detectable. Delivery from a compromised Ukrainian ministry official's email to their NATO partners is not. Prediction: the next disclosed RoundPress-style campaign will show a measurably higher proportion of victim organizations that have existing trust relationships with previously compromised accounts — evidence that the lateral spread mechanism is being deliberately exploited rather than used as a backup delivery option.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">AI-Assisted Vulnerability Research Compresses the Exploitation Window</div>
+        <div class="step-content-desc">Proofpoint noted in the July 23 advisory that LLMs will likely increase TA458's vulnerability discovery rate. This prediction extends that observation: the window between a new webmail CVE being patched and being actively exploited will compress from the current 30-90 day range to under 14 days within the next two campaign cycles. If accurate, organizations that could previously survive a 30-day patch cycle will face exploitation before they can respond. Prediction: at least one webmail CVE disclosed between August and October 2026 will show evidence of exploitation within 14 days of patch release.</div>
+      </div>
+    </div>
+  </div>
+
+  <p style="font-size:.82rem;color:#94a3b8;font-family:var(--mono);margin-top:2rem;padding-top:1rem;border-top:1px solid var(--rule)">Forecast published August 1, 2026. To be revisited against observed activity in October 2026.</p>
+
+</div>
+</div>
+
+<!-- SECTION 06 — CONCLUSION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>The Access Is the Asset</h2>
+
+  <p><a href="roundpress_analysis.html">Part 1 of this series</a> described the half-click — the moment the exploit fires and the credentials leave the building. Most threat intelligence analysis of Operation RoundPress stops there, because that is where the initial access ends and where the measurable, attributable activity becomes harder to trace.</p>
+
+  <p>But the credential theft is not the objective. It is the admission ticket. What TA458 and TA488 are building — one compromised Zimbra server at a time, one app-specific password at a time — is a persistent presence inside the communications infrastructure of the organizations most relevant to the current geopolitical conflict. Ukrainian ministries. NATO governments. Defense contractors. Nuclear facility operators. The access, once established, can be leveraged indefinitely: for intelligence collection, for MFA bypass, for lateral spread, for calendar-based C2, for the kind of persistent passive surveillance that does not require any further action from the attacker.</p>
+
+  <p>The HOLLOWGRAPH disclosure changes what we should be looking for. The question is no longer just "did the half-click exploit fire?" The question is "what did the actor do with the access after it did?" And the answer — calendar events dated 2050, DNS tunneling through IPv6, outgoing emails modified to carry tracking pixels, MFA notifications silently intercepted and deleted — is that the access enables an entire operational layer that is almost entirely invisible to standard security tooling.</p>
+
+  <p>The convergence of Russian and Iranian techniques around compromised mailbox infrastructure is the signal I find most significant. When two separate nation-state actor communities independently arrive at the same technique — using a legitimate cloud service as C2 infrastructure — it means the technique works well enough to be worth the operational security risk. Broader adoption across the threat actor community is the predictable next step.</p>
+
+  <p>The email remains the most reliable attack surface. The mailbox, once compromised, becomes something more: an operational platform, a surveillance tool, a launch pad for the next target. The patch gap documented in <a href="roundpress_analysis.html">Part 1</a> is not going to close by itself. The post-compromise capabilities documented in Part 2 are already in use. The 60-day forecast above will either be validated or corrected by what happens next.</p>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis is based on publicly available information including Group-IB's HOLLOWGRAPH disclosure (July 20, 2026), Proofpoint's Operation RoundPress advisory (July 23, 2026), Microsoft's documentation of mailbox rule abuse (2022), and MITRE ATT&CK technique documentation. The 60-day forecast in Section 05 represents independent analytical hypothesis — not confirmed intelligence. The outgoing email modification capability described in Finding 5 represents a technically validated but not yet publicly documented post-compromise technique; it is analytical synthesis based on known capabilities of the SpyPress PHP webshell and standard SMTP relay architecture. This analysis is the author's independent work, produced as a contribution to the security community. Part 1 of this series is available at <a href="roundpress_analysis.html">yanaivanov.com/analysis/roundpress_analysis.html</a>.</p>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap">
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- EDIT: footer spans — report title · author · date on left; classification note on right -->
+<footer>
+  <span>After the Half-Click &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; August 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+</body>
+</html>
