@@ -148,6 +148,13 @@
   section.problem-top{ padding-top:80px; padding-bottom:80px; }
 
   section.ai-section{ padding-bottom:80px; }
+
+  /* prevent orphans — no single word stranded on its own line */
+  .body-txt p, .hero-intro, .lead, .section-head h2, .hero-title{
+    text-wrap: pretty;
+  }
+  /* headings: keep balanced across lines */
+  .section-head h2{ text-wrap: balance; }
 </style>
 </head>
 <body>
