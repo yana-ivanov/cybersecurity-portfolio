@@ -201,6 +201,8 @@ footer a:hover{color:#93c5fd}
   .nav-right{gap:.5rem}
   .btn-primary,.btn-secondary{border:1px solid rgba(255,255,255,.4);padding:.55rem 1rem;font-size:.65rem}
 }
+
+.p-desc a, li a { display: inline !important; }
 </style>
     <!-- Privacy-friendly analytics by Plausible -->
     <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
@@ -239,9 +241,9 @@ footer a:hover{color:#93c5fd}
   <div class="section summary">
     <div class="section-num">Profile</div>
     <h2>Professional Summary</h2>
-    <p>Threat intelligence and detection content analyst with 15+ years of enterprise technology experience and an MS with graduate coursework in information systems security. Built <strong>ArgusX</strong>, an independent threat intelligence platform processing 1,000+ posts/day from 20+ public and vendor research sources, with classification taxonomy and methodology designed for predictive threat analysis. Architect systems, design detection logic, and ship working security tools using AI development assistants for implementation. Published 15+ threat analyses and authored 5 email detection rules — 2 merged into Sublime Security's production ruleset, 1 in maintainer review. Russian/English bilingual. CompTIA Security+ in progress.</p>
+    <p>Threat intelligence and detection content analyst with 15+ years of enterprise technology experience and an MS with graduate coursework in information systems security. Built <strong>ArgusX</strong>, an independent threat intelligence platform aggregating 40,000+ classified threat items from 20+ public and vendor research sources, with classification taxonomy and methodology designed for predictive threat analysis. Architect systems, design detection logic, and ship working security tools using AI development assistants for implementation. Published 15+ threat analyses and authored email detection rules for Sublime Security's open-source repository — one merged, others under maintainer review. Russian/English bilingual. CompTIA Security+ in progress.</p>
     <div class="callout">
-      <p>Most candidates studying for Security+ have a homelab. I have a working threat intelligence platform ingesting 1,000+ posts/day, classifying threats by category, and tracking nation-state actors. The work itself is the credential.</p>
+      <p>Most candidates studying for Security+ have a homelab. I have a working threat intelligence platform with a corpus of tens of thousands of classified threat items, categorizing threats and tracking nation-state actors. The work itself is the credential.</p>
     </div>
   </div>
 
@@ -305,7 +307,7 @@ footer a:hover{color:#93c5fd}
     <div class="portfolio-featured">
       <div class="portfolio-card">
         <a href="writing/argusx-field-notes.html">ArgusX — Threat Intelligence Platform Build</a>
-        <div class="p-desc">Built independent threat intel platform from scratch. Multi-source ingestion, AI-driven classification at $0.27/month, 61,000+ auto-detected relationships. Documents methodology, architectural decisions, and the workflow for shipping a working threat intel system without an engineering budget.</div>
+        <div class="p-desc">Built independent threat intel platform from scratch. Multi-source ingestion, AI-driven classification at insert time, and automated relationship-mapping between threats, actors, and infrastructure. Documents methodology, architectural decisions, and the workflow for shipping a working threat intel system without an engineering budget.</div>
       </div>
       <div class="portfolio-card">
         <a href="analysis/apple_watch_threat_analysis.html">The Trusted Device in the Room — Apple Watch as Nation-State Attack Surface</a>
@@ -338,7 +340,7 @@ footer a:hover{color:#93c5fd}
     <div class="portfolio-grid">
       <div class="portfolio-card">
         <a href="https://github.com/sublime-security/sublime-rules/pull/4267">Sublime Security · sublime-rules — Detection Rules (PR #4267)</a>
-        <div class="p-desc">Authored two detection rules submitted to Sublime's open-source rule repository: Unicode homoglyph BEC detection and Glassworm invisible Unicode payload detection (PR #4267). Follow-up PR #4596 merged into production ruleset. Work directly informed PR #4639 — a follow-on rule authored by Sublime's detection engineering team.</div>
+        <div class="p-desc">Authored detection rules for Sublime Security's open-source repository. Expanded confusable-character coverage in the homoglyph detection rules — merged into the main branch (<a href="https://github.com/sublime-security/sublime-rules/pull/4596" target="_blank" rel="noopener">PR #4596</a>). Additional rules under maintainer review: ClickFix clipboard-hijack lure (<a href="https://github.com/sublime-security/sublime-rules/pull/4921" target="_blank" rel="noopener">PR #4921</a>) and RoundPress @import tag-splitting XSS (<a href="https://github.com/sublime-security/sublime-rules/pull/4981" target="_blank" rel="noopener">PR #4981</a>).</div>
       </div>
       <div class="portfolio-card">
         <a href="https://yana-ivanov.github.io/cybersecurity-portfolio/labs/lab_log_011.html">Ladon · document_triage.py — Static Analysis Tool</a>
@@ -359,9 +361,9 @@ footer a:hover{color:#93c5fd}
       <div class="exp-company">SiteWave Studio LLC · Milford, CT</div>
       <ul class="exp-bullets">
         <li>Founded LLC operating as parent entity for ArgusX threat intelligence platform, published threat research, and detection content authoring</li>
-        <li>Built <strong>ArgusX</strong> — independent threat intelligence platform aggregating, classifying, and correlating threat data from 20+ public and vendor research sources, processing 1,000+ posts/day. Designed methodology for capability commodification analysis (nation-state tools cascading to criminal use) and trigger-based threat forecasting. Live system; demo available under NDA</li>
+        <li>Built <strong>ArgusX</strong> — independent threat intelligence platform aggregating, classifying, and correlating threat data from 20+ public and vendor research sources, with a corpus of tens of thousands of classified items. Designed methodology for capability commodification analysis (nation-state tools cascading to criminal use) and trigger-based threat forecasting. Live system; demo available under NDA</li>
         <li>Published 15+ threat analyses spanning nation-state operations (Volt Typhoon LOTL, Apple Watch attack surface, UNC1069/Lazarus npm supply chain), criminal infrastructure (TeamPCP Telnyx steganography, Glassworm Unicode supply chain, Lumma Stealer), and identity/credential research (38-breach exposure study, LinkedIn verification gap)</li>
-        <li>Authored 5 MQL detection rules — 2 merged into Sublime Security's production ruleset (Unicode homoglyph BEC, ClickFix clipboard-hijack lure), RoundPress @import XSS in review (PR #4981), Glassworm adopted internally via PR #4639, Apple Wallet pkpass abuse staged; built Ladon static analysis tool validated against 5 malicious samples including Gamaredon (Russian FSB-linked APT), ValleyRAT/SilverFox (Chinese APT), and live phishing that bypassed Gmail. Zero false negatives</li>
+        <li>Authored MQL email detection rules for Sublime Security's open-source repository — homoglyph confusable-character expansion merged into main (<a href="https://github.com/sublime-security/sublime-rules/pull/4596" target="_blank" rel="noopener">PR #4596</a>), with ClickFix clipboard-hijack lure (<a href="https://github.com/sublime-security/sublime-rules/pull/4921" target="_blank" rel="noopener">PR #4921</a>) and RoundPress @import XSS (<a href="https://github.com/sublime-security/sublime-rules/pull/4981" target="_blank" rel="noopener">PR #4981</a>) under maintainer review; built Ladon static analysis tool validated against 5 malicious samples including Gamaredon (Russian FSB-linked APT), ValleyRAT/SilverFox (Chinese APT), and live phishing that bypassed Gmail. Zero false negatives</li>
         <li>Identified Lumma Stealer C2 infrastructure via Wireshark/Zeek analysis, confirmed 2.27MB credential exfiltration, and mapped TLS-encrypted C2 domains invisible to standard filters</li>
         <li>Manage web design and digital advisory services for small business clients as separate revenue stream</li>
       </ul>
