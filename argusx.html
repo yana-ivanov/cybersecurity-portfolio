@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>ArgusX — Yana Ivanov</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ---------- RESET / BASE ---------- */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root{
+    --bg:#0a0a0a;
+    --panel:#111111;
+    --text:#f4f4f4;
+    --muted:#8a8a8a;
+    --line:#242424;
+    --accent:#a3e635;      /* lime accent, echoes your Volume Leaders mark */
+    --maxw:1080px;
+  }
+  html{ scroll-behavior:smooth; }
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', 'Helvetica Neue', Arial, sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 28px; }
+  section{ padding:80px 0; }
+  img{ display:block; width:100%; height:auto; border-radius:8px; }
+
+  /* ---------- TOP BAR ---------- */
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:22px 28px; border-bottom:1px solid var(--line);
+    font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+  }
+  .topbar .name{ color:var(--text); font-weight:700; }
+
+  /* ---------- HERO ---------- */
+  .hero{ padding:100px 0 100px; }
+  .hero-title{
+    font-size:clamp(56px, 11vw, 128px);
+    line-height:.92; font-weight:800; letter-spacing:-.02em;
+    text-transform:uppercase;
+  }
+  .hero-title .dot{ color:var(--accent); }
+  .hero-tag{
+    font-family:'Courier New', monospace;
+    color:var(--muted); font-size:18px; letter-spacing:.15em;
+    margin-top:20px; text-transform:uppercase;
+  }
+  .hero-intro{
+    max-width:640px; margin-top:44px;
+    color:#d0d0d0; font-size:20px; line-height:1.75;
+  }
+
+  /* ---------- HERO IMAGE ---------- */
+  .hero-shot{ margin:32px 0 0; }
+  
+
+  /* ---------- META ROW ---------- */
+  .meta{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:20px;
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    padding:26px 0; margin-top:8px;
+  }
+  .meta .label{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .meta .val{ font-size:13px; margin-top:8px; color:var(--text); }
+  @media(max-width:720px){ .meta{ grid-template-columns:repeat(2,1fr); row-gap:24px; } }
+
+  /* ---------- TEXT BLOCKS ---------- */
+  .lead{
+    max-width:720px; font-size:24px; line-height:1.6; color:#e8e8e8;
+    margin-left:auto;
+  }
+  .kicker{
+    display:flex; align-items:center; gap:12px;
+    font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+    margin-top:0; margin-bottom:28px;
+  }
+  .kicker::before{ content:""; width:9px; height:9px; border-radius:50%; background:var(--accent); display:inline-block; }
+  .col2{
+    display:grid; grid-template-columns:1fr 1fr; gap:72px; align-items:start;
+  }
+  @media(max-width:820px){ .col2{ grid-template-columns:1fr; gap:28px; } }
+  .body-txt{ color:#c8c8c8; font-size:19px; line-height:1.8; }
+  .body-txt p + p{ margin-top:22px; }
+
+  /* ---------- FIGURE ---------- */
+  figure{ margin:32px 0 40px; }
+  figure + figure{ margin-top:56px; }
+  figcaption{ margin-top:14px; font-size:12px; color:var(--muted); letter-spacing:.03em; }
+
+  .section-head{ margin-bottom:36px; }
+  .section-head h2{
+    font-size:clamp(34px,5vw,56px); font-weight:800; letter-spacing:-.015em; line-height:1.05;
+  }
+
+  /* full-bleed image band */
+  .band{ padding:0; }
+  .band img{ border-radius:0; }
+
+  /* ---------- FOOTER CTA ---------- */
+  .cta{
+    border-top:1px solid var(--line); padding:64px 0 48px; margin-top:24px;
+  }
+  .cta h2{
+    font-size:clamp(28px,4vw,44px); font-weight:700; letter-spacing:-.01em;
+    line-height:1.05;
+  }
+  .cta p{ color:var(--muted); margin-top:20px; max-width:520px; font-size:15px; }
+  .cta a.btn{
+    display:inline-block; margin-top:28px; padding:14px 26px;
+    background:var(--text); color:var(--bg); text-decoration:none;
+    font-size:13px; letter-spacing:.08em; text-transform:uppercase; font-weight:700; border-radius:4px;
+  }
+  .foot{
+    padding:28px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; font-size:11px;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+  }
+  .wordmark{
+    font-size:clamp(64px,16vw,190px); font-weight:800; text-transform:uppercase;
+    letter-spacing:-.03em; line-height:1; text-align:center; padding:40px 0 10px;
+  }
+  .wordmark .dot{ color:var(--accent); }
+
+  /* ---------- TYPE FACES ---------- */
+  .hero-title, .section-head h2, .cta h2, .wordmark{
+    font-family:'Space Grotesk', 'Inter', sans-serif;
+    font-weight:700;
+  }
+  .hero-tag{ font-family:'JetBrains Mono', 'Courier New', monospace; }
+  .kicker, .topbar, .meta .label, .foot{ font-family:'Inter', sans-serif; }
+
+
+  /* visual separation before a new movement of the page */
+  section.section-divider{ border-top:1px solid var(--line); margin-top:0; padding-top:80px; }
+
+
+  /* bottom text sections: half padding */
+  section.tight{ padding-top:80px; padding-bottom:80px; }
+
+  section.problem-top{ padding-top:80px; padding-bottom:80px; }
+
+  section.ai-section{ padding-bottom:80px; }
+</style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <span class="name">Yana Ivanov</span>
+    <span>ArgusX — Case Study</span>
+    <span>Product Design + Build</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="wrap">
+    <div class="hero">
+      <h1 class="hero-title">Argus<span class="dot">X</span></h1>
+      <div class="hero-tag">Intel in. Defense out.</div>
+      <p class="hero-intro">
+        ArgusX is a community threat intelligence platform I designed and built from the ground up.
+        The job: take an overwhelming flood of security data and turn it into something an analyst can
+        actually read, triage, and act on. I designed every part — the feed, the filtering system, the
+        data visualizations, the design system — and built it as both the designer and a member of the
+        community it serves, so every decision came from how defenders actually work.
+      </p>
+    </div>
+  </div>
+
+  <!-- HERO IMAGE -->
+  <div class="wrap">
+    <div class="hero-shot">
+      <img src="images/main_feed.png" alt="ArgusX main console — the live threat feed">
+    </div>
+  </div>
+
+  <!-- META -->
+  <div class="wrap">
+    <div class="meta">
+      <div><div class="label">Project</div><div class="val">ArgusX · Personal Venture</div></div>
+      <div><div class="label">Role</div><div class="val">Product Design + Build</div></div>
+      <div><div class="label">Timeline</div><div class="val">2026 · Ongoing</div></div>
+      <div><div class="label">Status</div><div class="val">In Development</div></div>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section class="wrap problem-top">
+    <div class="col2">
+      <div>
+        <div class="kicker">The problem</div>
+        <div class="section-head"><h2>Defenders are outgunned</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>The underground is organized. Attackers share tools, zero-days, and infrastructure in real time,
+        openly, and for free. Defenders aren't.</p>
+        <p>Real threat intelligence is fragmented across dozens of sources, and the structured, usable
+        version costs $50K a year, pricing out exactly the people who need it most.</p>
+        <p>ArgusX is the free, structured layer that aggregates intelligence from a dozen-plus public
+        sources and links every threat to the defense that stopped it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: RESEARCH / COMMUNITY -->
+  <section class="wrap section-divider">
+    <div class="col2">
+      <div>
+        <div class="kicker">01 — How I approached it</div>
+        <div class="section-head"><h2>Designed from inside the community</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>I approach every product by understanding the whole system, and the people in it, before drawing
+        a single screen. As a student inside the security community, I listened to what defenders actually
+        valued — mentorship, sharing, evidence over opinion — and built those values into the product's
+        structure rather than bolting a generic dashboard on top.</p>
+        <p>The result is an interface shaped around how analysts really work: scan fast, understand what
+        matters, act, and help each other.</p>
+      </div>
+    </div>
+    <figure>
+      <img src="images/notifications.png" alt="Community layer — vouches, mentorship requests, and defense approvals">
+    </figure>
+  </section>
+
+  <!-- SECTION: ORGANIZING THE FLOOD -->
+  <section class="wrap">
+    <div class="col2">
+      <div>
+        <div class="kicker">02 — Organizing the flood</div>
+        <div class="section-head"><h2>Thousands of signals, seconds to decide</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>The core challenge was hierarchy: thousands of incoming items, and an analyst who needs to see
+        what matters immediately. I designed a scannable feed with severity-coded cards, a live stats
+        layer, and a four-level filtering system that narrows from content type, to classification, to
+        campaign, to visualization.</p>
+        <p>Each level applies in sequence, so an analyst can move from the whole firehose to one specific
+        question without losing their place.</p>
+      </div>
+    </div>
+    <figure>
+      <img src="images/saved-filters-modal.png" alt="Saved filters and the layered filtering system in use">
+    </figure>
+  </section>
+
+  <!-- SECTION: FILTER BUILDER (centerpiece) -->
+  <section class="wrap">
+    <div class="col2">
+      <div>
+        <div class="kicker">03 — The centerpiece</div>
+        <div class="section-head"><h2>Complex querying, made approachable</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>Power users need to ask precise questions — severity is Critical or High, AND origin is Russia,
+        AND target sector is Healthcare, AND first seen within 30 days — without writing a query language.</p>
+        <p>I designed a visual condition builder that reads like plain English, updates its result count
+        live, and saves investigations users can pin and get alerted on. It's gated to the advanced tier,
+        so depth is available to those who need it without overwhelming newcomers.</p>
+      </div>
+    </div>
+    <figure>
+      <!-- Swap this img for a GIF (filter-builder.gif) once you make it -->
+      <img src="images/filter_query.png" alt="The visual filter / investigation builder">
+    </figure>
+  </section>
+
+  <!-- SECTION: TIERS -->
+  <section class="wrap">
+    <div class="col2">
+      <div>
+        <div class="kicker">04 — Designing for range</div>
+        <div class="section-head"><h2>Simple for one user, powerful for another</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>ArgusX serves everyone from a curious newcomer to a forensics analyst, so I designed the
+        interface to reveal complexity as users earn it. Lower tiers get a clean, guided experience;
+        higher tiers unlock the filter builder, saved investigations, multi-channel alerts, and sharing.</p>
+        <p>The same platform stays simple for one user and powerful for another — a permission model
+        expressed through design, not just access control.</p>
+      </div>
+    </div>
+    <figure>
+      <img src="images/left-side-bar-nation-state.png" alt="Campaign drill-down navigation">
+    </figure>
+  </section>
+
+  <!-- SECTION: DATA INTO DECISIONS -->
+  <section class="wrap">
+    <div class="col2">
+      <div>
+        <div class="kicker">05 — Data into decisions</div>
+        <div class="section-head"><h2>Every view answers a question</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>Beyond the feed, I designed analytical views that each answer a specific question a defender
+        asks: what's accelerating right now, who is attributed to what, and whether paying a ransom
+        actually works.</p>
+        <p>Each visualization turns raw telemetry into a clear, defensible story — rather than another
+        wall of numbers.</p>
+      </div>
+    </div>
+    <figure>
+      <!-- Swap for map-toggle.gif once made -->
+      <img src="images/rising-threats.png" alt="Rising threats — campaign velocity chart">
+    </figure>
+    <figure>
+      <img src="images/ransom-outcomes.png" alt="Ransom outcomes map — does paying actually work">
+    </figure>
+  </section>
+
+  <!-- SECTION: SYSTEMS THINKING (differentiator) -->
+  <section class="wrap">
+    <div class="col2">
+      <div>
+        <div class="kicker">06 — Systems thinking</div>
+        <div class="section-head"><h2>Documented so a team can build from it</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>As the sole designer, my judgment had to be legible to the engineers building from it. So every
+        decision is documented with rationale — the filtering logic, the five-tier threat-color system with
+        accessibility fallbacks (never color alone; hex chosen for contrast in both themes; explicit labels
+        for red-green color blindness), and the state model for saved filters.</p>
+        <p>This is the part I'm proudest of: not just the screens, but the system and reasoning a team can
+        extend without me in the room.</p>
+      </div>
+    </div>
+    <figure>
+      <img src="images/threat-level-color-spec.png" alt="Threat-level color system specification with accessibility rationale">
+    </figure>
+  </section>
+
+  <!-- AI IN MY PROCESS -->
+  <section class="wrap ai-section">
+    <div class="col2">
+      <div>
+        <div class="kicker">07 — AI in my process</div>
+        <div class="section-head"><h2>AI as a design and build partner</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>AI wasn't a feature I added to ArgusX; it was how I worked. I used Claude throughout the
+        process, to prototype interfaces in code, to pressure-test design decisions, and to move from
+        idea to working screen fast enough to actually feel the interaction before committing to it.</p>
+        <p>It also runs inside the product: Claude classifies every incoming post at insert time,
+        tagging campaign type, actor attribution, and severity. So I was designing with AI and designing
+        <em>for</em> an AI-driven system at the same time, which changed how I thought about trust,
+        review, and where a human stays in the loop.</p>
+        <p>Working this way is now core to how I design. It lets me spend less time on mechanical craft
+        and more on judgment: what to build, what to cut, and what a person actually needs to see.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEVELOPMENT -->
+  <section class="wrap section-divider tight">
+    <div class="col2">
+      <div>
+        <div class="kicker">Development</div>
+        <div class="section-head"><h2>Designed and built, end to end</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>My role went beyond design into building. I designed and built the platform end to end — the
+        ingestion of a dozen-plus threat feeds, an AI classification layer that tags every incoming post
+        by campaign type, actor attribution, and severity as it arrives, and the console analysts work in.</p>
+        <p>Working as both designer and builder meant every design decision was grounded in what the system
+        could actually do, and every technical decision was made in service of clarity for the person at
+        the screen.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAUSED FEATURE -->
+  <section class="wrap section-divider tight">
+    <div class="col2">
+      <div>
+        <div class="kicker">The hard problem I paused</div>
+        <div class="section-head"><h2>Knowing when a feature isn't ready</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>The most instructive part of this project is a feature I stopped shipping. I built a relationship
+        graph to show the connective tissue between a threat actor, a CVE, and a detection rule — and at
+        scale it became an unreadable hairball. Hundreds of nodes, no clarity.</p>
+        <p>So I paused it. The real problem isn't drawing the connections; it's revealing them progressively,
+        from a high-level view down to the specific relationship, without drowning the analyst. That's the
+        problem I'm designing now. Knowing when something isn't good enough to ship is part of the job.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAKEAWAY -->
+  <section class="wrap section-divider tight">
+    <div class="col2">
+      <div>
+        <div class="kicker">Takeaway</div>
+        <div class="section-head"><h2>Complexity, made clear</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>ArgusX crystallized how I work: I have to understand the whole system — and the people using it —
+        before I can make it simple. It also sits exactly where I want to be: designing complex, high-stakes
+        tools for technical users, in a domain I've spent this year going deep into as a practitioner.</p>
+        <p>The hardest and most rewarding part wasn't any single screen. It was turning an overwhelming,
+        fragmented problem into something clear enough that a defender can act on it in seconds.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="wrap cta">
+    <h2>Let's talk</h2>
+    <p>I design complex, data-heavy products for technical users, and I can go as deep as the problem needs.</p>
+    <a class="btn" href="mailto:yanaivanov@gmail.com">Get in touch</a>
+  </section>
+
+  <div class="foot">
+    <span>© 2026 SiteWave Studio LLC</span>
+    <span>Connecticut, USA</span>
+  </div>
+
+</body>
+</html>
