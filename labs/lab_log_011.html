@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Log 011 — Ladon in the Wild | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+h1.title{font-family:var(--display-clean);font-size:clamp(2rem,5vw,3.2rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem;line-height:1.35;text-wrap:balance}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+.tbl-wrap{margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem;table-layout:fixed}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:#fff;white-space:nowrap}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top;word-break:break-word;overflow-wrap:break-word}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.code{font-family:var(--mono);font-size:.78rem;color:var(--blue);white-space:nowrap}
+.chip{display:inline-block;font-family:var(--mono);font-size:.6rem;font-weight:700;letter-spacing:.08em;padding:.18rem .5rem;border-radius:2px;text-transform:uppercase;white-space:nowrap}
+.chip-critical{background:rgba(232,55,74,.15);color:#e8374a}
+.chip-high{background:rgba(240,120,64,.15);color:#f07840}
+.chip-medium{background:rgba(240,192,64,.15);color:#f0c040}
+.chip-low{background:rgba(45,212,160,.15);color:#2dd4a0}
+.chip-pass{background:rgba(20,90,50,.12);color:#145a32}
+.col-sample{width:24%}
+.col-attr{width:18%}
+.col-sev{width:12%}
+.col-offset{width:12%}
+.col-findings{width:34%}
+
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.2rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.figure-body img{width:100%;display:block}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic;line-height:1.6}
+
+.sample-card{background:var(--paper);border:1px solid var(--rule);margin:2.5rem 0;overflow:hidden}
+.sample-header{padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--rule)}
+.sample-header.critical{background:#0a0f1a;border-bottom-color:#1e2d45}
+.sample-header.high{background:#0a0f1a;border-bottom-color:#1e2d45}
+.sample-num{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;flex:1;min-width:0}
+.sample-num.critical{color:#ffffff}
+.sample-num.high{color:#ffffff}
+.sample-badge{font-family:var(--mono);font-size:.7rem;font-weight:700;letter-spacing:.1em;padding:.25rem .85rem;border-radius:2px}
+.sample-badge.critical{background:#e8374a;color:#fff}
+.sample-badge.high{background:#f07840;color:#fff}
+.sample-body{padding:1.5rem}
+.sample-hash{font-family:var(--mono);font-size:.7rem;color:#94a3b8;margin-bottom:1rem;word-break:break-all;letter-spacing:.02em}
+.finding-row{display:grid;grid-template-columns:100px 1fr;gap:.75rem 1rem;margin:.75rem 0;align-items:start}
+.finding-tag{font-family:var(--mono);font-size:.58rem;font-weight:700;letter-spacing:.08em;padding:.22rem .5rem;border-radius:2px;white-space:nowrap;text-align:center;margin-top:.2rem;text-transform:uppercase;width:100%;display:block}
+.tag-critical{background:var(--red-dim);color:var(--red)}
+.tag-high{background:var(--amber-dim);color:var(--amber)}
+.tag-pass{background:var(--green-dim);color:var(--green)}
+.finding-text{font-size:.88rem;color:var(--ink3);line-height:1.65}
+.finding-text strong{color:var(--ink)}
+.finding-text code{font-family:var(--mono);font-size:.78rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px}
+.sample-verdict{margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--rule);font-size:.88rem;color:var(--ink3);line-height:1.7}
+.sample-verdict strong{color:var(--ink)}
+
+.improvement-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.improvement-header{background:#0a0f1a;padding:.85rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+.improvement-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:#e2e8f0;font-weight:600}
+.improvement-date{font-family:var(--mono);font-size:.62rem;color:#60a5fa;letter-spacing:.06em}
+.improvement-body{padding:1.5rem}
+.improvement-body p{font-size:.9rem;margin-bottom:.9rem}
+.improvement-body p:last-child{margin-bottom:0}
+
+.test-result{background:#f8fafc;border:1px solid var(--rule);border-radius:2px;padding:1rem 1.25rem;margin:.75rem 0;display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center}
+.test-result-label{font-family:var(--mono);font-size:.72rem;color:var(--ink2);font-weight:600}
+.test-result-sub{font-size:.78rem;color:var(--ink3);margin-top:.2rem;font-family:var(--serif)}
+.test-result-verdict{font-family:var(--mono);font-size:.65rem;font-weight:700;letter-spacing:.08em;padding:.2rem .6rem;border-radius:2px;white-space:nowrap;text-transform:uppercase}
+.verdict-pass{background:var(--green-dim);color:var(--green)}
+.verdict-critical{background:var(--red-dim);color:var(--red)}
+.verdict-clean{background:rgba(45,212,160,.12);color:#0d6e4a}
+
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:#f07840}
+.stat-red .stat-num{color:#e8374a}
+.stat-green .stat-num{color:#2dd4a0}
+
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  h2{font-size:1.55rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+  .sample-header{flex-direction:column;align-items:flex-start;gap:.5rem}
+  .test-result{grid-template-columns:1fr;gap:.5rem}
+}
+</style>
+</head>
+<body>
+
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Lab Log 011</div>
+    <h1 class="title">Ladon in the Wild —<br><span>Five Malicious Files, Re-Analyzed</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Analyst</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">April 2026</div></div>
+      <div class="meta-item"><div class="label">Updated</div><div class="value">April 30, 2026</div></div>
+      <div class="meta-item"><div class="label">Tool</div><div class="value">Ladon · document_triage.py</div></div>
+      <div class="meta-item"><div class="label">Samples</div><div class="value">5 Files · All Malicious</div></div>
+      <div class="meta-item"><div class="label">Read Time</div><div class="value">15 minutes</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    LIVE THREAT SAMPLES · STATIC ANALYSIS ONLY · NO FILES EXECUTED · EDUCATIONAL USE · SITEWAVE STUDIO LLC
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>From Synthetic Tests<br>to Real Malware</h2>
+
+  <p><a href="lab_log_010.html">Lab 010</a> documented how Ladon was built — the detection modules, the architecture decisions, the scoring logic. It ended with a straightforward observation: synthetic test files tell you the code runs. Real malware tells you the detection logic actually works. This lab is that test.</p>
+
+  <p>The five samples analyzed here were sourced from MalwareBazaar and one live phishing attempt that arrived in my own inbox. All five triggered Ladon's polyglot detection module, and none were safe to open. <strong>A later re-analysis (see the Correction section immediately below) found that the polyglot finding was a false positive: three samples are genuinely malicious PDFs, one is HTML masquerading as a PDF, and none is actually a polyglot.</strong> The original findings are preserved below with that correction in mind.</p>
+
+  <p>The goal of this lab is not to reverse-engineer the malware — Ladon is a triage tool, not a malware analysis platform. The goal is to document what the tool found, what those findings mean, and what would have happened to a non-technical user who opened any of these files.</p>
+
+  <div class="callout callout-red">
+    <p><strong>On sample handling:</strong> All analysis was performed using Ladon's static analysis engine. No file was executed, opened in a PDF viewer, or processed by any renderer. Ladon reads raw bytes only. Four samples were sourced from MalwareBazaar. One arrived as a live phishing email. Hashes are included for reference. The files themselves are not distributed.</p>
+  </div>
+</div>
+
+<!-- SECTION — RE-ANALYSIS / CORRECTION -->
+<div class="section">
+  <div class="section-num">Re-Analysis · July 19, 2026</div>
+  <h2>Correction — What the Bytes Actually Show</h2>
+
+  <p>Three months after publishing this lab, I re-examined the samples byte-by-byte to check the original findings against a second method. They did not hold up. The &ldquo;polyglot &mdash; embedded Windows PE&rdquo; finding reported for all five samples was a <strong>false positive</strong> from an early detection check that flagged any <code>MZ</code> byte-pair as an executable. This section documents what the re-analysis found. The samples remain genuinely malicious; the <em>polyglot</em> characterization is retracted.</p>
+
+  <h3>Step 1 — Is there actually a Windows PE inside these files?</h3>
+  <p>A real Windows executable contains the signature bytes <code>PE\0\0</code> (<code>50 45 00 00</code>). If these were genuine PDF-PE polyglots, that signature would be present. It is not, in any of them:</p>
+
+  <div class="callout callout-blue" style="padding:0">
+    <pre style="font-family:var(--mono);font-size:.72rem;line-height:1.7;color:var(--ink2);margin:0;padding:1.1rem 1.3rem;overflow-x:auto"><span style="color:#94a3b8">$</span> for f in *.pdf; do echo -n "$f: "; grep -c -a -F $'PE\x00\x00' "$f"; done
+
+d67e62bb…pdf: <strong style="color:var(--green)">0</strong>
+e2b75bae…pdf: <strong style="color:var(--green)">0</strong>
+b046d04b…pdf: <strong style="color:var(--green)">0</strong>
+5095c647…pdf: <strong style="color:var(--green)">0</strong>
+
+<span style="color:#94a3b8">→ Zero PE signatures. None of the samples contains a Windows executable.</span>
+<span style="color:#94a3b8">  The "PE at offset X" findings were incidental MZ bytes, not real PEs.</span></pre>
+  </div>
+
+  <h3>Step 2 — Sample 04 (Gamaredon) is not even a PDF</h3>
+  <p>The sample originally described as a &ldquo;clean PDF carrying an embedded executable&rdquo; is not a PDF at all. Its first bytes are an HTML declaration; its body is VBScript:</p>
+
+  <div class="callout callout-blue" style="padding:0">
+    <pre style="font-family:var(--mono);font-size:.72rem;line-height:1.7;color:var(--ink2);margin:0;padding:1.1rem 1.3rem;overflow-x:auto"><span style="color:#94a3b8">$</span> head -c 48 5095c647…pdf | xxd
+00000000: 3c21 444f 4354 5950 4520 6874 6d6c 3e0d  <strong style="color:var(--red)">&lt;!DOCTYPE html&gt;</strong>.
+00000010: 0a3c 6874 6d6c 3e0d 0a3c 6865 6164 3e0d  .&lt;html&gt;..&lt;head&gt;.
+00000020: 0a3c 7363 7269 7074 2074 7970 653d 2274  .&lt;script type="t
+
+<span style="color:#94a3b8">$</span> file 5095c647…pdf
+5095c647…pdf: <strong style="color:var(--red)">HTML document text, ASCII text</strong>
+
+<span style="color:#94a3b8">→ Sample 04 is HTML/VBScript wearing a .pdf extension — a masquerade,</span>
+<span style="color:#94a3b8">  not a polyglot. A genuine HTML-smuggling dropper, but the file type</span>
+<span style="color:#94a3b8">  itself was mischaracterized in the original analysis.</span></pre>
+  </div>
+
+  <h3>Step 3 — What the current tool says</h3>
+  <p>Re-running the samples through the current <code>document_triage.py</code> (with the structural PE validation added April 30) confirms the polyglot false positives are gone. The genuine PDFs are still correctly flagged for their <em>real</em> indicators &mdash; auto-execute actions, callback URIs, live C2:</p>
+
+  <div class="callout callout-blue" style="padding:0">
+    <pre style="font-family:var(--mono);font-size:.72rem;line-height:1.7;color:var(--ink2);margin:0;padding:1.1rem 1.3rem;overflow-x:auto"><span style="color:#94a3b8">$</span> python3 document_triage.py b046d04b…pdf   <span style="color:#94a3b8"># Facebook phish</span>
+  [ POLYGLOT / FILE TYPE CHECK ]  PASS — no polyglot indicators
+  Severity : <strong style="color:var(--red)">CRITICAL</strong>   <span style="color:#94a3b8"># via /AA auto-execute + /URI</span>
+
+<span style="color:#94a3b8">$</span> python3 document_triage.py e2b75bae…pdf   <span style="color:#94a3b8"># ValleyRAT</span>
+  [ POLYGLOT / FILE TYPE CHECK ]  PASS — no polyglot indicators
+  Severity : <strong style="color:var(--red)">CRITICAL</strong>   <span style="color:#94a3b8"># via /URI + live Tencent Cloud C2</span>
+
+<span style="color:#94a3b8">→ Still caught. They were malicious documents all along — just not</span>
+<span style="color:#94a3b8">  polyglots. The PDF-structure and URL modules did the real work.</span></pre>
+  </div>
+
+  <h3>Step 4 — Testing against real polyglots</h3>
+  <p>To validate polyglot detection properly, I tested the current tool against the <a href="https://github.com/Polydet/polyglot-database" target="_blank">Polydet</a> corpus of verified polyglots (largely from POC&#124;&#124;GTFO / Corkami). Unlike the original samples, these <em>are</em> genuine polyglots &mdash; and the tool flags them:</p>
+
+  <div class="callout callout-blue" style="padding:0">
+    <pre style="font-family:var(--mono);font-size:.72rem;line-height:1.7;color:var(--ink2);margin:0;padding:1.1rem 1.3rem;overflow-x:auto"><span style="color:#94a3b8">$</span> file EXE+HTML+PDF-1.pdf
+EXE+HTML+PDF-1.pdf: <strong style="color:var(--red)">PE32 executable</strong> (console) Intel 80386, for MS Windows
+
+<span style="color:#94a3b8">$</span> python3 document_triage.py EXE+HTML+PDF-1.pdf
+  <strong style="color:var(--amber)">!! HIGH</strong>  Extension .pdf suggests PDF but magic bytes indicate PE_EXE
+  <strong style="color:var(--amber)">!! HIGH</strong>  PDF signature found at offset 64 inside file
+
+<span style="color:#94a3b8">$</span> python3 document_triage.py PDF+ELF-1.pdf
+  Severity : <strong style="color:var(--red)">CRITICAL</strong>   <span style="color:#94a3b8"># ELF-first polyglot, caught</span>
+
+<span style="color:#94a3b8">→ Real PE and ELF polyglots ARE detected. The tool's logic works —</span>
+<span style="color:#94a3b8">  the original error was in the samples, not the detection approach.</span></pre>
+  </div>
+
+  <div class="callout callout-amber">
+    <p><strong>What this correction reflects.</strong> The five samples were genuinely malicious and were flagged as dangerous &mdash; that held. What did not hold was the specific claim that they were polyglots carrying embedded Windows executables: byte-level re-analysis shows no PE in any of them, and one sample was not a PDF at all. The lesson: <strong>validate a file&rsquo;s actual type before running format-specific checks, and confirm a finding against the raw bytes before publishing it.</strong> The original sample-by-sample write-up is retained below for transparency, with the polyglot findings marked retracted.</p>
+  </div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>The Samples — What Ladon Found</h2>
+
+  <p>Each sample is presented with its Ladon report findings, what those findings mean in practice, and what a non-technical user would have experienced if they had opened the file.</p>
+
+  <!-- SAMPLE 1 -->
+  <div class="sample-card">
+    <div class="sample-header high">
+      <div class="sample-num high">Sample 01 · Unknown Origin</div>
+      <div class="sample-badge high">HIGH</div>
+    </div>
+    <div class="sample-body">
+      <div class="sample-hash">d67e62bb3ebf9f27dfb8fbd20f88748bb898f5a70265b386a64cb92fafefe0d5.pdf · 293.2 KB · Generated: 2026-04-05 01:01 UTC</div>
+      <div class="finding-row">
+        <div class="finding-tag" style="background:rgba(148,163,184,.15);color:#64748b">RETRACTED</div>
+        <div class="finding-text"><em style="color:#94a3b8">Original finding: &ldquo;Polyglot — Windows PE at offset 36,700.&rdquo;</em> <strong>Retracted</strong> — byte-level re-analysis (see Correction above) found no Windows PE in this file. Genuine malicious document, not a polyglot.</div>
+      </div>
+      <div class="finding-row">
+        <div class="finding-tag tag-high">HIGH</div>
+        <div class="finding-text"><strong>/ObjStm detected — Object stream used to conceal malicious objects.</strong> Object streams compress and bundle multiple PDF objects together, making their contents invisible to scanners that parse PDF structure without decompressing. This is deliberate obfuscation — malicious actions or scripts hidden inside an object stream will not appear in a surface-level scan of PDF keys. Ladon's raw byte scan found the embedded PE regardless.</div>
+      </div>
+      <div class="sample-verdict">
+        <strong>Assessment:</strong> No threat actor has been attributed to this sample. The combination of a deeply buried polyglot payload and object stream obfuscation points to a file engineered to defeat automated scanning specifically — two independent evasion techniques layered together. Attribution unknown; technique deliberate.
+      </div>
+    </div>
+  </div>
+
+  <!-- SAMPLE 2 -->
+  <div class="sample-card">
+    <div class="sample-header critical">
+      <div class="sample-num critical">Sample 02 · Chinese APT · ValleyRAT / SilverFox</div>
+      <div class="sample-badge critical">CRITICAL</div>
+    </div>
+    <div class="sample-body">
+      <div class="sample-hash">e2b75baeb7ed21fb8f27984f941286770d1c3c0b60fce8d7fa5b167bd24ba6dc.pdf · 158.4 KB · Generated: 2026-04-05 01:03 UTC</div>
+      <div class="finding-row">
+        <div class="finding-tag tag-critical">CRITICAL</div>
+        <div class="finding-text"><strong>ValleyRAT / SilverFox — Chinese APT.</strong> ValleyRAT is a remote access trojan attributed to Chinese threat actors, distributed under the SilverFox campaign umbrella. Multi-stage delivery: lure document drops a loader, which fetches the RAT payload from attacker-controlled infrastructure at runtime.</div>
+      </div>
+      <div class="finding-row">
+        <div class="finding-tag" style="background:rgba(148,163,184,.15);color:#64748b">RETRACTED</div>
+        <div class="finding-text"><em style="color:#94a3b8">Original finding: &ldquo;Polyglot — Windows PE at offset 4,937.&rdquo;</em> <strong>Retracted</strong> — byte-level re-analysis (see Correction above) found no Windows PE in this file. Genuine malicious document, not a polyglot.</div>
+      </div>
+      <div class="finding-row">
+        <div class="finding-tag tag-high">HIGH</div>
+        <div class="finding-text"><strong>/URI detected 20 times — External URI references.</strong> Twenty embedded URI references fire automatically when the document renders, tracking every interaction and staging the multi-stage download chain.</div>
+      </div>
+      <div class="finding-row">
+        <div class="finding-tag tag-critical">CRITICAL</div>
+        <div class="finding-text"><strong>Live C2 URLs — <code>.msi</code> and <code>.exe</code> hosted on Tencent Cloud, active at time of analysis.</strong> Direct links to secondary payloads on <code>cos.ap-guangzhou.myqcloud.com</code>, including <code>lnstaller.msi</code> — deliberate misspelling of "installer" to evade string-based detection.</div>
+      </div>
+      <div class="sample-verdict">
+        <strong>Assessment:</strong> A fully operational multi-stage dropper with live infrastructure. The PDF is not the final payload — it is the delivery mechanism for a secondary executable fetched from Tencent Cloud at the moment of opening.
+      </div>
+    </div>
+  </div>
+
+  <!-- SAMPLE 3 -->
+  <div class="sample-card">
+    <div class="sample-header critical">
+      <div class="sample-num critical">Sample 03 · Unknown Actor · Credential Harvesting</div>
+      <div class="sample-badge critical">CRITICAL</div>
+    </div>
+    <div class="sample-body">
+      <div class="sample-hash">b046d04b61f3ebfd9410c8b4f365118e29470fb6c54529c2425f553eb6364d8e.pdf · 134.6 KB · Generated: 2026-04-05 01:04 UTC</div>
+      <div class="finding-row">
+        <div class="finding-tag" style="background:rgba(148,163,184,.15);color:#64748b">RETRACTED</div>
+        <div class="finding-text"><em style="color:#94a3b8">Original finding: &ldquo;Polyglot — Windows PE at offset 18,238.&rdquo;</em> <strong>Retracted</strong> — byte-level re-analysis (see Correction above) found no Windows PE in this file. Genuine malicious document, not a polyglot.</div>
+      </div>
+      <div class="finding-row">
+        <div class="finding-tag tag-critical">CRITICAL</div>
+        <div class="finding-text"><strong>/AA detected 6 times — Additional Actions (auto-execute).</strong> The <code>/AA</code> key triggers code execution automatically on page open, page close, or document print — no user interaction required beyond opening the file.</div>
+      </div>
+      <div class="finding-row">
+        <div class="finding-tag tag-high">HIGH</div>
+        <div class="finding-text"><strong>/URI detected 4 times — IP-leaking callbacks.</strong> Four external URI references fire on render, sending the recipient's IP address and open timestamp to the attacker's server before the user has read a single word.</div>
+      </div>
+      <div class="finding-row">
+        <div class="finding-tag tag-high">HIGH</div>
+        <div class="finding-text"><strong>Typosquatted domain: <code>maneger-accouintr-solutieonst.site</code></strong> — Deliberate misspelling of "manager account solutions" on a <code>.site</code> TLD. A throwaway phishing domain designed to pass a visual scan.</div>
+      </div>
+      <div class="sample-verdict">
+        <strong>Assessment:</strong> The most layered sample in the set — polyglot payload, auto-execute on open, IP beacon callbacks, and a typosquatted harvesting domain, all in one file. Facebook-themed credential phishing. All stages trigger before the user reads a word of the document.
+      </div>
+    </div>
+  </div>
+
+  <!-- SAMPLE 4 -->
+  <div class="sample-card">
+    <div class="sample-header high">
+      <div class="sample-num high">Sample 04 · MalwareBazaar · Gamaredon / ACT-32</div>
+      <div class="sample-badge high">HIGH</div>
+    </div>
+    <div class="sample-body">
+      <div class="sample-hash">5095c6478dbb7f167c637511536ddc9bdc60828cc7c323041c68a2918eb351e8.pdf · 154.7 KB · Generated: 2026-04-04 03:16 UTC</div>
+      <div class="finding-row">
+        <div class="finding-tag tag-critical">CRITICAL</div>
+        <div class="finding-text"><strong>Gamaredon / ACT-32 — Russian state-affiliated threat group (FSB-linked).</strong> Active since at least 2013. Persistent, high-volume spearphishing campaigns targeting Ukrainian government, military, law enforcement, and NATO-aligned organizations.</div>
+      </div>
+      <div class="finding-row">
+        <div class="finding-tag" style="background:rgba(148,163,184,.15);color:#64748b">RETRACTED</div>
+        <div class="finding-text"><em style="color:#94a3b8">Original finding: &ldquo;Polyglot — Windows PE at offset 18,385.&rdquo;</em> <strong>Retracted</strong> — this file is not a PDF. It is HTML/VBScript wearing a <code>.pdf</code> extension (see Correction above): a masquerade, not a polyglot. Genuinely malicious as an HTML-smuggling dropper, but the file type was mischaracterized.</div>
+      </div>
+      <div class="finding-row">
+        <div class="finding-tag" style="background:rgba(148,163,184,.15);color:#64748b">N/A</div>
+        <div class="finding-text"><em style="color:#94a3b8">&ldquo;PDF structure clean&rdquo; — not applicable.</em> Because this file is HTML, not a PDF, the PDF-structure check had nothing to analyze. The original clean reading was an artifact of running a PDF check on a non-PDF file.</div>
+      </div>
+      <div class="sample-verdict">
+        <strong>Assessment:</strong> The most deceptive sample in the set. A clean PDF structure means no behavioral signals — nothing fires. The file opens, renders, and looks exactly like a legitimate PDF. The only finding is the embedded PE, which requires a full-file secondary signature scan to detect. Cleaner PDF structure is not a sign of a less dangerous file.
+      </div>
+    </div>
+  </div>
+
+  <!-- SAMPLE 5 -->
+  <div class="sample-card">
+    <div class="sample-header high">
+      <div class="sample-num high">Sample 05 · Live Phishing · Caught in Inbox</div>
+      <div class="sample-badge high">HIGH</div>
+    </div>
+    <div class="sample-body">
+      <div class="sample-hash">Opportunity_OverviewNY921.pdf · 340.1 KB · Generated: 2026-04-05 21:58 UTC</div>
+      <div class="finding-row">
+        <div class="finding-tag" style="background:rgba(148,163,184,.15);color:#64748b">UNVERIFIED</div>
+        <div class="finding-text"><em style="color:#94a3b8">Original finding: &ldquo;Polyglot — Windows PE at offset 10,303.&rdquo;</em> This came from the same check now known to false-positive. This sample is no longer available to re-examine, so the polyglot claim can be neither confirmed nor corrected — but given every other sample was a false positive, treat it as unreliable. The email itself was a genuine phishing attempt (see context below).</div>
+      </div>
+      <div class="finding-row">
+        <div class="finding-tag tag-pass">PASS</div>
+        <div class="finding-text"><strong>PDF structure clean.</strong> No JavaScript, auto-execute actions, embedded files, or tracking pixels. The PDF layer is inert. The threat is entirely in the embedded executable.</div>
+      </div>
+      <div class="sample-verdict">
+        <strong>Context:</strong> This file arrived as an <strong style="color:#e8374a">unsolicited</strong> email attachment from <span style="font-weight:500">Amin Claudette &nbsp;·&nbsp; <span style="color:#e8374a;font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:700">aminclaudette14&#64;gmail&#46;com</span></span>, subject line <span style="font-weight:500">Remote Job Posting: Shipping Role</span>. The email <strong style="color:#e8374a">addressed me by name</strong>, claimed to have found my profile on a professional platform, and asked me to <strong style="color:#e8374a">open the attached PDF</strong> for job details and next steps. The sender used a <strong style="color:#e8374a">personal Gmail address, not a business domain</strong>. <strong style="color:#e8374a">Gmail's scanner did not flag the attachment.</strong>
+        <br><br>This is the sample that validated the intended use case for Ladon — a real phishing email, a real target, a payload that passed Gmail. Ladon caught it on first scan.
+      </div>
+    </div>
+  </div>
+
+  <div class="figure">
+    <div class="figure-title">Figure 011-01 — Ladon Report · Opportunity_OverviewNY921.pdf · Sample 5</div>
+    <div class="figure-body"><img src="img/011/job_scam_polyglot.png" alt="Ladon analysis report showing HIGH severity, polyglot PE at offset 10303, clean PDF structure"></div>
+    <div class="figure-caption"><strong>Original April 2026 output, shown for transparency.</strong> This figure includes the polyglot/PE finding now retracted as a false positive (see Correction). What remains accurate: the email was a genuine phishing attempt that passed Gmail's attachment scanner. The polyglot claim shown here is unverified.</div>
+  </div>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>The Pattern Across All Five</h2>
+
+  <p><strong>[Corrected]</strong> The original version of this section claimed every sample was a polyglot carrying an embedded Windows PE. That was wrong (see the Correction section above): none of the samples contains a Windows PE, and one is not even a PDF. What the samples actually share is that they are malicious documents that evade surface-level scanning through <em>PDF-native</em> techniques — auto-execute actions, callback URIs, C2 domains — and, in one case, through file-type masquerade. The corrected summary below reflects what each sample actually is.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <colgroup>
+        <col class="col-sample"><col class="col-attr"><col class="col-sev"><col class="col-offset"><col class="col-findings">
+      </colgroup>
+      <thead><tr><th>Sample</th><th>Attribution</th><th>Actual Type</th><th>Polyglot?</th><th>Real Malicious Indicators</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>d67e62bb…</strong><br><span style="font-size:.75rem;color:#94a3b8">Unknown dropper</span></td>
+          <td>Unknown</td>
+          <td>Genuine PDF</td>
+          <td>No</td>
+          <td>/ObjStm object-stream obfuscation</td>
+        </tr>
+        <tr>
+          <td><strong>e2b75bae…</strong><br><span style="font-size:.75rem;color:#94a3b8">ValleyRAT / SilverFox</span></td>
+          <td>Chinese APT</td>
+          <td>Genuine PDF</td>
+          <td>No</td>
+          <td>/URI ×20, live Tencent Cloud .msi + .exe C2</td>
+        </tr>
+        <tr>
+          <td><strong>b046d04b…</strong><br><span style="font-size:.75rem;color:#94a3b8">Facebook phishing</span></td>
+          <td>Unknown</td>
+          <td>Genuine PDF</td>
+          <td>No</td>
+          <td>/AA ×6 auto-execute, /URI ×4, typosquatted .site</td>
+        </tr>
+        <tr>
+          <td><strong>5095c647…</strong><br><span style="font-size:.75rem;color:#94a3b8">Gamaredon loader</span></td>
+          <td>Russian APT (FSB)</td>
+          <td style="color:var(--red)">HTML/VBScript</td>
+          <td>No</td>
+          <td>HTML-smuggling dropper; spoofs .pdf extension</td>
+        </tr>
+        <tr>
+          <td><strong>Opportunity_<wbr>OverviewNY921</strong><br><span style="font-size:.75rem;color:#94a3b8">Job scam · live catch</span></td>
+          <td>Unknown</td>
+          <td>Unverified</td>
+          <td>Unverified</td>
+          <td>Genuine phishing email; passed Gmail</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p><strong>What actually holds up:</strong> The malicious nature of these samples was real, and Ladon's PDF-structure and URL modules correctly flagged the genuine indicators — auto-execute actions, callback URIs, live C2 domains, and typosquatted infrastructure. What did not hold up was the polyglot/embedded-PE claim, which was a detection artifact. Ladon is effective at catching malicious documents through their real behavioral signals; it was the polyglot module specifically that produced false positives, and it has since been rebuilt with structural validation.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The real lesson:</strong> The Gamaredon sample — originally the &ldquo;cleanest&rdquo; and most alarming case — turned out not to be a PDF at all, but HTML masquerading as one. A detector must validate a file's <em>actual type</em> before running format-specific checks, or it will both miss the real technique (HTML smuggling) and invent a fake one (a polyglot that isn't there). This single sample reshaped how I approach file-type validation in Ladon.</p>
+  </div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>What This Validates About Ladon</h2>
+
+  <p>The detection methodology in Ladon was built from reading threat reports and file format specifications. These five samples were the first test against files that weren't constructed to test the tool — and that test surfaced both a strength and a flaw.</p>
+
+  <p><strong>What worked:</strong> The URL analysis module correctly flagged the live Tencent Cloud C2 URLs in sample 2 and the typosquatted domain in sample 3. The PDF structure module correctly identified the auto-execute actions in sample 3 and the object-stream obfuscation in sample 1. These are real detections of real malicious behavior. <strong>What failed:</strong> the polyglot module reported embedded executables that do not exist — a false-positive class I only caught by re-examining the samples byte-by-byte months later. Reporting both honestly is the point of the correction above.</p>
+
+  <p>The live phishing sample is still the most meaningful data point — a real phishing email, sent to a real target, that passed Gmail's scanner. That is unchanged and genuine. What is retracted is the specific claim that Ladon &ldquo;caught the embedded PE&rdquo;: that finding came from the flawed check, and the sample is no longer available to verify. The durable point is that a tool reading raw bytes before a user opens an attachment is the right idea.</p>
+
+  <div class="callout callout-green">
+    <p><strong>The intended use case, restated honestly:</strong> Ladon was designed for a specific scenario — a non-technical employee who receives an unexpected attachment and has no way to know if it is safe to open. The job-scam email is exactly that scenario, and it passed Gmail's scanner. The principle — read the raw bytes before anyone opens anything — is sound. This lab's error was not in the principle but in overstating what a specific (and buggy) module found.</p>
+  </div>
+</div>
+
+<!-- SECTION 05 — NEW -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>Detection Improvements — April 30, 2026</h2>
+
+  <p>Following the original publication of this lab, two issues were identified through continued testing and addressed with updates to <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">document_triage.py</code>. Both fixes are documented here with validation results.</p>
+
+  <!-- FIX 1 — PE Validation -->
+  <div class="improvement-card">
+    <div class="improvement-header">
+      <div class="improvement-title">Fix 01 — PE Validation · False Positives &nbsp;·&nbsp; <span style="color:#60a5fa;font-weight:400">April 30, 2026</span></div>
+    </div>
+    <div class="improvement-body">
+      <p><strong>The problem:</strong> Ladon's polyglot detection was producing false positives on large legitimate PDFs — corporate threat intelligence reports, technical manuals, and similar documents were occasionally triggering a CRITICAL finding when no malicious content was present. The issue was specific to files with heavily embedded binary content such as fonts, images, and color profiles.</p>
+
+      <p><strong>The fix:</strong> The PE detection logic was updated to require a higher confidence threshold before flagging a finding. A file must now satisfy multiple structural validation checks before a Windows executable signature is reported. Incidental byte patterns that are not part of a real executable no longer trigger the module. The change was validated against both clean and malicious samples to confirm zero false negatives.</p>
+
+      <div class="test-result">
+        <div>
+          <div class="test-result-label">ValleyRAT (e2b75bae…) — confirmed malicious · re-tested April 30, 2026</div>
+          <div class="test-result-sub">[Retracted] This April 30 re-test reported the PE finding as still valid — but later byte-level analysis showed no PE exists in this sample. The re-test re-confirmed a false positive. The PDF-structure and URL findings for this sample remain accurate.</div>
+        </div>
+        <div class="test-result-verdict verdict-critical">CRITICAL ✓</div>
+      </div>
+
+      <div class="callout callout-red" style="margin:.75rem 0 1rem 0;padding:1rem 1.25rem">
+        <p style="font-family:'JetBrains Mono',monospace;font-size:.68rem;line-height:1.7;color:var(--ink2);margin:0"><strong style="color:var(--ink)">Re-test output — 2026-04-30 21:24 UTC</strong><br>
+        File: e2b75baeb7ed21fb8f27984f941286770d1c3c0b60fce8d7fa5b167bd24ba6dc.pdf · 158.4 KB · Severity: CRITICAL<br><br>
+        <strong style="color:#e8374a">Polyglot Detection — 1 finding</strong><br>
+        <span style="text-decoration:line-through">[CRITICAL] Windows PE (EXE) signature found at offset 4937 inside PDF file</span> ← retracted, false positive<br><br>
+        <strong style="color:#e8374a">PDF Structure Analysis — 6 issues</strong><br>
+        [Critical] /URI detected (20×) — External URI reference<br>
+        [Warning] https://6-1321729461.cos.ap-guangzhou.myqcloud.com/lnstaller.msi<br>
+        [Warning] https://00-1321729461.cos.ap-guangzhou.myqcloud.com/24-12-13uninstall.exe<br>
+        [Warning] http://www.baidu.com<br><br>
+        <strong style="color:var(--ink2)">URL Analysis — 13 suspicious URLs</strong><br>
+        Tencent Cloud COS domains (cos.ap-guangzhou.myqcloud.com) flagged MEDIUM — live Chinese APT C2 infrastructure confirmed at time of original analysis. Note: URL scoring for Chinese cloud infrastructure is a known improvement area — these domains warrant CRITICAL given attribution context.</p>
+      </div>
+
+      <div class="test-result">
+        <div>
+          <div class="test-result-label">Large legitimate PDF (40MB+ corporate document)</div>
+          <div class="test-result-sub">Previously flagged false CRITICAL. After fix: polyglot module passes clean.</div>
+        </div>
+        <div class="test-result-verdict verdict-clean">CLEAN ✓</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIX 2 — Calendar -->
+  <div class="improvement-card">
+    <div class="improvement-header">
+      <div class="improvement-title">Fix 02 — Calendar Analysis · False Positives &nbsp;·&nbsp; <span style="color:#60a5fa;font-weight:400">April 30, 2026</span></div>
+    </div>
+    <div class="improvement-body">
+      <p><strong>The problem:</strong> Ladon's calendar invite analysis was incorrectly flagging two categories of legitimate calendar invites as CRITICAL meeting platform spoofs. Invites scheduled through third-party scheduling platforms were being flagged because they reference meeting platform names without routing directly through those platforms. Additionally, calendar invites forwarded through corporate email security gateways were being flagged because those gateways rewrite URLs before delivery, making a legitimate Zoom or Teams link appear to come from an unrecognized domain.</p>
+
+      <p><strong>The fix:</strong> The calendar analysis module was updated to recognize both categories correctly. Legitimate scheduling platforms and known corporate email security gateways are now handled appropriately, passing clean instead of triggering false spoof alerts. Actual attacker-controlled domains that impersonate meeting platforms — the core detection target — are unaffected and still trigger CRITICAL.</p>
+
+      <div class="test-result">
+        <div>
+          <div class="test-result-label">Legitimate Calendly invite (calendly.com/john-smith/30min)</div>
+          <div class="test-result-sub">Previously flagged false CRITICAL. After fix: calendar module passes clean, severity LOW.</div>
+        </div>
+        <div class="test-result-verdict verdict-clean">CLEAN ✓</div>
+      </div>
+
+      <div class="test-result">
+        <div>
+          <div class="test-result-label">BlueNoroff-style fake Zoom lure (zoom-us.meeting-secure.site)</div>
+          <div class="test-result-sub">Modeled on the April 2026 BlueNoroff/Lazarus campaign using typosquatted Zoom domains. After fix: still detected correctly as CRITICAL spoof.</div>
+        </div>
+        <div class="test-result-verdict verdict-critical">CRITICAL ✓</div>
+      </div>
+
+      <div class="callout callout-blue" style="margin-top:1.25rem">
+        <p><strong>On the BlueNoroff campaign context:</strong> The fake Zoom test case was modeled on a documented active campaign. Arctic Wolf reported in April 2026 that BlueNoroff — a Lazarus sub-group tied to North Korea's Reconnaissance General Bureau — was using Calendly invites that later swap to typosquatted Zoom or Teams links to deliver second-stage malware via a fake SDK update prompt. The campaign was independently covered by <a href="https://www.govinfosecurity.com/crypto-targeting-north-koreans-wield-fake-zoom-meetings-a-31516" target="_blank">GovInfoSecurity</a>, Dark Reading, Infosecurity Magazine, and CyberSecurityNews between April 17–28, 2026, and is tracked under UNC1069 and Sapphire Sleet. The fix correctly allows legitimate Calendly scheduling through while catching the attacker-controlled destination domain substitution.</p>
+      </div>
+
+      <h3 style="margin-top:1.75rem">Active Campaign IOCs — April 2026</h3>
+      <p style="font-size:.88rem;color:var(--ink3);margin-bottom:1rem">The following indicators were submitted to ThreatFox on April 8, 2026 and are consistent with the BlueNoroff/UNC1069 fake Zoom campaign. Domains are defanged — brackets replace dots to prevent accidental navigation. These domains would trigger Ladon's ICS analysis if embedded in a calendar invite LOCATION or DESCRIPTION field.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th style="width:40%">Defanged Indicator</th><th style="width:20%">Type</th><th style="width:40%">Pattern</th></tr></thead>
+          <tbody>
+            <tr><td class="code">usz00mczyiee[.]store</td><td><span class="chip chip-critical">DOMAIN</span></td><td>Zero substitution in "zoom" — usz<strong>00</strong>m vs zoom</td></tr>
+            <tr><td class="code">zoominviteeees[.]de</td><td><span class="chip chip-critical">DOMAIN</span></td><td>Extra characters appended to "zoom" + unusual TLD</td></tr>
+            <tr><td class="code">googlemeet[.]emilychart[.]xyz</td><td><span class="chip chip-critical">DOMAIN</span></td><td>"googlemeet" as subdomain of unrelated domain + .xyz TLD</td></tr>
+            <tr><td class="code">simplicity-w[.]pages[.]dev</td><td><span class="chip chip-high">URL</span></td><td>Cloudflare Pages abuse — legitimate infrastructure, malicious content</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout callout-amber" style="margin-top:1.25rem">
+        <p><strong>What Ladon catches vs. where its boundary is:</strong> If any of these domains appeared in a calendar invite LOCATION or DESCRIPTION field, Ladon would flag CRITICAL — suspicious TLD, platform keyword in wrong domain, or typosquat pattern. What Ladon does not catch is the browser-based payload delivery stage: the fake meeting room rendering pre-recorded video, the fake audio failure, and the ClickFix "SDK Update" prompt that delivers the actual malware. That stage happens in the browser after the user clicks the link. Ladon is a pre-click triage tool — it catches the lure before it is opened. Detecting the browser-based stage requires endpoint behavioral detection or DNS-layer blocking, not static file analysis.</p>
+      </div>
+    </div>
+  </div>
+
+  <p>All five original malicious samples were re-tested after both fixes. Zero false negatives — every confirmed malicious file still fires at the correct severity. Zero false positives introduced — clean files that previously triggered incorrectly now pass clean.</p>
+</div>
+
+
+  <!-- FIX 3 — LNK Module -->
+  <div class="improvement-card">
+    <div class="improvement-header">
+      <div class="improvement-title">Fix 03 — LNK Shortcut Analysis · New Module &nbsp;·&nbsp; <span style="color:#60a5fa;font-weight:400">June 5, 2026</span></div>
+    </div>
+    <div class="improvement-body">
+      <p><strong>The addition:</strong> Windows shortcut (.lnk) files are a documented primary delivery mechanism in phishing campaigns — including the calendar-themed BlueNoroff attacks analyzed in this lab. Ladon previously had no support for this file type. A new static analysis module was added that reads the LNK binary structure and checks for suspicious execution patterns without opening or executing the file.</p>
+
+      <p><strong>What it detects:</strong> Living-off-the-land binaries (LOLBINs) — system utilities like <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">forfiles.exe</code>, <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">mshta</code>, <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">certutil</code>, and <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">rundll32</code> that attackers use to execute payloads while evading detection rules tuned for PowerShell. Also detects UNC network paths pointing to attacker infrastructure, double extensions disguising executables as documents, and suspicious target directories.</p>
+
+      <div class="test-result">
+        <div>
+          <div class="test-result-label">b8d97d29… · calendar-stib-com-ua · MalwareBazaar · October 2024</div>
+          <div class="test-result-sub">Real malicious LNK sample tagged with calendar delivery infrastructure. Ladon detected forfiles.exe in the shortcut target path — a documented LOLBIN used specifically to bypass PowerShell-based detection rules. File is 3.2 KB, inert on macOS, analyzed via static byte reading only.</div>
+        </div>
+        <div class="test-result-verdict verdict-critical">HIGH ✓</div>
+      </div>
+
+      <div class="callout callout-red" style="margin:.75rem 0 1rem 0;padding:1rem 1.25rem">
+        <p style="font-family:'JetBrains Mono',monospace;font-size:.68rem;line-height:1.7;color:var(--ink2);margin:0"><strong style="color:var(--ink)">Analysis output — June 5, 2026</strong><br>
+        File: b8d97d29e99e1f96e06836468db56855dc09305e3ed663c720fe700ea4bf6e73.lnk · 3.2 KB · Severity: HIGH<br><br>
+        <strong style="color:#e8374a">LNK Shortcut Analysis — 1 finding</strong><br>
+        [CRITICAL] Forfiles.exe detected — Windows LOLBIN used to execute commands and bypass detection<br><br>
+        <strong style="color:var(--green)">Polyglot Detection — Pass</strong><br>
+        File type consistent — no polyglot indicators. Magic bytes match the declared file extension.</p>
+      </div>
+
+      <div class="callout callout-amber" style="margin-top:1.25rem">
+        <p><strong>On calendar invite testing:</strong> The ICS analysis module was validated using synthetic test cases modeled on documented BlueNoroff campaign IOCs — a Calendly invite to confirm no false positive, and a typosquatted Zoom domain to confirm correct detection. Real malicious ICS lure files are rarely submitted to public malware repositories — attackers submit the payload, not the invite. Synthetic tests validate that the detection logic runs correctly against known patterns. Production validation of the calendar module against real attacker-crafted invites requires a mail flow deployment — the next phase of development.</p>
+      </div>
+    </div>
+  </div>
+
+<!-- SECTION 06 -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>The Full Picture</h2>
+
+  <p><strong>Corrected:</strong> The original version of this section claimed &ldquo;zero false negatives and zero false positives.&rdquo; That does not survive scrutiny — the polyglot module produced false positives on every sample in this lab, and separately misses HTML files masquerading as PDFs unless the newer masquerade check is applied. What is accurate: Ladon's PDF-structure, URL, and calendar modules reliably flag genuine malicious indicators, and the April 30 work reduced real sources of noise. An honest capability audit — including validation against a verified polyglot corpus (see Correction) and the limits of each module — is the subject of the revision in progress.</p>
+
+  <p>The tool does not execute anything. It does not require network access. It reads raw bytes and reports what it finds — which is exactly what is needed before anyone opens an unexpected file.</p>
+
+  <div style="padding:1.5rem 0 2rem 0;">
+    <a href="mailto:yana@sitewavestudio.com?subject=Ladon Demo Request" style="font-family:var(--mono);font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;background:#1a4fa0;color:#fff;padding:.75rem 1.75rem;border-radius:2px;text-decoration:none;display:inline-block;text-align:center;">REQUEST A LIVE DEMO<br><span style="font-size:.62rem;letter-spacing:.04em;color:#94a3b8;font-weight:400;text-transform:none;display:block;text-align:center;">available upon request</span></a>
+  </div>
+</div>
+
+</div></div>
+
+<footer>
+  <span>Lab Log 011 &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; April 2026 &nbsp;·&nbsp; Educational use only</span>
+  <a href="../index.html" style="color:#4a9eff;text-decoration:none;white-space:nowrap">← Portfolio</a>
+</footer>
+
+</body>
+</html>

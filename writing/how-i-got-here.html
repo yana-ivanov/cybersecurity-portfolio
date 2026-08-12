@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>How I Got Here | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker with decorative lines — blue theme style */
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+
+/* Blue bar — wraps naturally */
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.blue{color:var(--blue);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT CARD (blue theme uses mat-card wrapper) ── */
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+/* Numbers: IBM Plex Serif, clean editorial style */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-red .stat-num{color:var(--red)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE (for diagrams, screenshots, code blocks) ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── TIMELINE (horizontal grid — blue theme style) ── */
+.timeline{margin:0;display:grid;gap:0;border:1px solid var(--rule)}
+.tl-item{display:grid;grid-template-columns:140px 1fr;border-bottom:1px solid var(--rule)}
+.tl-item:last-child{border-bottom:none}
+.tl-left{padding:1.5rem 1.25rem;border-right:1px solid var(--rule);background:#f8fafc}
+.tl-date{font-family:var(--mono);font-size:.72rem;color:var(--blue);font-weight:700;margin-bottom:.3rem}
+.tl-tag{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.tl-right{padding:1.5rem}
+.tl-title{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3}
+.tl-body{font-size:.88rem;color:var(--ink3);line-height:1.7;margin:0}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── CODE BLOCKS (lab logs only) ── */
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.code-block{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.code-block .prompt{color:#4a9eff}
+.code-block .comment{color:#64748b}
+.code-block .highlight{color:#4ade80}
+.code-block .warning{color:#ef4444}
+.code-block .error{color:#f97316}
+/* shorthand color spans for inline use */
+.co{color:#94a3b8}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+
+/* ── TERMINAL WINDOW (macOS-style, for script output) ── */
+.terminal{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.terminal-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-left:.5rem}
+.terminal pre{font-family:var(--mono);font-size:.76rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#e2e8f0}
+/* terminal text color classes */
+.t-red{color:#ef4444;font-weight:bold}
+.t-orange{color:#fb923c;font-weight:bold}
+.t-blue{color:#60a5fa;font-weight:bold}
+.t-green{color:#4ade80}
+.t-dim{color:#94a3b8} /* was #475569 — bumped for legibility */
+.t-bold{color:#e2e8f0;font-weight:bold}
+
+/* ── HOST CARD (dark card for IP/host data) ── */
+.host-card{background:#0a0f1a;border-radius:2px;padding:1.5rem;margin:1.75rem 0;display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.hf-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.hf-value{font-family:var(--mono);font-size:.9rem;color:#4a9eff;font-weight:600}
+.hf-value.red{color:#ef4444}
+.hf-value.green{color:#4ade80}
+.hf-value.amber{color:#fbbf24}
+
+/* ── LAB ENVIRONMENT BOX (lab logs only) ── */
+.env-box{background:var(--paper);border:1px solid var(--rule);padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+
+/* ── COMPARE GRID (side-by-side comparison) ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.left{border-top:3px solid var(--blue)}
+.compare-box.right{border-top:3px solid var(--amber)}
+.compare-box.danger{border-top-color:var(--red)}
+.compare-box.safe{border-top-color:var(--green)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.left .compare-label{color:var(--blue)}
+.compare-box.right .compare-label{color:var(--amber)}
+.compare-box.danger .compare-label{color:var(--red)}
+.compare-box.safe .compare-label{color:var(--green)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+
+/* ── FUNCTION CARDS GRID (for script/tool documentation) ── */
+.fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.75rem 0}
+.fn-card{background:var(--paper);border:1px solid var(--rule);padding:1rem 1.1rem;border-top:2px solid var(--blue)}
+.fn-name{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--blue);margin-bottom:.3rem}
+.fn-desc{font-size:.82rem;color:var(--ink3);line-height:1.55}
+
+/* ── NIST MAPPING BOX (lab logs only) ── */
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:90px 1fr;gap:1rem;align-items:start}
+.nist-control{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--blue);padding-top:.15rem}
+.nist-desc{font-size:.88rem;color:var(--ink3);line-height:1.7}
+.nist-desc strong{color:var(--ink)}
+
+/* ── TOOL EMBED (for pages with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;gap:.5rem;white-space:nowrap;overflow-x:auto}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .tl-item{grid-template-columns:1fr}
+  .tl-left{border-right:none;border-bottom:1px solid var(--rule);padding:1rem 1.25rem}
+  .env-grid{grid-template-columns:1fr}
+  .nist-item{grid-template-columns:80px 1fr}
+  .compare-grid{grid-template-columns:1fr}
+  .fn-grid{grid-template-columns:1fr}
+  .host-card{grid-template-columns:1fr}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .mast-bar{padding:.55rem 1.5rem;font-size:.62rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.6rem}
+  .mast-meta{grid-template-columns:1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .timeline .tl-left{padding:.75rem .9rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .code-block,.terminal{padding:.85rem .9rem;font-size:.7rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<div class="masthead">
+  <div class="mast-inner">
+
+    <!-- EDIT: label — single category word or short phrase, e.g. "Field Notes" or "Lab Log" -->
+    <div class="mast-label">Field Notes · Career</div>
+
+    <!-- EDIT: title — first line plain white, subtitle in blue <span> -->
+    <h1 class="title">How I Got Here<br><span>A Pivot Into Cybersecurity, in Three Months</span></h1>
+
+    <!-- EDIT: meta grid — always 6 cells (2 rows × 3 cols) -->
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">May 2026</div></div>
+      <div class="meta-item"><div class="label">Category</div><div class="value">Field Notes · Career</div></div>
+      <div class="meta-item"><div class="label">Background</div><div class="value">15 yrs UX/Product</div></div>
+      <div class="meta-item"><div class="label">Pivot Started</div><div class="value">February 2026</div></div>
+      <div class="meta-item"><div class="label">Read Time</div><div class="value">10 minutes</div></div>
+    </div>
+  </div>
+
+  <!-- EDIT: blue bar text — ALL CAPS (blue theme convention) -->
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    15 YEARS UX/PRODUCT &nbsp;·&nbsp; 3 MONTHS BUILDING &nbsp;·&nbsp; ONE THROUGH-LINE
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 — The Through-Line -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>The Through-Line</h2>
+
+  <p>After fifteen years in product and user experience design, I pivoted into cybersecurity. The decision happened faster than the work that followed. I started dedicating myself to this in February 2026. By late May, threat intelligence had become the center of what I do — a working threat intelligence platform, nineteen published analyses, contributions to an open-source detection rule repository, eight functional security tools, thirteen lab logs documenting hands-on detection work, and CompTIA Security+ scheduled for June 16.</p>
+
+  <p>This is a working note about how that happened — not because the path was unusual, but because the through-line was something I didn&#x2019;t see until I was deep into the work.</p>
+</div>
+
+<!-- SECTION 02 — What Came Before -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>What Came Before</h2>
+
+  <p>Fifteen years designing products that shipped. Senior UX roles at Sylvan Road, 605 Tech, and Gogotech. Client engagements through Upwork going back to 2011. Twenty-four LinkedIn recommendations from managers, peers, and clients spanning more than a decade. The themes in those recommendations are consistent: she delivers on time under pressure, she thinks beyond what&#x2019;s asked, she brings analytical depth to creative problems, she makes teams better.</p>
+
+  <p>That was the work. It still is the work. The format changed; the approach didn&#x2019;t.</p>
+
+  <p>When the design industry contracted in 2024, the analytical and pattern-recognition work that made fifteen years meaningful was harder to find in traditional UX roles. The roles that were available emphasized different things — production speed over thinking, AI-assisted output over original problem-solving, narrower specializations. None of that was wrong; it just wasn&#x2019;t where my work lived.</p>
+
+  <p>I spent a year looking at what came next.</p>
+</div>
+
+<!-- SECTION 03 — The Realization -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>The Realization</h2>
+
+  <p>The pivot to cybersecurity wasn&#x2019;t an accident, but it also wasn&#x2019;t planned far in advance. The realization came from reading.</p>
+
+  <p>I&#x2019;d been reading threat intelligence the way some people read the news — out of genuine curiosity about how attacks worked and why defenses failed. Each new incident pulled me into the same set of questions: How did this happen? Why did existing defenses miss it? What would it take to prevent it?</p>
+
+  <p>The skill of looking at messy information and finding the story turned out to be the same skill I&#x2019;d been training for fifteen years — just applied to attacker behavior instead of user behavior. Reading user research data to find friction patterns is structurally identical to reading threat intelligence feeds to find adversary patterns. Mapping user journeys is the same work as mapping attack chains. Designing against misuse is the same as designing detection logic.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The technologies were new. The thinking wasn&#x2019;t.</strong></p>
+  </div>
+
+  <p>The moment it crystallized was March 11, 2026. The day before, Iranian threat actor Handala had wiped 200,000 Stryker Corporation devices across 79 countries using Microsoft Intune — the company&#x2019;s own device management tool — after compromising a single admin account that lacked MFA. I was deep into Security+ exam prep, drilling on the exact controls that would have stopped it: MFA enforcement, privileged access management, behavioral anomaly detection, least privilege, microsegmentation. The flashcard concepts were the failure modes from yesterday&#x2019;s news. The abstraction collapsed in real time.</p>
+
+  <p>I wrote up <a href="../analysis/stryker_threat_analysis.html">the Stryker attack</a> as my first published threat analysis that same week. The work I&#x2019;d been studying wasn&#x2019;t theoretical. It was the gap between what companies were doing and what defenders needed to do — and writing about that gap was something I could already do.</p>
+</div>
+
+<!-- SECTION 04 — The Build -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>The Build</h2>
+
+  <p>Roughly three months from full dedication to where I am now.</p>
+
+  <p>I deliberately didn&#x2019;t take the conventional career-change path. The standard advice — start with TryHackMe, get OSCP, build a generic homelab — is good advice for people without prior professional experience to leverage. I had a different starting point. I&#x2019;d been producing original analytical work for fifteen years. The fastest way to demonstrate cybersecurity capability wasn&#x2019;t to do what every entry-level candidate does. It was to do work that demonstrated thinking.</p>
+
+  <p>So I started writing original analyses. The first was <a href="../analysis/stryker_threat_analysis.html">Stryker</a> — written the same week as the attack. Then <a href="../analysis/The_Cascade_Analysis.html">a deep look at a coordinated infrastructure attack scenario</a> — the dependency stack that turns three technical failures into a national security crisis. Then <a href="../analysis/Volt_Typhoon_Analysis.html">Volt Typhoon&#x2019;s living-off-the-land techniques</a>. Then the <a href="../analysis/cpanel-cascade-analysis.html">cPanel CVE-2026-41940 cascade</a> — how three distinct threat actor tiers converged on a single vulnerability in seventy-two hours, the timeline reconstructed from nine independent sources. Then the <a href="../analysis/shinyhunters-operational-lifecycle.html">ShinyHunters operational lifecycle</a> — the OAuth Device Flow attack class that&#x2019;s invisible in mainstream coverage despite enabling billions in extortion losses.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Figure 1 — Output, February to May 2026</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-blue">
+        <div class="stat-num">19</div>
+        <div class="stat-label">Threat Analyses</div>
+        <div class="stat-sub">Published, original methodology</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">8</div>
+        <div class="stat-label">Interactive Tools</div>
+        <div class="stat-sub">All browser-based, working</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">13</div>
+        <div class="stat-label">Lab Logs</div>
+        <div class="stat-sub">Hands-on detection work</div>
+      </div>
+      <div class="stat-item stat-green">
+        <div class="stat-num">6</div>
+        <div class="stat-label">Field Notes</div>
+        <div class="stat-sub">Process and methodology pieces</div>
+      </div>
+    </div>
+  </div>
+
+  <p>A working thesis began to emerge about how modern cyber threats follow predictable cascade structures — a thesis I&#x2019;m still developing across new pieces.</p>
+</div>
+
+<!-- SECTION 05 — The VM Lab -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>The VM Lab</h2>
+
+  <p>Writing analyses was the easy part. The hands-on work was where the actual learning happened.</p>
+
+  <p>I spent eight hours one weekend trying to set up a Windows 11 ARM victim VM on my Apple Silicon Mac to run Meterpreter detection labs against my Kali attacker VM. The standard tool for free virtualization on Apple Silicon is UTM. UTM&#x2019;s Windows setup wizard does not properly import a pre-built VHDX disk image — it treats the file as a boot reference and creates a 536 KB placeholder disk instead of the actual 14 GB image. Discovering that took the first hour.</p>
+
+  <p>Converting the VHDX to qcow2 with <code>qemu-img</code> solved the disk problem. Then the network problem appeared. Windows 11 ARM inside QEMU needs the virtio-net driver to recognize the virtual network adapter. Without it, <code>ipconfig</code> returns nothing. Device Manager shows an unrecognized Ethernet Controller with a yellow warning.</p>
+
+  <p>This is the classic chicken-and-egg problem of virtualization: you need network to download drivers, but you need drivers to get network.</p>
+
+  <p>I tried five different approaches over the next several hours. UTM&#x2019;s guest tools installer (requires an empty removable drive slot the VM didn&#x2019;t have). Mounting the Red Hat virtio-win ISO directly (UTM&#x2019;s file picker filtered out <code>.iso</code> files from the drive attachment UI). Extracting the ARM64 drivers and creating a FAT32 USB image with <code>hdiutil</code>. Editing the VM&#x2019;s <code>config.plist</code> via Python to add the <code>Removable</code> flag UTM&#x2019;s guest tools installer requires. Configuring SPICE WebDAV folder sharing (requires the SPICE guest agent to already be installed inside Windows — which requires network to download).</p>
+
+  <p>Every path led to the same circular dependency. Every workaround required something that depended on the thing I was trying to install.</p>
+
+  <p>At hour eight, I stopped. Switched to Parallels Desktop — a paid commercial virtualization tool built specifically for macOS — and had Windows 11 ARM running with full drivers in under twenty minutes.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The lesson from that weekend wasn&#x2019;t really technical. It was operational.</strong> Time-box your troubleshooting. Document the failures. Know when to pivot. Match your tools to your use case. Eight hours on a tool configuration issue is a signal to change approach, not to keep trying the same things harder.</p>
+  </div>
+
+  <p>I wrote that whole experience up as a lab log so the next person trying this on Apple Silicon would have a reference for what doesn&#x2019;t work and why. That&#x2019;s the part that matters — the failed attempts become useful intelligence for the community when someone bothers to document them.</p>
+
+  <p>The VM lab eventually became the foundation for the <a href="../labs/lab_log_009c.html">WAVESHAPER.V2 detection work</a> — three lab logs documenting behavioral detection of North Korean RAT C2 traffic, including a live Meterpreter session captured between Kali and Windows 11 VMs on an isolated host-only network. Sixty-seven megabytes of real C2 traffic. The RST/ACK blocking pattern from Windows Defender and the live session side by side.</p>
+</div>
+
+<!-- SECTION 06 — The Tools and the Rest -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>The Tools and the Rest</h2>
+
+  <p>Alongside the analyses and the labs, the tools. A <a href="../tools/zeek_triage_tool.html">Zeek triage pcap analyzer</a>. An <a href="../tools/aes_tool.html">AES-256 file encryption tool</a>. A <a href="../tools/cvss_calculator.html">CVSS calculator</a>. A <a href="../tools/glassworm_detector.html">Glassworm detector</a> for hidden Unicode payloads. A <a href="../tools/bookmark-organizer.html">bookmark security auditor</a>. An <a href="../tools/email-threat-analyzer.html">email threat analyzer</a> with Gmail OAuth integration and MITRE ATT&amp;CK mapping. A <a href="../tools/youtube-purge.html">YouTube subscription cleanup tool</a> that became the foundation for an AI-powered SOC triage system called AlertDesk. An <a href="../tools/xtinction.html">X archive bulk-audit tool</a>. Eight functional tools, all browser-based or client-side, all built to solve problems I&#x2019;d actually encountered.</p>
+
+  <p>Then <a href="ladon-field-notes.html">Ladon</a> — a static document security analyzer validated against five real malicious PDFs including a Gamaredon APT sample and a live ValleyRAT dropper. Then <a href="argusx-field-notes.html">ArgusX</a> — a threat intelligence platform now ingesting tens of thousands of posts from dozens of sources, with AI classification running at $0.27/month. Then detection rule contributions to <a href="https://github.com/sublime-security/sublime-rules/pull/4267">Sublime Security&#x2019;s open-source repository</a>.</p>
+
+  <p>A <a href="../training/CMMC_Training.html">fourteen-module CMMC training program</a> for defense contractor employees. A working actor reference taxonomy.</p>
+
+  <p>This isn&#x2019;t an exhaustive list. The point isn&#x2019;t volume. The point is that the work is real, it&#x2019;s published, and it&#x2019;s growing.</p>
+</div>
+
+<!-- SECTION 07 — Contributing to Production Detection -->
+<div class="section">
+  <div class="section-num">Section 07</div>
+  <h2>Contributing to Production Detection</h2>
+
+  <p>One area kept pulling me back: email security. Specifically, how attackers manipulate trust at the protocol and encoding level — not just social engineering, but exploitation of how email clients render Unicode, how DNS handles internationalized domain names, how invisible characters slip malicious payloads past filters undetected.</p>
+
+  <p>That curiosity led me to <a href="https://sublime.security">Sublime Security</a> and its detection rule language, MQL (Message Query Language). Sublime maintains an open-source community rule repository at <a href="https://github.com/sublime-security/sublime-rules">github.com/sublime-security/sublime-rules</a> where contributed rules, once reviewed and merged, run in production email environments at organizations worldwide.</p>
+
+  <p>I wrote two detection rules and submitted them as <a href="https://github.com/sublime-security/sublime-rules/pull/4267">Pull Request #4267</a>:</p>
+
+  <p><strong>BEC: Unicode Homoglyph Domain Spoofing</strong> — Detects business email compromise attacks using Cyrillic, Greek, and other Unicode confusables in sender display names and domains. The Cyrillic <code>а</code> (U+0430) is visually identical to the Latin <code>a</code> but is a completely different character at the code point level. Combined with Punycode IDN domain registration, this technique allows attackers to register domains that look identical to legitimate brands while bypassing naive string-matching filters. The rule combines homoglyph detection with financial and urgency language signals, and excludes known trusted senders to minimize false positives.</p>
+
+  <p><strong>Glassworm Invisible Unicode Payload Detection</strong> — Detects emails carrying invisible Unicode payloads associated with the <a href="../analysis/glassworm_analysis.html">Glassworm campaign</a> that compromised 150+ GitHub repositories, npm packages, and VS Code extensions in March 2026. Covers all five categories of invisible characters the campaign abused: zero-width spaces, BiDi control characters, word joiners, the byte order mark, and the tag block codepoints (U+E0000–U+E007F). Also scans text-based attachments (<code>.js</code>, <code>.py</code>, <code>.ts</code>, <code>.json</code>) since Glassworm specifically spread through source code files.</p>
+
+  <p>Both rules are currently in the automated test pipeline — the final stage before reviewer approval and merge. The PR carries the <code>in-test-rules</code> label, meaning Sublime&#x2019;s CI is actively evaluating them against the production rule set.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>Once merged, these rules run against live email traffic in real enterprise environments.</strong> Any Sublime customer who enables the community feed benefits from the detection logic. The research behind them — original work on homoglyph attacks and the Glassworm campaign — is documented and attributed.</p>
+  </div>
+
+  <p>This is the difference between studying threats and building defenses against them. The Glassworm research started as a portfolio threat analysis. The detection logic followed naturally from understanding the campaign well enough to write about it. Once you understand a threat at that level, writing rules to catch it is the obvious next step.</p>
+</div>
+
+<!-- SECTION 08 — What This Is About -->
+<div class="section">
+  <div class="section-num">Section 08</div>
+  <h2>What This Is About</h2>
+
+  <p>The pivot wasn&#x2019;t a leap. It was applying the same approach I&#x2019;ve used for fifteen years to a different problem space.</p>
+
+  <p>The recommendations on my LinkedIn from 2011 forward describe the same person who built this portfolio in 2026. Twenty-four people across more than a decade saying some version of: she goes beyond what&#x2019;s asked, she delivers under pressure, she brings analytical thinking to creative work, she makes teams better. That isn&#x2019;t marketing language. That&#x2019;s the through-line of how I work in any field.</p>
+
+  <p>That&#x2019;s who I am. The format keeps changing. The way I show up doesn&#x2019;t.</p>
+</div>
+
+<!-- SECTION 09 — What I'm Looking For -->
+<div class="section">
+  <div class="section-num">Section 09</div>
+  <h2>What I&#x2019;m Looking For</h2>
+
+  <p>A team where threat analysis matters. Where building real things matters. Where the demonstrated work counts for as much as the traditional pedigree. Connecticut-based, hybrid or remote, defense-adjacent ideally. The kind of team where someone is willing to bet on someone like me — and where I get the chance to prove that bet was right.</p>
+
+  <p>I&#x2019;m not looking for someone to take a chance on me as a favor. I&#x2019;m looking for someone smart enough to see what&#x2019;s already there.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The fifteen years built the foundation. The three months built the proof.</strong> The next chapter is the part I&#x2019;m writing now.</p>
+  </div>
+
+  <p>If you&#x2019;re reading this and you&#x2019;re hiring, or you know someone who is, or you just want to compare notes on cascade structures in modern threats — <a href="mailto:yana@sitewavestudio.com">yana@sitewavestudio.com</a>. The work is at <a href="/">yanaivanov.com</a>.</p>
+</div>
+
+</div></div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Cybersecurity Researcher &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC compliance consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Web Design & Development, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance. This analysis was produced independently as a contribution to the security community's understanding of active threats against US defense infrastructure.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- EDIT: footer — single line, no title -->
+<footer>
+  <span>Yana Ivanov &nbsp;·&nbsp; May 2026 &nbsp;·&nbsp; Educational use only</span>
+  <a href="/" style="color:#4a9eff;text-decoration:none;white-space:nowrap">← Portfolio</a>
+</footer>
+
+<!-- Lab log footer example (swap above footer for this):
+<footer>
+  <span>Lab Log [N] — [Lab Title] &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; [Date] &nbsp;·&nbsp; Controlled lab environment &nbsp;·&nbsp; Educational use only</span>
+  <a href="/" style="color:#4a9eff;text-decoration:none;white-space:nowrap">← Portfolio</a>
+</footer>
+-->
+
+</body>
+</html>
+

@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Shai-Hulud Cascade — Six Weeks of a Supply Chain Worm | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT GRID — number on top, 2-line label, sub-text at bottom ── */
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.25rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper);display:flex;flex-direction:column;align-items:center}
+.stat-num-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.7rem;font-weight:700;line-height:1;margin-bottom:.9rem;letter-spacing:-.01em}
+.stat-num-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;line-height:1.4;min-height:2.5em;display:flex;align-items:flex-start;justify-content:center;margin-bottom:.75rem;max-width:100%}
+.stat-num-sub{font-size:.72rem;color:#94a3b8;line-height:1.5;font-family:var(--serif);display:flex;align-items:flex-start;justify-content:center;max-width:100%}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── ATTACK CHAIN ── */
+.attack-chain{margin:1rem 0;display:flex;flex-direction:column;gap:0}
+.chain-step{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;align-items:start;position:relative;padding-bottom:1.25rem}
+.chain-step:last-child{padding-bottom:0}
+.chain-step::before{content:'';position:absolute;left:1.2rem;top:2.5rem;bottom:0;width:2px;background:var(--rule)}
+.chain-step:last-child::before{display:none}
+.chain-num{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.chain-normal .chain-num{background:var(--bg);border:2px solid var(--rule);color:var(--ink3)}
+.chain-warning .chain-num{background:var(--amber-dim);border:2px solid var(--amber);color:var(--amber)}
+.chain-danger .chain-num{background:var(--red-dim);border:2px solid var(--red);color:var(--red)}
+.chain-body{padding-top:.4rem}
+.chain-label{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.25rem;letter-spacing:.02em}
+.chain-warning .chain-label{color:var(--amber)}
+.chain-danger .chain-label{color:var(--red)}
+.chain-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── SPLIT VISUAL ── */
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel p{font-size:.88rem;line-height:1.7;margin-bottom:.75rem}
+
+/* ── FINDINGS ── */
+.findings{margin:2rem 0}
+.finding{display:grid;grid-template-columns:3rem 1fr;gap:1.25rem;padding:1.5rem;background:var(--paper);border-left:3px solid;margin-bottom:1rem}
+.finding.fn-critical{border-color:var(--red);background:var(--red-dim)}
+.finding.fn-high{border-color:var(--amber);background:var(--amber-dim)}
+.finding.fn-medium{border-color:var(--blue);background:var(--blue-dim)}
+.finding-num{font-family:var(--display-clean);font-size:1.6rem;font-weight:700;color:var(--ink2);line-height:1}
+.fn-critical .finding-num{color:var(--red)}
+.fn-high .finding-num{color:var(--amber)}
+.fn-medium .finding-num{color:var(--blue)}
+.finding-title{font-weight:700;color:var(--ink);margin-bottom:.5rem;font-size:1rem}
+.finding-desc{font-size:.92rem;line-height:1.7;color:var(--ink3);margin-bottom:.5rem}
+.finding-tag{display:inline-block;font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.25rem .6rem;background:var(--ink);color:#fff;font-weight:600}
+.fn-critical .finding-tag{background:var(--red)}
+.fn-high .finding-tag{background:var(--amber)}
+.fn-medium .finding-tag{background:var(--blue)}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;padding:1.25rem 0;border-bottom:1px solid var(--rule)}
+.step-item:last-child{border-bottom:none}
+.step-num{width:2.5rem;height:2.5rem;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.85rem;font-weight:700}
+.step-content-label{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);font-weight:700;margin-bottom:.4rem}
+.step-content-desc{font-size:.92rem;line-height:1.7;color:var(--ink3)}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+.bio-text a{color:#60a5fa}
+.bio .back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#60a5fa;text-transform:uppercase;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem}
+.bio .back-nav-link::before{content:'←';font-size:.75rem}
+.bio .back-nav-link:hover{color:#93c5fd}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+@media (max-width:768px){
+  .wrap,.mast-inner,.bio,footer{padding-left:1.5rem;padding-right:1.5rem}
+  .back-nav,.mast-bar{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr;gap:1rem}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .split-visual{grid-template-columns:1fr}
+  .stat-num{font-size:1.2rem}
+}
+</style>
+</head>
+<body>
+
+<nav class="back-nav">
+  <a href="https://yanaivanov.com/">Portfolio</a>
+</nav>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Threat Intelligence Analysis · Supply Chain Cascade</div>
+    <h1 class="title">The Shai-Hulud Cascade — <em>Six Weeks of a Supply Chain Worm</em></h1>
+    <div class="mast-meta">
+      <div class="meta-item">
+        <div class="label">Author</div>
+        <div class="value">Yana Ivanov</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Published</div>
+        <div class="value">June 2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Classification</div>
+        <div class="value">Public · Educational</div>
+      </div>
+    </div>
+    <div class="mast-meta" style="margin-top:0;padding-top:0;border-top:none">
+      <div class="meta-item">
+        <div class="label">Actor</div>
+        <div class="value">TeamPCP / UNC6780</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Active Campaign</div>
+        <div class="value">Mar – Jun 2026</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Severity</div>
+        <div class="value">Critical · Active</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="mast-bar">
+  <div class="mast-bar-dot"></div>
+  <div>46 posts in 6 weeks · 600+ packages compromised · npm · PyPI · Packagist · 35+ verified IOC hashes</div>
+</div>
+
+<!-- SECTION 01 — OPENING -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>The Worm That Was Already Moving</h2>
+
+  <p>I've spent the past six weeks tracking one campaign across the npm software ecosystem: Shai-Hulud, a self-propagating worm stealing developer credentials wherever it touched. From late April through early June 2026, the campaign moved through hundreds of compromised packages, recognizable victims, and an unmistakable escalation pattern.</p>
+
+  <p>In Frank Herbert's <em>Dune</em>, "Shai-Hulud" is the name for the giant sandworms of Arrakis — creatures that move through the desert in massive, unstoppable patterns, consuming everything they cross. The attackers who named their worm chose the metaphor carefully. Between April 24 and June 2, 2026, their tool moved through the software ecosystem the same way: massive, unstoppable, consuming developer credentials wherever it touched.</p>
+
+  <p>Two weeks ago I wrote about a different cascade — <a href="https://yanaivanov.com/analysis/cpanel-cascade-analysis.html">the cPanel CVE-2026-41940 disclosure</a> that compressed mass exploitation into 72 hours. Three actor tiers converging on a single vulnerability in predictable order. I argued that cyber attacks aren't chaos — they're patterns that compress in time.</p>
+
+  <p>Then a different campaign showed me the same pattern in a different domain.</p>
+
+  <p>This analysis documents what six weeks of Shai-Hulud taught me about how supply chain attacks evolve — and why the structure is more predictable than defenders want to admit. But before I get to the worm itself, there's a more honest framing to acknowledge: <strong>Shai-Hulud is not where this story starts</strong>. The attackers behind it — TeamPCP, tracked by Google's Threat Intelligence Group as UNC6780 — were already operating a multi-month supply chain campaign when the worm went public. The Shai-Hulud campaign I documented for six weeks is one phase of a longer operation that was visible to threat researchers since at least March 25, 2026.</p>
+
+  <p>What I watched unfold wasn't the start of an attack. It was the visible surface of a much deeper campaign.</p>
+
+  <div class="stat-num-grid">
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">46</div>
+      <div class="stat-num-label">Threat Feeds Tracked</div>
+      <div class="stat-num-sub">Tracked April – June 2026</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">600+</div>
+      <div class="stat-num-label">Packages Compromised</div>
+      <div class="stat-num-sub">npm · PyPI · Packagist · single wave</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">35+</div>
+      <div class="stat-num-label">IOC Hashes Verified</div>
+      <div class="stat-num-sub">SHA256 · MD5 · ThreatFox &amp; OTX</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">21</div>
+      <div class="stat-num-label">Days to Source Release</div>
+      <div class="stat-num-sub">Worm emergence to public code</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 02 — WHAT IS SHAI-HULUD -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>What Shai-Hulud Actually Does</h2>
+
+  <p>For readers who don't live in the supply chain attack world, here's what Shai-Hulud actually does.</p>
+
+  <p>Modern software isn't built from scratch. Developers assemble it from thousands of smaller pieces of code called "packages" — pre-written solutions to common problems. Need to send data to a server? You don't write that code yourself. You install a package called <code>axios</code> that handles it. Need to manage navigation in your web app? You install <code>tanstack-router</code>. Need to display data in tables, handle dates, parse files, encrypt passwords? There's a package for each one.</p>
+
+  <p>The Node Package Manager (npm) is the central registry where JavaScript developers download these packages. As of 2026, npm hosts over 3 million packages. Popular ones like axios get downloaded approximately 50 million times per week. The entire modern web runs on this ecosystem.</p>
+
+  <p>When you install a package, you're trusting several things:</p>
+
+  <ol style="margin:1rem 0 1.5rem 2rem;color:var(--ink3)">
+    <li style="margin-bottom:.5rem">The code published under that name is what its maintainer intended</li>
+    <li style="margin-bottom:.5rem">The maintainer's account hasn't been compromised</li>
+    <li style="margin-bottom:.5rem">The package's dependencies — and their dependencies, and theirs — are equally clean</li>
+  </ol>
+
+  <p><strong>Shai-Hulud breaks that trust at every level.</strong></p>
+
+  <p>The worm spreads through compromised npm packages. When a developer installs an infected package, the malware:</p>
+
+  <ol style="margin:1rem 0 1.5rem 2rem;color:var(--ink3)">
+    <li style="margin-bottom:.5rem">Steals credentials from the developer's machine — npm tokens (which give publish access to packages), GitHub authentication (which gives access to source code), AWS keys (which give access to cloud infrastructure), Kubernetes secrets (which give access to running services), and any other credentials stored locally</li>
+    <li style="margin-bottom:.5rem">Uses those stolen credentials to publish malicious versions of other packages the developer maintains</li>
+    <li style="margin-bottom:.5rem">Repeats the process on every machine that installs those packages</li>
+  </ol>
+
+  <p>The cycle compounds. One developer's compromised laptop becomes the seed for hundreds of poisoned packages. Those packages get downloaded by other developers. Their credentials get stolen. The infection grows exponentially.</p>
+
+  <p>This is what makes Shai-Hulud different from most supply chain attacks. It's not a one-time poisoning — it's a self-propagating worm. The attackers don't have to compromise individual packages. They just have to start the chain reaction.</p>
+
+  <p>What happens to the stolen data is the second layer of the attack. Some credentials get used immediately to publish the next wave of poisoned packages. Others get monetized. TeamPCP has been documented selling stolen source code on cybercrime forums — Mistral AI's repositories were advertised for sale on May 14, 2026. By May 20, the group claimed to have stolen 4,000 internal GitHub repositories. The credential graph the worm builds doesn't just compromise packages. It compromises companies.</p>
+
+  <p>The name fits.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The concentration risk problem.</strong> When attackers compromise a package that's downloaded 50 million times a week, every organization using that package becomes a potential victim. The worm doesn't need to target you. You target it by installing the dependency. One point of failure. Thousands of downstream organizations exposed.</p>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 03 — HISTORICAL CONTEXT -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>The Pattern That Predates the Worm</h2>
+
+  <p>Supply chain attacks aren't new. They're 16 years old in their modern form. What changed in 2026 is the scale and speed, not the underlying pattern.</p>
+
+  <p>Public threat intelligence reporting on supply chain attacks goes back to 2010. Reading the documented incidents in order reveals a trajectory worth naming before discussing Shai-Hulud specifically.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>Campaign</th>
+          <th>Actor</th>
+          <th>Scale</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>2010</strong></td>
+          <td>Stuxnet</td>
+          <td>NSA / Unit 8200</td>
+          <td>Targeted destruction of Iranian centrifuges</td>
+        </tr>
+        <tr>
+          <td><strong>2013</strong></td>
+          <td>Target Breach</td>
+          <td>Unknown (HVAC vendor compromise)</td>
+          <td>40 million payment cards</td>
+        </tr>
+        <tr>
+          <td><strong>2015</strong></td>
+          <td>XcodeGhost</td>
+          <td>Likely China-affiliated</td>
+          <td>4,000 malicious iOS apps</td>
+        </tr>
+        <tr>
+          <td><strong>2017</strong></td>
+          <td>NotPetya (via M.E.Doc update)</td>
+          <td>Sandworm / GRU Unit 74455</td>
+          <td>$10 billion in damages</td>
+        </tr>
+        <tr>
+          <td><strong>2017</strong></td>
+          <td>CCleaner (Avast)</td>
+          <td>Floxif operators</td>
+          <td>2.27 million downloads infected</td>
+        </tr>
+        <tr>
+          <td><strong>2020</strong></td>
+          <td>SolarWinds SUNBURST</td>
+          <td>APT29 / SVR</td>
+          <td>18,000 organizations · 9-month dwell time</td>
+        </tr>
+        <tr>
+          <td><strong>2021</strong></td>
+          <td>Kaseya VSA</td>
+          <td>REvil ransomware</td>
+          <td>1,500 downstream victims</td>
+        </tr>
+        <tr>
+          <td><strong>2023</strong></td>
+          <td>3CX VoIP</td>
+          <td>Lazarus / DPRK</td>
+          <td>600,000 organizations</td>
+        </tr>
+        <tr>
+          <td><strong>2023</strong></td>
+          <td>MOVEit</td>
+          <td>Cl0p ransomware</td>
+          <td>2,500+ organizations</td>
+        </tr>
+        <tr>
+          <td><strong>2026</strong></td>
+          <td>Shai-Hulud / TeamPCP</td>
+          <td>UNC6780 (criminal enterprise)</td>
+          <td>600+ packages · 6 weeks · ongoing</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Three trends are visible across this timeline:</p>
+
+  <p><strong>Frequency increase.</strong> From rare, isolated incidents (one every 1-2 years through the mid-2010s) to constant background activity. My dataset shows 87 supply chain attacks in the first five months of 2026 alone.</p>
+
+  <p><strong>Actor diversification.</strong> The 2010-era attacks required nation-state resources (Stuxnet took the combined efforts of NSA and Israeli Unit 8200 operating for years). The 2023-era attacks include sophisticated criminal enterprises (REvil, Cl0p) operating at nation-state-equivalent scale. The 2026 attacks include criminal actors like TeamPCP who openly distribute their tools for use by other criminals.</p>
+
+  <p><strong>Speed acceleration.</strong> SolarWinds went undetected for nine months. Shai-Hulud propagated through 600 packages overnight in its May 19 wave. The defensive window has compressed from months to hours.</p>
+
+  <h3>What Changed Between Then and Now</h3>
+
+  <p>Two specific shifts explain why 2026 looks different from 2021.</p>
+
+  <p><strong>The first is AI tooling maturity.</strong> The same large language models that help engineers debug code help attackers find vulnerabilities. The same code generation capabilities that let companies ship features quickly let threat actors weaponize techniques quickly. AI raised the floor of attacker capability more than it raised the ceiling. Top-tier nation-state actors gained marginal improvements. Mid-tier criminal groups gained massive capability gains. What took a team of 20 elite operators in 2018 might take 5 capable operators with AI assistance in 2026.</p>
+
+  <p><strong>The second is ecosystem complexity.</strong> Modern software depends on more packages than ever. A typical enterprise application can have 50,000+ transitive dependencies. Each one is a potential attack surface. The trust model that worked when developers reviewed every dependency cannot scale to ecosystems where reviewing every dependency is impossible.</p>
+
+  <p>TeamPCP didn't invent supply chain attacks. They're operating in a well-documented tradition with techniques refined over a decade of predecessor work. What they bring is the willingness to operate at scale, openly distribute their tools, and treat the attack as a business rather than a one-time operation.</p>
+</div>
+</div>
+
+<!-- SECTION 04 — PHASE 0 -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>Phase 0 — The Beachhead Before the Worm</h2>
+
+  <p>The earliest documented TeamPCP activity in my data is March 25, 2026 — the Trivy supply chain compromise. By the time the Shai-Hulud worm went public on April 24, the attackers had already been operating for a full month, establishing the infrastructure and credential graph that the worm would later exploit.</p>
+
+  <p>This matters because most coverage treats Shai-Hulud as the start of the campaign. It wasn't. It was the escalation phase of an operation already in progress.</p>
+
+  <h3>The Trivy Compromise (March 25, 2026)</h3>
+
+  <p>Trivy is an open-source security scanner — a tool defenders use to find vulnerabilities in their containers and dependencies. It's published by Aqua Security and used widely in CI/CD pipelines, the automated build systems that turn developer code into production software.</p>
+
+  <p>TeamPCP compromised Trivy. The vulnerability (CVE-2026-33634) was severe enough that CISA added it to the Known Exploited Vulnerabilities catalog on April 6, 2026, with a patch deadline of April 9. The compromise allowed attackers to gain access to everything in a CI/CD environment — all tokens, SSH keys, cloud credentials, database passwords, and sensitive configuration in memory.</p>
+
+  <p>The Trivy compromise wasn't the first time TeamPCP targeted security tooling. SANS Internet Storm Center's report on the campaign — published as version 3.0 on March 25, 2026 — was titled <em>"When the Security Scanner Became the Weapon."</em> The title captured the strategic insight: TeamPCP was deliberately targeting the tools defenders use, because those tools have privileged access to everything they're meant to protect.</p>
+
+  <p>The downstream impact was significant. The Trivy compromise led to the theft of Cisco source code, confirmed by April 8. Mandiant assessed the campaign had reached over 1,000 SaaS environments. CERT-EU confirmed a European Commission cloud breach traced to the same actors. Google's Threat Intelligence Group formally designated TeamPCP as UNC6780 in their tracking system.</p>
+
+  <h3>The LiteLLM Attacks (March–April 2026)</h3>
+
+  <p>While Trivy provided access to defender infrastructure, TeamPCP simultaneously targeted LiteLLM — an AI gateway that handles API calls to large language model services like OpenAI, Anthropic, and Google. LiteLLM sits at a strategic chokepoint in modern AI infrastructure. Compromising it potentially gives attackers API keys for multiple AI providers, database credentials, and configuration for entire AI deployments.</p>
+
+  <p>The Hacker News documented the operation in detail on April 8, 2026: <em>"In March 2026, the TeamPCP threat actor proved just how valuable the developer workstation is."</em> The LiteLLM attack turned developer machines into credential vaults — every key the developer had ever used was harvested.</p>
+
+  <p>Between April 13 and May 28, eight CVEs were disclosed in LiteLLM — multiple critical vulnerabilities, several actively exploited within hours of disclosure. LiteLLM was even successfully attacked at Pwn2Own Berlin 2026 on May 16. Whether all of these vulnerabilities were found by TeamPCP or whether their initial attack exposed the broader weaknesses is unclear. What's clear is that AI infrastructure became a primary target.</p>
+
+  <h3>What This Beachhead Established</h3>
+
+  <p>By April 24, when Shai-Hulud emerged with the Bitwarden npm compromise, TeamPCP had already:</p>
+
+  <ol style="margin:1rem 0 1.5rem 2rem;color:var(--ink3)">
+    <li style="margin-bottom:.5rem">Established access to CI/CD pipelines across over 1,000 SaaS environments</li>
+    <li style="margin-bottom:.5rem">Compromised security scanner infrastructure used by enterprises globally</li>
+    <li style="margin-bottom:.5rem">Stolen Cisco source code and demonstrated willingness to sell it</li>
+    <li style="margin-bottom:.5rem">Penetrated AI gateway infrastructure handling major LLM provider API keys</li>
+    <li style="margin-bottom:.5rem">Built relationships with cybercrime markets for credential monetization</li>
+    <li style="margin-bottom:.5rem">Established the attribution lineage that researchers were already tracking through SANS ISC report updates</li>
+  </ol>
+
+  <p>The worm wasn't the start. It was the next phase of escalation by an actor who already had developer-infrastructure access at scale.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The methodology lesson.</strong> When a sophisticated supply chain attack appears in public coverage, it rarely represents the start of the campaign. By the time mass exploitation is visible, the attackers have typically been operating for weeks or months in less-visible ways. Defenders who treat each visible incident as a new campaign miss the continuity that connects them.</p>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 05 — THE FIVE PHASES -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>Six Weeks · Five Phases</h2>
+
+  <p>The Shai-Hulud campaign proper unfolded across five distinct phases between April 24 and June 2, 2026. Each phase had a triggering event, a targeting pattern, and an escalation that set up the next phase. The structure was visible in real time if you knew what to look for.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 1 — Shai-Hulud Campaign Timeline</div>
+    <div class="figure-body">
+      <div class="attack-chain">
+        <div class="chain-step chain-normal">
+          <div class="chain-num">01</div>
+          <div class="chain-body">
+            <div class="chain-label">PHASE 1 · APRIL 24 – 30 · ORIGINAL CAMPAIGN</div>
+            <div class="chain-desc">Bitwarden npm package compromised (April 24). SAP-related packages compromised (April 29) — @cap-js/sqlite, @cap-js/postgres, @cap-js/db-service, mbt. Combined weekly download count approximately 10 million. ~1,800 organizations hit. Targeting profile: credential management tools and enterprise development infrastructure.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-normal">
+          <div class="chain-num">02</div>
+          <div class="chain-body">
+            <div class="chain-label">PHASE 2 · MAY 1 – 6 · ECOSYSTEM EXPANSION</div>
+            <div class="chain-desc">The worm spreads beyond npm. Intercom's npm package compromised. Lightning and Intercom Packagist (PHP) packages compromised — same campaign, different ecosystem. Demonstrates the worm's ability to jump package registries.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">03</div>
+          <div class="chain-body">
+            <div class="chain-label">PHASE 3 · MAY 11 – 14 · AI/ML STRATEGIC TARGETING</div>
+            <div class="chain-desc">The targeting becomes strategic. TanStack ecosystem compromised (multiple packages). Mistral AI, UiPath, OpenSearch, Guardrails AI packages compromised. Over 400 malicious versions of 170 packages published in one wave. Two OpenAI employee devices compromised via TanStack supply chain. Mistral AI source code advertised for sale on cybercrime forums (May 14).</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">04</div>
+          <div class="chain-body">
+            <div class="chain-label">PHASE 4 · MAY 15 · SOURCE CODE RELEASE</div>
+            <div class="chain-desc">TeamPCP releases the Shai-Hulud worm's source code publicly. Partnership announced with BreachForums for a $1,000 contest encouraging others to use the code in attacks. Within 72 hours, the first clones emerge. The campaign transitions from controlled operation to distributed open-source threat.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">05</div>
+          <div class="chain-body">
+            <div class="chain-label">PHASE 5 · MAY 18 – JUNE 2 · MASS EXPLOITATION</div>
+            <div class="chain-desc">Clones emerge and propagate. May 18: Four malicious packages including a Shai-Hulud clone published. May 19: @antv npm ecosystem hit — 600+ packages compromised overnight, 323 unique packages affected. May 20: TeamPCP claims GitHub internal breach, 4,000 repositories for sale. Microsoft Python SDK (DurableTask) compromised. Grafana GitHub breach disclosed. June 2: Red Hat Cloud Services npm packages compromised — the visible surface of an operation now operating at industrial scale.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Phase reconstruction based on 46 source-attributed posts across npm, PyPI, Packagist ecosystems and primary security reporting from BleepingComputer, Dark Reading, Security Week, The Hacker News, OTX AlienVault, ThreatFox, MalwareBazaar, and SANS Internet Storm Center.</div>
+  </div>
+
+  <h3>What the Phases Reveal About the Attackers</h3>
+
+  <p>Reading the phases as a single narrative, three operational characteristics emerge.</p>
+
+  <p><strong>The targeting got more strategic over time.</strong> Phase 1 attacks looked opportunistic — Bitwarden, then SAP development tools. By Phase 3, the targeting was laser-focused on AI/ML infrastructure. TanStack, Mistral AI, Guardrails, UiPath, OpenAI — these weren't random selections. The operators learned what was valuable as they harvested credentials, and they pivoted toward higher-value targets.</p>
+
+  <p><strong>The escalation was deliberate, not emergent.</strong> The May 15 source code release wasn't a leak. TeamPCP published it intentionally, paired it with a paid contest on BreachForums, and announced their intent to encourage clones. The transition from "our worm" to "everyone's worm" was a planned operational shift, not an accident.</p>
+
+  <p><strong>The infrastructure scaled with the campaign.</strong> ThreatFox indicators show C2 (command and control) infrastructure expanding through May — domains like <code>git-tanstack.com</code>, <code>sh.azurestaticprovider.net</code>, and <code>filev2.getsession.org</code> appearing as the campaign progressed. The attackers built infrastructure as they needed it, not in advance.</p>
+</div>
+</div>
+
+<!-- SECTION 06 — WHAT THE STOLEN DATA BECOMES -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>What the Stolen Data Becomes</h2>
+
+  <p>Most coverage of Shai-Hulud focuses on credential theft. That's not wrong — credentials are the first thing stolen, and the most immediately monetizable. But credentials are also the surface layer. When attackers compromise developer infrastructure, they get inside something more valuable than the credentials themselves: they get inside the development pipeline. And what's in that pipeline is strategic intelligence about a company's entire technology operation.</p>
+
+  <p>The Mitnick parallel is worth drawing here. In the 1990s, Kevin Mitnick stole source code from Nokia, Motorola, Sun Microsystems, NEC, and Novell. He never sold it. He stole it to study it — the technical challenge was the motivation. TeamPCP has the same level of access Mitnick demonstrated. Their motivation is different: they sell it.</p>
+
+  <h3>Three Tiers of Monetization</h3>
+
+  <p><strong>Tier 1: Credentials (immediate value, short shelf life).</strong> Stolen tokens, keys, and authentication data get used immediately. Some publish the next wave of poisoned packages, maintaining the infection. Others get sold on cybercrime forums where buyers test them quickly before they're rotated. Some get used in ransomware operations. This layer has a short shelf life — credentials get rotated within days of disclosure.</p>
+
+  <p><strong>Tier 2: Source code (permanent value).</strong> Stolen source code doesn't expire. Once exfiltrated, it can be studied indefinitely for vulnerabilities, weaknesses, and implementation details. TeamPCP advertised Mistral AI's repositories for sale on May 14. By May 20, they claimed 4,000 internal GitHub repositories for sale. This isn't just the code — modern source code repositories contain architecture documents, configuration files revealing security implementations, build pipelines, years of commit history revealing engineering decisions, and sometimes secrets that weren't properly rotated.</p>
+
+  <p><strong>Tier 3: Strategic intelligence (buyer-dependent value).</strong> The same stolen GitHub repository is worth different amounts to different buyers. A competitor wanting to replicate features pays moderate amounts. A vulnerability broker hunting for zero-days pays significantly more if exploitable bugs are found. A nation-state intelligence service can pay very high amounts for strategically valuable targets.</p>
+
+  <p>The buyer market for stolen developer intelligence isn't hypothetical. Documented buyers include state-affiliated buyers from multiple countries with significant interest in Western technology development. The market exists. The prices for strategic source code far exceed credential market prices. The infrastructure to monetize at all three tiers is what makes operations like TeamPCP economically viable.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The depth of the compromise.</strong> Six weeks of Shai-Hulud isn't just credential theft. It's infrastructure for a multi-tier monetization model. The credentials are the entry. The source code is the product. The buyers are the market. And the buyers shape the danger — credentials sold for $50 to random scammers cause one kind of damage. The same access used to exfiltrate source code that ends up in nation-state hands causes a different kind entirely.</p>
+  </div>
+</div>
+</div>
+
+<!-- SECTION 07 — WHO TEAMPCP IS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 07</div>
+  <h2>Who TeamPCP Is</h2>
+
+  <p>The attackers go by many names. TeamPCP in security forums. UNC6780 in Google's tracking. To victims, just a notification that their code had been replaced.</p>
+
+  <p>Understanding TeamPCP matters because how threat actors actually operate shapes what defenders can do. TeamPCP isn't a faceless menace — they're a documented criminal operation with a business model, market relationships, and a protective ecosystem that determines what options defenders have.</p>
+
+  <h3>The Criminal Enterprise Framework</h3>
+
+  <p>TeamPCP operates with the discipline of a legitimate business. They have:</p>
+
+  <ul style="margin:1rem 0 1.5rem 2rem;color:var(--ink3)">
+    <li style="margin-bottom:.5rem"><strong>A branded identity</strong> they protect and promote</li>
+    <li style="margin-bottom:.5rem"><strong>A product portfolio</strong> — the Shai-Hulud worm, the CanisterWorm framework, custom tools for specific targets</li>
+    <li style="margin-bottom:.5rem"><strong>A marketing strategy</strong> — the $1,000 BreachForums contest, the May 15 source code release</li>
+    <li style="margin-bottom:.5rem"><strong>A distribution model</strong> — clones and copycats expand their reach</li>
+    <li style="margin-bottom:.5rem"><strong>Multiple revenue streams</strong> — credential sales, source code sales, implicit licensing through tool adoption</li>
+    <li style="margin-bottom:.5rem"><strong>Partnerships</strong> with affiliated groups (Vect ransomware operators have been deployed against TeamPCP victims)</li>
+  </ul>
+
+  <p>The open-sourcing of Shai-Hulud wasn't bragging rights. It was business strategy. The same playbook a legitimate software company uses: expand the ecosystem, become the standard, profit from being the originator. Microsoft open-sources VS Code so more developers use it and the Microsoft Cloud ecosystem benefits. TeamPCP open-sources Shai-Hulud so more attackers use it and the TeamPCP ecosystem benefits.</p>
+
+  <h3>The State Protection Question</h3>
+
+  <p>TeamPCP operates in the gray zone between criminal enterprise and state-aligned operations that defines much of modern Russian-speaking cybercrime. They show classic criminal characteristics: branded identity, public marketplaces, profit-driven targeting, sales of stolen data to whichever buyer pays most.</p>
+
+  <p>But they also operate with the kind of stability that requires safe haven. They've been continuously active since at least March 2026 without disruption. They openly partner with cybercrime forums. They don't target Russian or CIS infrastructure. This pattern strongly suggests state toleration: the Russian government likely doesn't direct their operations, but it doesn't disrupt them either, likely because their attacks on Western infrastructure serve broader state interests.</p>
+
+  <p>For defenders, the distinction between "criminal" and "state-protected criminal" is academic. The threat operates with state-grade protection regardless of state-grade tasking. Western law enforcement cannot reach them. Extradition is impossible. Disruption operations have limited reach.</p>
+
+  <h3>Comparison to ShinyHunters</h3>
+
+  <p>TeamPCP isn't the first criminal group to monetize stolen data through cybercrime forums. <a href="https://yanaivanov.com/analysis/shinyhunters-operational-lifecycle.html">ShinyHunters</a> has operated similarly since 2020, targeting customer databases and selling them on the same forums TeamPCP uses now. But the comparison reveals what makes TeamPCP more dangerous.</p>
+
+  <div class="split-visual">
+    <div class="split-panel left">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">database</span> ShinyHunters Operating Model</div>
+      <p><strong>Targets:</strong> Individual companies, one breach at a time</p>
+      <p><strong>Method:</strong> Voice phishing, OAuth Device Flow abuse, social engineering</p>
+      <p><strong>Tools:</strong> Generic cybercrime tooling</p>
+      <p><strong>Operators:</strong> Western (Com ecosystem), subject to arrests</p>
+      <p><strong>Scale:</strong> One organization per operation</p>
+    </div>
+    <div class="split-panel right">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">precision_manufacturing</span> TeamPCP Operating Model</div>
+      <p><strong>Targets:</strong> Developer infrastructure that thousands depend on</p>
+      <p><strong>Method:</strong> Self-propagating worms, supply chain compromise</p>
+      <p><strong>Tools:</strong> Custom-built, then open-sourced for distribution</p>
+      <p><strong>Operators:</strong> Russian-speaking, state-protected, no arrests</p>
+      <p><strong>Scale:</strong> Thousands of downstream organizations per compromise</p>
+    </div>
+  </div>
+
+  <p>The same monetization model. Different operational scale entirely. ShinyHunters breaches a single company at a time. TeamPCP attacks the developer infrastructure that thousands of companies depend on. ShinyHunters operators get arrested when they operate from Western jurisdictions. TeamPCP operates from somewhere they don't.</p>
+</div>
+</div>
+
+<!-- SECTION 08 — KEY FINDINGS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 08</div>
+  <h2>Key Findings</h2>
+
+  <p>Three findings emerged from the analysis that are worth foregrounding separately from the narrative reconstruction.</p>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">The Worm Was the Escalation, Not the Origin</div>
+        <div class="finding-desc">Shai-Hulud's public emergence on April 24, 2026 was the visible phase of a TeamPCP campaign that was already documented through eight SANS ISC report updates dating back to March 25, 2026. The Trivy and LiteLLM supply chain compromises of March 2026 established the developer-infrastructure access that the worm later weaponized at scale. Defenders who treated the April 24 event as the start of the campaign missed a month of attacker preparation that determined what would happen next.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">Targeting Evolution Tracks Capability Development</div>
+        <div class="finding-desc">The campaign's targeting got measurably more strategic over six weeks. Phase 1 (April 24-30) hit Bitwarden and SAP development tools — broad credential value, opportunistic selection. Phase 3 (May 11-14) hit TanStack, Mistral AI, Guardrails, UiPath, OpenAI employee devices — AI/ML infrastructure specifically. This wasn't lucky targeting. It was operators learning what was valuable as they harvested credentials, then pivoting toward higher-value targets. Each phase informed the next.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+    <div class="finding fn-medium">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">Source Code Release Functions as Phase Transition Catalyst</div>
+        <div class="finding-desc">When TeamPCP released the Shai-Hulud source code on May 15, the campaign transformed structurally. Within 72 hours, the first clones emerged. Within four days, a 600+ package wave hit the @antv npm ecosystem from operators using the released code. The release wasn't a leak — it was a deliberate strategic move that converted a controlled criminal operation into a distributed open-source threat. This pattern (controlled campaign → public release → mass exploitation by copycats) mirrors the cPanel cascade structure documented in earlier analysis. Two observations of the same transition mechanism in different attack contexts warrants treating it as a recurring pattern worth defending against, not an outlier.</div>
+        <span class="finding-tag">MEDIUM</span>
+      </div>
+    </div>
+  </div>
+
+  <p><strong>The cascade observation update.</strong> The cPanel cascade analysis I published two weeks ago documented three actor tiers converging on a single vulnerability in predictable order. The Shai-Hulud campaign shows a related but distinct cascade structure — a single sophisticated operator releasing tooling that creates rapid downstream exploitation by less-skilled actors. Two cascade patterns in different attack contexts suggest the broader phenomenon is real: cyber campaigns aren't chaotic events but predictable patterns that compress in time. Whether the pattern holds in future incidents will be visible over time.</p>
+</div>
+</div>
+
+<!-- SECTION 09 — RECOMMENDATIONS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 09</div>
+  <h2>What Defenders Should Do</h2>
+
+  <p>Three audiences need to respond to Shai-Hulud differently. The recommendations are organized by who needs to act, not because the recommendations are different by audience, but because the responsibility is.</p>
+
+  <h3>If You're an Individual Developer</h3>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Audit your installed packages weekly</div>
+        <div class="step-content-desc">Run <code>npm audit</code> regularly. Check for unexpected dependencies. If you installed any packages in the <code>@redhat-cloud-services</code>, <code>@antv</code>, or TanStack namespaces in the last 60 days, audit immediately and assume compromise until proven otherwise.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Rotate developer credentials regularly</div>
+        <div class="step-content-desc">npm tokens, GitHub Personal Access Tokens, AWS keys, and Kubernetes secrets are the credentials the worm targets. Set calendar reminders to rotate them. After any suspected exposure, rotate immediately.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">Enable two-factor authentication everywhere</div>
+        <div class="step-content-desc">npm, GitHub, package registries, cloud providers. 2FA won't stop the worm from stealing your already-authenticated tokens, but it limits the damage from credential theft to other systems.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">Use environment isolation</div>
+        <div class="step-content-desc">Different projects on different machines or containers when possible. The worm spreads through everything a developer machine has access to. Limit what any one machine can access.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>If You're Managing a Development Team</h3>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Centralize credential management</div>
+        <div class="step-content-desc">Tools like HashiCorp Vault, AWS Secrets Manager, or cloud-provider native solutions. Credentials in central management can be rotated in bulk after a compromise. Credentials scattered across developer machines cannot.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Audit npm publish permissions</div>
+        <div class="step-content-desc">Most developers don't need publish permissions for their organization's packages. Removing publish rights from accounts that don't ship packages removes attack surface for self-propagating worms.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">Implement package allowlisting</div>
+        <div class="step-content-desc">Not every package on npm should be installable in your environment. Tools like Sonatype Nexus, JFrog Artifactory, and GitHub Packages support allowlisting. The friction is real. So is the protection.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">Monitor outbound traffic from developer machines</div>
+        <div class="step-content-desc">Shai-Hulud variants communicate with specific C2 infrastructure. Domains observed include <code>git-tanstack.com</code>, <code>sh.azurestaticprovider.net</code>, and <code>filev2.getsession.org</code>. Block at firewall and DNS. Add SHA256 hashes from ThreatFox to endpoint detection.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-content-label">Establish supply chain incident response procedures</div>
+        <div class="step-content-desc">Supply chain compromises aren't the same as malware incidents. Your response procedures should account for the possibility that the compromise came from inside your dependency tree, not from a phishing email or external attack.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>If You're a Defense Contractor or Regulated Business</h3>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Map your software bill of materials (SBOM)</div>
+        <div class="step-content-desc">You can't defend what you can't inventory. SBOM generation tools exist for every major package ecosystem. The exercise of generating one will reveal dependencies you didn't know you had.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Apply NIST 800-171 and CMMC controls to dependencies</div>
+        <div class="step-content-desc">SI.L2-3.14.1 (flaw remediation) and SC.L2-3.13.6 (network communications) directly apply to supply chain compromises. CMMC auditors increasingly ask about supply chain risk. The <a href="https://yanaivanov.com/analysis/cmmc-supply-chain.html">CMMC Supply Chain analysis</a> covers this in depth.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">Document your dependency management process</div>
+        <div class="step-content-desc">"We use npm" isn't a process. A real process answers: how are new dependencies evaluated, who approves them, how often are existing dependencies reviewed, what's the response procedure when a compromise is disclosed.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">Train developers on supply chain attack patterns</div>
+        <div class="step-content-desc">Most CMMC and security awareness training covers phishing. Supply chain compromise is the newer threat vector that gets under-trained. Developers don't need to become security experts, but they should understand why their npm token matters.</div>
+      </div>
+    </div>
+  </div>
+
+  <p>These aren't theoretical recommendations. They're what would have limited Shai-Hulud's spread if implemented before the campaign began.</p>
+</div>
+</div>
+
+<!-- SECTION 10 — METHODOLOGY -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 10</div>
+  <h2>How I Approached the Analysis</h2>
+
+  <p>For other analysts working through similar exercises — particularly those early in their cybersecurity journey — this section documents the methodology used here.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Started with the data, not the narrative</div>
+        <div class="step-content-desc">Aggregated 46 source-attributed posts from public threat intelligence feeds covering April 24 to June 2, 2026. Cross-referenced against 35+ verified IOC hashes from ThreatFox and OTX AlienVault. Anchored every claim in observable evidence rather than secondary summarization.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Tested the original assumptions</div>
+        <div class="step-content-desc">Initial framing treated the Shai-Hulud campaign as starting April 24, 2026. Subsequent investigation revealed TeamPCP activity dating to March 25, 2026 — a month before the worm went public. The analysis was restructured to reflect this. Honest analysis requires being willing to revise assumptions when data contradicts them.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">Cross-referenced against the broader campaign history</div>
+        <div class="step-content-desc">Mapped supply chain attacks going back to 2010 (Stuxnet) to establish the historical pattern Shai-Hulud fits within. This contextualization changed the framing from "novel attack" to "current state of a 16-year evolution."</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">Connected to prior research</div>
+        <div class="step-content-desc">Tested whether the cascade structure documented in the cPanel CVE-2026-41940 analysis generalizes to a different attack vector. Two observations of cascade structure across different threat classes suggests a recurring pattern worth defending against, not a coincidence.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-content-label">Documented limitations honestly</div>
+        <div class="step-content-desc">My structured collection on this campaign began in April 2026. Historical depth on the campaign is limited to the visible escalation phase. Pre-March 2026 attribution relies on SANS ISC's tracking, which referenced prior report versions suggesting the campaign was observable earlier. The deeper history may exist in other sources but isn't fully recoverable from what's publicly accessible.</div>
+      </div>
+    </div>
+  </div>
+
+  <p><strong>Note on sources:</strong> This analysis draws from publicly available threat intelligence feeds aggregated via ArgusX, my community threat intelligence platform — documented in <a href="https://yanaivanov.com/writing/argusx-field-notes.html">field notes</a>. Source feeds include ThreatFox, OTX AlienVault, MalwareBazaar, SANS Internet Storm Center, and security journalism from BleepingComputer, Dark Reading, Security Week, The Hacker News, and CyberSecurityNews. Every conclusion drawn here is based on publicly available source material.</p>
+</div>
+</div>
+
+<!-- SECTION 11 — WHAT'S NEXT -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 11</div>
+  <h2>What I'm Watching For Next</h2>
+
+  <p>This analysis is the third observation in a developing investigation into cascade structure across modern cyber threats. The first was the <a href="https://yanaivanov.com/analysis/cpanel-cascade-analysis.html">cPanel CVE-2026-41940 cascade</a> — three actor tiers converging on a single vulnerability in three days. The second was the <a href="https://yanaivanov.com/analysis/shinyhunters-operational-lifecycle.html">ShinyHunters operational lifecycle</a> — supply chain cascades across cloud SaaS platforms. This third observation extends the pattern to npm supply chain attacks.</p>
+
+  <p>Three independent contexts. Same underlying structure. Worth naming as a hypothesis worth testing further.</p>
+
+  <p>The forward-looking observations below are based on the patterns documented above. Each one is specific enough to be wrong, which is the point. Pattern recognition that can't be falsified isn't pattern recognition — it's storytelling.</p>
+
+  <h3>Predictions for the Next 60 Days</h3>
+
+  <p><strong>Prediction 1: Shai-Hulud variants will continue emerging at a decreasing rate.</strong> The source code release on May 15 produced rapid clone proliferation in the first two weeks. That rate should decline as security tooling adapts to the published IOCs and the easy targets get hit. By August 2026, the clone activity should be visible but no longer dominant in npm security incidents.</p>
+
+  <p><strong>Prediction 2: TeamPCP will pivot to a new target ecosystem.</strong> The operational pattern across Trivy, LiteLLM, npm, Packagist, and PyPI shows the group cycling through high-value developer infrastructure systematically. The next pivot is likely. Candidate targets based on similar trust patterns: container registries (Docker Hub, GitHub Container Registry), CI/CD platforms (CircleCI, GitLab Runners), or AI model registries (Hugging Face).</p>
+
+  <p><strong>Prediction 3: A successor group will emerge using TeamPCP's tooling.</strong> The PCPJack pattern of May 7-8 — a rival group emerging to evict TeamPCP from compromised systems — is likely to repeat. Other actors will use the released Shai-Hulud code, develop their own variants, and compete for the same victim pool. The criminal ecosystem rewards fast followers.</p>
+
+  <p><strong>Prediction 4: The methodology will spread beyond Russian-speaking actors.</strong> Open-source attacker tooling democratizes capability. By late 2026, expect to see Shai-Hulud variants used by criminal groups outside the Russian-speaking ecosystem — possibly Latin American, Southeast Asian, or African-origin operators adapting the tools for regional targets.</p>
+
+  <p>I'll be watching each of these over the next 60 days.</p>
+</div>
+</div>
+
+<!-- SECTION 12 — CONCLUSION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 12</div>
+  <h2>Conclusion</h2>
+
+  <p>Shai-Hulud is not where this story starts, and it's not where it ends. It's a six-week window into a longer operation by a state-protected criminal enterprise that has been building capability since at least March 2026 — and probably longer than my data can demonstrate.</p>
+
+  <p>What I documented was the visible escalation phase of a campaign that follows a structure I've now seen three times in different contexts. The cPanel cascade compressed vulnerability exploitation into 72 hours. The ShinyHunters operational lifecycle scaled cloud SaaS extortion across eight industries. The Shai-Hulud cascade converted controlled supply chain compromise into distributed open-source threat in 21 days. Three observations in different threat contexts. Same underlying pattern of sophisticated actor activity producing predictable escalation phases.</p>
+
+  <p>The pattern matters because it changes what defense looks like. Defenders aren't fighting unpredictable chaos. They're fighting predictable patterns that look unpredictable because the patterns haven't been named. Once named, they become observable. Once observable, they become defendable. Once defendable, the asymmetric advantage attackers have starts to compress.</p>
+
+  <p>None of this means defenders catch up to attackers. It means defenders can stop treating each incident as a novel surprise and start recognizing the recurring structures that connect them. TeamPCP's Shai-Hulud campaign is not the first supply chain attack and it will not be the last. What it is — clearly, visibly, in the data — is one phase of a longer pattern that defenders can prepare for if they know what to watch.</p>
+
+  <p>If you can see the chain forming, you have a window. If you wait to react, the window is gone. That observation held for cPanel in May. It held for ShinyHunters across April and May. It holds for Shai-Hulud now.</p>
+
+  <p>The investigation continues.</p>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis is based entirely on publicly available reporting from security journalism, government advisories, threat intelligence feeds, and community sources. All findings reflect the author's independent analysis.</p>
+</div>
+</div>
+
+<!-- BIO -->
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &amp; Detection &nbsp;·&nbsp; Connecticut</div>
+    <p class="bio-text">Yana Ivanov is a security analyst transitioning into threat intelligence and detection engineering after 15 years in enterprise UX and product design. She holds an MS in Web Design & Development and is currently pursuing CompTIA Security+ certification. This analysis was produced independently as a contribution to the security community's understanding of vulnerability cascade dynamics. The methodology described here is part of ongoing research into whether vulnerability cascades follow predictable patterns.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="https://yanaivanov.com/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>The Shai-Hulud Cascade &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; June 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yana Ivanov — Resume</title>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --navy: #1a1a1a; --border: #cccccc; --text: #1a1a1a;
+  --muted: #555555; --light: #888888; --sidebar-bg: #f5f5f5; --rule: #dddddd;
+}
+body { font-family: 'Open Sans', sans-serif; font-size: 10.5pt; color: var(--text); background: #ffffff; line-height: 1.5; }
+.page { width: 8.5in; min-height: 11in; margin: 0 auto; display: grid; grid-template-columns: 1fr 2.5in; grid-template-rows: auto 1fr; background: #ffffff; }
+.header { grid-column: 1 / -1; padding: 0.38in 0.38in 0.22in 0.38in; border-bottom: 2pt solid #1a1a1a; }
+.header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.header-left h1 { font-family: 'Merriweather', serif; font-size: 28pt; font-weight: 700; color: #1a1a1a; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 4pt; }
+.header-left .title { font-size: 11pt; color: var(--muted); font-weight: 600; letter-spacing: 0.02em; }
+.header-right { text-align: right; font-size: 9.5pt; color: var(--muted); line-height: 1.8; }
+.header-right a { color: var(--text); text-decoration: none; }
+.main { padding: 0.28in 0.22in 0.28in 0.38in; border-right: 1pt solid var(--border); }
+.sidebar { background: var(--sidebar-bg); padding: 0.28in 0.22in; }
+.section-title { font-family: 'Open Sans', sans-serif; font-size: 8.5pt; font-weight: 700; color: #1a1a1a; text-transform: uppercase; letter-spacing: 0.14em; border-bottom: 1.5pt solid #1a1a1a; padding-bottom: 3pt; margin-bottom: 10pt; margin-top: 16pt; }
+.section-title:first-child { margin-top: 0; }
+.summary-text { font-size: 10pt; color: var(--text); line-height: 1.6; margin-bottom: 8pt; }
+.callout { border-left: 2.5pt solid #aaaaaa; padding: 6pt 10pt; margin-top: 8pt; font-size: 9.5pt; font-style: italic; color: var(--muted); line-height: 1.55; background: #fafafa; }
+.exp-block { margin-bottom: 14pt; padding-bottom: 14pt; border-bottom: 0.5pt solid var(--rule); }
+.exp-block:last-child { border-bottom: none; padding-bottom: 0; }
+.exp-role-line { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1pt; }
+.exp-role { font-size: 11pt; font-weight: 700; color: #1a1a1a; }
+.exp-dates { font-size: 9pt; color: var(--muted); white-space: nowrap; font-weight: 600; }
+.exp-company { font-size: 9.5pt; color: var(--muted); margin-bottom: 6pt; font-style: italic; }
+.exp-bullets { list-style: none; padding: 0; }
+.exp-bullets li { font-size: 10pt; color: var(--text); padding-left: 12pt; position: relative; margin-bottom: 3pt; line-height: 1.5; }
+.exp-bullets li::before { content: '•'; position: absolute; left: 2pt; color: #555555; font-size: 9pt; top: 1pt; }
+.portfolio-item { margin-bottom: 7pt; padding-bottom: 7pt; border-bottom: 0.5pt solid var(--rule); }
+.portfolio-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.portfolio-item .p-title { font-size: 10pt; font-weight: 700; color: #1a1a1a; margin-bottom: 2pt; }
+.portfolio-item .p-url { font-size: 8pt; color: var(--light); margin-bottom: 2pt; font-style: italic; }
+.portfolio-item .p-desc { font-size: 9pt; color: var(--muted); line-height: 1.4; }
+.sidebar .section-title { font-size: 8pt; margin-top: 16pt; border-bottom: 1pt solid #bbbbbb; }
+.sidebar .section-title:first-child { margin-top: 0; }
+.contact-list { list-style: none; font-size: 9.5pt; line-height: 1.9; color: var(--muted); }
+.contact-list a { color: var(--text); text-decoration: none; }
+.cert-item { margin-bottom: 8pt; padding-bottom: 8pt; border-bottom: 0.5pt solid var(--rule); }
+.cert-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.cert-name { font-size: 9.5pt; font-weight: 700; color: #1a1a1a; line-height: 1.3; margin-bottom: 2pt; }
+.cert-status { font-size: 8.5pt; color: var(--muted); }
+.cert-status.earned { font-weight: 700; color: #1a1a1a; }
+.cert-status.progress { color: var(--muted); font-style: italic; }
+.cert-status.planned { color: var(--light); font-style: italic; }
+.skill-group { margin-bottom: 10pt; }
+.skill-label { font-size: 8.5pt; font-weight: 700; color: #1a1a1a; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3pt; }
+.skill-list { list-style: none; font-size: 9.5pt; color: var(--muted); line-height: 1.75; }
+.skill-list li::before { content: '· '; color: #aaaaaa; }
+.target-list { list-style: none; font-size: 9.5pt; color: var(--muted); line-height: 1.8; }
+.target-list li::before { content: '· '; color: #aaaaaa; }
+.target-note { font-size: 8.5pt; color: var(--light); font-style: italic; margin-top: 6pt; line-height: 1.5; }
+@media print {
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { background: #ffffff; }
+  .page { width: 100%; margin: 0; }
+  .print-bar { display: none; }
+  .exp-block, .cert-item, .portfolio-item { page-break-inside: avoid; }
+  .section-title { page-break-after: avoid; }
+  @page { size: letter portrait; margin: 0; }
+}
+@media screen {
+  body { background: #ffffff; padding: 0.3in 0; }
+  .page { box-shadow: 0 4px 24px rgba(0,0,0,0.15); }
+  .print-bar { width: 8.5in; margin: 0 auto 12pt auto; display: flex; justify-content: space-between; align-items: center; }
+  .print-btn { font-family: 'Open Sans', sans-serif; font-size: 9pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: #1a1a1a; color: #ffffff; border: none; padding: 7pt 16pt; cursor: pointer; border-radius: 2pt; }
+  .print-btn:hover { background: #333333; }
+  .back-link { font-family: 'Open Sans', sans-serif; font-size: 9pt; color: #1a1a1a; text-decoration: none; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 7pt 16pt; border: 1pt solid #1a1a1a; border-radius: 2pt; }
+  .back-link:hover { background: #f5f5f5; }
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+<div class="print-bar">
+  <a href="resume.html" class="back-link">← Web Resume</a>
+  <button class="print-btn" onclick="window.print()">⬇ Download PDF</button>
+</div>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-left">
+        <h1>Yana Ivanov</h1>
+        <div class="title">Security Analyst · Threat Intelligence & Detection</div>
+      </div>
+
+    </div>
+  </div>
+  <div class="main">
+    <div class="section-title">Professional Summary</div>
+    <p class="summary-text">Threat intelligence and detection content analyst with 15+ years of enterprise technology experience and an MS with graduate coursework in information systems security. Built <strong>ArgusX</strong>, an independent threat intelligence platform processing 1,000+ posts/day from 20+ public and vendor research sources, with classification taxonomy and methodology designed for predictive threat analysis. Architect systems, design detection logic, and ship working security tools using AI development assistants for implementation. Published 15+ threat analyses and authored 5 email detection rules — 2 merged into Sublime Security's production ruleset, 1 in maintainer review. Russian/English bilingual. CompTIA Security+ in progress.</p>
+    <div class="callout">Most candidates studying for Security+ have a homelab. I have a working threat intelligence platform ingesting 1,000+ posts/day, classifying threats by category, and tracking nation-state actors. The work itself is the credential.</div>
+
+    <div class="section-title">Professional Experience</div>
+
+    <div class="exp-block">
+      <div class="exp-role-line">
+        <span class="exp-role">Founder &amp; Independent Security Researcher</span>
+        <span class="exp-dates">2023 – Present</span>
+      </div>
+      <div class="exp-company">SiteWave Studio LLC · Milford, CT</div>
+      <ul class="exp-bullets">
+        <li>Founded LLC operating as parent entity for ArgusX threat intelligence platform, threat research, and detection content authoring</li>
+        <li>Built <strong>ArgusX</strong> — independent threat intel platform aggregating data from 20+ public and vendor research sources, processing 1,000+ posts/day. Designed methodology for capability commodification analysis and trigger-based forecasting. Live system; demo available under NDA</li>
+        <li>Published 15+ threat analyses on nation-state operations (Volt Typhoon, Apple Watch attack surface, UNC1069/Lazarus npm supply chain), criminal infrastructure (TeamPCP Telnyx, Glassworm, Lumma Stealer), and identity research (38-breach exposure study, LinkedIn verification gap)</li>
+        <li>Authored 5 MQL detection rules — 2 merged into Sublime Security's production ruleset (homoglyph BEC, ClickFix), 1 in review (RoundPress XSS), Glassworm adopted internally via PR #4639; built Ladon static analysis tool tested against Gamaredon (Russian APT), ValleyRAT (Chinese APT), and live phishing that bypassed Gmail</li>
+        <li>Mapped Lumma Stealer C2 infrastructure via Wireshark/Zeek analysis, identified TLS-encrypted domains invisible to standard filters, published IOCs to ThreatFox</li>
+      </ul>
+    </div>
+
+    <div class="exp-block">
+      <div class="exp-role-line">
+        <span class="exp-role">Senior UI/UX Designer</span>
+        <span class="exp-dates">2022 – 2024</span>
+      </div>
+      <div class="exp-company">SylvanRoad Capital · Remote</div>
+      <ul class="exp-bullets">
+        <li>Rebuilt core rental application experience for national housing platform, increasing application completion rates ~30%</li>
+        <li>Led end-to-end UX design across custom web and mobile applications collaborating with product managers, developers, and C-suite stakeholders</li>
+      </ul>
+    </div>
+
+    <div class="exp-block">
+      <div class="exp-role-line">
+        <span class="exp-role">Lead UI/UX Designer</span>
+        <span class="exp-dates">2019 – 2022</span>
+      </div>
+      <div class="exp-company">605 · Media Analytics · Remote</div>
+      <ul class="exp-bullets">
+        <li>Accelerated project delivery 30%+ by establishing reusable design framework adopted across full product team</li>
+        <li>Led complex B2B analytics product design from discovery through developer handoff for media measurement clients making multi-million dollar advertising decisions</li>
+        <li>Translated technical constraints into user decisions — directly transferable to making security findings and threat intelligence actionable for non-technical stakeholders</li>
+      </ul>
+    </div>
+
+    <div class="exp-block">
+      <div class="exp-role-line">
+        <span class="exp-role">Founder &amp; Senior UX/UI Consultant</span>
+        <span class="exp-dates">2016 – 2019</span>
+      </div>
+      <div class="exp-company">YiVentures Corp · New York</div>
+      <ul class="exp-bullets">
+        <li>Operated independent design consultancy serving SaaS, B2B, and startup clients across UX/UI design and product strategy</li>
+        <li>Communicated directly with C-suite and VP-level clients — translated technical constraints into actionable design and strategy, directly transferable to making security findings actionable for non-technical stakeholders</li>
+      </ul>
+    </div>
+
+    <div class="section-title">Published Research &amp; Security Tools</div>
+
+    <div class="portfolio-item">
+      <div class="p-title">ArgusX — Threat Intelligence Platform Build</div>
+      <div class="p-url"><a href="https://yanaivanov.com/writing/argusx-field-notes.html">yanaivanov.com/writing/argusx-field-notes.html</a></div>
+      <div class="p-desc">Built independent threat intel platform from scratch. Multi-source ingestion, AI classification at $0.27/month, 61,000+ auto-detected relationships. No engineering budget.</div>
+    </div>
+    <div class="portfolio-item">
+      <div class="p-title">Apple Watch as Nation-State Attack Surface</div>
+      <div class="p-url"><a href="https://yanaivanov.com/analysis/apple_watch_threat_analysis.html">yanaivanov.com/analysis/apple_watch_threat_analysis.html</a></div>
+      <div class="p-desc">Original threat research on nation-state actors exploiting Apple Watch always-on radio stack and inherited Wi-Fi trust relationships. Three documented attack chains with MITRE ATT&amp;CK mapping. Identifies policy gap leaving boardrooms unprotected.</div>
+    </div>
+    <div class="portfolio-item">
+      <div class="p-title">60 Seconds — North Korean npm Supply Chain Hijack</div>
+      <div class="p-url"><a href="https://yanaivanov.com/analysis/sixty_seconds.html">yanaivanov.com/analysis/sixty_seconds.html</a></div>
+      <div class="p-desc">UNC1069 (BlueNoroff/Lazarus) compromised the axios npm maintainer account, injecting WAVESHAPER.V2 cross-platform RAT into releases with 100M+ weekly downloads. Three-hour exposure window. Attack reconstruction and four detection gaps analyzed.</div>
+    </div>
+    <div class="portfolio-item">
+      <div class="p-title">Sublime Security · Open Source Detection Rules</div>
+      <div class="p-url"><a href="https://github.com/sublime-security/sublime-rules/pull/4267">github.com/sublime-security/sublime-rules/pull/4267</a></div>
+      <div class="p-desc">Two detection rules authored for Sublime's open-source production ruleset: Unicode homoglyph BEC detection and Glassworm invisible Unicode payload detection (PR #4267). Follow-up PR #4596 merged into production ruleset. Work directly informed PR #4639 — a follow-on rule by Sublime's detection engineering team.</div>
+    </div>
+    <div class="portfolio-item">
+      <div class="p-title">Ladon · Document Security Analyzer</div>
+      <div class="p-url"><a href="https://yanaivanov.com/labs/lab_log_011.html">yanaivanov.com/labs/lab_log_011.html</a></div>
+      <div class="p-desc">Static analysis tool for PDF and calendar invite triage. Tested against 5 malicious samples including ValleyRAT (Chinese APT), Gamaredon (Russian FSB-linked APT), and live phishing that bypassed Gmail. Flagged malicious indicators across the sample set. IOCs published to ThreatFox.</div>
+    </div>
+    <div class="portfolio-item">
+      <div class="p-title">Volt Typhoon — Living Off the Land</div>
+      <div class="p-url"><a href="https://yanaivanov.com/analysis/Volt_Typhoon_Analysis.html">yanaivanov.com/analysis/Volt_Typhoon_Analysis.html</a></div>
+      <div class="p-desc">China's APT campaign targeting US critical infrastructure using LOTL techniques. Years-long persistence, audit log deletion patterns, detection gaps in standard SIEM rules, defensive recommendations.</div>
+    </div>
+
+  </div>
+
+  <div class="sidebar">
+
+    <div class="section-title">Contact</div>
+    <ul class="contact-list">
+      <li>Milford, CT</li>
+      <li><a href="tel:+19175932690">917-593-2690</a></li>
+      <li><a href="mailto:yanaivanov@gmail.com">yanaivanov@gmail.com</a></li>
+      <li><a href="https://linkedin.com/in/yanaivanov">linkedin.com/in/yanaivanov</a></li>
+      <li><a href="https://github.com/yana-ivanov">github.com/yana-ivanov</a></li>
+      <li><a href="https://yanaivanov.com">yanaivanov.com</a></li>
+    </ul>
+
+    <div class="section-title">Certifications</div>
+    <div class="cert-item">
+      <div class="cert-name">CompTIA Security+<br>SY0-701</div>
+      <div class="cert-status progress">In Progress</div>
+    </div>
+    <div class="section-title">Education</div>
+    <div class="cert-item">
+      <div class="cert-name">MS, Web Design &amp; Development</div>
+      <div class="cert-status earned">Golden Gate University</div>
+      <div class="cert-status earned" style="margin-top:.25rem;font-size:.7rem">Graduate coursework: Information Systems Security (CIS 305), Digital Security/Networking (TM 335), Unix Systems (CIS 341), Internet Architecture (CIS 361)</div>
+    </div>
+    <div class="cert-item">
+      <div class="cert-name">BFA Visual Communication</div>
+      <div class="cert-status earned">Fashion Institute of Technology</div>
+    </div>
+
+    <div class="section-title">Threat Intelligence</div>
+    <ul class="skill-list">
+      <li>IOC enrichment</li>
+      <li>Threat classification</li>
+      <li>MITRE ATT&amp;CK</li>
+      <li>OSINT</li>
+      <li>Threat actor attribution</li>
+      <li>Capability commodification</li>
+    </ul>
+
+    <div class="section-title">Detection &amp; Analysis</div>
+    <ul class="skill-list">
+      <li>Detection content design</li>
+      <li>Behavioral patterns</li>
+      <li>Malware traffic analysis</li>
+      <li>pcap parsing</li>
+      <li>Log analysis</li>
+      <li>Executive briefing</li>
+    </ul>
+
+    <div class="section-title">AI-Augmented Development</div>
+    <ul class="skill-list">
+      <li>Prompt engineering</li>
+      <li>System architecture</li>
+      <li>Code validation</li>
+      <li>AI-directed implementation</li>
+    </ul>
+
+    <div class="section-title">Tools &amp; Data</div>
+    <ul class="skill-list">
+      <li>SQL / PostgreSQL</li>
+      <li>Supabase</li>
+      <li>Wireshark / Zeek</li>
+      <li>Nmap / tcpdump</li>
+      <li>Docker / Kali Linux</li>
+      <li>Linux CLI / GPG</li>
+      <li>Python (read/modify/validate)</li>
+      <li>JavaScript / Git</li>
+    </ul>
+
+    <div class="section-title">Targeting Roles</div>
+    <ul class="target-list">
+      <li>Threat Intelligence Analyst</li>
+      <li>Detection Content Developer</li>
+      <li>Threat Researcher</li>
+      <li>SOC Analyst (Tier 2)</li>
+      <li>Security Researcher</li>
+    </ul>
+    <div class="target-note">Open to remote or on-site within commuting distance of Milford, CT (covers New Haven, Stratford, Bridgeport, Stamford, Groton/New London corridor). Available for clearance sponsorship.</div>
+
+    <div class="section-title">Languages</div>
+    <ul class="skill-list">
+      <li>English (Fluent)</li>
+      <li>Russian (Fluent)</li>
+    </ul>
+
+  </div>
+</div>
+</body>
+</html>

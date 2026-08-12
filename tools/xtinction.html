@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xtinction — X Post Bulk Delete Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0e1a;--surface:#111827;--surface2:#1a2235;
+  --border:rgba(255,255,255,0.08);
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#4a5568;
+  --red:#ef4444;--red-dim:rgba(239,68,68,0.1);
+  --green:#22c55e;--green-dim:rgba(34,197,94,0.1);
+  --blue:#1d9bf0;--blue-dim:rgba(29,155,240,0.1);
+  --amber:#f59e0b;--amber-dim:rgba(245,158,11,0.1);
+  --mono:"IBM Plex Mono",monospace;
+  --sans:"IBM Plex Sans",sans-serif;
+}
+html{font-size:16px}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
+
+/* ── SETUP SCREEN ── */
+.setup-screen{position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;align-items:center;justify-content:center;padding:2rem;overflow-y:auto}
+.setup-screen.hidden{display:none}
+.setup-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;max-width:560px;width:100%;padding:2.5rem;margin:auto}
+.setup-logo{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:1.5rem}
+.setup-title{font-size:1.4rem;font-weight:600;color:var(--text);margin-bottom:.5rem}
+.setup-subtitle{font-size:1rem;color:var(--text2);line-height:1.6;margin-bottom:2rem}
+.setup-steps{display:flex;flex-direction:column;gap:1rem;margin-bottom:2rem}
+.setup-step{display:flex;gap:1rem;align-items:flex-start}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--blue-dim);border:1px solid rgba(29,155,240,0.3);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;color:var(--blue);flex-shrink:0;margin-top:.1rem}
+.step-text{font-size:.85rem;color:var(--text2);line-height:1.6}
+.step-text a{color:var(--blue);text-decoration:none}
+.step-text a:hover{text-decoration:underline}
+.step-text strong{color:var(--text)}
+.setup-input-wrap{margin-bottom:1.25rem}
+.setup-input-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:.5rem;display:block}
+.setup-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:.65rem 1rem;font-family:var(--mono);font-size:.8rem;color:var(--text);outline:none;transition:border-color .2s}
+.setup-input:focus{border-color:var(--blue)}
+.setup-input::placeholder{color:var(--text3)}
+.setup-btn{width:100%;background:var(--blue);color:#fff;border:none;border-radius:4px;padding:.75rem;font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .2s;margin-bottom:.5rem}
+.setup-btn:hover{background:#1a87d2}
+.setup-btn:disabled{opacity:.4;cursor:not-allowed}
+.setup-btn.secondary{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.setup-btn.secondary:hover{border-color:var(--text2);color:var(--text);background:transparent}
+.setup-error{font-family:var(--mono);font-size:.72rem;color:var(--red);margin-top:.5rem;display:none}
+.setup-error.visible{display:block}
+.setup-note{font-size:.75rem;color:var(--text3);margin-top:1rem;line-height:1.5;text-align:center}
+.setup-upload{display:block;width:100%;background:var(--bg);border:1px dashed var(--border);border-radius:4px;padding:1.25rem;text-align:center;cursor:pointer;transition:all .2s;font-family:var(--mono);font-size:.75rem;color:var(--text2);margin-bottom:1rem}
+.setup-upload:hover{border-color:var(--blue);color:var(--text)}
+.setup-upload.has-file{border-style:solid;border-color:var(--green);color:var(--green);background:var(--green-dim)}
+
+/* ── MAIN APP ── */
+.app{display:none}
+.app.visible{display:block}
+
+.back-nav{background:#0a0d14;padding:.4rem 2rem;border-bottom:1px solid rgba(255,255,255,.06);position:sticky;top:0;z-index:101}
+.back-nav a{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a::before{content:'←';font-size:13px}
+.back-nav a:hover{color:#93c5fd}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.header{background:#0d1117;border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:29px;z-index:100;flex-wrap:wrap;gap:1rem}
+.header-left{display:flex;align-items:center;gap:.75rem}
+.logo{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase}
+.header-title{font-size:.95rem;font-weight:600;color:var(--text)}
+.header-right{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.header-count{font-family:var(--mono);font-size:.72rem;color:var(--text2)}
+.reset-key-btn{font-family:var(--mono);font-size:.72rem;color:var(--text3);background:none;border:none;cursor:pointer;text-decoration:underline;letter-spacing:.06em}
+.reset-key-btn:hover{color:var(--text2)}
+
+.progress-bar{height:6px;background:var(--surface2)}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .4s;width:0}
+
+.status-bar{padding:.7rem 2rem;font-family:var(--mono);font-size:.75rem;color:var(--blue);background:var(--blue-dim);border-bottom:1px solid rgba(29,155,240,0.2);display:none;align-items:center;gap:.75rem}
+.status-bar.visible{display:flex}
+.status-spinner{width:10px;height:10px;border:2px solid rgba(29,155,240,0.3);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.toolbar{background:var(--surface);border-bottom:1px solid var(--border);padding:.8rem 2rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;position:sticky;top:85px;z-index:99}
+.search-box{flex:1;min-width:180px;position:relative}
+.search-box input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:.45rem 1rem .45rem 2rem;font-family:var(--mono);font-size:.78rem;color:var(--text);outline:none;transition:border-color .2s}
+.search-box input:focus{border-color:var(--blue)}
+.search-box input::placeholder{color:var(--text3)}
+.search-icon{position:absolute;left:.65rem;top:50%;transform:translateY(-50%);color:var(--text3)}
+
+.filter-chips{display:flex;gap:.35rem;flex-wrap:wrap}
+.chip{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:.32rem .75rem;border:1px solid var(--border);border-radius:2px;cursor:pointer;color:var(--text2);background:transparent;transition:all .15s;white-space:nowrap}
+.chip:hover{border-color:var(--text2);color:var(--text)}
+.chip.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.chip.keep-chip.active{background:var(--green);border-color:var(--green)}
+.chip.remove-chip.active{background:var(--red);border-color:var(--red)}
+.chip.unsure-chip.active{background:var(--amber);border-color:var(--amber)}
+
+.actions{margin-left:auto;display:flex;gap:.4rem;flex-wrap:wrap}
+.btn{font-family:var(--mono);font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;padding:.5rem 1rem;border-radius:3px;border:1px solid;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-classify{background:var(--blue-dim);color:var(--blue);border-color:rgba(29,155,240,0.3)}
+.btn-classify:hover{background:rgba(29,155,240,0.2)}
+.btn-classify:disabled{opacity:.4;cursor:not-allowed}
+.btn-script{background:var(--red-dim);color:var(--red);border-color:rgba(239,68,68,0.3)}
+.btn-script:hover{background:rgba(239,68,68,0.2)}
+.btn-neutral{background:var(--surface);color:var(--text2);border-color:var(--border)}
+.btn-neutral:hover{color:var(--text);border-color:var(--text2)}
+#undoBtn:not(:disabled){background:rgba(255,165,0,0.1);color:#f59e0b;border-color:rgba(245,158,11,0.4);opacity:1!important}
+#undoBtn:not(:disabled):hover{background:rgba(255,165,0,0.2)}
+
+.stats-bar{background:var(--surface2);border-bottom:1px solid var(--border);padding:.6rem 2rem;display:flex;gap:1.75rem;flex-wrap:wrap;align-items:center}
+.stat{display:flex;flex-direction:column;align-items:flex-start;gap:.15rem}
+.stat-num{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;line-height:1;letter-spacing:.04em}
+.stat-label{font-family:var(--mono);font-size:.68rem;color:var(--text2);text-transform:uppercase;letter-spacing:.08em}
+.stat-keep .stat-num{color:var(--green)}
+.stat-remove .stat-num{color:var(--red)}
+.stat-unsure .stat-num{color:var(--amber)}
+.stat-unreviewed .stat-num{color:var(--text3)}
+
+.grid-wrap{padding:1.25rem 2rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.6rem}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.8rem 1rem;cursor:pointer;transition:all .15s;position:relative;user-select:none;display:flex;flex-direction:column;min-height:120px}
+.card:hover{border-color:rgba(255,255,255,0.18);transform:translateY(-1px)}
+.card.keep{border-color:rgba(34,197,94,0.5);background:rgba(34,197,94,0.06)}
+.card.remove{border-color:rgba(239,68,68,0.5);background:rgba(239,68,68,0.06)}
+.card.unsure{border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.05)}
+.card-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;gap:.5rem}
+.card-date{font-family:var(--mono);font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.05em}
+.card-text{font-size:.82rem;color:var(--text);line-height:1.4;flex:1;word-break:break-word;white-space:pre-wrap;overflow:hidden;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical}
+.card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:.5rem;padding-top:.5rem;border-top:1px solid rgba(255,255,255,0.04)}
+.card-status-label{font-family:var(--mono);font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.card.keep .card-status-label{color:var(--green)}
+.card.remove .card-status-label{color:var(--red)}
+.card.unsure .card-status-label{color:var(--amber)}
+.card-engagement{font-family:var(--mono);font-size:.62rem;color:var(--text3);display:flex;gap:.5rem}
+.card-engagement span{display:inline-flex;align-items:center;gap:.2rem}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:2rem}
+.modal-bg.hidden{display:none}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:6px;max-width:720px;width:100%;max-height:85vh;display:flex;flex-direction:column}
+.modal-header{padding:1.1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-title{font-family:var(--mono);font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;color:var(--blue)}
+.modal-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1.1rem}
+.modal-body{padding:1.5rem;overflow-y:auto;flex:1}
+.modal-note{font-size:.95rem;color:var(--text2);margin-bottom:1rem;line-height:1.65;padding:.75rem 1rem;background:var(--blue-dim);border-left:3px solid var(--blue);border-radius:2px}
+.modal-warn{font-size:.95rem;color:var(--text2);margin-bottom:1rem;line-height:1.65;padding:.75rem 1rem;background:var(--red-dim);border-left:3px solid var(--red);border-radius:2px}
+.modal-username{margin-bottom:1rem}
+.modal-username label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:.4rem;display:block}
+.modal-username input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:.55rem .85rem;font-family:var(--mono);font-size:.85rem;color:var(--text);outline:none}
+.modal-username input:focus{border-color:var(--blue)}
+.modal-steps{list-style:none;display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.25rem}
+.modal-steps li{font-size:.95rem;color:var(--text2);line-height:1.5;padding-left:1.25rem;position:relative}
+.modal-steps li::before{content:counter(step);counter-increment:step;position:absolute;left:0;color:var(--blue);font-family:var(--mono);font-size:.82rem;font-weight:600}
+.modal-steps{counter-reset:step}
+.modal-body pre{font-family:var(--mono);font-size:.75rem;color:var(--text2);line-height:1.7;white-space:pre-wrap;word-break:break-all;background:var(--bg);padding:1rem;border-radius:4px;border:1px solid var(--border);max-height:280px;overflow-y:auto}
+.modal-footer{padding:.9rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.6rem;justify-content:flex-end}
+
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.6rem 1rem;font-family:var(--mono);font-size:.7rem;color:var(--text);z-index:300;transition:opacity .3s}
+.toast.hidden{opacity:0;pointer-events:none}
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:400;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.confirm-overlay.hidden{display:none}
+.confirm-box{background:var(--surface);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:2rem;max-width:380px;width:90%;box-shadow:0 24px 64px rgba(0,0,0,.7)}
+.confirm-title{font-family:var(--sans);font-size:1.1rem;font-weight:600;color:var(--text);margin-bottom:.6rem}
+.confirm-body{font-family:var(--mono);font-size:.85rem;color:var(--text2);line-height:1.6;margin-bottom:1.5rem}
+.confirm-actions{display:flex;gap:.5rem;justify-content:flex-end}
+.confirm-cancel{font-family:var(--mono);font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;padding:.45rem 1rem;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s}
+.confirm-cancel:hover{border-color:var(--text2);color:var(--text)}
+.confirm-ok{font-family:var(--mono);font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;padding:.45rem 1rem;border-radius:3px;border:none;background:var(--blue);color:#fff;cursor:pointer;transition:background .15s}
+.confirm-ok:hover{background:#1a87d2}
+.confirm-ok.danger{background:var(--red)}
+.confirm-ok.danger:hover{background:#dc2626}
+.empty{text-align:center;padding:4rem;color:var(--text3);font-family:var(--mono);font-size:.8rem}
+.empty.hidden{display:none}
+
+/* ── CATEGORY BAR ── */
+.cat-bar{background:var(--bg);border-bottom:1px solid var(--border);padding:.6rem 2rem;display:flex;align-items:center;gap:.35rem;flex-wrap:wrap}
+.cat-chip{font-family:var(--mono);font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;padding:.3rem .7rem;border:1px solid var(--border);border-radius:2px;cursor:pointer;color:var(--text2);background:transparent;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:.3rem}
+.cat-chip:hover{border-color:rgba(255,255,255,0.25);color:var(--text)}
+.cat-chip.active{color:#fff}
+.cat-chip .cat-count{font-size:.6rem;opacity:.75}
+.cat-chip[data-cat="all"].active{background:var(--blue);border-color:var(--blue)}
+.cat-chip[data-cat="Retweets"].active{background:#10b981;border-color:#10b981}
+.cat-chip[data-cat="Replies"].active{background:#8b5cf6;border-color:#8b5cf6}
+.cat-chip[data-cat="Originals"].active{background:#3b82f6;border-color:#3b82f6}
+.cat-chip[data-cat="With Media"].active{background:#f97316;border-color:#f97316}
+.cat-chip[data-cat="With Links"].active{background:#14b8a6;border-color:#14b8a6}
+.cat-chip[data-cat="Tech"].active{background:#3b82f6;border-color:#3b82f6}
+.cat-chip[data-cat="News & Politics"].active{background:#64748b;border-color:#64748b}
+.cat-chip[data-cat="Personal"].active{background:#ec4899;border-color:#ec4899}
+.cat-chip[data-cat="Memes"].active{background:#facc15;border-color:#facc15;color:#000}
+.cat-chip[data-cat="Crypto"].active{background:#f59e0b;border-color:#f59e0b}
+.cat-chip[data-cat="Other"].active{background:#374151;border-color:#6b7280}
+
+/* ── Drag & Drop ── */
+.card{cursor:grab}
+.card.dragging{opacity:.4;cursor:grabbing}
+.cat-chip.drag-over{border-color:var(--blue) !important;background:rgba(29,155,240,.18) !important;color:#fff !important;transform:scale(1.06)}
+.cat-chip.drop-hint{border-style:dashed;opacity:.85}
+.add-cat-btn{font-family:var(--mono);font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;padding:.3rem .7rem;border:1px dashed var(--border);border-radius:2px;cursor:pointer;color:var(--blue);background:transparent;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.add-cat-btn:hover{border-color:var(--blue);background:var(--blue-dim)}
+.cat-chip .cat-delete{display:none;margin-left:.2rem;font-size:.65rem;opacity:.6;line-height:1;background:none;border:none;color:inherit;cursor:pointer;padding:0}
+.cat-chip:hover .cat-delete{display:inline}
+.cat-chip .cat-delete:hover{opacity:1;color:var(--red)}
+
+.card-cat{font-family:var(--mono);font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;opacity:.6}
+</style>
+</head>
+<body>
+
+<!-- ── SETUP SCREEN ── -->
+<div class="setup-screen" id="setupScreen">
+  <div class="setup-box">
+    <div style="font-family:'Arial Black',Arial,sans-serif;letter-spacing:-.01em;display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem;flex-wrap:wrap">
+      <span style="font-size:2rem;line-height:1;display:inline-flex;align-items:baseline;">
+        <span style="color:var(--red);font-size:1.5em;line-height:.85;margin-right:.02em;">X</span><span style="color:var(--text);">tinction</span>
+      </span>
+      <span style="font-size:.62rem;font-family:'IBM Plex Mono',monospace;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);padding:.2rem .5rem;border-radius:2px;letter-spacing:.15em;display:inline-flex;align-items:center;gap:5px;"><span style="width:5px;height:5px;border-radius:50%;background:var(--red);animation:pulse 2s ease-in-out infinite;display:inline-block;"></span> POST AUDIT</span>
+    </div>
+    <div class="setup-subtitle" style="margin-top:1.25rem">Bulk audit and delete your old posts on X. Upload your X data archive, sort posts into Keep / Remove / Unsure, then run the generated script to delete only what you marked.</div>
+
+    <div class="setup-steps">
+      <div class="setup-step">
+        <div class="step-num">1</div>
+        <div class="step-text">On X, go to <strong>Settings → Your Account → Download an archive of your data</strong>. X will email you a ZIP file (usually within 24 hours).</div>
+      </div>
+      <div class="setup-step">
+        <div class="step-num">2</div>
+        <div class="step-text">Unzip the archive. Inside the <strong>data</strong> folder, find <strong>tweets.js</strong> (or <strong>tweet.js</strong>) and upload it below.</div>
+      </div>
+      <div class="setup-step">
+        <div class="step-num">3</div>
+        <div class="step-text">Get a free <a href="https://console.groq.com/keys" target="_blank">Groq API key</a> to enable AI auto-classification (optional but recommended).</div>
+      </div>
+    </div>
+
+    <label class="setup-upload" id="tweetUploadLabel">
+      <span id="tweetUploadText">📁 Click to upload tweets.js</span>
+      <input type="file" id="tweetUpload" accept=".js,.json" style="display:none" onchange="loadTweets(event)">
+    </label>
+
+    <div class="setup-input-wrap">
+      <label class="setup-input-label">Your Groq API Key (optional)</label>
+      <input class="setup-input" id="groqKeyInput" type="password" placeholder="gsk_... — leave blank to skip AI classify" oninput="validateSetup()" onpaste="setTimeout(validateSetup,10)">
+      <div class="setup-error" id="setupError">Please upload your tweets.js file first</div>
+    </div>
+
+    <button class="setup-btn" id="setupBtn" onclick="saveAndStart()" disabled>Get Started →</button>
+    <div class="setup-note">Your file and key never leave your browser. Everything runs locally except an optional call to Groq's AI API for classification.</div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<div class="app" id="app">
+
+  <div class="back-nav">
+    <a href="/">Portfolio</a>
+  </div>
+
+  <div class="header">
+    <div class="header-left">
+      <div style="font-family:'Arial Black',Arial,sans-serif;letter-spacing:-.01em;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
+        <span style="font-size:1.6rem;line-height:1;display:inline-flex;align-items:baseline;">
+          <span style="color:var(--red);font-size:1.5em;line-height:.85;margin-right:.02em;">X</span><span style="color:var(--text);">tinction</span>
+        </span>
+        <span style="font-size:.62rem;font-family:'IBM Plex Mono',monospace;background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);padding:.2rem .5rem;border-radius:2px;letter-spacing:.15em;display:inline-flex;align-items:center;gap:5px;"><span style="width:5px;height:5px;border-radius:50%;background:var(--red);animation:pulse 2s ease-in-out infinite;display:inline-block;"></span> POST AUDIT</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="header-count" id="headerCount">0 posts</span>
+      <label class="reset-key-btn" style="cursor:pointer" title="Load a different tweets.js file">⬆ Upload tweets.js<input type="file" id="reUpload" accept=".js,.json" style="display:none" onchange="loadTweets(event)"></label>
+      <button class="reset-key-btn" onclick="confirmReset()" title="Reset all Keep/Remove decisions to Unreviewed">↺ Reset Decisions</button>
+      <button class="reset-key-btn" onclick="resetAll()">Start Over</button>
+    </div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="status-bar" id="statusBar">
+    <div class="status-spinner" id="statusSpinner"></div>
+    <span id="statusText"></span>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Search post text..." oninput="renderGrid()">
+    </div>
+    <div class="filter-chips">
+      <button class="chip active" data-filter="all" onclick="setFilter('all',this)">All</button>
+      <button class="chip keep-chip" data-filter="keep" onclick="setFilter('keep',this)">Keep</button>
+      <button class="chip remove-chip" data-filter="remove" onclick="setFilter('remove',this)">Remove</button>
+      <button class="chip unsure-chip" data-filter="unsure" onclick="setFilter('unsure',this)">Unsure</button>
+      <button class="chip" data-filter="unreviewed" onclick="setFilter('unreviewed',this)">Unreviewed</button>
+    </div>
+    <div class="actions">
+      <button class="btn btn-classify" id="classifyBtn" onclick="classifyAll()">✦ AI Classify All</button>
+      <button class="btn btn-neutral" onclick="markVisible('keep')">Mark Keep</button>
+      <button class="btn btn-neutral" onclick="markVisible('remove')">Mark Remove</button>
+      <button class="btn btn-neutral" id="undoBtn" onclick="undoMark()" disabled style="opacity:0.4">↩ Undo</button>
+      <button class="btn btn-script" onclick="generateScript()">⬇ Get Delete Script</button>
+    </div>
+  </div>
+
+  <!-- CATEGORY BAR -->
+  <div class="cat-bar" id="catBar">
+    <!-- populated by JS -->
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-num" id="statTotal">0</span><span class="stat-label">Total</span></div>
+    <div class="stat stat-keep"><span class="stat-num" id="statKeep">0</span><span class="stat-label">Keep</span></div>
+    <div class="stat stat-remove"><span class="stat-num" id="statRemove">0</span><span class="stat-label">Remove</span></div>
+    <div class="stat stat-unsure"><span class="stat-num" id="statUnsure">0</span><span class="stat-label">Unsure</span></div>
+    <div class="stat stat-unreviewed"><span class="stat-num" id="statUnreviewed">0</span><span class="stat-label">Unreviewed</span></div>
+  </div>
+
+  <div class="grid-wrap">
+    <div class="grid" id="grid"></div>
+    <div class="empty hidden" id="emptyState">No posts match</div>
+  </div>
+
+</div>
+
+<!-- ── SCRIPT MODAL ── -->
+<div class="modal-bg hidden" id="modalBg">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Delete Script</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-warn">⚠ <strong>Permanent deletion.</strong> This script will delete <strong id="modalDeleteCount">0</strong> posts marked Remove. There is no undo on X. Posts marked Keep, Unsure, or Unreviewed are not touched.</p>
+      <p class="modal-note">⏱ <strong>Pacing:</strong> The script deletes one post every ~4 seconds to stay under X's rate limits. Estimated time: <strong id="modalEstTime">—</strong>. Keep the tab open and visible until done.</p>
+
+      <div class="modal-username">
+        <label>Your X username (without @)</label>
+        <input type="text" id="usernameInput" placeholder="e.g. yanaivanov" oninput="updateScriptUsername()">
+      </div>
+
+      <ol class="modal-steps">
+        <li>Make sure you are <strong>logged into X</strong> in this same browser</li>
+        <li>Go to <strong>x.com</strong> (any page on x.com works)</li>
+        <li>Press <strong>F12</strong> (Windows) or <strong>Cmd + Option + J</strong> (Mac) to open DevTools</li>
+        <li>Click the <strong>Console</strong> tab — type <strong>allow pasting</strong> and press Enter if prompted</li>
+        <li>Paste the script below and press <strong>Enter</strong></li>
+        <li>The script will open each post in a new tab, delete it, close the tab, move on. Don't switch away.</li>
+        <li>Watch the console — it logs progress. Stop anytime by closing the tab.</li>
+      </ol>
+      <pre id="scriptOutput"></pre>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-classify" onclick="copyScript()">Copy Script</button>
+      <button class="btn btn-neutral" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+
+<div class="confirm-overlay hidden" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirmTitle"></div>
+    <div class="confirm-body" id="confirmBody"></div>
+    <div class="confirm-actions">
+      <button class="confirm-cancel" id="confirmCancel">Cancel</button>
+      <button class="confirm-ok" id="confirmOk">OK</button>
+    </div>
+  </div>
+</div>
+
+<div class="confirm-overlay hidden" id="keyOverlay">
+  <div class="confirm-box" style="max-width:440px">
+    <div class="confirm-title">Enter Groq API Key</div>
+    <div class="confirm-body" style="margin-bottom:1rem">
+      AI Classify uses Groq's free LLM to suggest Keep / Remove / Unsure for each post.
+      Get a free key at <a href="https://console.groq.com/keys" target="_blank" style="color:var(--blue);text-decoration:none">console.groq.com/keys</a> — no credit card required. Stored only in your browser.
+    </div>
+    <input class="setup-input" id="keyOverlayInput" type="password" placeholder="gsk_..." style="margin-bottom:1.25rem" oninput="validateKeyOverlay()" onkeydown="if(event.key==='Enter'&&!document.getElementById('keyOverlayOk').disabled)document.getElementById('keyOverlayOk').click()">
+    <div class="confirm-actions">
+      <button class="confirm-cancel" id="keyOverlayCancel">Cancel</button>
+      <button class="confirm-ok" id="keyOverlayOk" disabled style="opacity:.4">Save & Classify</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Safe storage ───────────────────────────────────────────────────────────
+const _mem = {};
+const _ls = window.localStorage;
+const store = {
+  getItem(k) { try { return _ls.getItem(k); } catch(e) { return _mem[k] ?? null; } },
+  setItem(k, v) { try { _ls.setItem(k, v); } catch(e) { _mem[k] = v; } },
+  removeItem(k) { try { _ls.removeItem(k); } catch(e) { delete _mem[k]; } }
+};
+
+// ── Constants ──────────────────────────────────────────────────────────────
+const GROQ_KEY_STORAGE = "xtinction_groq_key";
+const STATE_STORAGE = "xtinction_state";
+const TWEETS_STORAGE = "xtinction_tweets";
+const USERNAME_STORAGE = "xtinction_username";
+const GROQ_MODEL = "llama-3.3-70b-versatile";
+const GROQ_API = "https://api.groq.com/openai/v1/chat/completions";
+
+// ── Categories ─────────────────────────────────────────────────────────────
+const CATEGORIES = [
+  "Retweets", "Replies", "Originals", "With Media", "With Links",
+  "Tech", "News & Politics", "Personal", "Memes", "Crypto", "Other"
+];
+
+// Topic-based keyword rules (applied to text-based categorization)
+const CAT_RULES = [
+  { cat: "Tech", kw: ["javascript","python","react","nodejs","programming","code","coding","developer",
+    "software","github","linux","api","database","sql","cloud","aws","azure","devops","docker","kubernetes",
+    "ai","ml","machine learning","llm","gpt","claude","tech","framework","frontend","backend","fullstack"] },
+  { cat: "News & Politics", kw: ["news","breaking","politics","election","biden","trump","government","policy",
+    "congress","senate","supreme court","war","ukraine","russia","israel","gaza","china","economy","inflation",
+    "geopolitics","journalist","report","reuters","bbc","cnn"] },
+  { cat: "Crypto", kw: ["bitcoin","btc","ethereum","eth","crypto","blockchain","nft","defi","solana","sol",
+    "doge","memecoin","altcoin","hodl","web3","dao","wallet","coinbase","binance","gm","airdrop"] },
+  { cat: "Memes", kw: ["lol","lmao","lmfao","rofl","based","cringe","cope","ratio","skill issue","mid",
+    "meme","ngl","tbh","fr fr","no cap","goated","sigma","ohio","skibidi","💀","😂","🤡","based ","mfw","tfw"] },
+  { cat: "Personal", kw: ["i feel","i think","my life","my day","my wife","my husband","my kid","my dog",
+    "my cat","my job","my boss","i went","i love","i hate","i miss","birthday","anniversary","good morning",
+    "gn ","goodnight","tired","sleepy","hungry","coffee","beer"] },
+];
+
+let CHANNELS_CAT = {}; // tweetId -> category
+let customCats = [];
+let draggedTweetId = null;
+let activeCat = "all";
+
+// ── State ──────────────────────────────────────────────────────────────────
+let groqKey = "";
+let TWEETS = []; // array of {id, text, date, isRetweet, isReply, hasMedia, hasUrls}
+const state = {}; // tweetId -> "keep"|"remove"|"unsure"|"unreviewed"
+let activeFilter = "all";
+let classifying = false;
+let undoStack = [];
+let pendingTweetsFile = null;
+let xUsername = "";
+
+// ── Setup screen ───────────────────────────────────────────────────────────
+function validateSetup() {
+  const btn = document.getElementById("setupBtn");
+  const err = document.getElementById("setupError");
+  if (pendingTweetsFile || TWEETS.length > 0) {
+    btn.disabled = false;
+    err.classList.remove("visible");
+  } else {
+    btn.disabled = true;
+  }
+}
+
+function saveAndStart() {
+  const key = document.getElementById("groqKeyInput").value.trim();
+  if (key.length > 20) {
+    groqKey = key;
+    store.setItem(GROQ_KEY_STORAGE, key);
+  }
+  showApp();
+}
+
+function resetAll() {
+  store.removeItem(GROQ_KEY_STORAGE);
+  store.removeItem(STATE_STORAGE);
+  store.removeItem(TWEETS_STORAGE);
+  store.removeItem(USERNAME_STORAGE);
+  location.reload();
+}
+
+async function confirmReset() {
+  const ok = await showConfirm(
+    'Reset Decisions',
+    'Reset all Keep / Remove / Unsure decisions back to Unreviewed? Your post list stays the same.',
+    'Reset', true
+  );
+  if (!ok) return;
+  undoStack = [];
+  document.getElementById("undoBtn").disabled = true;
+  document.getElementById("undoBtn").style.opacity = "0.4";
+  TWEETS.forEach(t => { state[t.id] = "unreviewed"; });
+  store.removeItem(STATE_STORAGE);
+  activeFilter = "all";
+  document.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c.dataset.filter === "all"));
+  activeCat = "all";
+  buildCatBar();
+  updateStats();
+  renderGrid();
+  showToast("All decisions reset to Unreviewed");
+}
+
+// ── Load tweets.js ─────────────────────────────────────────────────────────
+function loadTweets(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const raw = e.target.result;
+    const parsed = parseTweetsJs(raw);
+    if (!parsed.length) {
+      showToast("Couldn't parse file — make sure it's tweets.js from your X data archive");
+      return;
+    }
+    TWEETS = parsed;
+    // Wipe state
+    Object.keys(state).forEach(k => delete state[k]);
+    TWEETS.forEach(t => { state[t.id] = "unreviewed"; });
+    undoStack = [];
+    activeFilter = "all";
+    activeCat = "all";
+    store.removeItem(STATE_STORAGE);
+    try { store.setItem(TWEETS_STORAGE, JSON.stringify(TWEETS)); } catch(e) {
+      // tweets.js may be too large for localStorage — that's ok, just don't persist
+    }
+    pendingTweetsFile = file.name;
+    // Setup screen UI
+    const lbl = document.getElementById("tweetUploadLabel");
+    const txt = document.getElementById("tweetUploadText");
+    if (lbl && txt) {
+      lbl.classList.add("has-file");
+      txt.textContent = `✓ Loaded ${TWEETS.length.toLocaleString()} posts from ${file.name}`;
+    }
+    // If app already visible, refresh it
+    if (document.getElementById("app").classList.contains("visible")) {
+      assignCategories();
+      buildCatBar();
+      updateStats();
+      renderGrid();
+      document.getElementById("headerCount").textContent = TWEETS.length.toLocaleString() + " posts";
+      document.getElementById("statTotal").textContent = TWEETS.length;
+      showToast(`Loaded ${TWEETS.length.toLocaleString()} posts`);
+    }
+    validateSetup();
+    event.target.value = "";
+  };
+  reader.readAsText(file);
+}
+
+// Parse the tweets.js file — strips JS wrapper, parses JSON
+function parseTweetsJs(text) {
+  // tweets.js looks like:  window.YTD.tweets.part0 = [ {"tweet": {...}}, ... ]
+  // Strip everything up to the first '['
+  let jsonText = text;
+  const eqIdx = text.indexOf('=');
+  const brkIdx = text.indexOf('[');
+  if (brkIdx > -1 && (eqIdx === -1 || brkIdx > eqIdx)) {
+    jsonText = text.substring(brkIdx);
+  }
+  let arr;
+  try {
+    arr = JSON.parse(jsonText);
+  } catch(e) {
+    // Try a more aggressive strip if there's trailing junk
+    try {
+      const lastBracket = jsonText.lastIndexOf(']');
+      arr = JSON.parse(jsonText.substring(0, lastBracket + 1));
+    } catch(e2) {
+      console.error("Parse failed:", e2);
+      return [];
+    }
+  }
+  if (!Array.isArray(arr)) return [];
+
+  const result = [];
+  for (const item of arr) {
+    const t = item.tweet || item; // some archives don't wrap
+    if (!t) continue;
+    const id = t.id_str || t.id;
+    if (!id) continue;
+    const text = t.full_text || t.text || "";
+    const date = t.created_at || "";
+    const isRetweet = text.startsWith("RT @");
+    const isReply = !!(t.in_reply_to_status_id_str || t.in_reply_to_status_id || t.in_reply_to_user_id_str);
+    const hasMedia = !!(t.entities && t.entities.media && t.entities.media.length) ||
+                     !!(t.extended_entities && t.extended_entities.media && t.extended_entities.media.length);
+    const hasUrls = !!(t.entities && t.entities.urls && t.entities.urls.length);
+    const retweetCount = parseInt(t.retweet_count || 0);
+    const favoriteCount = parseInt(t.favorite_count || 0);
+    result.push({
+      id: String(id),
+      text, date,
+      isRetweet, isReply, hasMedia, hasUrls,
+      retweetCount, favoriteCount
+    });
+  }
+  // Sort newest first
+  result.sort((a, b) => {
+    const da = new Date(a.date).getTime() || 0;
+    const db = new Date(b.date).getTime() || 0;
+    return db - da;
+  });
+  return result;
+}
+
+function showApp() {
+  document.getElementById("setupScreen").classList.add("hidden");
+  document.getElementById("app").classList.add("visible");
+
+  // Restore tweets from storage if available
+  try {
+    const saved = store.getItem(TWEETS_STORAGE);
+    if (saved && TWEETS.length === 0) {
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.length) TWEETS = parsed;
+    }
+  } catch(e) {}
+
+  TWEETS.forEach(t => { if (!state[t.id]) state[t.id] = "unreviewed"; });
+
+  assignCategories();
+  buildCatBar();
+  loadSavedState();
+  preClassify();
+  updateStats();
+  renderGrid();
+
+  document.getElementById("headerCount").textContent = TWEETS.length.toLocaleString() + " posts";
+  document.getElementById("statTotal").textContent = TWEETS.length;
+
+  // Restore username
+  const u = store.getItem(USERNAME_STORAGE);
+  if (u) xUsername = u;
+}
+
+// ── Categories ─────────────────────────────────────────────────────────────
+function assignCategories() {
+  TWEETS.forEach(t => {
+    // Structural categories take priority for clear-cut cases
+    if (t.isRetweet) { CHANNELS_CAT[t.id] = "Retweets"; return; }
+    if (t.isReply) { CHANNELS_CAT[t.id] = "Replies"; return; }
+    // Topic-based via keywords
+    const text = t.text.toLowerCase();
+    let assigned = null;
+    for (const rule of CAT_RULES) {
+      if (rule.kw.some(kw => text.includes(kw))) {
+        assigned = rule.cat;
+        break;
+      }
+    }
+    if (assigned) { CHANNELS_CAT[t.id] = assigned; return; }
+    // Fallbacks
+    if (t.hasMedia) { CHANNELS_CAT[t.id] = "With Media"; return; }
+    if (t.hasUrls) { CHANNELS_CAT[t.id] = "With Links"; return; }
+    CHANNELS_CAT[t.id] = "Originals";
+  });
+}
+
+function buildCatBar() {
+  const allCats = [...CATEGORIES, ...customCats];
+  const counts = { all: TWEETS.length };
+  allCats.forEach(c => { counts[c] = 0; });
+  TWEETS.forEach(t => {
+    const cat = CHANNELS_CAT[t.id] || "Other";
+    counts[cat] = (counts[cat] || 0) + 1;
+  });
+  // Hide cats with 0 count
+  const visibleCats = allCats.filter(c => counts[c] > 0 || customCats.includes(c));
+  const bar = document.getElementById("catBar");
+  const chips = [["all", "All", counts.all], ...visibleCats.map(c => [c, c, counts[c] || 0])];
+  bar.innerHTML = chips.map(([val, label, count]) => {
+    const isCustom = customCats.includes(val);
+    const deleteBtn = isCustom
+      ? `<button class="cat-delete" onclick="deleteCustomCat(event,'${val.replace(/'/g,"\\'")}')" title="Delete category">✕</button>`
+      : "";
+    return `<button class="cat-chip${val === activeCat ? " active" : ""}" data-cat="${val}"
+      onclick="setCat('${val.replace(/'/g,"\\'")}',this)"
+      ondragover="chipDragOver(event,this)"
+      ondragleave="chipDragLeave(this)"
+      ondrop="chipDrop(event,'${val.replace(/'/g,"\\'")}')">
+      ${label} <span class="cat-count">${count}</span>${deleteBtn}
+    </button>`;
+  }).join("") + `<button class="add-cat-btn" onclick="addCustomCat()">+ Category</button>`;
+}
+
+function setCat(cat, el) {
+  activeCat = cat;
+  document.querySelectorAll(".cat-chip").forEach(c => c.classList.remove("active"));
+  el.classList.add("active");
+  renderGrid();
+}
+
+async function addCustomCat() {
+  const name = prompt("New category name:");
+  if (!name || !name.trim()) return;
+  const clean = name.trim();
+  if (CATEGORIES.includes(clean) || customCats.includes(clean)) {
+    showToast("Category already exists");
+    return;
+  }
+  customCats.push(clean);
+  buildCatBar();
+  showToast(`Category "${clean}" created`);
+}
+
+function deleteCustomCat(e, cat) {
+  e.stopPropagation();
+  TWEETS.forEach(t => { if (CHANNELS_CAT[t.id] === cat) CHANNELS_CAT[t.id] = "Originals"; });
+  customCats = customCats.filter(c => c !== cat);
+  if (activeCat === cat) activeCat = "all";
+  buildCatBar();
+  renderGrid();
+  showToast(`Category "${cat}" deleted`);
+}
+
+// ── Drag & Drop ────────────────────────────────────────────────────────────
+function cardDragStart(e, id) {
+  draggedTweetId = id;
+  e.dataTransfer.effectAllowed = "move";
+  setTimeout(() => e.target.classList.add("dragging"), 0);
+  document.querySelectorAll(".cat-chip:not([data-cat='all'])").forEach(c => c.classList.add("drop-hint"));
+}
+
+function cardDragEnd(e) {
+  e.target.classList.remove("dragging");
+  document.querySelectorAll(".cat-chip").forEach(c => c.classList.remove("drop-hint", "drag-over"));
+  draggedTweetId = null;
+}
+
+function chipDragOver(e, el) {
+  if (!draggedTweetId) return;
+  if (el.dataset.cat === "all") return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  el.classList.add("drag-over");
+}
+
+function chipDragLeave(el) { el.classList.remove("drag-over"); }
+
+function chipDrop(e, cat) {
+  e.preventDefault();
+  if (!draggedTweetId || cat === "all") return;
+  CHANNELS_CAT[draggedTweetId] = cat;
+  document.querySelectorAll(".cat-chip").forEach(c => c.classList.remove("drag-over", "drop-hint"));
+  buildCatBar();
+  renderGrid();
+  showToast(`Moved to ${cat}`);
+  draggedTweetId = null;
+}
+
+// ── Filter / Render ────────────────────────────────────────────────────────
+function setFilter(f, el) {
+  activeFilter = f;
+  document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+  el.classList.add("active");
+  renderGrid();
+}
+
+function renderGrid() {
+  const q = document.getElementById("searchInput").value.toLowerCase().trim();
+  const grid = document.getElementById("grid");
+  const empty = document.getElementById("emptyState");
+
+  let visible = TWEETS.filter(t => {
+    const s = state[t.id];
+    if (activeFilter !== "all" && s !== activeFilter) return false;
+    if (activeCat !== "all" && (CHANNELS_CAT[t.id] || "Other") !== activeCat) return false;
+    if (q && !t.text.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  // Cap rendered items for performance
+  const cap = 500;
+  const slice = visible.slice(0, cap);
+
+  if (!visible.length) {
+    grid.innerHTML = "";
+    empty.classList.remove("hidden");
+    return;
+  }
+  empty.classList.add("hidden");
+
+  grid.innerHTML = slice.map(t => {
+    const s = state[t.id] || "unreviewed";
+    const cat = CHANNELS_CAT[t.id] || "Other";
+    const dateStr = formatDate(t.date);
+    const textSafe = escapeHtml(t.text);
+    return `<div class="card ${s}" data-id="${t.id}" draggable="true"
+      ondragstart="cardDragStart(event,'${t.id}')"
+      ondragend="cardDragEnd(event)"
+      onclick="cycleState('${t.id}')">
+      <div class="card-meta">
+        <span class="card-cat">${cat}</span>
+        <span class="card-date">${dateStr}</span>
+      </div>
+      <div class="card-text">${textSafe}</div>
+      <div class="card-footer">
+        <span class="card-status-label">${s}</span>
+        <span class="card-engagement">${t.retweetCount ? `🔁 ${t.retweetCount}` : ""} ${t.favoriteCount ? `❤ ${t.favoriteCount}` : ""}</span>
+      </div>
+    </div>`;
+  }).join("");
+
+  if (visible.length > cap) {
+    grid.innerHTML += `<div style="grid-column:1/-1;text-align:center;padding:1rem;font-family:var(--mono);font-size:.75rem;color:var(--text3)">Showing first ${cap.toLocaleString()} of ${visible.length.toLocaleString()} — refine your filters to see more</div>`;
+  }
+}
+
+function formatDate(d) {
+  if (!d) return "";
+  try {
+    const dt = new Date(d);
+    if (isNaN(dt.getTime())) return "";
+    return dt.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+  } catch(e) { return ""; }
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+
+// ── State cycling ──────────────────────────────────────────────────────────
+const CYCLE = { unreviewed: "keep", keep: "remove", remove: "unsure", unsure: "unreviewed" };
+
+function cycleState(id) {
+  undoStack.push({ ...state });
+  if (undoStack.length > 50) undoStack.shift();
+  document.getElementById("undoBtn").disabled = false;
+  document.getElementById("undoBtn").style.opacity = "1";
+  state[id] = CYCLE[state[id] || "unreviewed"];
+  updateStats();
+  renderGrid();
+  saveState();
+}
+
+function markVisible(target) {
+  const q = document.getElementById("searchInput").value.toLowerCase().trim();
+  const matches = TWEETS.filter(t => {
+    const s = state[t.id];
+    if (activeFilter !== "all" && s !== activeFilter) return false;
+    if (activeCat !== "all" && (CHANNELS_CAT[t.id] || "Other") !== activeCat) return false;
+    if (q && !t.text.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if (!matches.length) { showToast("Nothing to mark"); return; }
+  undoStack.push({ ...state });
+  if (undoStack.length > 50) undoStack.shift();
+  document.getElementById("undoBtn").disabled = false;
+  document.getElementById("undoBtn").style.opacity = "1";
+  matches.forEach(t => { state[t.id] = target; });
+  updateStats();
+  renderGrid();
+  saveState();
+  showToast(`Marked ${matches.length} as ${target}`);
+}
+
+function undoMark() {
+  if (!undoStack.length) return;
+  const prev = undoStack.pop();
+  Object.keys(state).forEach(k => delete state[k]);
+  Object.assign(state, prev);
+  const btn = document.getElementById("undoBtn");
+  if (!undoStack.length) {
+    btn.disabled = true;
+    btn.style.opacity = "0.4";
+  }
+  updateStats();
+  renderGrid();
+  saveState();
+}
+
+function updateStats() {
+  const counts = { keep: 0, remove: 0, unsure: 0, unreviewed: 0 };
+  TWEETS.forEach(t => {
+    const s = state[t.id] || "unreviewed";
+    counts[s] = (counts[s] || 0) + 1;
+  });
+  document.getElementById("statKeep").textContent = counts.keep;
+  document.getElementById("statRemove").textContent = counts.remove;
+  document.getElementById("statUnsure").textContent = counts.unsure;
+  document.getElementById("statUnreviewed").textContent = counts.unreviewed;
+}
+
+function setStatus(msg, err, done) {
+  const bar = document.getElementById("statusBar");
+  const spinner = document.getElementById("statusSpinner");
+  document.getElementById("statusText").textContent = msg;
+  bar.classList.add("visible");
+  spinner.style.display = done ? "none" : "";
+  if (err) bar.style.background = "var(--red-dim)";
+  else if (done) bar.style.background = "var(--green-dim)";
+  else bar.style.background = "";
+}
+
+// ── Persist ────────────────────────────────────────────────────────────────
+function saveState() { try { store.setItem(STATE_STORAGE, JSON.stringify(state)); } catch(e) {} }
+
+function loadSavedState() {
+  try {
+    const saved = store.getItem(STATE_STORAGE);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const validIds = new Set(TWEETS.map(t => t.id));
+      Object.entries(parsed).forEach(([id, val]) => {
+        if (validIds.has(id)) state[id] = val;
+      });
+    }
+  } catch(e) {}
+}
+
+// ── Keyword pre-classifier ─────────────────────────────────────────────────
+// Suggest "remove" for likely-junk patterns; "keep" for higher-value content
+const REMOVE_PATTERNS = [
+  /^@\w+\s+(lol|lmao|haha|nice|cool|nope|yes|no|same|true|this|agreed|exactly|👀|💀|😂)[\s!.]*$/i,  // single-word replies
+  /^@\w+\s+\w+\s+(lol|lmao|haha|same|true|this)[\s!.]*$/i,  // two-word replies ending in filler
+  /^(gm|gn|good morning|good night|goodnight)[\s!.]*$/i,  // greetings
+  /^\.@/,  // dotted replies
+  /^rt @/i  // retweets — default suggest remove
+];
+const KEEP_PATTERNS = [
+  /https?:\/\/(github|medium|substack)/i,  // links to your own work
+  /^\s*1\/\s*\S/,  // start of a thread (1/ ...) — common thread convention
+  /🧵/,  // thread emoji anywhere
+  /announc(e|ing|ed)|launch(ing|ed)|releas(ing|ed)|ship(ping|ped)/i,  // announcements
+];
+
+function autoPreClassify(t) {
+  // Don't auto-mark if user already touched it
+  if (state[t.id] && state[t.id] !== "unreviewed") return;
+  const text = t.text;
+  // Long posts (>240 chars) are usually intentional — lean keep
+  if (text.length > 240) { return "keep"; }
+  for (const re of KEEP_PATTERNS) { if (re.test(text)) return "keep"; }
+  for (const re of REMOVE_PATTERNS) { if (re.test(text)) return "remove"; }
+  return null;
+}
+
+function preClassify() {
+  TWEETS.forEach(t => {
+    if (state[t.id] === "unreviewed") {
+      const r = autoPreClassify(t);
+      if (r) state[t.id] = r;
+    }
+  });
+  saveState();
+}
+
+// ── Groq AI Classification ─────────────────────────────────────────────────
+async function classifyAll() {
+  if (classifying) return;
+  if (!groqKey) {
+    const key = await askForGroqKey();
+    if (!key) return;
+    groqKey = key;
+    store.setItem(GROQ_KEY_STORAGE, groqKey);
+  }
+  classifying = true;
+  document.getElementById("classifyBtn").disabled = true;
+
+  const unclassified = TWEETS.filter(t => state[t.id] === "unreviewed" || state[t.id] === "unsure");
+  if (!unclassified.length) {
+    showToast("Nothing left to classify");
+    classifying = false;
+    document.getElementById("classifyBtn").disabled = false;
+    return;
+  }
+
+  setStatus(`Classifying ${unclassified.length} posts with AI...`);
+  const BATCH_SIZE = 25;
+  let done = 0;
+
+  for (let i = 0; i < unclassified.length; i += BATCH_SIZE) {
+    const batch = unclassified.slice(i, i + BATCH_SIZE);
+    try {
+      const results = await classifyBatch(batch);
+      for (const r of results) {
+        if (r && r.id && state[r.id] !== undefined && ["keep","remove","unsure"].includes(r.verdict)) {
+          state[r.id] = r.verdict;
+        }
+      }
+      done += batch.length;
+      const pct = Math.round((done / unclassified.length) * 100);
+      document.getElementById("progressFill").style.width = pct + "%";
+      setStatus(`Classifying... ${done} / ${unclassified.length} (${pct}%)`);
+      updateStats();
+      renderGrid();
+      saveState();
+    } catch(e) {
+      console.error("Batch failed:", e);
+      setStatus("Batch failed — continuing with remainder. Check console.", true);
+    }
+    await new Promise(r => setTimeout(r, 250));
+  }
+
+  document.getElementById("progressFill").style.width = "100%";
+  setStatus(`✓ Classified ${done} posts`, false, true);
+  classifying = false;
+  document.getElementById("classifyBtn").disabled = false;
+  setTimeout(() => {
+    document.getElementById("statusBar").classList.remove("visible");
+    document.getElementById("progressFill").style.width = "0";
+  }, 4000);
+}
+
+async function classifyBatch(batch) {
+  const posts = batch.map(t => ({
+    id: t.id,
+    text: (t.text || "").substring(0, 280)
+  }));
+  const sys = `You audit old X/Twitter posts to suggest which to delete. For each post, return:
+- "remove" if it's likely cringe, embarrassing, dated (years old), a low-effort reply, a retweet of forgettable content, or unlikely to matter today
+- "keep" if it has lasting value: announcements, links to user's own work, thoughtful threads, evergreen insights, professional content
+- "unsure" only if genuinely ambiguous
+
+Return ONLY a JSON array, no other text. Format: [{"id":"123","verdict":"remove"}, {"id":"456","verdict":"keep"}]`;
+  const user = `Audit these posts:\n${JSON.stringify(posts)}`;
+
+  const resp = await fetch(GROQ_API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${groqKey}` },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      messages: [{ role: "system", content: sys }, { role: "user", content: user }],
+      temperature: 0.2,
+      max_tokens: 4000,
+      response_format: { type: "json_object" }
+    })
+  });
+  if (!resp.ok) throw new Error(`Groq returned ${resp.status}`);
+  const data = await resp.json();
+  let content = data.choices?.[0]?.message?.content || "[]";
+  // Strip code fences if present
+  content = content.replace(/```json|```/g, "").trim();
+  // Handle both raw array and object-wrapped responses
+  let parsed;
+  try { parsed = JSON.parse(content); } catch(e) { return []; }
+  if (Array.isArray(parsed)) return parsed;
+  // Some models wrap arrays: {"results": [...]} or similar
+  for (const v of Object.values(parsed)) {
+    if (Array.isArray(v)) return v;
+  }
+  return [];
+}
+
+// ── Script generation ──────────────────────────────────────────────────────
+function generateScript() {
+  const toRemove = TWEETS.filter(t => state[t.id] === "remove");
+  if (!toRemove.length) { showToast("No posts marked for removal"); return; }
+
+  // Restore saved username
+  const savedU = store.getItem(USERNAME_STORAGE);
+  if (savedU) {
+    document.getElementById("usernameInput").value = savedU;
+    xUsername = savedU;
+  }
+
+  document.getElementById("modalDeleteCount").textContent = toRemove.length.toLocaleString();
+  // Time estimate: ~4 seconds per tweet
+  const totalSec = toRemove.length * 4;
+  const mins = Math.ceil(totalSec / 60);
+  document.getElementById("modalEstTime").textContent = mins < 60
+    ? `~${mins} minute${mins === 1 ? "" : "s"}`
+    : `~${Math.floor(mins/60)}h ${mins%60}m`;
+
+  renderScript();
+  document.getElementById("modalBg").classList.remove("hidden");
+}
+
+function updateScriptUsername() {
+  xUsername = document.getElementById("usernameInput").value.trim().replace(/^@/, "");
+  store.setItem(USERNAME_STORAGE, xUsername);
+  renderScript();
+}
+
+function renderScript() {
+  const toRemove = TWEETS.filter(t => state[t.id] === "remove");
+  const ids = toRemove.map(t => `"${t.id}"`).join(",\n  ");
+  const u = xUsername || "YOUR_USERNAME";
+  const script =
+`// Xtinction — X Post Delete Script
+// ⚠ PERMANENTLY deletes ${toRemove.length} posts marked REMOVE in the app
+// Posts marked Keep, Unsure, or Unreviewed are NOT touched
+// Run this from any x.com page while logged in
+
+const USERNAME = "${u}";
+const POST_IDS = [
+  ${ids}
+];
+
+(async function() {
+  const DELAY_MS = 4000; // ~4s between deletes — respects rate limits
+  let done = 0, failed = 0;
+  console.log(\`%c[Xtinction] Starting deletion of \${POST_IDS.length} posts...\`, 'color:#1d9bf0;font-weight:bold');
+  console.log('%cTo stop: close this tab or refresh the page.', 'color:#f59e0b');
+
+  for (let i = 0; i < POST_IDS.length; i++) {
+    const id = POST_IDS[i];
+    const url = \`https://x.com/\${USERNAME}/status/\${id}\`;
+    let win = null;
+    try {
+      win = window.open(url, '_blank');
+      if (!win) {
+        console.error('Popup blocked! Allow popups for x.com and re-run.');
+        break;
+      }
+      // Wait for the tab to load and render the tweet
+      await new Promise(r => setTimeout(r, 2200));
+
+      // Run deletion inside the opened tab
+      const deleteFn = async () => {
+        // Find the "More" (...) button on the focused tweet
+        const findMoreBtn = () => {
+          const candidates = win.document.querySelectorAll('[data-testid="caret"]');
+          // Prefer the one inside the main article (the focal tweet)
+          for (const btn of candidates) {
+            const article = btn.closest('article');
+            if (article && article.getAttribute('tabindex') === '-1') return btn;
+          }
+          return candidates[0] || null;
+        };
+        const moreBtn = findMoreBtn();
+        if (!moreBtn) return { ok: false, reason: 'no-more-button' };
+        moreBtn.click();
+        await new Promise(r => setTimeout(r, 600));
+
+        // Find "Delete" menu item — match by text since data-testid varies
+        const menuItems = win.document.querySelectorAll('[role="menuitem"]');
+        let deleteItem = null;
+        for (const m of menuItems) {
+          if (/^\\s*delete\\s*$/i.test(m.textContent)) { deleteItem = m; break; }
+        }
+        if (!deleteItem) return { ok: false, reason: 'no-delete-option' };
+        deleteItem.click();
+        await new Promise(r => setTimeout(r, 600));
+
+        // Click the red "Delete" confirm button
+        const confirmBtn = win.document.querySelector('[data-testid="confirmationSheetConfirm"]');
+        if (!confirmBtn) return { ok: false, reason: 'no-confirm-button' };
+        confirmBtn.click();
+        await new Promise(r => setTimeout(r, 800));
+        return { ok: true };
+      };
+
+      let result;
+      try { result = await deleteFn(); }
+      catch(e) { result = { ok: false, reason: 'exception:' + e.message }; }
+
+      if (result.ok) {
+        done++;
+        console.log(\`%c[\${i+1}/\${POST_IDS.length}] ✓ Deleted \${id}\`, 'color:#22c55e');
+      } else {
+        failed++;
+        console.warn(\`[\${i+1}/\${POST_IDS.length}] ✗ Failed \${id}: \${result.reason}\`);
+      }
+    } catch(e) {
+      failed++;
+      console.error(\`[\${i+1}/\${POST_IDS.length}] Error \${id}:\`, e);
+    } finally {
+      try { if (win && !win.closed) win.close(); } catch(e) {}
+    }
+    // Pacing
+    await new Promise(r => setTimeout(r, DELAY_MS));
+  }
+  console.log(\`%c[Xtinction] ✓ Done. Deleted: \${done}. Failed: \${failed}.\`, 'color:#1d9bf0;font-weight:bold;font-size:14px');
+  if (failed > 0) console.log('Tip: Failed posts may already be deleted, may be replies to deleted threads, or X rate-limited you. Re-run after a break.');
+})();`;
+  document.getElementById("scriptOutput").textContent = script;
+}
+
+function closeModal() { document.getElementById("modalBg").classList.add("hidden"); }
+
+function copyScript() {
+  navigator.clipboard.writeText(document.getElementById("scriptOutput").textContent)
+    .then(() => showToast("Script copied to clipboard!"));
+}
+
+function showConfirm(title, body, okLabel, danger) {
+  return new Promise(resolve => {
+    document.getElementById('confirmTitle').textContent = title;
+    document.getElementById('confirmBody').textContent = body;
+    const ok = document.getElementById('confirmOk');
+    ok.textContent = okLabel || 'OK';
+    ok.className = 'confirm-ok' + (danger ? ' danger' : '');
+    document.getElementById('confirmOverlay').classList.remove('hidden');
+    const cleanup = result => {
+      document.getElementById('confirmOverlay').classList.add('hidden');
+      resolve(result);
+    };
+    ok.onclick = () => cleanup(true);
+    document.getElementById('confirmCancel').onclick = () => cleanup(false);
+  });
+}
+
+function validateKeyOverlay() {
+  const v = document.getElementById('keyOverlayInput').value.trim();
+  const ok = document.getElementById('keyOverlayOk');
+  if (v.length > 20) {
+    ok.disabled = false;
+    ok.style.opacity = '1';
+  } else {
+    ok.disabled = true;
+    ok.style.opacity = '.4';
+  }
+}
+
+function askForGroqKey() {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('keyOverlay');
+    const input = document.getElementById('keyOverlayInput');
+    const ok = document.getElementById('keyOverlayOk');
+    const cancel = document.getElementById('keyOverlayCancel');
+    input.value = '';
+    validateKeyOverlay();
+    overlay.classList.remove('hidden');
+    setTimeout(() => input.focus(), 50);
+    const cleanup = result => {
+      overlay.classList.add('hidden');
+      resolve(result);
+    };
+    ok.onclick = () => {
+      const v = input.value.trim();
+      if (v.length < 20) return;
+      cleanup(v);
+    };
+    cancel.onclick = () => cleanup(null);
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.remove("hidden");
+  setTimeout(() => t.classList.add("hidden"), 2500);
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+const savedKey = store.getItem(GROQ_KEY_STORAGE);
+if (savedKey && savedKey.length > 20) {
+  groqKey = savedKey;
+  document.getElementById("groqKeyInput").value = savedKey;
+}
+
+// Check if we have tweets saved from a previous session
+try {
+  const savedTweets = store.getItem(TWEETS_STORAGE);
+  if (savedTweets) {
+    const parsed = JSON.parse(savedTweets);
+    if (parsed && parsed.length) {
+      TWEETS = parsed;
+      showApp();
+    }
+  }
+} catch(e) {}
+</script>
+</body>
+</html>

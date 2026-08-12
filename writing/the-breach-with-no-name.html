@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>The Breach With No Name | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker with decorative lines — blue theme style */
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+
+/* Blue bar — wraps naturally */
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.blue{color:var(--blue);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT CARD (blue theme uses mat-card wrapper) ── */
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+/* Numbers: IBM Plex Serif, clean editorial style */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-red .stat-num{color:var(--red)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE (for diagrams, screenshots, code blocks) ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── TIMELINE (horizontal grid — blue theme style) ── */
+.timeline{margin:0;display:grid;gap:0;border:1px solid var(--rule)}
+.tl-item{display:grid;grid-template-columns:140px 1fr;border-bottom:1px solid var(--rule)}
+.tl-item:last-child{border-bottom:none}
+.tl-left{padding:1.5rem 1.25rem;border-right:1px solid var(--rule);background:#f8fafc}
+.tl-date{font-family:var(--mono);font-size:.72rem;color:var(--blue);font-weight:700;margin-bottom:.3rem}
+.tl-tag{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.tl-right{padding:1.5rem}
+.tl-title{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3}
+.tl-body{font-size:.88rem;color:var(--ink3);line-height:1.7;margin:0}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── CODE BLOCKS (lab logs only) ── */
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.code-block{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.code-block .prompt{color:#4a9eff}
+.code-block .comment{color:#64748b}
+.code-block .highlight{color:#4ade80}
+.code-block .warning{color:#ef4444}
+.code-block .error{color:#f97316}
+/* shorthand color spans for inline use */
+.co{color:#94a3b8}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+
+/* ── TERMINAL WINDOW (macOS-style, for script output) ── */
+.terminal{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.terminal-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-left:.5rem}
+.terminal pre{font-family:var(--mono);font-size:.76rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#e2e8f0}
+/* terminal text color classes */
+.t-red{color:#ef4444;font-weight:bold}
+.t-orange{color:#fb923c;font-weight:bold}
+.t-blue{color:#60a5fa;font-weight:bold}
+.t-green{color:#4ade80}
+.t-dim{color:#94a3b8} /* was #475569 — bumped for legibility */
+.t-bold{color:#e2e8f0;font-weight:bold}
+
+/* ── HOST CARD (dark card for IP/host data) ── */
+.host-card{background:#0a0f1a;border-radius:2px;padding:1.5rem;margin:1.75rem 0;display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.hf-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.hf-value{font-family:var(--mono);font-size:.9rem;color:#4a9eff;font-weight:600}
+.hf-value.red{color:#ef4444}
+.hf-value.green{color:#4ade80}
+.hf-value.amber{color:#fbbf24}
+
+/* ── LAB ENVIRONMENT BOX (lab logs only) ── */
+.env-box{background:var(--paper);border:1px solid var(--rule);padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+
+/* ── COMPARE GRID (side-by-side comparison) ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.left{border-top:3px solid var(--blue)}
+.compare-box.right{border-top:3px solid var(--amber)}
+.compare-box.danger{border-top-color:var(--red)}
+.compare-box.safe{border-top-color:var(--green)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.left .compare-label{color:var(--blue)}
+.compare-box.right .compare-label{color:var(--amber)}
+.compare-box.danger .compare-label{color:var(--red)}
+.compare-box.safe .compare-label{color:var(--green)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+
+/* ── FUNCTION CARDS GRID (for script/tool documentation) ── */
+.fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.75rem 0}
+.fn-card{background:var(--paper);border:1px solid var(--rule);padding:1rem 1.1rem;border-top:2px solid var(--blue)}
+.fn-name{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--blue);margin-bottom:.3rem}
+.fn-desc{font-size:.82rem;color:var(--ink3);line-height:1.55}
+
+/* ── NIST MAPPING BOX (lab logs only) ── */
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:90px 1fr;gap:1rem;align-items:start}
+.nist-control{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--blue);padding-top:.15rem}
+.nist-desc{font-size:.88rem;color:var(--ink3);line-height:1.7}
+.nist-desc strong{color:var(--ink)}
+
+/* ── TOOL EMBED (for pages with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .tl-item{grid-template-columns:1fr}
+  .tl-left{border-right:none;border-bottom:1px solid var(--rule);padding:1rem 1.25rem}
+  .env-grid{grid-template-columns:1fr}
+  .nist-item{grid-template-columns:80px 1fr}
+  .compare-grid{grid-template-columns:1fr}
+  .fn-grid{grid-template-columns:1fr}
+  .host-card{grid-template-columns:1fr}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .mast-bar{padding:.55rem 1.5rem;font-size:.62rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.6rem}
+  .mast-meta{grid-template-columns:1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .timeline .tl-left{padding:.75rem .9rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .code-block,.terminal{padding:.85rem .9rem;font-size:.7rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> · best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<div class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-label">Field Notes</div>
+
+    <h1 class="title">The Breach With No Name<br><span>What my own platform could and couldn't tell me about who hit HSIN</span></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">July 2026</div></div>
+      <div class="meta-item"><div class="label">Category</div><div class="value">Field Note · Threat Intel</div></div>
+      <div class="meta-item"><div class="label">Subject</div><div class="value">DHS / HSIN breach</div></div>
+      <div class="meta-item"><div class="label">Data Source</div><div class="value">ArgusX corpus (~41K entries)</div></div>
+      <div class="meta-item"><div class="label">Read Time</div><div class="value">7 minutes</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    ACTOR: UNKNOWN &nbsp;·&nbsp; METHOD: WELL CHARACTERIZED &nbsp;·&nbsp; CONFIDENCE: LOW, PENDING INDICATORS
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>The Itch to Know Who</h2>
+
+  <p>Someone broke into the Homeland Security Information Network. HSIN is the unclassified platform DHS uses to share sensitive information with federal, state, and local partners; the place where agencies coordinate security operations before anything reaches a classified system. According to Nextgov reporting that DHS later confirmed, the intrusion hit a legacy information-sharing system and a SharePoint network used for partner collaboration. DHS isolated the compromised systems, opened a forensic investigation, and said there is no indication classified networks were touched. The platform stayed operational. It is HSIN's second incident, after a 2023 data exposure caused by a contractor's configuration error.</p>
+
+  <p>Here is what nobody has said: who did it. No attribution, no indicators of compromise, no TTPs. The actor is a blank space in every report I have read. And when you run a threat intelligence platform, a blank space like that is an itch you cannot leave alone. I have roughly 41,000 feed entries sitting in ArgusX. Surely the data could tell me <em>something</em>.</p>
+
+  <p>It could. Just not what I expected, and not what I initially thought it was telling me. This note is about both halves of that: what the data supported, and the moment it almost fooled me.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The honest constraint, stated up front:</strong> my feed coverage begins in April 2026 and this breach is fresh, so the corpus contains nothing about this specific incident. No IOCs exist to pivot on because none have been released. What ArgusX can offer is context and hypothesis material, not attribution. Everything below should be read with that frame.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>Turning the Platform on the Question</h2>
+
+  <p>The corpus is not fully entity-mapped yet, so this was keyword and structured-field work against the Supabase backend: the posts table, filtering on titles, bodies, plain-English summaries, MITRE tags, and origin-country fields. One wrinkle worth admitting: the body column stores RSS snippets, not full articles, so anything I found was a lead to chase back to source, not a finding in itself.</p>
+
+  <p>I ran three passes, each one deliberately wider than the last.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Target surface</div>
+        <div class="step-content-desc">Everything mentioning HSIN or SharePoint. What does the attack surface actually look like, independent of who is attacking it?</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Actor signal, narrow</div>
+        <div class="step-content-desc">Named-actor reporting intersecting SharePoint and government targets: APT groups, webshells, espionage language, nation-state flags.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">Actor signal, wide</div>
+        <div class="step-content-desc">All government-targeting nation-state activity in the window, regardless of technique. This is the pass that mattered most, for reasons that will become obvious.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>The Method Is Better Supported Than the Actor</h2>
+
+  <p>The first pass returned the strongest material of the night. My corpus shows a dense, sustained cluster of actively exploited SharePoint vulnerabilities running through 2025 and 2026, dominated by deserialization and authentication-bypass remote code execution. CVE-2026-32201, a SharePoint zero-day flagged as actively exploited in April. CVE-2026-20963, also under active exploitation. CVE-2026-45659, an RCE scoring 8.8. Behind those sits the 2025 ToolShell-era chain (CVE-2025-49704, CVE-2025-49706, CVE-2025-53770) that was heavily abused against on-premises SharePoint, and older KEV entries going back to CVE-2019-0604. Dark Reading's framing of the stakes stuck with me: getting into an organization's SharePoint tends to hand an attacker the keys to a great deal more than SharePoint. HSIN's breached environment being a partner-collaboration SharePoint network makes that framing uncomfortably literal.</p>
+
+  <p>There is a second plausible door, and it does not involve exploiting the server at all. My data includes reporting on CORDIAL SPIDER and SNARKY SPIDER running adversary-in-the-middle credential phishing against SharePoint, HubSpot, and Google Workspace since October 2025. Against a collaboration environment full of external partner accounts, stolen credentials are at least as plausible an entry as server-side RCE, and considerably quieter.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Figure 1 · What the corpus supports vs. what it doesn't</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-blue">
+        <div class="stat-num">9+</div>
+        <div class="stat-label">SharePoint CVEs</div>
+        <div class="stat-sub">Actively exploited or KEV-listed, 2019 to 2026, in corpus</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">2</div>
+        <div class="stat-label">Plausible entry vectors</div>
+        <div class="stat-sub">Server-side RCE chain, or AiTM credential phishing</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">0</div>
+        <div class="stat-label">IOCs for this breach</div>
+        <div class="stat-sub">Nothing released; investigation ongoing</div>
+      </div>
+      <div class="stat-item stat-green">
+        <div class="stat-num">1</div>
+        <div class="stat-label">Textbook objective</div>
+        <div class="stat-sub">ATT&amp;CK T1213.002, SharePoint data mining</div>
+      </div>
+    </div>
+  </div>
+
+  <p>The objective is the easiest part to characterize, because MITRE already wrote it down. T1213.002 describes adversaries mining a SharePoint repository to harvest information about internal structure and systems. That is nearly a job description for what an actor would want from HSIN. The value is not the server; it is the sensitive partner and planning data inside an information-sharing platform. For access and lateral movement, T1558.002, forging Kerberos Silver Tickets for services like SharePoint, rounds out a plausible technical picture. So I can describe the how and the why with reasonable rigor. The who is where it got interesting.</p>
+
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>The Tempting Name</h2>
+
+  <p>The second pass, the narrow one, produced a moment I want to be honest about, because it is the whole reason this piece exists. When I filtered for the full profile of the incident as I imagined it, nation-state actor, SharePoint webshells, government target, exactly one named group survived the intersection: APT27, better known as Emissary Panda, a China-nexus espionage group also tracked as TG-3390, Bronze Union, and Lucky Mouse. SharePoint webshells against government networks is documented Emissary Panda tradecraft. For a few minutes, sitting alone with a query result, it felt like an answer.</p>
+
+  <p>Then I looked at the date on the pulse. It described activity from 2019, against government targets in the Middle East. Not this breach. Not this year. Not even this region. APT27 surfaced not because the evidence pointed there but because my filter was shaped exactly like that one historical report. I had built a funnel and then been impressed that something came out the bottom of it.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The trap, named:</strong> a narrow query does not find the answer, it manufactures one. APT27 sat at the intersection of my search terms, which is a selection effect, not a finding. The first name that surfaces is a property of the filter at least as much as a property of the world.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>Widening the Lens</h2>
+
+  <p>So I ran the third pass: drop SharePoint entirely and pull everything in the corpus involving nation-state activity against government targets. This is the query that dissolved my lead.</p>
+
+  <div class="code-label">The query that dissolved the lead</div>
+  <div class="code-block"><pre><span class="comment">-- Widen to all government-targeting nation-state activity</span>
+SELECT id, created_at, title, source_label, malware_family,
+       origin_country, LEFT(plain_english, 300) AS snippet
+FROM posts
+WHERE (body ILIKE '%government%' OR plain_english ILIKE '%government%'
+       OR body ILIKE '%federal agenc%' OR body ILIKE '%homeland%')
+  AND (body ILIKE '%APT%' OR body ILIKE '%espionage%'
+       OR body ILIKE '%nation-state%' OR origin_country IS NOT NULL)
+ORDER BY created_at DESC LIMIT 200;</pre></div>
+
+  <p>The apparent China signal did not survive contact with the wider data. What came back instead was a crowded field: a broad, multi-nation set of clusters actively working government targets in this same window, any of which fits the shape of an unattributed intrusion into a US information-sharing platform.</p>
+
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Archetype</th><th>In-corpus examples</th><th>Why it fits</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="red">Russia-nexus</td>
+        <td><strong>APT29</strong> phishing US and European government targets; <strong>APT28</strong> against military and government worldwide; <strong>Turla</strong> converting Kazuar into a P2P botnet; <strong>COLDRIVER</strong>, <strong>Gamaredon</strong>, <strong>Cloud Atlas</strong>, <strong>Ghostwriter</strong></td>
+        <td>Arguably the deepest bench in my data for sustained government-focused espionage, including credential phishing against exactly this kind of collaboration layer</td>
+      </tr>
+      <tr>
+        <td class="amber">China-nexus</td>
+        <td><strong>Silk Typhoon</strong> (Government of Alberta), <strong>Mustang Panda</strong>, <strong>APT40</strong>, <strong>GopherWhisper</strong> (Mongolian government), <strong>TA416</strong>, and yes, <strong>APT27</strong></td>
+        <td>The documented home of SharePoint-webshell-against-government tradecraft, but one cluster among several, not a standout</td>
+      </tr>
+      <tr>
+        <td class="blue">Iran-nexus</td>
+        <td><strong>APT42</strong>, <strong>APT34</strong>, <strong>Fox Kitten</strong>; an operation against twelve Omani ministries exposing 26,000 citizen records; joint FBI/CISA/NSA warnings on Iranian actors</td>
+        <td>Active, government-focused, and demonstrably interested in bulk data from ministry-class systems</td>
+      </tr>
+      <tr>
+        <td class="green">DPRK-nexus</td>
+        <td><strong>Lazarus</strong>, <strong>Kimsuky</strong>, <strong>APT43</strong> / Emerald Sleet, plus the laptop-farm insider cases</td>
+        <td>Persistent espionage collection against government and policy targets alongside revenue operations</td>
+      </tr>
+      <tr>
+        <td>Criminal / ransomware</td>
+        <td><strong>LockBit</strong>-linked Warlock webshell activity on SharePoint; <strong>SharkLoader</strong> delivering Cobalt Strike</td>
+        <td>SharePoint exploitation is not exclusive to states; criminal crews abuse the same CVE chain for access and extortion</td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <p>One more data point deserves mention, not as a lead but as context for how this actually works against US federal targets right now. CISA disclosed that an unnamed federal civilian agency's Cisco Firepower and ASA devices were compromised in September 2025 in the FIRESTARTER case, with malware that survived patching. That is current, confirmed tradecraft against US government infrastructure: edge devices and stubborn persistence. As a mental model for how someone gets into and stays inside a federal network, it is far more relevant than a 2019 SharePoint pulse from another continent. Which is exactly the point.</p>
+
+</div>
+
+<!-- SECTION 06 -->
+<div class="section">
+  <div class="section-num">Section 06</div>
+  <h2>The Honest Landing</h2>
+
+  <p>Do I have a suspicion? I do, and I will label it as exactly that. If forced to bet on an archetype, the method-fit leans toward China-nexus SharePoint operators, with APT27 as the in-corpus example of the pattern, because SharePoint webshells against government networks is documented tradecraft for that cluster in a way it is not for most others. That is an informed hypothesis. It is built on technique overlap with old reporting, not on a single indicator from this incident, and technique overlap is one of the weakest forms of attribution evidence there is. Techniques get shared, copied, and deliberately imitated.</p>
+
+  <p>So here is what I can actually defend. The actor is unknown, and my data does not narrow it to a nation. What the data does support is uncomfortable enough on its own: US and allied government systems are under active, simultaneous targeting by Russian, Chinese, Iranian, and North Korean state clusters, plus criminal crews abusing the same SharePoint weaknesses. The technical picture is far better supported than the actor: entry through a SharePoint RCE chain or AiTM credential phishing, with T1213.002 data mining as the likely objective.</p>
+
+  <div class="callout callout-green">
+    <p><strong>The defensible output:</strong> unknown actor. Multiple candidate archetypes. Method well characterized. Confidence low, pending indicators. Anything more specific would be a guess wearing the costume of analysis.</p>
+  </div>
+
+  <p>The real lesson of the night was not about HSIN at all. It was watching my own narrow query manufacture a false lead, and watching a wider one dissolve it. Anchoring on the first name that surfaces is the exact failure mode that floods this space with confident, wrong attribution, and the only reliable defense is the boring one: widen the lens before you believe your own result. That discipline, keeping a bright line between claimed and confirmed, saying "candidate, not conclusion" while a tempting name sits right in front of you, is what I am trying to build into ArgusX at the platform level. It is also, honestly, the same muscle I have used for fifteen years in design: the first idea that fits is rarely the right one, and the job is to hold it loosely while you check the alternatives.</p>
+
+  <p>When DHS releases indicators, I will run them against the corpus and write the follow-up, whatever it says. If my suspicion turns out wrong, that follow-up gets more interesting, not less.</p>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">Methodology note: this piece reflects the author's own analysis. The breach description is based on public reporting confirmed by DHS. All corpus findings come from ArgusX, the author's threat intelligence platform (~41,000 feed entries, coverage beginning April 2026), queried by keyword and structured field. No attribution is claimed; no non-public information was used.</p>
+
+</div>
+
+</div></div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER
+     ════════════════════════════════════════════════════════════ -->
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Researcher &nbsp;·&nbsp; Threat Intelligence &amp; Detection &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on “unknown.” When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>The Breach With No Name · Yana Ivanov · July 2026</span>
+  <span>Based on public reporting · For educational use · Independent analysis</span>
+</footer>
+
+</body>
+</html>

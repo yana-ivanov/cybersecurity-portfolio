@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building ArgusX — Field Notes — Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover{color:#93c5fd}
+.back-nav a::before{content:'←';font-size:.75rem}
+
+.masthead{background:var(--ink);color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#4a9eff}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:1.5rem 0;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem}
+.mast-bar-dot{width:8px;height:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:2rem}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+.callout{padding:1.25rem 1.5rem;border-radius:4px;margin:1.75rem 0;border-left:4px solid;box-shadow:var(--shadow)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+.tbl-wrap{overflow-x:auto;margin:1.75rem 0;border-radius:4px;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:var(--ink);color:#fff}
+th{padding:.85rem 1rem;text-align:left;font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;font-weight:600}
+td{padding:.75rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.blue{color:var(--blue);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:700;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:700;font-family:var(--mono);font-size:.82rem}
+
+.mat-card{background:var(--paper);border-radius:6px;box-shadow:var(--shadow-md);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:1rem 1.5rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.mat-card-body{padding:1.5rem}
+
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.08em;color:var(--ink3);text-transform:uppercase;margin-bottom:.4rem;line-height:1.4}
+.stat-sub{font-size:.78rem;color:#94a3b8;line-height:1.5}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+
+.flow{display:flex;align-items:center;gap:0;margin:2rem 0;flex-wrap:wrap}
+.flow-step{flex:1;min-width:140px;padding:1.25rem;background:var(--paper);border:1px solid var(--rule);border-radius:4px;text-align:center;box-shadow:var(--shadow);position:relative}
+.flow-step.blue{border-top:3px solid var(--blue);background:#eff6ff}
+.flow-step.amber{border-top:3px solid var(--amber);background:#fffbeb}
+.flow-step.red{border-top:3px solid var(--red);background:#fef2f2}
+.flow-step.green{border-top:3px solid var(--green);background:#f0fdf4}
+.flow-arrow{font-size:1.4rem;color:#94a3b8;padding:0 .25rem;flex-shrink:0}
+.flow-step-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.4rem}
+.flow-step.blue .flow-step-label{color:var(--blue)}
+.flow-step.amber .flow-step-label{color:var(--amber)}
+.flow-step.red .flow-step-label{color:var(--red)}
+.flow-step.green .flow-step-label{color:var(--green)}
+.flow-step-title{font-family:var(--display-clean);font-size:.88rem;font-weight:700;color:var(--ink);margin-bottom:.3rem;line-height:1.3}
+.flow-step-body{font-size:.75rem;color:var(--ink3);line-height:1.5}
+
+.bio{background:var(--ink);color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+footer{background:var(--ink2);color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .flow{flex-direction:column}
+  .flow-arrow{transform:rotate(90deg)}
+  .bio{grid-template-columns:1fr}
+  footer{flex-direction:column;text-align:center}
+}
+@media(max-width:480px){
+  html{font-size:17px}
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-meta{grid-template-columns:1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-label">Field Notes · Platform Build</div>
+    <h1 class="title">Building ArgusX<br><span>What Happens When You Stop Waiting for Someone Else to Build It</span></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">April 2026 · Updated May 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Field Notes</div></div>
+      <div class="meta-item"><div class="label">Topic</div><div class="value">Threat Intelligence · Community Platform</div></div>
+      <div class="meta-item"><div class="label">Read Time</div><div class="value">10 minutes</div></div>
+      <div class="meta-item"><div class="label">Status</div><div class="value">Active development · Private collaboration</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    INDEPENDENT BUILD · COMMUNITY-FIRST PLATFORM · 14+ INTEL SOURCES · BUILT IN WEEKS · UNDER ACTIVE DEVELOPMENT
+  </div>
+</div>
+
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>I Keep Hearing the Same Thing</h2>
+
+  <p>Podcasts. YouTube. Conference talks. Study groups. The security community is — and I mean this — one of the most generous, vocal, and passionate communities I have ever encountered. They share everything. TTPs, IOCs, tooling, tradecraft, career advice. Freely. Without gatekeeping.</p>
+
+  <p>And everywhere I listened, the same frustration surfaced. <strong>The signal is scattered.</strong> A critical IOC lands on Twitter and disappears in six hours. A Sigma rule gets buried in a GitHub thread. Someone connects a new malware sample to an existing campaign on Mastodon and nobody sees it because they follow different people. The intelligence exists. The people who care exist. The connective tissue does not.</p>
+
+  <p>I am not a seasoned analyst with a decade of incident response behind me. I am someone who made a career pivot into security earlier this year, is actively studying for CompTIA Security+, and has spent these months listening — deeply — to the people who live this work every day. What I heard was not a complaint. It was an opening.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The gap I kept seeing:</strong> Threat intelligence is being generated constantly by a passionate, skilled, generous community — and then dispersed across platforms that weren't designed to connect it. No structure. No relationships. No way for a defense post to find the threat it addresses.</p>
+  </div>
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>The Idea Was Simple. The Problem Was Real.</h2>
+
+  <p>What if every threat post could be linked to the defense that addressed it? What if an IOC from MalwareBazaar could automatically surface its relationship to a CVE from CISA — and that CVE could surface the Sigma rule someone wrote to detect it? What if the community's collective intelligence was <em>structured</em> rather than scattered?</p>
+
+  <p>That's ArgusX. A community-driven threat intelligence platform where defenders share what they find, learn from each other, and grow together.</p>
+
+  <p>The name comes from Argus Panoptes — the hundred-eyed giant of Greek mythology who never sleeps. Every eye watching. Nothing missed. That felt right for a platform designed to surface what existing tools let fall through the cracks.</p>
+
+  <div style="font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);margin:2rem 0 1rem">Figure 1 — The Asymmetry ArgusX Is Trying to Fix</div>
+  <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;gap:0;margin:0 0 2rem">
+    <div style="border:1px solid var(--rule);border-top:3px solid var(--red);border-radius:4px;padding:1.5rem;background:#fef2f2;box-shadow:var(--shadow)">
+      <div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:.5rem">The Underground</div>
+      <div style="font-family:var(--display-clean);font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3">Organized. Coordinated. Free.</div>
+      <div style="font-size:.8rem;color:var(--ink3);line-height:1.6">Threat actors share tools, zero-days, victim lists, and TTPs in real time. No fees, no membership committees, no gatekeeping. The offensive ecosystem works.</div>
+    </div>
+    <div style="font-size:1.5rem;color:#94a3b8;padding:0 1.25rem;text-align:center;display:flex;align-items:center;justify-content:center">vs</div>
+    <div style="border:1px solid var(--rule);border-top:3px solid var(--blue);border-radius:4px;padding:1.5rem;background:#eff6ff;box-shadow:var(--shadow)">
+      <div style="font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:.5rem">The Defenders</div>
+      <div style="font-family:var(--display-clean);font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3">Fragmented. Gated. Expensive.</div>
+      <div style="font-size:.8rem;color:var(--ink3);line-height:1.6">ISACs cost thousands. Threat intel platforms are enterprise-only. Independent analysts, students, and small teams have nowhere structured to share what they find.</div>
+    </div>
+  </div>
+
+  <p>That asymmetry is not acceptable when the stakes are this high. ArgusX is the open infrastructure layer for defenders who are currently isolated by design — modeled on what works in open-source software (GitHub, npm, PyPI), where contributors share freely and reputation is earned through contribution.</p>
+</div>
+
+<!-- SECTION 02b — COMMUNITY MODEL -->
+<div class="section">
+  <div class="section-num">Section 02b</div>
+  <h2>Built Around the Community, Not the Engine</h2>
+
+  <p>Most threat intel platforms are built engine-first — the value is the data and the analytics, the user is incidental. ArgusX is built community-first. The data only matters because of the people contributing it, learning from it, and using it to defend the things that matter.</p>
+
+  <p>That means the structure of the community is the most important design decision in the platform. Not the algorithms. Not the visualizations. The <strong>shape of how people enter, contribute, mentor, and progress</strong>.</p>
+
+  <h3>A path, not a wall</h3>
+
+  <p>The biggest mistake I could make would be to gate the platform behind credentials and connections — exactly the friction that made me build this in the first place. ArgusX is a vetted community, but never an elitist one. The application path is transparent and meritocratic. Someone with no credentials but real drive should be able to walk in and find the road forward, the same way I did when I started.</p>
+
+  <p>Tiers exist not as status symbols but as a structure for trust. Read access opens broadly. Posting and contribution access requires light verification. Mentorship and access to sensitive intelligence requires demonstrated contribution and community trust — earned through participation, not purchased.</p>
+
+  <h3>Mentorship is built into the architecture</h3>
+
+  <p>This is the part that matters most to me personally. The reason I struggled to break into security wasn't a lack of resources online — it was the lack of a guide. The cost of a mentor in this field, when you can find one, is often years of social capital you don't have when you're starting.</p>
+
+  <p>ArgusX makes mentorship a first-class feature, not an afterthought. Senior analysts can opt in to mentor. New analysts can apply for mentorship through a structured submission process. Matching is bias-free by design — mentors don't get to filter mentees on demographics, only on objective compatibility (timezone, technical focus area, learning goals). Every mentor commits to the same standard: open to all matched mentees, in good faith.</p>
+
+  <p>This isn't charity work. It's how the community sustains itself. The seniors of tomorrow are the juniors who got brought along today.</p>
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>What I Actually Built — And How Fast</h2>
+
+  <p>This is the part I am genuinely proud of. Not because the technology is novel — it isn't. But because of what it demonstrates about what is possible when you combine a clear problem, the right tools, and a willingness to just start.</p>
+
+  <p>ArgusX went from idea to a working platform in weeks. Not months. Weeks. Built entirely by one person, with no dedicated engineering budget, using a stack that costs almost nothing to run.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Figure 2 — What's Running</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-blue">
+        <div class="stat-num">14+</div>
+        <div class="stat-label">Live Intel<br>Sources</div>
+        <div class="stat-sub">Continuously<br>aggregated</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">10K+</div>
+        <div class="stat-label">Threat Posts<br>Catalogued</div>
+        <div class="stat-sub">Growing every<br>5 minutes</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">~5min</div>
+        <div class="stat-label">Ingestion<br>Cadence</div>
+        <div class="stat-sub">Pulls overnight<br>at higher volume</div>
+      </div>
+      <div class="stat-item stat-green">
+        <div class="stat-num">~$5</div>
+        <div class="stat-label">Monthly<br>Infrastructure</div>
+        <div class="stat-sub">Railway cron<br>everything else free</div>
+      </div>
+    </div>
+  </div>
+
+  <p>The backend is a Python ingestion script running on Railway — a cron job that fires every five minutes, pulls from over a dozen public threat intelligence APIs, deduplicates, and inserts into Supabase. During off-hours, between 1am and 8am, it pulls aggressively. It runs while I sleep.</p>
+
+  <p>The frontend is vanilla HTML, CSS, and JavaScript. No framework. No build step. The platform is designed to be lean enough that one person can maintain it indefinitely while the community grows around it.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The AI layer:</strong> Every new post is classified at insert time using Anthropic's Claude — campaign type, threat actor attribution, origin country, severity reasoning, additional tags. The intelligence gets smarter with every post ingested, and the cost remains a small fraction of monthly infrastructure spend.</p>
+  </div>
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>The Stack — Because Someone Is Going to Ask</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Layer</th><th>Technology</th><th>Cost</th><th>Why</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Frontend</strong></td><td>Vanilla HTML/CSS/JS — no build step, no framework</td><td class="green">Free</td><td>Ships instantly. Zero dependencies. One person can maintain it.</td></tr>
+        <tr><td><strong>Hosting</strong></td><td>Static hosting + Cloudflare DNS</td><td class="green">Free</td><td>CDN included. Custom domain. Zero ops overhead.</td></tr>
+        <tr><td><strong>Database</strong></td><td>Supabase Postgres</td><td class="green">Free tier</td><td>Managed Postgres with real-time, auth, RLS, and REST API built in.</td></tr>
+        <tr><td><strong>Auth</strong></td><td>Supabase + GitHub OAuth</td><td class="green">Free</td><td>GitHub identity = security community identity. Natural fit for a defender community.</td></tr>
+        <tr><td><strong>Ingestion</strong></td><td>Python 3 on Railway cron</td><td class="amber">~$5/mo</td><td>Runs every 5 minutes. Handles a dozen+ APIs, dedup, and AI classification.</td></tr>
+        <tr><td><strong>AI Classification</strong></td><td>Claude (Anthropic API)</td><td class="green">Pennies/mo</td><td>Classifies every new post. Campaign type, threat actor, severity reasoning.</td></tr>
+        <tr><td><strong>Intel Sources</strong></td><td>Public threat intelligence APIs (government, abuse-tracking, vulnerability registries, news)</td><td class="green">Free</td><td>All public. All free. All running simultaneously.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>The total monthly cost to run ArgusX at current scale — ingesting hundreds of posts per day, classifying with AI, supporting community features — is approximately five dollars. That number will stay low for a long time. The Supabase free tier holds 500MB. At roughly 3KB per post, that is room for tens of thousands of posts before any cost scales.</p>
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>What This Is Really About</h2>
+
+  <p>I want to be honest about something. I am building this because I genuinely believe it is needed. But I am also building it because the security community — the one I have been listening to, learning from, being inspired by — deserves a platform that reflects how it actually works.</p>
+
+  <p>The underground is organized. It has forums, shared tools, coordinated campaigns, and structured intelligence sharing. The defense community has Twitter threads and PDF reports that get emailed around. That asymmetry is not acceptable when the stakes are this high.</p>
+
+  <p>ArgusX is free for individual analysts. That is not a trial tier. That is the model. The people doing the actual work — the ones who write the detection rules, analyze the samples, share the IOCs — they should never have to pay to access or contribute intelligence. The platform exists because of them. It belongs to them.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The principles that guide every decision:</strong></p>
+    <ul style="margin:.75rem 0 0;padding-left:1.5rem;line-height:1.8">
+      <li><strong>Evidence over opinion.</strong> No FUD. IOCs must be real. Claims must be verifiable.</li>
+      <li><strong>Respect over hierarchy.</strong> Tier doesn't make you better than anyone — just trusted with more responsibility.</li>
+      <li><strong>Defense over noise.</strong> The platform is for actual work, not chatter.</li>
+      <li><strong>Mentorship without bias.</strong> Mentors open to all matched mentees, in good faith.</li>
+      <li><strong>Built by defenders, for defenders.</strong> The people doing the work are the ones who own the platform.</li>
+    </ul>
+  </div>
+
+  <h3>What This Demonstrates About Building</h3>
+
+  <p>I want to say one more thing about the process, because it matters beyond ArgusX specifically. We are at a moment where a single person with a clear problem, access to AI tools, and the willingness to learn in public can build things that would have required a funded team three years ago.</p>
+
+  <p>I did not know how to build a community platform from scratch when I started. I did not know how to architect a tier-based trust system. I did not know how to integrate AI classification into an ingestion pipeline. I figured it out — iteratively, with help, in public — and the result is a working platform with a real architecture and a real community model behind it.</p>
+
+  <p><strong>When there is a will and the right tools, there is absolutely a way.</strong> That is the lesson I want this build to demonstrate. Not that I am exceptional. That the barrier is lower than you think, and the only thing between an idea and a working product is starting.</p>
+
+  <div class="callout callout-green">
+    <p><strong>ArgusX is currently in active development.</strong> The platform is in private collaboration with a small team — engineering, research, methodology — focused on stabilizing the data pipeline and building out the rules and mentorship layers before broader access. If you work in threat intelligence, defensive security, detection engineering, or community-building for security analysts, and you'd like to learn more or follow the build, I'd genuinely love to hear from you.</p>
+    <p style="margin-top:1rem;font-size:.85rem;color:var(--ink2)">Reach out via the contact channels on my portfolio.</p>
+  </div>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">These are honest field notes from a platform under active development. Originally published April 2026; updated May 2026 to reflect the current collaboration phase. The platform's architecture and feature set are evolving — but the mission remains: defenders helping defenders, free for the people who do the work, structured for the community that actually exists.</p>
+</div>
+
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Researcher &nbsp;·&nbsp; Threat Intelligence &amp; Detection &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on “unknown.” When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>Building ArgusX · Yana Ivanov · April 2026 · Updated May 2026</span>
+  <span>Based on public reporting · For educational use · Independent analysis</span>
+</footer>
+
+</body>
+</html>
