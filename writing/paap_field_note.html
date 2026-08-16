@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>The Platform Is the Weapon — How Attackers Use GitHub, Jira, and Slack Against You | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker with decorative lines — blue theme style */
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+
+/* Blue bar — wraps naturally */
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.blue{color:var(--blue);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT CARD (blue theme uses mat-card wrapper) ── */
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+/* Numbers: IBM Plex Serif, clean editorial style */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-red .stat-num{color:var(--red)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE (for diagrams, screenshots, code blocks) ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── TIMELINE (horizontal grid — blue theme style) ── */
+.timeline{margin:0;display:grid;gap:0;border:1px solid var(--rule)}
+.tl-item{display:grid;grid-template-columns:140px 1fr;border-bottom:1px solid var(--rule)}
+.tl-item:last-child{border-bottom:none}
+.tl-left{padding:1.5rem 1.25rem;border-right:1px solid var(--rule);background:#f8fafc}
+.tl-date{font-family:var(--mono);font-size:.72rem;color:var(--blue);font-weight:700;margin-bottom:.3rem}
+.tl-tag{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.tl-right{padding:1.5rem}
+.tl-title{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3}
+.tl-body{font-size:.88rem;color:var(--ink3);line-height:1.7;margin:0}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── CODE BLOCKS (lab logs only) ── */
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.code-block{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.code-block .prompt{color:#4a9eff}
+.code-block .comment{color:#64748b}
+.code-block .highlight{color:#4ade80}
+.code-block .warning{color:#ef4444}
+.code-block .error{color:#f97316}
+/* shorthand color spans for inline use */
+.co{color:#94a3b8}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+
+/* ── TERMINAL WINDOW (macOS-style, for script output) ── */
+.terminal{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.terminal-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-left:.5rem}
+.terminal pre{font-family:var(--mono);font-size:.76rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#e2e8f0}
+/* terminal text color classes */
+.t-red{color:#ef4444;font-weight:bold}
+.t-orange{color:#fb923c;font-weight:bold}
+.t-blue{color:#60a5fa;font-weight:bold}
+.t-green{color:#4ade80}
+.t-dim{color:#94a3b8} /* was #475569 — bumped for legibility */
+.t-bold{color:#e2e8f0;font-weight:bold}
+
+/* ── HOST CARD (dark card for IP/host data) ── */
+.host-card{background:#0a0f1a;border-radius:2px;padding:1.5rem;margin:1.75rem 0;display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.hf-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.hf-value{font-family:var(--mono);font-size:.9rem;color:#4a9eff;font-weight:600}
+.hf-value.red{color:#ef4444}
+.hf-value.green{color:#4ade80}
+.hf-value.amber{color:#fbbf24}
+
+/* ── LAB ENVIRONMENT BOX (lab logs only) ── */
+.env-box{background:var(--paper);border:1px solid var(--rule);padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+
+/* ── COMPARE GRID (side-by-side comparison) ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.left{border-top:3px solid var(--blue)}
+.compare-box.right{border-top:3px solid var(--amber)}
+.compare-box.danger{border-top-color:var(--red)}
+.compare-box.safe{border-top-color:var(--green)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.left .compare-label{color:var(--blue)}
+.compare-box.right .compare-label{color:var(--amber)}
+.compare-box.danger .compare-label{color:var(--red)}
+.compare-box.safe .compare-label{color:var(--green)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+
+/* ── FUNCTION CARDS GRID (for script/tool documentation) ── */
+.fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.75rem 0}
+.fn-card{background:var(--paper);border:1px solid var(--rule);padding:1rem 1.1rem;border-top:2px solid var(--blue)}
+.fn-name{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--blue);margin-bottom:.3rem}
+.fn-desc{font-size:.82rem;color:var(--ink3);line-height:1.55}
+
+/* ── NIST MAPPING BOX (lab logs only) ── */
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:90px 1fr;gap:1rem;align-items:start}
+.nist-control{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--blue);padding-top:.15rem}
+.nist-desc{font-size:.88rem;color:var(--ink3);line-height:1.7}
+.nist-desc strong{color:var(--ink)}
+
+/* ── TOOL EMBED (for pages with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .tl-item{grid-template-columns:1fr}
+  .tl-left{border-right:none;border-bottom:1px solid var(--rule);padding:1rem 1.25rem}
+  .env-grid{grid-template-columns:1fr}
+  .nist-item{grid-template-columns:80px 1fr}
+  .compare-grid{grid-template-columns:1fr}
+  .fn-grid{grid-template-columns:1fr}
+  .host-card{grid-template-columns:1fr}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .mast-bar{padding:.55rem 1.5rem;font-size:.62rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.6rem}
+  .mast-meta{grid-template-columns:1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .timeline .tl-left{padding:.75rem .9rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .code-block,.terminal{padding:.85rem .9rem;font-size:.7rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<div class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-label">Field Notes</div>
+
+    <h1 class="title">The Platform Is the Weapon —<br><span>How Attackers Use GitHub, Jira, and Slack Against You</span></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">August 2026</div></div>
+      <div class="meta-item"><div class="label">Category</div><div class="value">Field Notes · Email Security</div></div>
+      <div class="meta-item"><div class="label">Technique</div><div class="value">Platform-as-a-Proxy (PaaP)</div></div>
+      <div class="meta-item"><div class="label">Source</div><div class="value">Cisco Talos · April 2026</div></div>
+      <div class="meta-item"><div class="label">Read Time</div><div class="value">8 minutes</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    2.89% OF GITHUB EMAILS WERE ABUSE ON PEAK DAY &nbsp;·&nbsp; PASSES SPF, DKIM, AND DMARC &nbsp;·&nbsp; NO TECHNICAL GROUNDS TO BLOCK
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>The Notification You Almost Didn't Question</h2>
+
+  <p>There is a GitHub notification in your inbox. It looks exactly like every other GitHub notification you have ever received — the same header, the same formatting, the same sender address, the same unsubscribe footer. The subject line says something about an invoice. You almost click it.</p>
+
+  <p>I say almost because I know myself well enough now to pause. I check PR notifications in GitHub directly, not through email. I've learned to go to the source. But I learned that because I've been studying how these attacks work — and most people reading this GitHub notification haven't.</p>
+
+  <p>What Cisco Talos documented in April 2026 and named Platform-as-a-Proxy is not a new vulnerability in GitHub or Jira or any other platform. It is the deliberate weaponization of how those platforms work. The attacker never sends an email. They make the platform send it for them. And because the email comes from the platform's own infrastructure, it passes every technical security check that exists.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>What makes this different:</strong> Traditional phishing sends email from a fake domain — <code>noreply@github-security.com</code>. DMARC catches it. PaaP sends email from <code>notifications@github.com</code> — the real address. SPF passes. DKIM passes. DMARC passes. There is no technical grounds for any email gateway to block it. The only thing left to catch it is the human reading it, and the human sees an email that looks exactly like the real thing — because it is the real thing, carrying a fake message.</p>
+  </div>
+
+  <div class="mat-card">
+    <div class="mat-card-title">The Scale — February 17, 2026</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-red">
+        <div class="stat-num">2.89%</div>
+        <div class="stat-label">GitHub Emails Abused</div>
+        <div class="stat-sub">On the peak day of activity, nearly 3 in 100 emails from GitHub's own infrastructure were tied to PaaP abuse. Cisco Talos, April 2026.</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">1.20%</div>
+        <div class="stat-label">Invoice Lures</div>
+        <div class="stat-sub">Over a five-day window, 1 in 83 emails from noreply@github.com contained an invoice lure in the subject line.</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Auth Checks Failed</div>
+        <div class="stat-sub">SPF, DKIM, and DMARC all pass. Every standard email authentication protocol approves these emails as legitimate.</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">Free</div>
+        <div class="stat-label">Cost to Attacker</div>
+        <div class="stat-sub">A free GitHub or Jira account is all that is required. No infrastructure, no domains, no servers. The platform does the sending.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>How It Works — Three Platforms, Three Methods</h2>
+
+  <p>The PaaP model works on any platform that sends notification emails and allows user-generated content in those notifications. The attacker's job is to find the field where they can inject their message and the feature that triggers the notification. Cisco Talos documented two platforms in detail. I'll add a third that concerns me more than either of them.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Figure 1 — Platform-as-a-Proxy Attack Mechanisms</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date">GitHub</div>
+          <div class="tl-tag">@mention abuse</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Comment Notification Injection</div>
+          <div class="tl-body">Attacker creates a free GitHub account, finds a public repository the target watches or contributes to, and posts a comment containing the phishing message and a malicious link. The comment tags the target with @username. GitHub's own servers send <code>notifications@github.com</code> to the target's email. The notification contains the attacker's exact message — invoice language, urgency, a link to a credential harvesting page — wrapped in GitHub's trusted branding and footer. The target sees a real GitHub notification. The attacker never touched their inbox directly.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date">Jira</div>
+          <div class="tl-tag">Welcome message abuse</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Customer Invite Injection</div>
+          <div class="tl-body">Attacker creates a free Jira Service Management project with a plausible name — "IT Support," "Billing," "Security Team." They embed the phishing message in the "Welcome Message" or "Project Description" field. Using the "Invite Customers" feature, they enter the target's email address. Atlassian's backend generates a professional customer invite email, wrapping the attacker's content inside Atlassian's own signed and branded template — complete with the Atlassian footer that signals legitimacy to anyone who has ever used Jira. The email arrives looking exactly like an official Jira onboarding notification.</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-date">Slack</div>
+          <div class="tl-tag">The escalation</div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-title">Colleague Trust Exploitation</div>
+          <div class="tl-body">Slack is not the first step — it is what happens after the first step works. An attacker uses a GitHub or Jira PaaP email to harvest a colleague's credentials. Now inside their Slack account, the attacker sends a direct message to the real target: "Hey, can you check this out?" with a malicious link. The target doesn't see a GitHub notification from an unknown account. They see a message from a person they know and work with every day. Enterprise Slack has strong platform security — SSO, SAML, device management, audit logs. None of that prevents a compromised colleague from sending a message. The trust is personal, not technical. That is the hardest kind to defend against.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p>The same mechanism works on Notion (@mention in a page), Figma (@mention in a comment), Trello (@mention in a card), Asana (@mention in a task), Linear (@mention in an issue), and any forum or collaborative platform that sends email notifications for user-generated content. The attacker needs a free account and knowledge of which field triggers the notification. That information is in every platform's help documentation.</p>
+
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>The Sender Is Real. The Email Is Real. The Content Is the Attack.</h2>
+
+  <p>Every email security control we have is built around one question: is this sender who they say they are? SPF checks whether the sending server is authorized. DKIM checks whether the email was cryptographically signed by the domain. DMARC checks whether both of those passed and enforces a policy if they didn't. These are the three pillars of email authentication, and PaaP bypasses all three simultaneously — not by breaking them, but by making them irrelevant.</p>
+
+  <p>The sender is authorized. The signing is valid. The policy passes. Because the email actually came from GitHub. The controls worked exactly as designed. They just answered the wrong question.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The question that's not being asked:</strong> Is the content inside this legitimate notification legitimate? Email authentication verifies the envelope — who sent it and from where. It says nothing about what's inside. A GitHub notification that contains "Your account has an unpaid invoice — click here to resolve" is technically indistinguishable from a GitHub notification that contains "Someone commented on your PR." Both come from the same address. Both pass the same checks. One is an attack.</p>
+  </div>
+
+  <p>The existing Sublime Security rule for GitHub notification abuse (<code>service_abuse_github_excessive_mentions_sus_link.yml</code>) catches the bulk spam version — twenty or more @mentions combined with a suspicious external link. That's the noisy, high-volume campaign. The targeted version uses one or two mentions, legitimate-looking language, and a link to a newly registered domain or a page that passes link analysis at delivery time. The signal has to be in the content — what the notification says, not who sent it.</p>
+
+  <p>GitHub never sends billing or invoice notifications from <code>notifications@github.com</code>. Jira customer invites from organizations you've never interacted with are inherently suspicious. The platform behavior is predictable enough that deviations from it are detectable — if you know what normal looks like. Most people, and most email security tools, don't check.</p>
+
+</div>
+
+<!-- SECTION 04 — CONCLUSION -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>Three Rules and One Caveat</h2>
+
+  <p>The defense against PaaP is not technical at the platform level. These are features, not vulnerabilities, and the platforms are not going to remove them. The defense is behavioral at the individual level and content-based at the detection layer.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Never Click What You Didn't Request</div>
+        <div class="step-content-desc">If you did not initiate a password reset, a billing change, or an account action, do not click the link in the notification email telling you one happened. Go directly to the platform — open a new browser tab, type the URL yourself, check there. This applies to GitHub, Jira, Atlassian, Notion, Figma, and every other platform that sends notification emails. The email is for awareness. The action happens at the source.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Enable Two-Factor Authentication on Everything</div>
+        <div class="step-content-desc">PaaP aims to harvest credentials. Even when it succeeds, 2FA stops the attacker from using those credentials. A stolen GitHub password is useless without the second factor. Enable 2FA on every platform that supports it — GitHub, Atlassian, Slack, Notion, Figma — and use an authenticator app rather than SMS where possible. This doesn't prevent the credential theft but it breaks the attack chain at the next step.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">Always Go Directly to the Source</div>
+        <div class="step-content-desc">For any notification that prompts an action — pay this, verify this, review this — go to the platform directly rather than clicking the email link. If it's a real GitHub issue someone commented on, it will be there when you open GitHub. If it's a real Jira invite, it will be in your Jira notifications. The email is a signal that something happened. The platform is where you verify what it was.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>The Slack caveat:</strong> The three rules above work for email notifications. They are harder to apply when the message comes from a colleague in Slack. You have worked with this person. You recognize their name. The message feels like a conversation, not a notification. If a colleague sends you a link in Slack asking you to check something — especially something unexpected — verify out of band before clicking. Send them a separate message, or ask them in person. A compromised colleague account is indistinguishable from the real person until you check. That thirty-second verification is the only technical control that works at this layer.</p>
+  </div>
+
+  <p>The thing that makes PaaP attacks effective is the same thing that makes the platforms they abuse valuable: they've earned our trust through consistent, legitimate behavior. GitHub notifications are real. Jira invites are real. Slack messages from colleagues are real. The attack works because it borrows that earned trust and uses it to carry something that doesn't belong there.</p>
+
+  <p>The sender is real. The email is real. Read the content before you click.</p>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">This field note is based on Cisco Talos research "Weaponizing SaaS Notification Pipelines" (April 7, 2026), CyberSecurityNews coverage of the GitHub and Jira PaaP campaigns (April 13, 2026), and Help Net Security reporting on the Talos findings (April 9, 2026). The Slack escalation scenario represents the author's original analytical synthesis connecting PaaP initial access to downstream collaboration platform exploitation. The existing Sublime Security rule referenced (<code>service_abuse_github_excessive_mentions_sus_link.yml</code>) covers the bulk spam variant; targeted PaaP phishing remains a detection gap in the open-source feed. This field note represents independent analytical work based entirely on public information.</p>
+
+</div>
+
+</div></div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Compliance Analyst &nbsp;·&nbsp; SiteWave Studio</div>
+    <p class="bio-text">Yana Ivanov is a security analyst and CMMC compliance consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Web Design & Development, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance. This analysis was produced independently as a contribution to the security community's understanding of active threats against US defense infrastructure.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- EDIT: footer spans — for WRITING: left=title/date, right=classification note -->
+<!-- For LAB LOGS: left=title/date/environment, right=← Portfolio link -->
+<!-- Writing footer example: -->
+<footer>
+  <span>The Platform Is the Weapon &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; August 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+<!-- Lab log footer example (swap above footer for this):
+<footer>
+  <span>Lab Log [N] — [Lab Title] &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; [Date] &nbsp;·&nbsp; Controlled lab environment &nbsp;·&nbsp; Educational use only</span>
+  <a href="../index.html" style="color:#4a9eff;text-decoration:none;white-space:nowrap">← Portfolio</a>
+</footer>
+-->
+
+</body>
+</html>
+
+<!-- ════════════════════════════════════════════════════════════
+     LAB LOG COMPONENTS — copy-paste as needed
+     ════════════════════════════════════════════════════════════
+
+── CODE LABEL + BLOCK ──────────────────────────────────────────
+<div class="code-label">Command</div>
+<div class="code-block"><pre><span class="prompt">┌──(root㉿kali)-[/]
+└─# </span>nmap -sV 172.17.0.1
+
+<span class="comment"># -sV : Service version detection
+# Target: 172.17.0.1</span></pre></div>
+
+<div class="code-label">Output</div>
+<div class="code-block"><pre>PORT    STATE SERVICE VERSION
+<span class="highlight">111/tcp open  rpcbind 2-4 (RPC #100000)</span>
+<span class="warning">65471/tcp open  status  1 (RPC #100024)</span></pre></div>
+
+── TERMINAL WINDOW (macOS-style, for script output) ────────────
+<div class="terminal">
+  <div class="terminal-bar">
+    <div class="terminal-dot" style="background:#ef4444"></div>
+    <div class="terminal-dot" style="background:#fbbf24;margin-left:4px"></div>
+    <div class="terminal-dot" style="background:#4ade80;margin-left:4px"></div>
+    <div class="terminal-title">python3 script.py ~/Desktop/zeek-logs</div>
+  </div>
+  <pre><span class="t-bold">============================================================
+  ZEEK TRIAGE REPORT
+============================================================</span>
+
+<span class="t-blue">[ INFECTED HOST IDENTITY ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  IP Address : 10.1.21.58
+  Hostname   : DESKTOP-ES9F3ML
+  Username   : <span class="t-red">suspicious_user</span>
+
+<span class="t-blue">[ SEVERITY SUMMARY ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  Overall severity : <span class="t-red">CRITICAL</span></pre>
+</div>
+
+── HOST CARD (dark card for IP/host summary data) ──────────────
+<div class="host-card">
+  <div>
+    <div class="hf-label">IP Address</div>
+    <div class="hf-value">10.1.21.58</div>
+  </div>
+  <div>
+    <div class="hf-label">Hostname</div>
+    <div class="hf-value">DESKTOP-ES9F3ML</div>
+  </div>
+  <div>
+    <div class="hf-label">Threat Score</div>
+    <div class="hf-value red">CRITICAL</div>
+  </div>
+  <div>
+    <div class="hf-label">IOCs Found</div>
+    <div class="hf-value">5 domains</div>
+  </div>
+</div>
+
+── ENV BOX ─────────────────────────────────────────────────────
+<div class="env-box">
+  <div class="env-box-title">Environment Configuration</div>
+  <div class="env-grid">
+    <div class="env-item">
+      <div class="env-label">Scanning Host</div>
+      <div class="env-value">Kali Linux (kali-rolling) · Docker Container</div>
+    </div>
+    <div class="env-item">
+      <div class="env-label">Target Host</div>
+      <div class="env-value">macOS Sequoia · Apple M1 · Docker Host</div>
+    </div>
+  </div>
+</div>
+
+── COMPARE GRID (side-by-side) ─────────────────────────────────
+<div class="compare-grid">
+  <div class="compare-box left">
+    <div class="compare-label">[Left Panel Title]</div>
+    <p><strong>[Attribute]:</strong> [Description]</p>
+    <p><strong>[Attribute]:</strong> [Description]</p>
+  </div>
+  <div class="compare-box right">
+    <div class="compare-label">[Right Panel Title]</div>
+    <p><strong>[Attribute]:</strong> [Description]</p>
+    <p><strong>[Attribute]:</strong> [Description]</p>
+  </div>
+</div>
+
+── FUNCTION CARDS GRID ─────────────────────────────────────────
+<div class="fn-grid">
+  <div class="fn-card">
+    <div class="fn-name">function_name()</div>
+    <div class="fn-desc">What this function does and why it matters.</div>
+  </div>
+  <div class="fn-card">
+    <div class="fn-name">another_function()</div>
+    <div class="fn-desc">Description of second function.</div>
+  </div>
+</div>
+
+── NIST MAPPING BOX ────────────────────────────────────────────
+<div class="nist-box">
+  <div class="nist-box-title">Applicable NIST SP 800-171 Controls</div>
+  <div class="nist-items">
+    <div class="nist-item">
+      <span class="nist-control">3.13.6</span>
+      <span class="nist-desc"><strong>Deny by default.</strong> Implement deny-by-default / allow-by-exception for network communications.</span>
+    </div>
+    <div class="nist-item">
+      <span class="nist-control">3.4.6</span>
+      <span class="nist-desc"><strong>Least functionality.</strong> Configure systems to provide only essential capabilities.</span>
+    </div>
+  </div>
+</div>
+
+════════════════════════════════════════════════════════════ -->
