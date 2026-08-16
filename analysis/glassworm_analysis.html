@@ -583,6 +583,51 @@ def scan_for_invisible_unicode(filepath):
 
 </div></div>
 
+</div></div>
+
+<!-- SECTION 08 — AUGUST 2026 UPDATE -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 08 — August 2026 Update</div>
+  <h2>What Happened After March — Scale, Sleepers, and the Takedown</h2>
+
+  <p>This analysis was published in March 2026. Since then, the Glassworm campaign has evolved significantly, been partially disrupted, and confirmed several threat models this report described. This section documents what changed between March and August 2026.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Scale update:</strong> The 151+ GitHub repositories documented in the original analysis represented only the first wave. By the time of the coordinated takedown in May 2026, Glassworm had compromised over 433 software components total — 72 Visual Studio Code extensions in the Open VSX Marketplace, 88 npm packages, and more than 151 GitHub repositories. The campaign had expanded to macOS users via trojanized crypto wallet clients and had been confirmed targeting connected vehicle software supply chains.</p>
+  </div>
+
+  <h3 style="margin-top:2rem;font-size:1.1rem;color:var(--ink1)">The Sleeper Extension Technique — April 2026</h3>
+
+  <p>The March 2026 wave was large enough to be noisy. Multiple research teams caught the activity early. Glassworm adapted. In April 2026, researchers identified 73 new "sleeper" extensions on the Open VSX Marketplace — extensions that were published clean, built an install base, and then introduced the malicious payload in a subsequent update. Some remained dormant for hours, others for days or weeks, before activation.</p>
+
+  <p>The technique exploited <code>extensionPack</code> and <code>extensionDependencies</code> fields in the extension manifest — turning a clean extension into a transitive delivery vehicle that pulled in malicious dependencies only after trust had been established. On March 17-18, 2026, researchers observed previously dormant extensions activate in real time: updates converted them into extension packs pulling malicious dependencies, and at least one sleeper extension was updated to directly download and install a malicious VSIX from GitHub across VS Code, Cursor, and Windsurf simultaneously.</p>
+
+  <p>This technique defeated the detection approach of reviewing extension code at install time. A clean install followed by a malicious update is indistinguishable from a legitimate software update to any static analysis tool.</p>
+
+  <h3 style="margin-top:2rem;font-size:1.1rem;color:var(--ink1)">C2 Infrastructure — Solana Blockchain and BitTorrent DHT</h3>
+
+  <p>The original analysis documented Solana blockchain as a C2 channel. The takedown operation confirmed four distinct C2 channels in active use: the Solana blockchain, the BitTorrent DHT network, Google Calendar as a fallback command server, and a traditional HTTP C2. The multi-channel architecture was specifically designed to resist takedown — neutralizing any single channel would allow the others to continue operating. CrowdStrike's operation on May 26, 2026 succeeded by simultaneously disrupting all four channels.</p>
+
+  <h3 style="margin-top:2rem;font-size:1.1rem;color:var(--ink1)">AI-Generated Cover Commits</h3>
+
+  <p>One of the more significant technique evolutions documented between March and May 2026 was the use of AI-generated commits to camouflage malicious injections. Rather than making obvious changes, the Glassworm operators surrounded invisible Unicode payload injections with realistic-looking surrounding changes — documentation tweaks, version bumps, minor refactors, and bug fixes stylistically consistent with each target repository. To a developer reviewing the commit history, the changes appeared legitimate. The malicious payload was invisible by design and the surrounding changes were indistinguishable from normal maintenance.</p>
+
+  <p>This technique directly addresses the "four-eyes" code review principle that most organizations rely on as a supply chain defense. Two developers reviewing the same commit would see the same thing: normal-looking changes. Neither would see the invisible Unicode payload embedded between visible characters.</p>
+
+  <h3 style="margin-top:2rem;font-size:1.1rem;color:var(--ink1)">North Korea Attribution — The PolinRider Connection</h3>
+
+  <p>Concurrent research published in April 2026 connected Glassworm to the broader PolinRider campaign, attributed to Democratic People's Republic of Korea (DPRK) threat actors. PolinRider ran a parallel wave targeting 240+ repositories through account takeover and force-pushing during the same March 2026 timeframe. The forensic post-mortem published by Nocturnal Knight documented infrastructure overlaps between the two campaigns suggesting coordinated or shared operational infrastructure between the two groups.</p>
+
+  <h3 style="margin-top:2rem;font-size:1.1rem;color:var(--ink1)">The May 26, 2026 Takedown</h3>
+
+  <p>On May 26, 2026, CrowdStrike in partnership with Google and the Shadowserver Foundation simultaneously disrupted all four Glassworm C2 channels. The operation severed the operators' ability to control infected machines and deliver new payloads. Infected machines were effectively orphaned — the malware could no longer receive commands or exfiltrate data through its established channels.</p>
+
+  <p>The takedown does not mean the threat is over. The invisible Unicode technique persists in code that was already distributed. Repositories, npm packages, and extensions that were compromised before the takedown may still contain the payload. Developers who installed affected extensions or pulled from compromised repositories before May 26, 2026 should treat their development environment as potentially compromised and rotate all secrets regardless of whether they observed any suspicious activity.</p>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">August 2026 update sources: BleepingComputer (April 29, May 27, 2026), SecurityWeek (April 28, May 27, 2026), CyberSecurityNews (April 26, 2026), The Hacker News (March 14, May 27, 2026), Socket.dev (March 18, 2026), Aikido Security (April 27, 2026), Rescana (May 28, 2026), VICOne (April 2, 2026), Nocturnal Knight forensic post-mortem (April 3, 2026), CrowdStrike takedown announcement (May 26, 2026).</p>
+
+</div></div>
+
 <div class="bio">
   <div class="bio-avatar">YI</div>
   <div>
