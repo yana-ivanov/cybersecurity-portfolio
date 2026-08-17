@@ -2146,7 +2146,7 @@ ${emailsStr}`
 
   return emails.map((email, i) => {
     const base = { ...email, analysis: analyses[i] || { risk: 'clean', threatType: 'Unknown', summary: 'Analysis unavailable', iocs: [], mitre: [], training: {}, bodyHighlights: '' } };
-    return applyGlasswormToResult(base, email.snippet);
+    return applyCSSInjectionToResult(applyGlasswormToResult(base, email.snippet), email.snippet);
   });
 }
 
@@ -2640,7 +2640,7 @@ ${emailsStr}`
   return emails.map((email, i) => {
     const base = { ...email, analysis: analyses[i] || { risk: 'clean', threatType: 'Unknown', summary: 'Analysis unavailable', iocs: [], mitre: [], training: {}, bodyHighlights: '' } };
     const rawText = (email.rawHeaders || '') + '\n' + (email.snippet || '');
-    return applyGlasswormToResult(base, rawText);
+    return applyCSSInjectionToResult(applyGlasswormToResult(base, rawText), rawText);
   });
 }
 
@@ -3248,6 +3248,69 @@ function applyGlasswormToResult(emailObj, rawText) {
 
   return { ...emailObj, analysis: { ...a, risk, iocs, mitre, glasswormFindings: findings } };
 }
+
+
+// --- CSS INJECTION DETECTION ---------------------------------------------
+// Based on Portswigger Research "CSS: The Bomb Inside Your Inbox" (Aug 2026)
+// and APT28 Operation Roundish CSS injection toolkit (April 2026)
+// Reference: https://yanaivanov.com/writing/css_field_note.html
+
+const CSS_INJECTION_SIGNALS = [
+  { re: /position\s*:\s*fixed/i,                          label: 'CSS position:fixed',          severity: 'high',   desc: 'position:fixed in email CSS used to overlay the entire webmail interface with attacker-controlled content including fake login forms. Documented in Portswigger CSS bomb research Aug 2026.' },
+  { re: /<select[\s>]/i,                                   label: 'HTML select element',         severity: 'high',   desc: '<select> element in email body used in CSS keylogger attacks to capture keystrokes via CSS attribute selectors. Legitimate emails never contain form select menus.' },
+  { re: /:has\s*\(/i,                                      label: 'CSS :has() pseudo-class',     severity: 'high',   desc: ':has() pseudo-class in email CSS combined with :checked to detect option selection and trigger credential exfiltration to attacker infrastructure.' },
+  { re: /:checked/i,                                       label: 'CSS :checked pseudo-class',   severity: 'medium', desc: ':checked pseudo-class in email CSS used with :has() in keylogger attack chains. Rarely appears in legitimate email styling.' },
+  { re: /@font-face/i,                                     label: 'CSS @font-face rule',         severity: 'medium', desc: '@font-face in email body combined with unicode-range or descent-override used to measure digit heights for token extraction without external requests.' },
+  { re: /unicode-range|descent-override|ascent-override/i, label: 'CSS font metric override',    severity: 'high',   desc: 'unicode-range or descent-override in email CSS. Documented token exfiltration technique that measures digit heights to extract numeric authentication tokens even when CSP blocks external requests.' },
+  { re: /image-set\s*\(\s*var\s*\(/i,                     label: 'CSS image-set(var()) bypass', severity: 'high',   desc: 'image-set(var(...)) in email CSS. Gmail image proxy bypass technique documented by Portswigger. Makes direct external requests even when remote images are disabled.' },
+  { re: /<label[^>]+for\s*=/i,                             label: 'HTML label hijacking',        severity: 'medium', desc: '<label for="..."> in email body used in CSS hotwiring attacks to intercept clicks on trusted UI elements outside the email message window.' },
+];
+
+function runCSSInjectionScan(text) {
+  const findings = [];
+  const seen = new Set();
+  for (const sig of CSS_INJECTION_SIGNALS) {
+    if (sig.re.test(text)) {
+      if (!seen.has(sig.label)) {
+        seen.add(sig.label);
+        findings.push(sig);
+      }
+    }
+  }
+  return findings;
+}
+
+function cssInjectionToIOCs(findings) {
+  return findings.map(f => ({
+    category: 'infrastructure',
+    type: 'CSS Injection',
+    description: f.desc,
+    example: f.label,
+    severity: f.severity
+  }));
+}
+
+function applyCSSInjectionToResult(emailObj, rawText) {
+  const text = rawText || (emailObj.rawHeaders || '') + '\n' + (emailObj.snippet || '');
+  const findings = runCSSInjectionScan(text);
+  if (!findings.length) return emailObj;
+
+  const extraIOCs = cssInjectionToIOCs(findings);
+  const a = emailObj.analysis || {};
+  const iocs = [...extraIOCs, ...(a.iocs || [])];
+  const mitre = [...(a.mitre || [])];
+  let risk = a.risk || 'clean';
+
+  const hasCritical = findings.some(f => f.severity === 'high');
+  if (hasCritical) {
+    if (risk === 'clean' || risk === 'low') risk = 'high';
+    if (!mitre.some(m => m.includes('T1185'))) mitre.unshift('T1185 Browser Session Hijacking — CSS Injection (Portswigger/APT28 Operation Roundish)');
+    if (!mitre.some(m => m.includes('T1056'))) mitre.unshift('T1056.003 Input Capture — Web Portal Capture via CSS Keylogger');
+  }
+
+  return { ...emailObj, analysis: { ...a, risk, iocs, mitre, cssInjectionFindings: findings } };
+}
+// --- END CSS INJECTION DETECTION -----------------------------------------
 
 // ─── CIPHER ──────────────────────────────────────────
 let cipherEmailContext = null;
