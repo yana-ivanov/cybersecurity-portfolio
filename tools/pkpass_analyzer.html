@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>pkpass Analyzer — Apple Wallet Pass Inspector | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300&family=IBM+Plex+Serif:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d5cfc4;--bg:#f0ede6;--paper:#ffffff;--card:#f7f5f0;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+  --serif:'IBM Plex Serif',serif;
+}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.7;font-size:16px}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem}
+.back-nav a::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.03) 39px,rgba(255,255,255,.03) 40px)}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.5rem}
+h1.title{font-family:var(--serif);font-size:clamp(2rem,5vw,3rem);font-weight:600;line-height:1.15;margin-bottom:1rem;color:#fff}
+.mast-desc{font-family:var(--sans);font-size:.95rem;color:#94a3b8;line-height:1.75;max-width:640px;margin-bottom:2rem}
+.mast-bar{background:#1a4fa0;margin-top:2.5rem;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mast-bar-dot{width:8px;height:8px;min-width:8px;border-radius:50%;background:#fff;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:3rem 0}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--rule);margin-bottom:2rem}
+.tab-btn{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.75rem 1.5rem;background:none;border:none;cursor:pointer;color:#94a3b8;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab-btn:hover{color:var(--ink)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.notice{border-radius:4px;padding:.85rem 1.1rem;margin-bottom:1.25rem;display:flex;gap:.75rem;align-items:flex-start;box-shadow:var(--shadow)}
+.notice.amber{background:#fffbeb;border:1px solid #fcd34d}
+.notice-icon{font-size:1rem;flex-shrink:0;margin-top:.1rem}
+.notice-text{font-family:var(--mono);font-size:.65rem;letter-spacing:.03em;line-height:1.65;color:#78350f}
+.notice-text strong{display:block;margin-bottom:.2rem;letter-spacing:.1em;text-transform:uppercase;color:var(--amber)}
+.drop-zone{border:2px dashed #bfdbfe;border-radius:2px;background:#f0f7ff;padding:1.75rem 1.5rem;text-align:center;cursor:pointer;transition:background .15s,border-color .15s;position:relative}
+.drop-zone:hover,.drop-zone.dragover{background:#dbeafe;border-color:var(--blue)}
+.drop-zone.has-file{border-style:solid;border-color:var(--blue)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{font-size:1.3rem;color:var(--blue);margin-bottom:.4rem}
+.drop-title{font-family:var(--sans);font-size:.95rem;font-weight:600;color:var(--ink);margin-bottom:.25rem}
+.drop-sub{font-family:var(--mono);font-size:.68rem;color:#94a3b8;letter-spacing:.06em}
+.drop-filename{font-family:var(--mono);font-size:.68rem;color:var(--blue);margin-top:.4rem;display:none;word-break:break-all}
+.drop-zone.has-file .drop-sub{display:none}
+.drop-zone.has-file .drop-filename{display:block}
+.action-row{display:flex;align-items:center;gap:1rem;margin-top:1.25rem;flex-wrap:wrap}
+.zbtn{font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;padding:.85rem 2.25rem;border-radius:2px;border:none;cursor:pointer;transition:background .2s;display:inline-flex;align-items:center;gap:.5rem}
+.zbtn-run{background:#a8c4f5;color:#fff;pointer-events:none}
+.zbtn-run.ready{background:var(--blue);color:#fff;pointer-events:auto}
+.zbtn-run.ready:hover{background:#153e80}
+.zbtn-run.running{background:var(--blue);pointer-events:none;opacity:.7}
+.zbtn-clear{background:transparent;color:#64748b;border:1px solid var(--rule);font-size:.72rem;padding:.7rem 1.75rem}
+.zbtn-clear:hover{border-color:var(--ink);color:var(--ink)}
+.zstatus{font-family:var(--mono);font-size:.65rem;letter-spacing:.06em;color:#94a3b8}
+.zstatus.ok{color:var(--green)}.zstatus.warn{color:var(--amber)}.zstatus.running{color:var(--amber)}
+.spinner{display:none;width:10px;height:10px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.zbtn-run.running .spinner{display:block}
+.zbtn-run.running .run-icon{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.output-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:#94a3b8;margin:.85rem 0 .35rem}
+.scan-output{background:#0a0f1a;border-radius:2px;padding:1.1rem 1.4rem;font-family:var(--mono);font-size:.75rem;line-height:1.7;color:#e2e8f0;min-height:180px;max-height:600px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+.scan-output .placeholder{color:#334155;font-style:italic}
+.zt-red{color:#ef4444}.zt-orange{color:#fb923c}.zt-green{color:#4ade80}
+.zt-blue{color:#60a5fa}.zt-dim{color:#475569}.zt-bold{font-weight:700}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0}
+.how-card{background:var(--paper);border:1px solid var(--rule);border-top:3px solid var(--blue);border-radius:4px;padding:1.1rem;box-shadow:var(--shadow)}
+.how-num{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;color:var(--blue);text-transform:uppercase;margin-bottom:.35rem}
+.how-title{font-family:var(--serif);font-size:.92rem;font-weight:700;color:var(--ink);margin-bottom:.35rem;line-height:1.3}
+.how-desc{font-size:.82rem;color:var(--ink3);line-height:1.6}
+.field-table{width:100%;border-collapse:collapse;font-size:.82rem;margin:1.25rem 0;box-shadow:var(--shadow);border-radius:4px;overflow:hidden}
+.field-table thead tr{background:#0a0f1a;color:#fff}
+.field-table th{padding:.7rem 1rem;text-align:left;font-family:var(--mono);font-size:.65rem;letter-spacing:.1em}
+.field-table td{padding:.65rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+.field-table tr:last-child td{border-bottom:none}
+.field-table tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+.field-table td.code{font-family:var(--mono);font-size:.75rem;color:var(--red)}
+.callout{padding:1rem 1.25rem;border-radius:4px;margin:1.5rem 0;border-left:4px solid;box-shadow:var(--shadow)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{font-size:.88rem;color:var(--ink3);line-height:1.7;margin:0}
+.callout strong{color:var(--ink)}
+.sample-row{display:flex;gap:1rem;margin-top:1.5rem;flex-wrap:wrap}
+.sample-card{background:var(--paper);border:1px solid var(--rule);border-radius:4px;padding:1rem 1.25rem;flex:1;min-width:200px;box-shadow:var(--shadow)}
+.sample-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:.35rem}
+.sample-title{font-family:var(--serif);font-size:.9rem;font-weight:700;margin-bottom:.35rem;color:var(--ink)}
+.sample-desc{font-size:.8rem;color:var(--ink3);line-height:1.6;margin-bottom:.75rem}
+.sample-link{font-family:var(--mono);font-size:.68rem;color:var(--blue);text-decoration:none}
+.prevent-list{list-style:none;margin:1rem 0}
+.prevent-list li{font-size:.88rem;color:var(--ink3);line-height:1.7;padding:.5rem 0;border-bottom:1px solid var(--rule);padding-left:1.25rem;position:relative}
+.prevent-list li::before{content:'→';position:absolute;left:0;color:var(--blue);font-family:var(--mono)}
+.prevent-list li:last-child{border-bottom:none}
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer a{color:#4a9eff;text-decoration:none}
+@media(max-width:680px){
+  .mast-inner,.wrap{padding-left:1.5rem;padding-right:1.5rem}
+  .how-grid{grid-template-columns:1fr}
+  .mast-bar{padding:.55rem 1.5rem;font-size:.62rem}
+}
+</style>
+</head>
+<body>
+
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<div class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Analyst Toolkit · Email Security</div>
+    <h1 class="title">pkpass Analyzer</h1>
+    <p class="mast-desc">Drop an Apple Wallet pass file (.pkpass) and get a full security report — suspicious webServiceURL, archive contents, embedded URLs, and field anomalies. One upload, one scan, everything in one report. Built on the detection logic from the <a href="https://yanaivanov.com/analysis/pkpass_analysis.html" style="color:#60a5fa">pkpass threat analysis</a>.</p>
+    <div style="font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;color:#475569;margin-bottom:1.5rem">BROWSER-BASED &nbsp;·&nbsp; NO SERVER &nbsp;·&nbsp; NO DATA UPLOAD &nbsp;·&nbsp; EDUCATIONAL USE ONLY</div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    PKPASS IS A ZIP OF JSON + IMAGES &nbsp;·&nbsp; NO EXECUTABLE CODE &nbsp;·&nbsp; SAFE TO ANALYZE IN BROWSER
+  </div>
+</div>
+
+<div class="wrap content">
+
+  <div class="notice amber">
+    <div class="notice-icon">⚠️</div>
+    <div class="notice-text">
+      <strong>Educational Use Only</strong>
+      This tool demonstrates pkpass phishing detection for educational purposes. Do not upload passes containing real booking references, PNR codes, or loyalty account numbers from production travel environments.
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('scan',this)">Scan Pass</button>
+    <button class="tab-btn" onclick="switchTab('how',this)">How It Works &amp; Prevention</button>
+  </div>
+
+  <!-- TAB 1: SCAN -->
+  <div class="tab-panel active" id="tab-scan">
+
+    <div class="drop-zone" id="mainDrop">
+      <input type="file" id="mainFileInput" accept=".pkpass">
+      <div class="drop-icon">🎫</div>
+      <div class="drop-title">Drop a .pkpass file here</div>
+      <div class="drop-sub">Click to browse &nbsp;·&nbsp; .pkpass files only</div>
+      <div class="drop-filename" id="mainFileName"></div>
+    </div>
+
+    <div class="action-row">
+      <button class="zbtn zbtn-run" id="mainRunBtn">
+        <span class="run-icon">▶</span>
+        <span class="spinner"></span>
+        Analyze Pass
+      </button>
+      <button class="zbtn zbtn-clear" onclick="mainClear()">Clear</button>
+      <span class="zstatus" id="mainStatus"></span>
+    </div>
+
+    <div class="output-label">Report</div>
+    <div class="scan-output" id="mainOutput"><span class="placeholder">Drop a .pkpass file above and click Analyze Pass to generate a full security report…</span></div>
+
+    <div class="sample-row">
+      <div class="sample-card">
+        <div class="sample-label">Test File · Clean</div>
+        <div class="sample-title">sample_legitimate.pkpass</div>
+        <div class="sample-desc">Synthetic United Airlines boarding pass. All fields match expected legitimate issuer patterns. Tool should report CLEAN.</div>
+        <a href="https://yanaivanov.com/samples/sample_legitimate.pkpass" class="sample-link">↓ Download</a>
+      </div>
+      <div class="sample-card">
+        <div class="sample-label">Test File · Malicious</div>
+        <div class="sample-title">sample_malicious.pkpass</div>
+        <div class="sample-desc">Synthetic phishing pass with suspicious .top TLD webServiceURL, short authenticationToken, and urgency language. Tool should report CRITICAL.</div>
+        <a href="https://yanaivanov.com/samples/sample_malicious.pkpass" class="sample-link">↓ Download</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAB 2: HOW IT WORKS & PREVENTION -->
+  <div class="tab-panel" id="tab-how">
+
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">Attack Layer 01</div>
+        <div class="how-title">The Email — Trusted Delivery</div>
+        <div class="how-desc">A phishing email arrives with a convincing .pkpass attachment — a fake boarding pass, hotel key, or event ticket. It adds directly to Apple Wallet without triggering email security controls. The familiar Wallet UI builds trust.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">Attack Layer 02</div>
+        <div class="how-title">The webServiceURL — Hidden Channel</div>
+        <div class="how-desc">Once in your Wallet, the pass silently polls its webServiceURL for updates — sending your device push token and IP address to attacker infrastructure on a schedule. This channel persists after your trip ends until the pass is deleted.</div>
+      </div>
+      <div class="how-card">
+        <div class="how-num">Attack Layer 03</div>
+        <div class="how-title">The Phishing Link — Credential Harvest</div>
+        <div class="how-desc">The email also contains a "manage your booking" link pointing to a fake login page. The legitimate-looking pass makes the victim trust the email, increasing the chance they click the link and enter their credentials.</div>
+      </div>
+    </div>
+
+    <div class="callout callout-red">
+      <p><strong>The webServiceURL is invisible to you in Wallet.</strong> You cannot see it in the Wallet UI — only the pass designer can see it in pass.json. This tool makes it visible and checks it against known suspicious patterns. A malicious pass from a phishing campaign will have this field pointing to attacker infrastructure while the pass itself looks like a completely normal boarding pass.</p>
+    </div>
+
+    <h3 style="font-family:var(--serif);font-size:1.05rem;font-weight:700;margin:1.5rem 0 .75rem;color:var(--ink)">What This Tool Checks</h3>
+    <table class="field-table">
+      <thead>
+        <tr><th>Field</th><th>Risk</th><th>What to Look For</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="code">webServiceURL</td><td><strong style="color:var(--red)">CRITICAL</strong></td><td>Must match the organization's own domain. Freemail, suspicious TLD (.top .xyz .click), or no HTTPS = malicious.</td></tr>
+        <tr><td class="code">authenticationToken</td><td><strong style="color:var(--red)">HIGH</strong></td><td>Should be a high-entropy random string of 16+ characters. Short or predictable tokens indicate a fake pass.</td></tr>
+        <tr><td class="code">passTypeIdentifier</td><td><strong style="color:var(--amber)">MEDIUM</strong></td><td>Format: pass.com.domain.name — the domain should match the organization.</td></tr>
+        <tr><td class="code">organizationName</td><td><strong style="color:var(--amber)">MEDIUM</strong></td><td>Urgency language ("Verify", "Confirm", "Security") in the org name is a red flag.</td></tr>
+        <tr><td class="code">Archive contents</td><td><strong style="color:var(--amber)">MEDIUM</strong></td><td>A legitimate pkpass contains only JSON, PNG images, and a signature file. Unexpected file types are suspicious.</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-family:var(--serif);font-size:1.05rem;font-weight:700;margin:1.5rem 0 .75rem;color:var(--ink)">How to Stay Safe</h3>
+    <ul class="prevent-list">
+      <li>Only add pkpass files from emails you expected — a booking confirmation you initiated, an event ticket you purchased. Unsolicited passes are suspicious regardless of how convincing they look.</li>
+      <li>Check the sender's email domain before opening any attachment. A boarding pass from <code style="font-family:var(--mono);font-size:.82rem">noreply@united.com</code> is expected. One from <code style="font-family:var(--mono);font-size:.82rem">support@booking-verify.top</code> is not.</li>
+      <li>Remove old passes from Apple Wallet after every trip. A malicious pass continues polling its webServiceURL indefinitely until deleted. Open Wallet, swipe left on the pass, tap Remove.</li>
+      <li>If you received an unexpected pass and added it, delete it immediately and check your push notification settings for unusual apps.</li>
+      <li>For security teams: the companion Sublime Security detection rule for pkpass phishing is available at <a href="https://gist.github.com/yana-ivanov/b3e4ee146561d05f63e71618a6ba366e" style="color:var(--blue);font-family:var(--mono);font-size:.82rem">gist.github.com/yana-ivanov</a>.</li>
+    </ul>
+
+  </div>
+
+</div>
+
+<footer>
+  <span>pkpass Analyzer &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; Educational Use Only</span>
+  <span><a href="/">← Portfolio</a></span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function H(cls, txt) {
+  return `<span class="${cls}">${String(txt).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>`;
+}
+function setStatus(el, msg, cls) {
+  el.textContent = msg;
+  el.className = 'zstatus' + (cls ? ' ' + cls : '');
+}
+
+const SUSPICIOUS_TLDS = ['top','xyz','click','work','rest','site','online','store','live',
+  'fun','space','host','vip','cc','su','cn','ru','tk','ml','ga','cf','gq','pw','loan',
+  'win','racing','party','cricket','science','webcam','accountant','date','zip','mov'];
+const FREEMAIL = ['gmail.com','yahoo.com','hotmail.com','outlook.com','protonmail.com',
+  'icloud.com','aol.com','mail.com','yandex.com','tutanota.com','gmx.com'];
+const UNEXPECTED_EXTS = ['js','exe','sh','py','rb','zip','gz','tar','dmg','pkg','bat','ps1','vbs','jar','php'];
+
+function getDomain(url) { try { return new URL(url).hostname.toLowerCase(); } catch { return url; } }
+function getTLD(url) { try { const p = new URL(url).hostname.split('.'); return p[p.length-1].toLowerCase(); } catch { return ''; } }
+function isFreemail(d) { return FREEMAIL.some(f => d.endsWith(f)); }
+function isSuspTLD(url) { return SUSPICIOUS_TLDS.includes(getTLD(url)); }
+function extractURLs(obj, out=[]) {
+  if (typeof obj === 'string') { const re=/https?:\/\/[^\s"'<>]+/g; let m; while((m=re.exec(obj))!==null) out.push(m[0]); }
+  else if (Array.isArray(obj)) obj.forEach(v=>extractURLs(v,out));
+  else if (obj && typeof obj==='object') Object.values(obj).forEach(v=>extractURLs(v,out));
+  return out;
+}
+
+const div56 = '─'.repeat(56);
+const eq56  = '═'.repeat(56);
+
+// ── MAIN UPLOAD ────────────────────────────────────────────────────────────
+let mainFile = null;
+const mainDrop   = document.getElementById('mainDrop');
+const mainInput  = document.getElementById('mainFileInput');
+const mainFName  = document.getElementById('mainFileName');
+const mainRunBtn = document.getElementById('mainRunBtn');
+const mainStatus = document.getElementById('mainStatus');
+const mainOutput = document.getElementById('mainOutput');
+
+function setMainFile(f) {
+  mainFile = f;
+  mainFName.textContent = f.name;
+  mainDrop.classList.add('has-file');
+  mainRunBtn.classList.add('ready');
+  setStatus(mainStatus, '');
+}
+mainInput.addEventListener('change', () => { if (mainInput.files[0]) setMainFile(mainInput.files[0]); });
+mainDrop.addEventListener('dragover', e => { e.preventDefault(); mainDrop.classList.add('dragover'); });
+mainDrop.addEventListener('dragleave', e => { if (!mainDrop.contains(e.relatedTarget)) mainDrop.classList.remove('dragover'); });
+mainDrop.addEventListener('drop', e => { e.preventDefault(); mainDrop.classList.remove('dragover'); if (e.dataTransfer.files[0]) setMainFile(e.dataTransfer.files[0]); });
+
+function mainClear() {
+  mainFile = null;
+  mainDrop.classList.remove('has-file');
+  mainFName.textContent = '';
+  mainInput.value = '';
+  mainRunBtn.classList.remove('ready');
+  mainOutput.innerHTML = '<span class="placeholder">Drop a .pkpass file above and click Analyze Pass to generate a full security report…</span>';
+  setStatus(mainStatus, '');
+}
+
+mainRunBtn.addEventListener('click', async () => {
+  if (!mainFile || !mainRunBtn.classList.contains('ready')) return;
+  mainRunBtn.classList.add('running'); mainRunBtn.classList.remove('ready');
+  setStatus(mainStatus, 'Analyzing…', 'running');
+  mainOutput.innerHTML = '';
+
+  try {
+    const buf = await mainFile.arrayBuffer();
+    const zip = await JSZip.loadAsync(buf);
+    const passFile = zip.file('pass.json');
+    const passJson = passFile ? JSON.parse(await passFile.async('string')) : null;
+    if (!passJson) throw new Error('pass.json not found — is this a valid .pkpass file?');
+    const archiveFiles = Object.keys(zip.files).filter(f => f);
+
+    let allFindings = [];
+    let detailHtml = '';
+
+    // ── SECTION 1: PASS FIELDS ──
+    detailHtml += H('zt-blue', '[ 1 / 3 ]  PASS FIELDS') + '\n' + H('zt-dim', div56) + '\n\n';
+
+    const fields = [
+      ['passTypeIdentifier', passJson.passTypeIdentifier],
+      ['organizationName',   passJson.organizationName],
+      ['description',        passJson.description],
+      ['serialNumber',       passJson.serialNumber],
+      ['webServiceURL',      passJson.webServiceURL],
+      ['authenticationToken',passJson.authenticationToken],
+      ['teamIdentifier',     passJson.teamIdentifier],
+    ];
+
+    const fieldFindings = [];
+    for (const [key, val] of fields) {
+      const v = val !== undefined ? String(val) : '(not set)';
+      detailHtml += H('zt-blue', key.padEnd(22)) + H('zt-dim', ': ') + escHtml(v) + '\n';
+      if (key === 'webServiceURL' && val) {
+        const domain = getDomain(val);
+        if (isFreemail(domain)) fieldFindings.push({ sev:'CRITICAL', field:key, reason:`webServiceURL uses a freemail provider (${domain}). Legitimate issuers never use freemail for pass polling.` });
+        else if (isSuspTLD(val)) fieldFindings.push({ sev:'CRITICAL', field:key, reason:`webServiceURL TLD (.${getTLD(val)}) is associated with phishing infrastructure.` });
+        else if (!val.startsWith('https://')) fieldFindings.push({ sev:'HIGH', field:key, reason:'webServiceURL does not use HTTPS. Legitimate passes always use encrypted polling.' });
+      }
+      if (key === 'authenticationToken' && val && val.length < 16) {
+        fieldFindings.push({ sev:'HIGH', field:key, reason:`Token is very short (${val.length} chars). Legitimate tokens are high-entropy 16+ character strings.` });
+      }
+      if (key === 'passTypeIdentifier' && val && val.split('.').length < 3) {
+        fieldFindings.push({ sev:'MEDIUM', field:key, reason:`Unusual format (${val}). Expected: pass.com.domain.name` });
+      }
+      if (key === 'organizationName' && val && /\b(verify|confirm|secure|update|alert|support|notice|urgent)\b/i.test(val)) {
+        fieldFindings.push({ sev:'HIGH', field:key, reason:`Urgency language in organization name ("${val}"). Legitimate issuers use their actual company name.` });
+      }
+    }
+    allFindings = allFindings.concat(fieldFindings);
+
+    // ── SECTION 2: URLs ──
+    detailHtml += '\n' + H('zt-blue', '[ 2 / 3 ]  EMBEDDED URLS') + '\n' + H('zt-dim', div56) + '\n\n';
+    const urls = [...new Set(extractURLs(passJson))];
+    const urlFindings = [];
+
+    if (urls.length === 0) {
+      detailHtml += H('zt-dim', '  No URLs found in pass.json\n');
+    } else {
+      for (const url of urls) {
+        const domain = getDomain(url);
+        const isWebSvc = url === passJson.webServiceURL;
+        const flags = [];
+        if (isWebSvc) flags.push({ sev:'INFO', msg:'webServiceURL — persistent polling channel' });
+        if (isFreemail(domain)) flags.push({ sev:'CRITICAL', msg:`Freemail domain (${domain})` });
+        if (isSuspTLD(url)) flags.push({ sev:'CRITICAL', msg:`.${getTLD(url)} is a high-risk TLD` });
+        if (!url.startsWith('https://')) flags.push({ sev:'HIGH', msg:'Not HTTPS' });
+        const hasCrit = flags.some(f=>f.sev==='CRITICAL');
+        const hasHigh = flags.some(f=>f.sev==='HIGH');
+        if (hasCrit || hasHigh) urlFindings.push({ sev: hasCrit?'CRITICAL':'HIGH', field:'URL', reason: url + ' — ' + flags.filter(f=>f.sev!=='INFO').map(f=>f.msg).join(', ') });
+        const col = hasCrit?'zt-red':hasHigh?'zt-orange':flags.length?'zt-blue':'zt-green';
+        detailHtml += '  ' + H(col, escHtml(url)) + '\n';
+        for (const f of flags) {
+          const fc = f.sev==='CRITICAL'?'zt-red':f.sev==='HIGH'?'zt-orange':'zt-dim';
+          detailHtml += H(fc, `    [${f.sev}] `) + H('zt-dim', escHtml(f.msg)) + '\n';
+        }
+        if (!flags.length) detailHtml += H('zt-green', '    [CLEAN]') + '\n';
+        detailHtml += '\n';
+      }
+    }
+    allFindings = allFindings.concat(urlFindings);
+
+    // ── SECTION 3: ARCHIVE CONTENTS ──
+    detailHtml += H('zt-blue', '[ 3 / 3 ]  ARCHIVE CONTENTS') + '\n' + H('zt-dim', div56) + '\n\n';
+    const archiveFindings = [];
+    const required = ['pass.json','manifest.json','signature'];
+    for (const fname of archiveFiles) {
+      const ext = fname.split('.').pop().toLowerCase();
+      const isUnexp = UNEXPECTED_EXTS.includes(ext);
+      if (isUnexp) archiveFindings.push({ sev:'CRITICAL', field:'Archive', reason:`Unexpected file type: ${fname} — pkpass archives should contain only JSON, PNG, and signature files.` });
+      const col = isUnexp ? 'zt-red' : 'zt-dim';
+      detailHtml += '  ' + H(col, escHtml(fname)) + (isUnexp ? ' ' + H('zt-red', '← UNEXPECTED') : '') + '\n';
+    }
+    detailHtml += '\n';
+    for (const r of required) {
+      const present = archiveFiles.includes(r);
+      detailHtml += '  ' + r.padEnd(16) + (present ? H('zt-green','PRESENT') : H('zt-red','MISSING')) + '\n';
+    }
+    allFindings = allFindings.concat(archiveFindings);
+
+    // ── BUILD SUMMARY FIRST, THEN PREPEND TO DETAILS ──
+    let summaryHtml = '';
+    summaryHtml += H('zt-bold', eq56) + '\n';
+    summaryHtml += H('zt-bold', '  PKPASS SECURITY REPORT') + '\n';
+    summaryHtml += H('zt-dim', `  File: ${mainFile.name}`) + '\n';
+    summaryHtml += H('zt-bold', eq56) + '\n\n';
+    summaryHtml += H('zt-blue', '[ SUMMARY ]') + '\n' + H('zt-dim', div56) + '\n\n';
+
+    if (allFindings.length === 0) {
+      summaryHtml += H('zt-green', '[ CLEAN ]') + ' No suspicious indicators detected.\n';
+      summaryHtml += H('zt-dim', 'This pass matches expected patterns for legitimate issuers.\n');
+      summaryHtml += H('zt-dim', 'Always verify the sender email domain independently.\n');
+    } else {
+      const sevOrder = { CRITICAL:0, HIGH:1, MEDIUM:2 };
+      allFindings.sort((a,b)=>(sevOrder[a.sev]??3)-(sevOrder[b.sev]??3));
+      const topSev = allFindings[0].sev;
+      const sevCol = topSev==='CRITICAL'?'zt-red':'zt-orange';
+      summaryHtml += `  Total findings : ${H('zt-red', String(allFindings.length))}\n`;
+      summaryHtml += `  Severity       : ${H(sevCol, topSev)}\n\n`;
+      for (const f of allFindings) {
+        const col = f.sev==='CRITICAL'?'zt-red':f.sev==='HIGH'?'zt-orange':'zt-blue';
+        summaryHtml += H(col, `  [ ${f.sev} ] `) + H('zt-dim', escHtml(f.reason)) + '\n';
+      }
+    }
+    summaryHtml += '\n' + H('zt-bold', eq56) + '\n';
+    summaryHtml += H('zt-blue', '[ FULL REPORT ]') + '\n' + H('zt-dim', div56) + '\n\n';
+
+    mainOutput.innerHTML = summaryHtml + detailHtml;
+    setStatus(mainStatus, `Done — ${allFindings.length} finding(s)`, allFindings.length ? 'warn' : 'ok');
+  } catch(e) {
+    mainOutput.innerHTML = H('zt-red','[ ERROR ] ') + H('zt-dim', String(e.message));
+    setStatus(mainStatus, 'Error', 'warn');
+  }
+  mainRunBtn.classList.remove('running');
+  mainRunBtn.classList.add('ready');
+});
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
