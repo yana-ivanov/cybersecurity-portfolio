@@ -42,7 +42,7 @@ body {
   display: grid;
   grid-template-columns: 300px 1fr;
   grid-template-rows: 48px 1fr;
-  height: 100vh;
+  height: calc(100vh - 48px);
   overflow: hidden;
 }
 
@@ -56,6 +56,45 @@ body {
   align-items: center;
   gap: 1rem;
   z-index: 100;
+}
+.portfolio-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 32px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  height: 48px;
+  box-sizing: border-box;
+}
+.portfolio-nav-brand {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .12em;
+  color: var(--blue);
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+.back-portfolio {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .12em;
+  color: #4a9eff;
+  text-decoration: none;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  white-space: nowrap;
+  transition: color .2s;
+}
+.back-portfolio::before { content: '\2190'; font-size: 13px; }
+.back-portfolio:hover { color: #93c5fd; }
+.topbar-divider {
+  width: 1px;
+  height: 20px;
+  background: var(--border);
+  flex-shrink: 0;
 }
 
 .logo {
@@ -631,6 +670,12 @@ body {
 </head>
 <body>
 
+<nav class="portfolio-nav">
+  <a href="https://yanaivanov.com/" class="back-portfolio">Portfolio</a>
+  <span class="portfolio-nav-brand">// ladon</span>
+</nav>
+
+
 <div class="layout">
 
   <!-- TOPBAR -->
@@ -690,7 +735,6 @@ body {
       <div class="sidebar-text">
         Travel documents, invoices, and calendar invites are increasingly used as attack vectors. Ladon is purpose-built to detect threats that standard email security tools miss.
       </div>
-      <a href="#" class="sidebar-cta">Full Platform — Coming Soon</a>
       <div class="built-by">Built by <a href="https://sitewavestudio.com">SiteWave Studio LLC</a></div>
     </div>
   </div>
