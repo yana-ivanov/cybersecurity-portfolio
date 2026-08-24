@@ -782,15 +782,15 @@ body {
         </div>
 
         <div class="module-card">
-          <div class="module-name">Image Steganography</div>
-          <div class="module-what">Checks for data appended after the image's end-of-file marker, analyzes pixel bit distribution for LSB encoding anomalies, scores Shannon entropy, and inspects EXIF metadata for hidden content or suspicious URLs.</div>
-          <div class="module-why"><strong>Why it matters:</strong> A normal-looking airline logo or banner image inside a PDF or email can carry an encrypted payload — invisible to the eye and to most security scanners.</div>
+          <div class="module-name">Image Steganography Indicators</div>
+          <div class="module-what">Checks for data appended after the image's end-of-file marker, analyzes pixel bit distribution for LSB anomalies, scores Shannon entropy, and inspects EXIF metadata for suspicious URLs. These are heuristic indicators — a flag for closer review, not confirmation. The module does not decode or extract a hidden payload.</div>
+          <div class="module-why"><strong>Why it matters:</strong> A normal-looking logo or banner image inside a PDF or email can be used to conceal data. An unusually even LSB distribution or high entropy can suggest steganography — though many ordinary images also trip these signals, so the finding warrants review rather than confirming a payload.</div>
           <div class="module-formats">JPG · PNG · GIF · BMP · WEBP · ICO</div>
         </div>
 
         <div class="module-card">
-          <div class="module-name">Audio Steganography</div>
-          <div class="module-what">Analyzes audio file headers and sample data for appended payloads, anomalous chunk structures, and LSB encoding in audio samples — the same technique used in documented supply chain attacks.</div>
+          <div class="module-name">Appended Audio Data</div>
+          <div class="module-what">Reads the WAV RIFF header to find data appended after the declared audio stream ends, and flags unusually high-entropy trailers in MP3 files. This is appended-data detection, not in-sample steganography — the technique documented in the TeamPCP/Telnyx supply chain attack, where a payload was carried past the end of a WAV file.</div>
           <div class="module-why"><strong>Why it matters:</strong> WAV files have been used in real attacks to carry encrypted malware. A music file or voicemail attachment can be a delivery vehicle — documented in the TeamPCP supply chain campaign.</div>
           <div class="module-formats">WAV · MP3</div>
         </div>
@@ -870,7 +870,7 @@ body {
         </div>
 
         <div class="example-card" onclick="loadDemo('wav')" style="background:var(--bg2);border:1px solid rgba(0,174,255,0.12);border-radius:2px;padding:1.1rem;cursor:pointer">
-          <div class="example-type" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:.4rem">Audio Steganography</div>
+          <div class="example-type" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:.4rem">Appended Audio Data</div>
           <div class="example-name" style="font-size:14px;font-weight:500;color:#e2e8f0;margin-bottom:.3rem">WAV File Malware Carrier</div>
           <div class="example-desc" style="font-size:13px;color:#94a3b8;line-height:1.55">A WAV audio attachment with malware appended after the audio data end marker. The audio plays normally — the payload is extracted by a companion dropper already on the system.</div>
         </div>
@@ -1162,14 +1162,14 @@ function getDemoData(type, name) {
               level: 'fail',
               label: 'High — LSB Distribution Anomaly',
               title: 'Near-perfect 50/50 bit distribution detected',
-              detail: 'LSB 0-ratio: 0.5003 · LSB 1-ratio: 0.4997 · Deviation from 50/50: 0.0003. Natural images show deviation > 0.05. This file\'s pixel least-significant bits are statistically indistinguishable from random data — a signature of LSB steganography.',
-              education: '<strong>What this means:</strong> LSB steganography hides data by replacing the least significant bit of each pixel\'s color value. The image looks identical — a 1-bit change in color is invisible to the human eye. But statistically, the bit distribution betrays it: natural images are not perfectly random.'
+              detail: 'LSB 0-ratio: 0.5003 · LSB 1-ratio: 0.4997 · Deviation from 50/50: 0.0003. Natural images often show larger deviation. This file\'s pixel least-significant bits are close to statistically random — a possible indicator of LSB steganography, worth a closer look rather than a confirmation.',
+              education: '<strong>What this means:</strong> LSB steganography hides data by replacing the least significant bit of each pixel\'s color value. The image looks identical — a 1-bit change in color is invisible to the human eye. Statistically, a near-even bit distribution can hint at it — but this is a soft signal: plenty of ordinary images look similar, so it points toward a closer look, not a verdict.'
             },
             {
               level: 'warn',
               label: 'Warning — High Entropy',
               title: 'Pixel entropy 7.82 — above threshold of 7.5',
-              detail: 'Shannon entropy of image pixel data is unusually high. Encrypted or compressed payloads produce near-maximum entropy values. Combined with the LSB anomaly, this strongly suggests an encoded payload.',
+              detail: 'Shannon entropy of image pixel data is unusually high. Encrypted or compressed payloads produce near-maximum entropy values. Combined with the LSB anomaly, this is consistent with an encoded payload — though high entropy alone can also come from ordinary compressed or detailed images.',
               education: '<strong>What this means:</strong> Entropy measures randomness. Natural image data has patterns — sky gradients, consistent textures — producing entropy around 6.5–7.0. An encrypted payload has no patterns: every byte is maximally random, pushing entropy toward 8.0. This file scores 7.82.'
             }
           ]
