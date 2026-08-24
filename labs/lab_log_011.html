@@ -304,10 +304,10 @@ EXE+HTML+PDF-1.pdf: <strong style="color:var(--red)">PE32 executable</strong> (c
       </div>
       <div class="finding-row">
         <div class="finding-tag tag-high">HIGH</div>
-        <div class="finding-text"><strong>/ObjStm detected — Object stream used to conceal malicious objects.</strong> Object streams compress and bundle multiple PDF objects together, making their contents invisible to scanners that parse PDF structure without decompressing. This is deliberate obfuscation — malicious actions or scripts hidden inside an object stream will not appear in a surface-level scan of PDF keys. Ladon's raw byte scan found the embedded PE regardless.</div>
+        <div class="finding-text"><strong>/ObjStm detected — object stream present.</strong> Object streams compress and bundle multiple PDF objects together, which can make their contents harder to inspect for scanners that parse PDF structure without decompressing. Object streams are also standard in most modern PDFs, so their presence alone is context, not proof of malice — the current tool treats <code>/ObjStm</code> as informational rather than dangerous on its own. <em>(The original version of this finding claimed Ladon's byte scan "found the embedded PE regardless." That polyglot/PE claim is retracted — see the Correction section above. No Windows PE exists in this file.)</em></div>
       </div>
       <div class="sample-verdict">
-        <strong>Assessment:</strong> No threat actor has been attributed to this sample. The combination of a deeply buried polyglot payload and object stream obfuscation points to a file engineered to defeat automated scanning specifically — two independent evasion techniques layered together. Attribution unknown; technique deliberate.
+        <strong>Assessment:</strong> No threat actor has been attributed to this sample. It is a genuine malicious PDF; the object-stream structure is worth noting as context, but the earlier characterization of a "deeply buried polyglot payload" is retracted (see Correction) — no embedded executable is present. Attribution unknown.
       </div>
     </div>
   </div>
@@ -367,7 +367,7 @@ EXE+HTML+PDF-1.pdf: <strong style="color:var(--red)">PE32 executable</strong> (c
         <div class="finding-text"><strong>Typosquatted domain: <code>maneger-accouintr-solutieonst.site</code></strong> — Deliberate misspelling of "manager account solutions" on a <code>.site</code> TLD. A throwaway phishing domain designed to pass a visual scan.</div>
       </div>
       <div class="sample-verdict">
-        <strong>Assessment:</strong> The most layered sample in the set — polyglot payload, auto-execute on open, IP beacon callbacks, and a typosquatted harvesting domain, all in one file. Facebook-themed credential phishing. All stages trigger before the user reads a word of the document.
+        <strong>Assessment:</strong> The most layered sample in the set — auto-execute on open, IP beacon callbacks, and a typosquatted harvesting domain, all in one genuine PDF. Facebook-themed credential phishing. (The original assessment also listed a "polyglot payload" here; that is retracted — see Correction — no embedded executable is present.) The real, still-accurate finding is that all these PDF-native stages trigger before the user reads a word of the document.
       </div>
     </div>
   </div>
@@ -393,7 +393,7 @@ EXE+HTML+PDF-1.pdf: <strong style="color:var(--red)">PE32 executable</strong> (c
         <div class="finding-text"><em style="color:#94a3b8">&ldquo;PDF structure clean&rdquo; — not applicable.</em> Because this file is HTML, not a PDF, the PDF-structure check had nothing to analyze. The original clean reading was an artifact of running a PDF check on a non-PDF file.</div>
       </div>
       <div class="sample-verdict">
-        <strong>Assessment:</strong> The most deceptive sample in the set. A clean PDF structure means no behavioral signals — nothing fires. The file opens, renders, and looks exactly like a legitimate PDF. The only finding is the embedded PE, which requires a full-file secondary signature scan to detect. Cleaner PDF structure is not a sign of a less dangerous file.
+        <strong>Assessment:</strong> The most deceptive sample in the set — but not for the reason originally stated. This file is not a PDF at all: it is HTML/VBScript wearing a <code>.pdf</code> extension (see Correction). The original assessment claimed "the only finding is the embedded PE," which is retracted twice over — the file is not a PDF, and there is no embedded PE. The real technique is file-type masquerade / HTML smuggling, which is why validating a file's <em>actual</em> type before running format-specific checks matters. A clean PDF-structure reading here was an artifact of running a PDF check on a non-PDF file.
       </div>
     </div>
   </div>

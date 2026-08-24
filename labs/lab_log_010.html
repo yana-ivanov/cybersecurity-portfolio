@@ -352,8 +352,8 @@ executable_present = <span class="ke">any</span>(k <span class="ke">in</span> da
             <span class="va">'severity'</span>: <span class="wa">'CRITICAL'</span> <span class="ke">if</span> <span class="va">'EXE'</span> <span class="ke">in</span> description <span class="ke">else</span> <span class="va">'HIGH'</span>,
         })</pre></div>
 
-  <h3>Module 3 — Image Steganography</h3>
-  <p>Steganography hides data inside something that doesn't look like it contains data. Three sub-checks run on every image: appended data after the EOF marker, LSB (Least Significant Bit) distribution analysis, and Shannon entropy scoring. Legitimate images have slightly uneven LSB distributions. LSB steganography produces near-perfect 50/50 distribution — statistically detectable.</p>
+  <h3>Module 3 — Image Steganography Indicators</h3>
+  <p>Steganography hides data inside something that doesn't look like it contains data. This module runs three heuristic checks on every image: appended data after the EOF marker, LSB (Least Significant Bit) distribution analysis, and Shannon entropy scoring. These are <em>indicators</em>, not confirmation — an unusually even LSB distribution can suggest LSB steganography, but many ordinary images also produce near-even distributions, and a determined attacker can evade the check. The module flags a statistical anomaly worth a closer look; it does not decode or extract a hidden payload, and it does not confirm steganography is present. Appended-data detection (bytes after the image's EOF marker) is the stronger of the three signals.</p>
 
   <div class="code-label">LSB Distribution Analysis</div>
   <div class="code-block"><pre><span class="ke">for</span> pixel <span class="ke">in</span> sample:
@@ -366,8 +366,8 @@ deviation = abs(ratio_0 - <span class="hi">0.5</span>)
 # Natural images: deviation &gt; 0.05</span>
 suspicious = deviation < <span class="hi">0.02</span></pre></div>
 
-  <h3>Module 4 — Audio Steganography</h3>
-  <p>WAV files have explicit chunk sizes declared in their RIFF header. Any bytes after the declared chunk boundary are appended data — not part of the audio. This is the exact delivery mechanism used in the TeamPCP/Telnyx supply chain attack, where malware was hidden inside a WAV file named <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">ringtone.wav</code> and extracted in memory.</p>
+  <h3>Module 4 — Appended Audio Data</h3>
+  <p>WAV files declare explicit chunk sizes in their RIFF header. Any bytes after the declared chunk boundary are appended data — not part of the audio. This is not steganography in the strict sense (data hidden <em>inside</em> the audio samples); it is data concealed <em>after</em> the file's declared end, which is exactly the delivery mechanism used in the TeamPCP/Telnyx supply chain attack, where a payload was carried past the end of a WAV file named <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">ringtone.wav</code> and extracted in memory. For MP3 the module flags an unusually high-entropy trailer, a weaker signal that warrants review rather than confirming a payload.</p>
 
   <div class="code-label">WAV Chunk Boundary Check</div>
   <div class="code-block"><pre><span class="ke">if</span> data[:<span class="hi">4</span>] == b<span class="va">'RIFF'</span> <span class="ke">and</span> len(data) > <span class="hi">8</span>:
