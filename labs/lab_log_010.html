@@ -309,21 +309,27 @@ footer span{color:#94a3b8}
         <tr><td class="code">/AA</td><td>Additional Actions</td><td>Executes code on page open/close/print</td></tr>
         <tr><td class="code">/Launch</td><td>Launches external application</td><td>Can spawn shell commands</td></tr>
         <tr><td class="code">/EmbeddedFile</td><td>Contains embedded file attachment</td><td>Dropper for secondary payload</td></tr>
-        <tr><td class="code">/ObjStm</td><td>Object stream</td><td>Commonly used to hide malicious objects from scanners</td></tr>
-        <tr><td class="code">/URI</td><td>External URI reference</td><td>Tracking pixel — phones home on render</td></tr>
+        <tr><td class="code">/ObjStm</td><td>Object stream</td><td>Standard in most modern PDFs — noted as context, not a threat on its own</td></tr>
+        <tr><td class="code">/URI</td><td>External URI reference</td><td>Indicates a link exists — the destination URL is analyzed separately for actual risk</td></tr>
         <tr><td class="code">/SubmitForm</td><td>Form submission action</td><td>Data exfiltration on open</td></tr>
       </tbody>
     </table>
   </div>
 
-  <div class="code-label">Core PDF Analysis Loop</div>
-  <div class="code-block"><pre><span class="ke">for</span> key, description <span class="ke">in</span> PDF_DANGEROUS_KEYS.items():
+  <div class="code-label">Core PDF Analysis Loop — context-aware</div>
+  <div class="code-block"><pre><span class="co"># An auto-trigger key only matters if it can reach something executable</span>
+executable_present = <span class="ke">any</span>(k <span class="ke">in</span> data <span class="ke">for</span> k <span class="ke">in</span>
+    (b<span class="va">'/JavaScript'</span>, b<span class="va">'/JS'</span>, b<span class="va">'/Launch'</span>, b<span class="va">'/EmbeddedFile'</span>))
+
+<span class="ke">for</span> key, description <span class="ke">in</span> PDF_DANGEROUS_KEYS.items():
     <span class="ke">if</span> key <span class="ke">in</span> data:
-        count = data.count(key)
+        key_str = key.decode(<span class="va">'latin-1'</span>)
+        <span class="co"># A bare /OpenAction or /AA with no executable action is benign</span>
+        benign = key_str <span class="ke">in</span> (<span class="va">'/OpenAction'</span>, <span class="va">'/AA'</span>) <span class="ke">and</span> <span class="ke">not</span> executable_present
         results[<span class="va">'dangerous_keys'</span>].append({
-            <span class="va">'key'</span>:         key.decode(<span class="va">'latin-1'</span>),
-            <span class="va">'description'</span>: description,
-            <span class="va">'count'</span>:       count,
+            <span class="va">'key'</span>:            key_str,
+            <span class="va">'count'</span>:          data.count(key),
+            <span class="va">'benign_trigger'</span>: benign,   <span class="co"># noted, but does not escalate</span>
         })</pre></div>
 
   <h3>Module 2 — Polyglot Detection</h3>
@@ -410,12 +416,13 @@ suspicious = deviation < <span class="hi">0.02</span></pre></div>
         <tr><td><strong>Polyglot — CRITICAL</strong> (EXE/ELF inside file)</td><td style="color:#e8374a;font-weight:600;font-family:var(--mono);font-size:.82rem">+5</td><td>Executable inside document is never legitimate</td></tr>
         <tr><td><strong>Polyglot — HIGH</strong> (ZIP inside image)</td><td style="color:#f07840;font-weight:600;font-family:var(--mono);font-size:.82rem">+3</td><td>Unusual but not always malicious</td></tr>
         <tr><td><strong>PDF dangerous key</strong> (JavaScript, OpenAction, Launch)</td><td style="color:#e8374a;font-weight:600;font-family:var(--mono);font-size:.82rem">+4</td><td>Actively dangerous — no legitimate use in typical docs</td></tr>
-        <tr><td><strong>PDF structural key</strong> (ObjStm, URI, etc.)</td><td style="color:#f07840;font-weight:600;font-family:var(--mono);font-size:.82rem">+2</td><td>Suspicious context — common in malicious docs</td></tr>
+        <tr><td><strong>PDF auto-trigger</strong> (OpenAction, AA)</td><td style="color:#f0c040;font-weight:600;font-family:var(--mono);font-size:.82rem">0 / +4</td><td>Benign alone (sets zoom/page) — only escalates when paired with an executable action</td></tr>
+        <tr><td><strong>PDF structural key</strong> (ObjStm, URI, Encrypt, XFA)</td><td style="color:#2dd4a0;font-weight:600;font-family:var(--mono);font-size:.82rem">0</td><td>Ubiquitous in normal documents — noted as context, does not raise severity alone</td></tr>
         <tr><td><strong>Appended image data</strong></td><td style="color:#e8374a;font-weight:600;font-family:var(--mono);font-size:.82rem">+4</td><td>Data after EOF is almost never legitimate</td></tr>
         <tr><td><strong>LSB steganography suspected</strong></td><td style="color:#f07840;font-weight:600;font-family:var(--mono);font-size:.82rem">+3</td><td>Statistical anomaly — possible hidden payload</td></tr>
         <tr><td><strong>Audio appended data</strong></td><td style="color:#e8374a;font-weight:600;font-family:var(--mono);font-size:.82rem">+5</td><td>WAV with data past chunk boundary — confirmed technique</td></tr>
         <tr><td><strong>URL risk — CRITICAL</strong></td><td style="color:#e8374a;font-weight:600;font-family:var(--mono);font-size:.82rem">+5</td><td>Typosquat, homoglyph, or confirmed malicious</td></tr>
-        <tr><td><strong>URL risk — HIGH</strong></td><td style="color:#f07840;font-weight:600;font-family:var(--mono);font-size:.82rem">+3</td><td>Shortener, suspicious TLD</td></tr>
+        <tr><td><strong>URL risk — HIGH</strong></td><td style="color:#f07840;font-weight:600;font-family:var(--mono);font-size:.82rem">+4</td><td>Shortener, suspicious TLD, typosquat — reaches HIGH on its own</td></tr>
         <tr><td><strong>ICS meeting spoof</strong></td><td style="color:#e8374a;font-weight:600;font-family:var(--mono);font-size:.82rem">+5</td><td>Deliberate platform impersonation</td></tr>
       </tbody>
     </table>
@@ -428,7 +435,7 @@ suspicious = deviation < <span class="hi">0.02</span></pre></div>
 <span class="ke">else</span>:            <span class="ke">return</span> <span style="color:#2dd4a0;font-weight:bold">'LOW'</span></pre></div>
 
   <div class="callout callout-amber">
-    <p><strong>Design choice — conservative thresholds:</strong> The scoring is intentionally tuned to minimize false negatives over false positives. A file with a suspicious TLD (MEDIUM, score=1) should prompt review even if nothing else fires. A file with an embedded EXE (score=5) is immediately HIGH regardless of other findings. For the intended audience — a contractor's employee who receives an unexpected PDF — the cost of a false positive (reviewing a clean file) is far lower than the cost of a false negative (opening malware).</p>
+    <p><strong>Design choice — severity from real risk, not surface presence:</strong> The scoring favors catching genuine threats while staying quiet on the ubiquitous, benign features that appear in almost every normal document. An embedded EXE (score +5) or a live typosquatted C2 URL is immediately HIGH or CRITICAL. But a bare auto-open action, an object stream, encryption, or an ordinary hyperlink — all standard in legitimate PDFs — do not raise severity on their own; they are noted as context. Earlier versions weighted these structural features too heavily and over-flagged clean files. The scoring was rebuilt so that severity reflects what a finding actually <em>does</em>, not merely that a keyword is present. The recalibration and its validation are documented in <a href="https://yanaivanov.com/labs/lab_log_011.html">Lab Log 011</a>.</p>
   </div>
 </div>
 
@@ -461,7 +468,7 @@ suspicious = deviation < <span class="hi">0.02</span></pre></div>
   <p>The <code style="font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--blue);background:var(--blue-dim);padding:.1rem .3rem;border-radius:2px">finally</code> block is not an afterthought. It guarantees the uploaded file is deleted regardless of whether analysis succeeds or throws an exception. A malicious file that crashes the parser is still deleted. The server never accumulates files.</p>
 
   <div class="callout callout-blue">
-    <p><strong>On Railway deployment:</strong> Railway provides automatic deploys from GitHub — every push to main triggers a rebuild. The service runs on a paid plan ($5 deposited) to avoid cold starts on free tier. The URL is kept private during the testing and IP protection phase. Auto-deploy means the analysis engine and backend always stay in sync — no manual deployment steps.</p>
+    <p><strong>On Railway deployment:</strong> Railway provides automatic deploys from GitHub — every push to main triggers a rebuild. The service runs on a paid plan ($5 deposited) to avoid cold starts on free tier. Auto-deploy means the analysis engine and backend always stay in sync — no manual deployment steps.</p>
   </div>
 </div>
 
@@ -503,9 +510,9 @@ suspicious = deviation < <span class="hi">0.02</span></pre></div>
   <p>The most useful thing about building this way: the tool is only as good as the edge cases you think to test. Synthetic test files tell you the code runs. Real malware tells you the detection logic actually works. That validation is documented in <a href="lab_log_011.html">Lab Log 011</a>.</p>
 
   <div style="padding:1.5rem 0 2rem 0;">
-    <a href="mailto:yana@sitewavestudio.com?subject=Ladon Demo Request" style="font-family:var(--mono);font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;background:#1a4fa0;color:#fff;padding:.75rem 1.75rem;border-radius:2px;text-decoration:none;display:inline-block;text-align:center;">REQUEST A LIVE DEMO<br><span style="font-size:.62rem;letter-spacing:.04em;color:#94a3b8;font-weight:400;text-transform:none !important;display:block;text-align:center;">available upon request</span></a>
+    <a href="https://yanaivanov.com/tools/ladon.html" style="font-family:var(--mono);font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;background:#1a4fa0;color:#fff;padding:.75rem 1.75rem;border-radius:2px;text-decoration:none;display:inline-block;text-align:center;">VIEW TOOL<br><span style="font-size:.62rem;letter-spacing:.04em;color:#94a3b8;font-weight:400;text-transform:none !important;display:block;text-align:center;">static analysis · no files stored</span></a>
   </div>
-  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">Ladon is a static analysis tool — it reads file structure and content without executing anything. All analysis runs server-side on Railway infrastructure. No files are stored after analysis. The tool is currently in private testing. SiteWave Studio LLC · Built by Yana Ivanov · April 2026</p>
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">Ladon is a static analysis tool — it reads file structure and content without executing anything. All analysis runs server-side on Railway infrastructure. No files are stored after analysis. SiteWave Studio LLC · Built by Yana Ivanov · April 2026</p>
 </div>
 
 </div></div>

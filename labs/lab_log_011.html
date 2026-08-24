@@ -641,6 +641,41 @@ EXE+HTML+PDF-1.pdf: <strong style="color:var(--red)">PE32 executable</strong> (c
     </div>
   </div>
 
+  <!-- FIX 4 — PDF Metadata / Structural False Positives -->
+  <div class="improvement-card">
+    <div class="improvement-header">
+      <div class="improvement-title">Fix 04 — PDF Metadata &amp; Structural False Positives &nbsp;·&nbsp; <span style="color:#60a5fa;font-weight:400">August 24, 2026</span></div>
+    </div>
+    <div class="improvement-body">
+      <p><strong>The problem:</strong> Continued testing surfaced a class of false positives on ordinary, benign PDFs. Two harmless nonprofit brochures — plain documents produced by standard authoring software — were both scored <strong>CRITICAL</strong>. The severity came entirely from features that appear in almost every normal PDF: the XMP metadata namespaces embedded by Adobe and most PDF libraries (<code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">w3.org</code>, <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">purl.org</code>, <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">ns.adobe.com</code>) were being reported as external tracking URLs, and a bare <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">/OpenAction</code> (which usually just sets the zoom level or opening page) was treated as auto-execute malware. Object streams, encryption, and interactive-form keys added the same kind of noise.</p>
+
+      <p><strong>The fix:</strong> Severity was rebuilt to reflect what a finding actually does, not merely that a keyword is present. Standard XMP/schema namespaces are now recognized and excluded from URL reporting. <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">/OpenAction</code> and <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">/AA</code> escalate only when paired with an executable action (<code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">/JavaScript</code>, <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">/Launch</code>, <code style="font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--blue);background:var(--blue-dim);padding:.08rem .25rem;border-radius:2px">/EmbeddedFile</code>). Object streams, encryption, XFA, and bare hyperlinks are now treated as informational context. A genuinely suspicious URL (bad TLD, typosquat, shortener) reaches HIGH on its own.</p>
+
+      <p><strong>The safety property that had to hold:</strong> making encryption informational must not let a threat hide behind it. A test PDF that is <em>both</em> encrypted <em>and</em> carries embedded JavaScript still scores CRITICAL — the encryption is noted as context, the JavaScript is still caught. Benign features are quieted; real indicators are not.</p>
+
+      <div class="test-result">
+        <div>
+          <div class="test-result-label">Benign nonprofit brochure — /OpenAction + XMP metadata, no executable action</div>
+          <div class="test-result-sub">Previously scored CRITICAL from XMP namespaces mislabeled as tracking URLs and a bare auto-open action. After fix: the namespaces are recognized as schema identifiers, the auto-open action is noted as benign context, and the file passes clean.</div>
+        </div>
+        <div class="test-result-verdict verdict-clean">LOW ✓</div>
+      </div>
+
+      <div class="test-result">
+        <div>
+          <div class="test-result-label">Encrypted PDF concealing JavaScript — safety regression check</div>
+          <div class="test-result-sub">Confirms that treating /Encrypt as informational does not mask a real threat. The embedded JavaScript is still detected and scored on its own.</div>
+        </div>
+        <div class="test-result-verdict verdict-critical">CRITICAL ✓</div>
+      </div>
+
+      <div class="callout callout-amber" style="margin-top:1.25rem">
+        <p><strong>On this validation:</strong> The recalibration was validated against a 17-case <strong>synthetic</strong> battery spanning benign and malicious patterns across PDF, SVG, and calendar files — plain PDFs, auto-open actions, object streams, encryption, forms, and hyperlinks on the benign side; JavaScript, Launch, embedded executables, tracking pixels, HTML masquerade, malicious SVG, and spoofed calendar links on the malicious side. The battery returned zero false positives and zero false negatives, including the encrypted-plus-JavaScript safety case. As with the calendar module, synthetic tests confirm the logic behaves correctly against known patterns; re-validation of the affected recalibration against the real malicious samples in this lab is the next step.</p>
+      </div>
+    </div>
+  </div>
+
+
 <!-- SECTION 06 -->
 <div class="section">
   <div class="section-num">Section 06</div>
@@ -651,7 +686,7 @@ EXE+HTML+PDF-1.pdf: <strong style="color:var(--red)">PE32 executable</strong> (c
   <p>The tool does not execute anything. It does not require network access. It reads raw bytes and reports what it finds — which is exactly what is needed before anyone opens an unexpected file.</p>
 
   <div style="padding:1.5rem 0 2rem 0;">
-    <a href="mailto:yana@sitewavestudio.com?subject=Ladon Demo Request" style="font-family:var(--mono);font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;background:#1a4fa0;color:#fff;padding:.75rem 1.75rem;border-radius:2px;text-decoration:none;display:inline-block;text-align:center;">REQUEST A LIVE DEMO<br><span style="font-size:.62rem;letter-spacing:.04em;color:#94a3b8;font-weight:400;text-transform:none;display:block;text-align:center;">available upon request</span></a>
+    <a href="https://yanaivanov.com/tools/ladon.html" style="font-family:var(--mono);font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;background:#1a4fa0;color:#fff;padding:.75rem 1.75rem;border-radius:2px;text-decoration:none;display:inline-block;text-align:center;">VIEW TOOL<br><span style="font-size:.62rem;letter-spacing:.04em;color:#94a3b8;font-weight:400;text-transform:none;display:block;text-align:center;">static analysis · no files stored</span></a>
   </div>
 </div>
 

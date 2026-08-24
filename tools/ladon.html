@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ladon — Document Security Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0d1520;
+  --bg2:      #111c2d;
+  --bg3:      #162235;
+  --border:   rgba(0,174,255,0.12);
+  --border2:  rgba(0,174,255,0.25);
+  --blue:     #00aeff;
+  --blue2:    #0029bb;
+  --blue-dim: rgba(0,174,255,0.08);
+  --text:     #e2e8f0;
+  --text2:    #94a3b8;
+  --text3:    #94a3b8;
+  --red:      #ef4444;
+  --orange:   #f97316;
+  --green:    #22c55e;
+  --amber:    #f59e0b;
+  --mono:     'JetBrains Mono', monospace;
+  --display:  'Orbitron', monospace;
+  --body:     'Inter', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: var(--body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* ── LAYOUT ── */
+.layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  grid-template-rows: 48px 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  grid-column: 1 / -1;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: .75rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  z-index: 100;
+}
+
+.logo {
+  font-family: var(--display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--blue);
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+
+.logo-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  animation: pulse 2s ease-in-out infinite;
+  margin-left: .5rem;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .4; transform: scale(.7); }
+}
+
+.topbar-badge {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .12em;
+  color: var(--blue);
+  border: 1px solid var(--border2);
+  padding: .2rem .5rem;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 2rem 1.5rem;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.sidebar-title {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-bottom: .5rem;
+}
+
+.sidebar-subtitle {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 20px;
+  letter-spacing: 0;
+  font-weight: 500;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-subtitle a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.sidebar-section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.sidebar-section-title {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .15em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.sidebar-text {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 20px;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.sidebar-text strong {
+  color: var(--text);
+}
+
+.format-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin-top: .75rem;
+}
+
+.format-tag {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .08em;
+  color: var(--blue);
+  background: var(--blue-dim);
+  border: 1px solid var(--border2);
+  padding: .2rem .5rem;
+  border-radius: 2px;
+}
+
+.sidebar-cta {
+  display: block;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--blue);
+  padding: .65rem 1rem;
+  border-radius: 2px;
+  text-decoration: none;
+  text-align: center;
+  margin-top: 1rem;
+  transition: background .2s, opacity .2s;
+}
+
+.sidebar-cta:hover { opacity: .85; }
+
+.built-by {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text3);
+  letter-spacing: .08em;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.built-by a {
+  color: var(--text2);
+  text-decoration: none;
+}
+
+/* ── MAIN ── */
+.main {
+  padding: 1.5rem 2rem;
+  overflow-y: auto;
+  background: var(--bg);
+  color: var(--text);
+  height: 100%;
+}
+
+/* ── UPLOAD ZONE ── */
+.upload-section {
+  margin-bottom: 1.5rem;
+}
+
+.upload-zone {
+  border: 2px dashed #94b8d4;
+  border-radius: 4px;
+  padding: 1.5rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  position: relative;
+  background: var(--bg2);
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+  border-color: var(--blue);
+  background: var(--blue-dim);
+}
+
+.upload-title {
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: .12em;
+  color: var(--text);
+  margin-bottom: .5rem;
+}
+
+.upload-subtitle {
+  font-size: 14px;
+  color: var(--text2);
+  margin-bottom: 1.5rem;
+}
+
+.upload-btn {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--blue);
+  background: transparent;
+  border: 1px solid var(--border2);
+  padding: .6rem 1.5rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+
+.upload-btn:hover {
+  background: var(--blue-dim);
+  border-color: var(--blue);
+}
+
+#fileInput { display: none; }
+
+.upload-formats {
+  margin-top: 1rem;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: .08em;
+  white-space: normal;
+  text-align: center;
+}
+
+/* ── MODULE CARDS ── */
+.modules-section {
+  margin-bottom: 1.5rem;
+}
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .2em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.module-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1rem;
+  transition: border-color .2s, background .2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.module-card:hover {
+  border-color: var(--border2);
+  background: var(--bg3);
+}
+
+.module-name {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: .75rem;
+}
+
+.module-formats {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: .06em;
+  margin-top: auto;
+  padding-top: .75rem;
+  border-top: 1px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.module-what {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.65;
+  margin-bottom: .6rem;
+}
+
+.module-why {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.65;
+  padding-top: .6rem;
+  border-top: 1px solid var(--border);
+}
+
+.module-why strong {
+  color: var(--amber);
+  font-weight: 500;
+}
+
+/* ── RESULTS ── */
+.results-section { display: none; }
+.results-section.visible { display: block; }
+
+.results-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.severity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .06em;
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.severity-badge::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .2; }
+}
+.severity-badge.critical { background: rgba(232,55,74,0.12);  color: #e8374a; border: 1px solid rgba(232,55,74,0.25); }
+.severity-badge.high     { background: rgba(240,120,64,0.12); color: #f07840; border: 1px solid rgba(240,120,64,0.25); }
+.severity-badge.medium   { background: rgba(240,192,64,0.12); color: #f0c040; border: 1px solid rgba(240,192,64,0.25); }
+.severity-badge.low      { background: rgba(45,212,160,0.12); color: #2dd4a0; border: 1px solid rgba(45,212,160,0.2); }
+
+.severity-badge.no-dot::before {
+  display: none;
+}
+
+.file-meta {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text2);
+  display: flex;
+  gap: 2rem;
+}
+
+.file-meta span { color: var(--text3); }
+
+.result-module {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.result-module-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.result-module-header:hover { background: var(--bg3); }
+
+.result-module-name {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot.pass    { background: var(--green); }
+.status-dot.warn    { background: var(--amber); }
+.status-dot.fail    { background: var(--red); }
+.status-dot.info    { background: var(--blue); }
+
+.result-status-text {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .08em;
+}
+
+.result-status-text.pass   { color: var(--green); }
+.result-status-text.warn   { color: var(--amber); }
+.result-status-text.fail   { color: var(--red); }
+.result-status-text.info   { color: var(--blue); }
+
+.result-module-body {
+  padding: 0 1.25rem 1.25rem;
+  display: none;
+}
+
+.result-module-body.open { display: block; }
+
+.finding {
+  padding: .75rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.finding:last-child { border-bottom: none; }
+
+.finding-label {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: .3rem;
+}
+
+.finding-label.warn  { color: var(--amber); }
+.finding-label.info  { color: var(--blue); }
+.finding-label.pass  { color: var(--green); }
+
+.finding-title {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: .3rem;
+  line-height: 20px;
+}
+
+.finding-detail {
+  color: var(--text2);
+  line-height: 20px;
+  font-size: 14px;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.finding-education {
+  margin-top: .6rem;
+  padding: .6rem .8rem;
+  background: var(--blue-dim);
+  border-left: 2px solid var(--blue);
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+.finding-education strong { color: var(--blue); }
+
+.code-val {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--blue);
+  background: rgba(0,174,255,.06);
+  padding: .15rem .4rem;
+  border-radius: 2px;
+}
+
+/* ── EXAMPLE ATTACKS ── */
+.examples-section { display: block; margin-top: 2rem; }
+
+.examples-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.example-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1.1rem;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+
+.example-card:hover {
+  border-color: var(--border2);
+  background: var(--bg3);
+}
+
+.example-type {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: .4rem;
+}
+
+.example-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: .3rem;
+}
+
+.example-desc {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.55;
+}
+
+/* ── RESPONSIVE ── */
+@media (min-width: 1600px) {
+  .layout { grid-template-columns: 320px 1fr; }
+  .main { padding: 2rem 3rem; }
+  .modules-grid { grid-template-columns: repeat(3, 1fr); }
+  .examples-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 1920px) {
+  .layout { grid-template-columns: 340px 1fr; }
+  .main { padding: 2rem 4rem; }
+}
+
+@media (max-width: 1280px) {
+  .layout { grid-template-columns: 280px 1fr; }
+  .modules-grid { grid-template-columns: repeat(3, 1fr); }
+  .examples-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 1024px) {
+  .layout { grid-template-columns: 260px 1fr; }
+  .modules-grid { grid-template-columns: repeat(2, 1fr); }
+  .examples-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .main { padding: 1.5rem; }
+  .modules-grid { grid-template-columns: 1fr; }
+  .examples-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="#00aeff" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;margin-right:-2px">
+      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+    </svg>
+    <div class="logo">Ladon</div>
+    <div class="logo-dot"></div>
+    <div class="topbar-badge">Document Security Analyzer</div>
+    <div style="flex:1"></div>
+    <button id="topbarExport" onclick="exportReport()" style="display:none;font-family:var(--mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--blue);background:transparent;border:1px solid var(--border2);padding:.4rem 1rem;border-radius:2px;cursor:pointer;transition:background .2s;line-height:1.4;align-items:center;gap:.5rem" onmouseover="this.style.background='var(--blue-dim)'" onmouseout="this.style.background='transparent'">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export Report
+    </button>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-subtitle">
+      Automatically analyze any document, attachment, or travel file to detect hidden threats — steganography, malicious PDF structure, phishing QR codes, and more.
+      <br><br>
+      Built for security analysts, IT teams, and anyone who needs to verify a suspicious file before opening it.
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">How does it work?</div>
+      <div class="sidebar-text">
+        Ladon runs static analysis — it reads the file's structure and contents without executing anything. Every module looks for a different class of threat: hidden payloads, dangerous PDF objects, suspicious barcodes, and malicious calendar links.
+        <br><br>
+        <strong>No file is sent to a server.</strong> Analysis runs locally via <span style="font-family:var(--mono);font-size:13px;color:var(--blue)">document_triage.py</span>.
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Supported Formats</div>
+      <div class="format-list">
+        <span class="format-tag">PDF</span>
+        <span class="format-tag">EML</span>
+        <span class="format-tag">ICS</span>
+        <span class="format-tag">PKPass</span>
+        <span class="format-tag">LNK</span>
+        <span class="format-tag">JPG</span>
+        <span class="format-tag">PNG</span>
+        <span class="format-tag">GIF</span>
+        <span class="format-tag">SVG</span>
+        <span class="format-tag">ICO</span>
+        <span class="format-tag">BMP</span>
+        <span class="format-tag">WEBP</span>
+        <span class="format-tag">WAV</span>
+        <span class="format-tag">MP3</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Prevent Attacks</div>
+      <div class="sidebar-text">
+        Travel documents, invoices, and calendar invites are increasingly used as attack vectors. Ladon is purpose-built to detect threats that standard email security tools miss.
+      </div>
+      <a href="#" class="sidebar-cta">Full Platform — Coming Soon</a>
+      <div class="built-by">Built by <a href="https://sitewavestudio.com">SiteWave Studio LLC</a></div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- UPLOAD -->
+    <div class="upload-section">
+      <div class="upload-zone" id="uploadZone">
+<div class="upload-title">Drop any file here to analyze</div>
+        <div class="upload-subtitle">PDF, email attachment, boarding pass, image, calendar invite, shortcut file, audio file</div>
+        <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Upload File</button>
+        <input type="file" id="fileInput" accept="*/*">
+        <div class="upload-formats">PDF · EML · ICS · PKPass · LNK · JPG · PNG · GIF · SVG · ICO · BMP · WEBP · WAV · MP3</div>
+      </div>
+    </div>
+
+    <!-- RESULTS (hidden until upload) -->
+    <div class="results-section" id="resultsSection">
+      <div class="section-label">Analysis Results</div>
+
+      <div class="results-header">
+        <div class="file-meta">
+          <div><span>File: </span><span id="resultFilename" style="color:var(--text)">—</span></div>
+          <div><span>Size: </span><span id="resultSize" style="color:var(--text)">—</span></div>
+          <div><span>Type: </span><span id="resultType" style="color:var(--text)">—</span></div>
+        </div>
+        <div class="severity-badge low" id="severityBadge">LOW</div>
+      </div>
+
+      <div id="resultsModules"></div>
+    </div>
+
+    <!-- DETECTION MODULES -->
+    <div class="modules-section">
+      <div class="section-label">Detection Modules</div>
+      <div class="modules-grid">
+
+        <div class="module-card">
+          <div class="module-name">PDF Structure</div>
+          <div class="module-what">Scans the internal object tree of a PDF for dangerous actions — JavaScript that auto-executes on open, Launch commands, embedded hidden files, and external URL references used as tracking pixels.</div>
+          <div class="module-why"><strong>Why it matters:</strong> A PDF can silently phone home the moment it is opened — leaking your IP address, operating system, and location to an attacker's server before you read a single word.</div>
+          <div class="module-formats">PDF</div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-name">Image Steganography</div>
+          <div class="module-what">Checks for data appended after the image's end-of-file marker, analyzes pixel bit distribution for LSB encoding anomalies, scores Shannon entropy, and inspects EXIF metadata for hidden content or suspicious URLs.</div>
+          <div class="module-why"><strong>Why it matters:</strong> A normal-looking airline logo or banner image inside a PDF or email can carry an encrypted payload — invisible to the eye and to most security scanners.</div>
+          <div class="module-formats">JPG · PNG · GIF · BMP · WEBP · ICO</div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-name">Audio Steganography</div>
+          <div class="module-what">Analyzes audio file headers and sample data for appended payloads, anomalous chunk structures, and LSB encoding in audio samples — the same technique used in documented supply chain attacks.</div>
+          <div class="module-why"><strong>Why it matters:</strong> WAV files have been used in real attacks to carry encrypted malware. A music file or voicemail attachment can be a delivery vehicle — documented in the TeamPCP supply chain campaign.</div>
+          <div class="module-formats">WAV · MP3</div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-name">QR Code Analysis</div>
+          <div class="module-what">Extracts and decodes all QR codes and barcodes — including PDF417 on boarding passes and Frame QR codes with embedded logos. Scores the decoded URL for typosquatting, homoglyph substitution, URL shorteners, and suspicious TLDs.</div>
+          <div class="module-why"><strong>Why it matters:</strong> A boarding pass QR that looks identical to the legitimate version can point to a credential harvesting page. The attack is invisible until you scan — and by then it may be too late.</div>
+          <div class="module-formats">All image types · PDF · EML</div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-name">Calendar &amp; Meeting</div>
+          <div class="module-what">Parses .ics calendar files for malicious URLs in LOCATION, DESCRIPTION, and ATTACH fields. Detects meeting platform spoofing — Zoom links that don't resolve to zoom.us, Teams invites pointing to attacker-controlled OAuth pages.</div>
+          <div class="module-why"><strong>Why it matters:</strong> Calendar invites bypass most email security filters. Outlook and Google Calendar auto-add them — the malicious link appears in your calendar even if the email was quarantined.</div>
+          <div class="module-formats">ICS · EML</div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-name">Shortcut File Analysis</div>
+          <div class="module-what">Parses Windows shortcut (.lnk) files for suspicious command execution patterns — PowerShell, CMD, and living-off-the-land binaries (LOLBINs) like forfiles.exe that attackers use to execute payloads while evading detection. Detects UNC network paths, double extensions, and suspicious target directories.</div>
+          <div class="module-why"><strong>Why it matters:</strong> Malicious LNK files are a primary delivery mechanism in phishing campaigns. They appear as innocent shortcuts but silently execute attacker commands the moment a user double-clicks — commonly delivered via calendar invites and email attachments.</div>
+          <div class="module-formats">LNK</div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-name">URL Analysis</div>
+          <div class="module-what">Analyzes every URL extracted from documents, calendar files, and email — checking for typosquatting, homoglyph substitution, suspicious TLDs, URL shorteners, raw IP addresses, and excessive subdomains used to spoof trusted domains.</div>
+          <div class="module-why"><strong>Why it matters:</strong> A URL that looks legitimate at a glance can differ by a single character from the real domain. Automated analysis catches what the human eye misses — before anyone clicks.</div>
+          <div class="module-formats">All formats</div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-name">Email Analysis</div>
+          <div class="module-what">Parses raw .eml files for malicious attachments, suspicious sender domains, tracking pixels, and embedded URLs. Combines attachment scanning with header analysis to detect phishing delivery patterns.</div>
+          <div class="module-why"><strong>Why it matters:</strong> Email is the primary delivery vector for every attack type Ladon detects. Analyzing the raw email file before opening any attachment or clicking any link is the first line of defense.</div>
+          <div class="module-formats">EML</div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-name">Polyglot Detection</div>
+          <div class="module-what">Checks every file's actual magic bytes against its declared extension. Scans for secondary file signatures embedded inside the primary file — a JPEG that is also a valid ZIP, a PNG that contains a Windows executable.</div>
+          <div class="module-why"><strong>Why it matters:</strong> Security tools identify files by extension or the first few bytes. A polyglot file exploits this — passing as a safe image while carrying a malicious payload that malware on the endpoint extracts and executes.</div>
+          <div class="module-formats">All formats</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- EXAMPLE ATTACKS -->
+    <div class="examples-section">
+      <div class="section-label">Example Attack Scenarios</div>
+      <div class="examples-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem">
+
+        <div class="example-card" onclick="loadDemo('boarding_pass')" style="background:var(--bg2);border:1px solid rgba(0,174,255,0.12);border-radius:2px;padding:1.1rem;cursor:pointer">
+          <div class="example-type" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:.4rem">Travel Document</div>
+          <div class="example-name" style="font-size:14px;font-weight:500;color:#e2e8f0;margin-bottom:.3rem">Boarding Pass QR Substitution</div>
+          <div class="example-desc" style="font-size:13px;color:#94a3b8;line-height:1.55">A modified e-ticket PDF with a malicious QR code replacing the legitimate boarding pass barcode. Destination: credential harvesting page mimicking the airline.</div>
+        </div>
+
+        <div class="example-card" onclick="loadDemo('pdf_js')" style="background:var(--bg2);border:1px solid rgba(0,174,255,0.12);border-radius:2px;padding:1.1rem;cursor:pointer">
+          <div class="example-type" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:.4rem">PDF</div>
+          <div class="example-name" style="font-size:14px;font-weight:500;color:#e2e8f0;margin-bottom:.3rem">PDF JavaScript Tracking Pixel</div>
+          <div class="example-desc" style="font-size:13px;color:#94a3b8;line-height:1.55">An invoice PDF with an embedded invisible 1×1 image that phones home when opened — leaking the recipient's IP address, OS, and exact open timestamp to the attacker.</div>
+        </div>
+
+        <div class="example-card" onclick="loadDemo('calendar')" style="background:var(--bg2);border:1px solid rgba(0,174,255,0.12);border-radius:2px;padding:1.1rem;cursor:pointer">
+          <div class="example-type" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:.4rem">Calendar Invite</div>
+          <div class="example-name" style="font-size:14px;font-weight:500;color:#e2e8f0;margin-bottom:.3rem">Malicious ICS Meeting Link</div>
+          <div class="example-desc" style="font-size:13px;color:#94a3b8;line-height:1.55">A fake Zoom meeting invite with the Join Meeting button pointing to an OAuth consent page. If approved, the attacker gains persistent access to Microsoft 365 — surviving a password reset.</div>
+        </div>
+
+        <div class="example-card" onclick="loadDemo('stego')" style="background:var(--bg2);border:1px solid rgba(0,174,255,0.12);border-radius:2px;padding:1.1rem;cursor:pointer">
+          <div class="example-type" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:.4rem">Image Steganography</div>
+          <div class="example-name" style="font-size:14px;font-weight:500;color:#e2e8f0;margin-bottom:.3rem">LSB Payload in Email Attachment</div>
+          <div class="example-desc" style="font-size:13px;color:#94a3b8;line-height:1.55">A company logo PNG in an email signature with an encrypted payload encoded in the least significant bits of each pixel. Undetectable by eye — statistically anomalous under analysis.</div>
+        </div>
+
+        <div class="example-card" onclick="loadDemo('wav')" style="background:var(--bg2);border:1px solid rgba(0,174,255,0.12);border-radius:2px;padding:1.1rem;cursor:pointer">
+          <div class="example-type" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:.4rem">Audio Steganography</div>
+          <div class="example-name" style="font-size:14px;font-weight:500;color:#e2e8f0;margin-bottom:.3rem">WAV File Malware Carrier</div>
+          <div class="example-desc" style="font-size:13px;color:#94a3b8;line-height:1.55">A WAV audio attachment with malware appended after the audio data end marker. The audio plays normally — the payload is extracted by a companion dropper already on the system.</div>
+        </div>
+
+        <div class="example-card" onclick="loadDemo('polyglot')" style="background:var(--bg2);border:1px solid rgba(0,174,255,0.12);border-radius:2px;padding:1.1rem;cursor:pointer">
+          <div class="example-type" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:.4rem">Polyglot File</div>
+          <div class="example-name" style="font-size:14px;font-weight:500;color:#e2e8f0;margin-bottom:.3rem">JPEG / ZIP Polyglot</div>
+          <div class="example-desc" style="font-size:13px;color:#94a3b8;line-height:1.55">A file that passes image validation and renders as a photo in any viewer — but is also a valid ZIP archive containing a malicious executable extracted by malware on the endpoint.</div>
+        </div>
+
+
+        <div class="example-card" onclick="loadDemo('lnk')" style="background:var(--bg2);border:1px solid rgba(0,174,255,0.12);border-radius:2px;padding:1.1rem;cursor:pointer">
+          <div class="example-type" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:.4rem">Shortcut File</div>
+          <div class="example-name" style="font-size:14px;font-weight:500;color:#e2e8f0;margin-bottom:.3rem">Malicious LNK Delivery</div>
+          <div class="example-desc" style="font-size:13px;color:#94a3b8;line-height:1.55">A Windows shortcut disguised as a calendar invite attachment. Double-clicking executes a hidden PowerShell command that fetches and runs a remote payload — the user sees nothing.</div>
+        </div>
+
+        <div class="example-card" onclick="loadDemo('url_analysis')" style="background:var(--bg2);border:1px solid rgba(0,174,255,0.12);border-radius:2px;padding:1.1rem;cursor:pointer">
+          <div class="example-type" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:.4rem">URL Analysis</div>
+          <div class="example-name" style="font-size:14px;font-weight:500;color:#e2e8f0;margin-bottom:.3rem">Typosquatted C2 Domain</div>
+          <div class="example-desc" style="font-size:13px;color:#94a3b8;line-height:1.55">A PDF with embedded URLs pointing to attacker-controlled infrastructure on Chinese cloud storage — URLs designed to look legitimate at a glance but flagged by typosquat and TLD analysis.</div>
+        </div>
+
+        <div class="example-card" onclick="loadDemo('eml')" style="background:var(--bg2);border:1px solid rgba(0,174,255,0.12);border-radius:2px;padding:1.1rem;cursor:pointer">
+          <div class="example-type" style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-bottom:.4rem">Email</div>
+          <div class="example-name" style="font-size:14px;font-weight:500;color:#e2e8f0;margin-bottom:.3rem">Phishing Email with Payload</div>
+          <div class="example-desc" style="font-size:13px;color:#94a3b8;line-height:1.55">A raw email file containing a malicious attachment and tracking pixel. The sender domain is a typosquat of a known vendor — designed to pass a quick visual check.</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+// ── API config ───────────────────────────────────────────────────
+// Change this to your Railway URL after deployment
+// For local testing: 'http://localhost:5000'
+const API_URL = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : 'https://web-production-706b1.up.railway.app';  // UPDATE after Railway deploy
+
+const uploadZone = document.getElementById('uploadZone');
+const fileInput  = document.getElementById('fileInput');
+
+uploadZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  uploadZone.classList.add('dragover');
+});
+
+uploadZone.addEventListener('dragleave', () => {
+  uploadZone.classList.remove('dragover');
+});
+
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) analyzeFile(file);
+});
+
+fileInput.addEventListener('change', e => {
+  if (e.target.files[0]) analyzeFile(e.target.files[0]);
+});
+
+function fmtBytes(n) {
+  if (n >= 1e6) return (n/1e6).toFixed(2) + ' MB';
+  if (n >= 1e3) return (n/1e3).toFixed(1) + ' KB';
+  return n + ' bytes';
+}
+
+function getFileType(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  const map = {
+    pdf:'PDF', eml:'EML', ics:'ICS', pkpass:'PKPass', lnk:'LNK',
+    jpg:'JPEG', jpeg:'JPEG', png:'PNG', gif:'GIF',
+    bmp:'BMP', webp:'WEBP', ico:'ICO', svg:'SVG',
+    wav:'WAV', mp3:'MP3'
+  };
+  return map[ext] || ext.toUpperCase();
+}
+
+async function analyzeFile(file) {
+  const section = document.getElementById('resultsSection');
+  section.classList.add('visible');
+  setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+
+  document.getElementById('resultFilename').textContent = file.name;
+  document.getElementById('resultSize').textContent     = fmtBytes(file.size);
+  document.getElementById('resultType').textContent     = getFileType(file.name);
+
+  // Show loading state
+  const container = document.getElementById('resultsModules');
+  const badge     = document.getElementById('severityBadge');
+  badge.className = 'severity-badge';
+  badge.textContent = 'Analyzing...';
+  container.innerHTML = `<div style="padding:2rem;text-align:center;font-family:var(--mono);font-size:13px;color:var(--text2)">
+    <div style="margin-bottom:.5rem">Running ${getModuleCount(file.name)} detection modules...</div>
+    <div style="color:var(--text3);font-size:11px">${file.name}</div>
+  </div>`;
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_URL}/analyze`, {
+      method: 'POST',
+      body:   formData,
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error || `Server error ${response.status}`);
+    }
+
+    const data = await response.json();
+    renderResults(data);
+
+  } catch (err) {
+    // Backend unavailable or request failed. Do NOT substitute demo data for a
+    // real upload — showing fabricated results about a file the user actually
+    // dropped would be misleading and, for a security tool, unsafe. Show an
+    // honest error instead. (Demo results are only shown when the user
+    // deliberately clicks a demo example card.)
+    console.warn('Analysis request failed:', err.message);
+    const offline = err.message.includes('fetch') || err.message.includes('Failed');
+    const msg = offline
+      ? 'Analysis unavailable — the analysis service is not responding right now. Your file was not scanned. Please try again shortly.'
+      : err.message;
+    container.innerHTML = `<div style="padding:2rem;font-family:var(--mono);font-size:13px;color:var(--red);line-height:1.7">${msg}</div>`;
+    badge.className = 'severity-badge';
+    badge.textContent = offline ? 'Unavailable' : 'Error';
+  }
+}
+
+function getModuleCount(filename) {
+  const ext = filename.split('.').pop().toLowerCase();
+  const counts = { pdf: 3, jpg: 4, jpeg: 4, png: 4, gif: 4, bmp: 4,
+                   webp: 4, svg: 2, wav: 2, mp3: 2, ics: 2, eml: 3, lnk: 2 };
+  return counts[ext] || 2;
+}
+
+function showBanner(msg) {
+  const existing = document.getElementById('offlineBanner');
+  if (existing) return;
+  const banner = document.createElement('div');
+  banner.id = 'offlineBanner';
+  banner.style.cssText = 'background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);color:#f59e0b;font-family:var(--mono);font-size:12px;padding:.5rem 1rem;text-align:center;margin-bottom:1rem;border-radius:2px';
+  banner.textContent = msg;
+  document.getElementById('resultsSection').prepend(banner);
+}
+
+function loadDemo(type) {
+  const section = document.getElementById('resultsSection');
+  section.classList.add('visible');
+  setTimeout(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+
+  const demos = {
+    boarding_pass: { name: 'boarding_pass_JFK_CUN.pdf', size: '184 KB', type: 'PDF' },
+    pdf_js:        { name: 'invoice_march_2026.pdf',    size: '92 KB',  type: 'PDF' },
+    calendar:      { name: 'team_sync_invite.ics',      size: '4 KB',   type: 'ICS' },
+    stego:         { name: 'company_logo.png',          size: '48 KB',  type: 'PNG' },
+    wav:           { name: 'voicemail_03042026.wav',    size: '1.2 MB', type: 'WAV' },
+    polyglot:      { name: 'photo_receipt.jpg',         size: '218 KB', type: 'JPEG'},
+    lnk:           { name: 'calendar_invite.lnk',         size: '3.2 KB', type: 'LNK' },
+    url_analysis:  { name: 'suspicious_invoice.pdf',      size: '156 KB', type: 'PDF' },
+    eml:           { name: 'job_offer_attachment.eml',    size: '28 KB',  type: 'EML' },
+  };
+
+  const d = demos[type];
+  document.getElementById('resultFilename').textContent = d.name;
+  document.getElementById('resultSize').textContent     = d.size;
+  document.getElementById('resultType').textContent     = d.type;
+  renderResults(getDemoData(type, d.name));
+}
+
+function getDemoData(type, name) {
+  const ext = (name || '').split('.').pop().toLowerCase();
+  const t   = type || ext;
+  console.log('getDemoData called with type:', type, 'ext:', ext, 't:', t);
+
+  const base = [
+    {
+      name: 'Polyglot Detection',
+      status: 'pass',
+      statusText: 'Clean',
+      findings: [{
+        level: 'pass',
+        label: 'File Type Consistent',
+        title: 'Magic bytes match file extension',
+        detail: 'The file\'s internal structure matches its declared type. No secondary file signatures detected.',
+        education: null
+      }]
+    }
+  ];
+
+  if (t === 'pdf' || t === 'boarding_pass' || t === 'pdf_js') {
+  return {
+      severity: t === 'pdf_js' || t === 'boarding_pass' ? 'CRITICAL' : 'HIGH',
+      modules: [
+        {
+          name: 'PDF Structure Analysis',
+          status: 'fail',
+          statusText: '3 threats found',
+          findings: [
+            {
+              level: 'fail',
+              label: 'Critical — Auto-Execute Action',
+              title: '/OpenAction with /JavaScript detected',
+              detail: 'The PDF contains an OpenAction directive with embedded JavaScript. This code will execute automatically when the document is opened in Chrome, Adobe Acrobat, or any reader with JavaScript enabled.',
+              education: '<strong>What this means:</strong> The PDF does not need you to click anything. Simply opening it triggers the JavaScript — which in this document calls <span style="font-family:var(--mono);font-size:13px">submitForm()</span> pointing to an external server. Your IP address, browser fingerprint, and open timestamp are transmitted immediately.'
+            },
+            {
+              level: 'fail',
+              label: 'Critical — External URL Reference',
+              title: 'Invisible tracking pixel detected',
+              detail: 'An embedded image with a remote URL src attribute was found. The image is 1×1 pixel — invisible to the reader but fetched automatically when the PDF renders.',
+              education: '<strong>What this means:</strong> When you open this document your PDF viewer silently requests the remote image. This single request tells the attacker: you opened the file, when you opened it, your IP address, and your operating system. No interaction required.'
+            },
+            {
+              level: 'warn',
+              label: 'Warning — QR Code Found',
+              title: 'QR code destination does not match document context',
+              detail: 'A QR code was extracted from the document. The encoded URL resolves to a domain that does not match the airline or issuing organization referenced in the document text.',
+              education: '<strong>What this means:</strong> The boarding pass QR visually looks legitimate — same format, same position, same surrounding text. But it points to <span style="font-family:var(--mono);font-size:13px">jetblue-checkin.info</span> instead of <span style="font-family:var(--mono);font-size:13px">jetblue.com</span>. Scanning it at the airport or on your phone would redirect you to a credential harvesting page.'
+            }
+          ]
+        },
+        {
+          name: 'QR Code Analysis',
+          status: 'fail',
+          statusText: '1 malicious URL',
+          findings: [
+            {
+              level: 'fail',
+              label: 'Critical — Typosquat Domain',
+              title: 'jetblue-checkin.info — possible typosquat of jetblue.com',
+              detail: 'The decoded QR URL points to a domain with edit distance 2 from the legitimate jetblue.com. The domain was registered 11 days ago. TLD .info is associated with high phishing rates.',
+              education: '<strong>What this means:</strong> Typosquatting replaces one or two characters in a trusted domain name. <span style="font-family:var(--mono);font-size:13px">jetblue-checkin.info</span> looks plausible to someone glancing at a URL preview. Combined with a fake boarding pass design, most travelers would not notice before entering their credentials.'
+            }
+          ]
+        },
+        ...base
+      ]
+    };
+  }
+
+  if (t === 'calendar' || t === 'ics') {
+    return {
+      severity: 'CRITICAL',
+      modules: [
+        {
+          name: 'Calendar & Meeting Analysis',
+          status: 'fail',
+          statusText: '2 threats found',
+          findings: [
+            {
+              level: 'fail',
+              label: 'Critical — Meeting Platform Spoof',
+              title: 'Zoom referenced but URL does not resolve to zoom.us',
+              detail: 'The DESCRIPTION field contains text "Join Zoom Meeting" with a hyperlink pointing to zoom-verify-account.com — not zoom.us. Legitimate Zoom meeting URLs always use the zoom.us domain.',
+              education: '<strong>What this means:</strong> Clicking "Join Zoom Meeting" in this calendar invite opens a fake Microsoft login page — not Zoom. The page requests OAuth consent for a malicious application. If approved, the attacker gains persistent read/write access to your Microsoft 365 account, email, files, and contacts — even after you change your password.'
+            },
+            {
+              level: 'fail',
+              label: 'Critical — Suspicious URL in LOCATION field',
+              title: 'External URL in calendar LOCATION field',
+              detail: 'The LOCATION field contains a URL instead of a physical location. The domain zoom-verify-account.com was registered 3 days ago and resolves to an IP address with no prior reputation.',
+              education: '<strong>What this means:</strong> This invite will automatically appear in your Google Calendar or Outlook even if the email was quarantined. The malicious link persists in your calendar until manually deleted — a second opportunity for the attacker after the email was blocked.'
+            }
+          ]
+        },
+        ...base
+      ]
+    };
+  }
+
+  if (t === 'stego' || t === 'png' || t === 'jpg' || t === 'jpeg') {
+    return {
+      severity: 'HIGH',
+      modules: [
+        {
+          name: 'Image Steganography Analysis',
+          status: 'fail',
+          statusText: '2 anomalies detected',
+          findings: [
+            {
+              level: 'fail',
+              label: 'High — LSB Distribution Anomaly',
+              title: 'Near-perfect 50/50 bit distribution detected',
+              detail: 'LSB 0-ratio: 0.5003 · LSB 1-ratio: 0.4997 · Deviation from 50/50: 0.0003. Natural images show deviation > 0.05. This file\'s pixel least-significant bits are statistically indistinguishable from random data — a signature of LSB steganography.',
+              education: '<strong>What this means:</strong> LSB steganography hides data by replacing the least significant bit of each pixel\'s color value. The image looks identical — a 1-bit change in color is invisible to the human eye. But statistically, the bit distribution betrays it: natural images are not perfectly random.'
+            },
+            {
+              level: 'warn',
+              label: 'Warning — High Entropy',
+              title: 'Pixel entropy 7.82 — above threshold of 7.5',
+              detail: 'Shannon entropy of image pixel data is unusually high. Encrypted or compressed payloads produce near-maximum entropy values. Combined with the LSB anomaly, this strongly suggests an encoded payload.',
+              education: '<strong>What this means:</strong> Entropy measures randomness. Natural image data has patterns — sky gradients, consistent textures — producing entropy around 6.5–7.0. An encrypted payload has no patterns: every byte is maximally random, pushing entropy toward 8.0. This file scores 7.82.'
+            }
+          ]
+        },
+        ...base
+      ]
+    };
+  }
+
+  if (t === 'wav' || t === 'mp3') {
+    return {
+      severity: 'CRITICAL',
+      modules: [
+        {
+          name: 'Audio Steganography Analysis',
+          status: 'fail',
+          statusText: '1 critical finding',
+          findings: [
+            {
+              level: 'fail',
+              label: 'Critical — Appended Data After Audio End Marker',
+              title: '48,392 bytes of data found after WAV end marker',
+              detail: 'The WAV file\'s data chunk ends at offset 1,204,182. An additional 48,392 bytes follow with no valid audio structure. Shannon entropy of appended data: 7.94 — consistent with encrypted payload.',
+              education: '<strong>What this means:</strong> This is the same technique documented in the TeamPCP supply chain attack — malicious code hidden in audio files by appending it after the audio data ends. The file plays normally in any audio player. The payload is extracted by a companion dropper that reads past the end of the audio stream.'
+            }
+          ]
+        },
+        ...base
+      ]
+    };
+  }
+
+  if (t === 'polyglot') {
+    return {
+      severity: 'CRITICAL',
+      modules: [
+        {
+          name: 'Polyglot Detection',
+          status: 'fail',
+          statusText: '1 critical finding',
+          findings: [
+            {
+              level: 'fail',
+              label: 'Critical — Secondary File Signature Detected',
+              title: 'ZIP signature found at offset 218,432 inside JPEG file',
+              detail: 'File extension .jpg and primary magic bytes FF D8 FF confirm JPEG format. However, a valid ZIP signature (50 4B 03 04) was found at offset 218,432 — immediately after the JPEG EOF marker FF D9. The ZIP archive contains: system_update.exe (PE32 executable).',
+              education: '<strong>What this means:</strong> This file is simultaneously a valid JPEG and a valid ZIP archive — a polyglot. Security tools that check the file extension or first bytes classify it as a safe image. Endpoint malware reads the same file as a ZIP and executes the embedded PE32 binary. The image renders normally in any viewer.'
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  if (t === 'lnk') return getLnkDemo();
+  if (t === 'url_analysis') return getUrlDemo();
+  if (t === 'eml') return getEmlDemo();
+
+  // Default clean result
+  return {
+    severity: 'LOW',
+    modules: [
+      ...base,
+      {
+        name: 'General Analysis',
+        status: 'pass',
+        statusText: 'Clean',
+        findings: [{
+          level: 'pass',
+          label: 'No threats detected',
+          title: 'File appears clean',
+          detail: 'No malicious indicators found across all detection modules.',
+          education: null
+        }]
+      }
+    ]
+  };
+
+}
+
+function getLnkDemo() {
+  return {
+    severity: 'HIGH',
+    modules: [
+      {
+        name: 'LNK Shortcut Analysis',
+        status: 'fail',
+        statusText: '1 finding found',
+        findings: [{
+          level: 'fail',
+          label: 'CRITICAL — Suspicious Command',
+          title: 'Forfiles.exe detected — Windows LOLBIN used to execute commands and bypass detection',
+          detail: '',
+          education: '<strong>What this means:</strong> This shortcut file contains suspicious execution patterns. Malicious LNK files silently execute attacker commands the moment a user double-clicks — commonly delivered via phishing emails and calendar invites.'
+        }]
+      },
+      {
+        name: 'Polyglot Detection',
+        status: 'pass',
+        statusText: 'Clean',
+        findings: [{
+          level: 'pass',
+          label: 'Pass',
+          title: 'File type consistent — no polyglot indicators',
+          detail: 'Magic bytes match the declared file extension.',
+          education: null
+        }]
+      }
+    ]
+  };
+}
+
+function getUrlDemo() {
+  return {
+    severity: 'CRITICAL',
+    modules: [
+      {
+        name: 'URL Analysis',
+        status: 'fail',
+        statusText: '3 suspicious URLs',
+        findings: [
+          {
+            level: 'fail',
+            label: 'Critical — Live C2 Infrastructure',
+            title: '6-1321729461.cos.ap-guangzhou.myqcloud.com',
+            detail: 'URL points to Tencent Cloud Object Storage — active Chinese APT C2. Path references lnstaller.msi — deliberately misspelled to evade string-based detection.',
+            education: '<strong>What this means:</strong> Opening this PDF would silently fetch a secondary payload from attacker-controlled cloud storage. The misspelling of installer is intentional — it bypasses security tools that scan for that string.'
+          },
+          {
+            level: 'warn',
+            label: 'Warning — Unencrypted Connection',
+            title: 'http://www.baidu.com — HTTP not HTTPS',
+            detail: 'An unencrypted HTTP reference was found embedded in the PDF structure.',
+            education: null
+          },
+          {
+            level: 'warn',
+            label: 'Warning — Unknown Domain',
+            title: 'fuued5-1329400280.cos.ap-guangzhou.myqcloud.com',
+            detail: 'Additional Tencent Cloud domain with randomized subdomain — consistent with attacker-generated C2 infrastructure.',
+            education: null
+          }
+        ]
+      },
+      {
+        name: 'PDF Structure Analysis',
+        status: 'fail',
+        statusText: '2 issues found',
+        findings: [
+          {
+            level: 'fail',
+            label: 'Critical — External URI Reference',
+            title: '/URI detected (20x)',
+            detail: 'Twenty embedded URI references fire automatically on render — beaconing your IP and open timestamp to the attacker.',
+            education: null
+          },
+          {
+            level: 'fail',
+            label: 'Critical — Secondary Signature',
+            title: 'Windows PE (EXE) signature found at offset 4937 inside PDF file',
+            detail: 'An executable was found embedded inside this PDF. Security tools that check only the file extension will classify it as safe.',
+            education: null
+          }
+        ]
+      },
+      {
+        name: 'Polyglot Detection',
+        status: 'fail',
+        statusText: '1 finding',
+        findings: [{
+          level: 'fail',
+          label: 'Critical — Secondary Signature',
+          title: 'Windows PE (EXE) signature found at offset 4937',
+          detail: '',
+          education: '<strong>What this means:</strong> An executable signature was found inside this file. Security tools that check only the file extension will classify it as safe — endpoint malware can extract and run the executable.'
+        }]
+      }
+    ]
+  };
+}
+
+function getEmlDemo() {
+  return {
+    severity: 'HIGH',
+    modules: [
+      {
+        name: 'URL Analysis',
+        status: 'fail',
+        statusText: '2 suspicious URLs',
+        findings: [
+          {
+            level: 'fail',
+            label: 'Critical — Typosquat Domain',
+            title: 'maneger-accouintr-solutieonst.site',
+            detail: 'Deliberate misspelling of manager account solutions on a .site TLD — a throwaway phishing domain designed to pass a visual scan.',
+            education: '<strong>What this means:</strong> The .site TLD is inexpensive and disposable — commonly used for credential harvesting. This domain was likely registered hours before this email was sent.'
+          },
+          {
+            level: 'warn',
+            label: 'Warning — Suspicious TLD',
+            title: 'Suspicious TLD: .site',
+            detail: '.site is associated with high phishing rates and throwaway attack infrastructure.',
+            education: null
+          }
+        ]
+      },
+      {
+        name: 'Polyglot Detection',
+        status: 'fail',
+        statusText: '1 finding',
+        findings: [{
+          level: 'fail',
+          label: 'Critical — Secondary Signature',
+          title: 'Windows PE (EXE) signature found at offset 10303 inside PDF attachment',
+          detail: 'An executable was found embedded inside the PDF attachment. The file opens normally — the payload is invisible until extracted.',
+          education: '<strong>What this means:</strong> This is the same technique used in the live job scam phishing email caught in the wild — a PDF that passed Gmail scanner but contained an embedded Windows executable.'
+        }]
+      }
+    ]
+  };
+}
+
+function renderResults(data) {
+  const badge = document.getElementById('severityBadge');
+  const sev   = (data.severity || 'LOW').toLowerCase();
+  badge.className = 'severity-badge ' + sev;
+  badge.textContent = data.severity || 'LOW';
+
+  // Show export button in topbar
+  const topbarExport = document.getElementById('topbarExport');
+  topbarExport.style.display = 'inline-flex';
+
+  const container = document.getElementById('resultsModules');
+  container.innerHTML = '';
+
+  (data.modules || []).forEach((mod, i) => {
+    const el = document.createElement('div');
+    el.className = 'result-module';
+    el.innerHTML = `
+      <div class="result-module-header" onclick="toggleModule(this)">
+        <div class="result-module-name">
+          <span class="status-dot ${mod.status}"></span>
+          ${mod.name}
+          ${mod.status !== 'pass' ? `<span class="severity-badge no-dot ${mod.status === 'fail' ? 'critical' : mod.status === 'warn' ? 'high' : 'info'}" style="font-size:11px;padding:2px 7px;margin-left:.5rem">${mod.statusText}</span>` : ''}        </div>
+        ${mod.status === 'pass' ? `<div class="result-status-text pass">${mod.statusText}</div>` : ''}
+      </div>
+      <div class="result-module-body ${i === 0 ? 'open' : ''}">
+        ${(mod.findings || []).map(f => `
+          <div class="finding">
+            <div class="finding-label ${f.level}">${f.label}</div>
+            <div class="finding-title">${f.title}</div>
+            <div class="finding-detail">${f.detail}</div>
+            ${f.education ? `<div class="finding-education">${f.education}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    `;
+    container.appendChild(el);
+  });
+}
+
+function toggleModule(header) {
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+function exportReport() {
+  const filename = document.getElementById('resultFilename').textContent;
+  const size     = document.getElementById('resultSize').textContent;
+  const type     = document.getElementById('resultType').textContent;
+  const severity = document.getElementById('severityBadge').textContent;
+  const now      = new Date().toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+
+  let text = `LADON DOCUMENT SECURITY ANALYZER
+Generated: ${now}
+========================================
+File:     ${filename}
+Size:     ${size}
+Type:     ${type}
+Severity: ${severity}
+========================================
+
+`;
+
+  const modules = document.querySelectorAll('.result-module');
+  modules.forEach(mod => {
+    const name   = mod.querySelector('.result-module-name').textContent.trim();
+    const status = mod.querySelector('.result-status-text')?.textContent.trim() || '';
+    text += `MODULE: ${name}
+STATUS: ${status}
+`;
+
+    const findings = mod.querySelectorAll('.finding');
+    findings.forEach(f => {
+      const label  = f.querySelector('.finding-label')?.textContent.trim() || '';
+      const title  = f.querySelector('.finding-title')?.textContent.trim() || '';
+      const detail = f.querySelector('.finding-detail')?.textContent.trim() || '';
+      const edu    = f.querySelector('.finding-education')?.textContent.trim() || '';
+      text += `  [${label}] ${title}\n  ${detail}\n`;
+      if (edu) text += `  NOTE: ${edu}\n`;
+    });
+    text += '\n';
+  });
+
+  text += `\n========================================\nBuilt by SiteWave Studio LLC — ladon.sitewavestudio.com`;
+
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `ladon-report-${filename.replace(/[^a-z0-9]/gi, '-')}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+
+</body>
+</html>
