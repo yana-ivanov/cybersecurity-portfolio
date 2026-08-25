@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Forecast Was Right — OWAReaper and the Microsoft Pivot | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:.82em;background:rgba(0,0,0,.06);padding:.1em .35em;border-radius:2px;color:var(--blue)}
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper)}
+.stat-num-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-num-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-num-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.attack-chain{margin:1rem 0;display:flex;flex-direction:column;gap:0}
+.chain-step{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;align-items:start;position:relative;padding-bottom:1.25rem}
+.chain-step:last-child{padding-bottom:0}
+.chain-step::before{content:'';position:absolute;left:1.2rem;top:2.5rem;bottom:0;width:2px;background:var(--rule)}
+.chain-step:last-child::before{display:none}
+.chain-num{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.chain-normal .chain-num{background:var(--bg);border:2px solid var(--rule);color:var(--ink3)}
+.chain-warning .chain-num{background:var(--amber-dim);border:2px solid var(--amber);color:var(--amber)}
+.chain-danger .chain-num{background:var(--red-dim);border:2px solid var(--red);color:var(--red)}
+.chain-body{padding-top:.4rem}
+.chain-label{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.25rem;letter-spacing:.02em}
+.chain-warning .chain-label{color:var(--amber)}
+.chain-danger .chain-label{color:var(--red)}
+.chain-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--amber);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--amber-dim);color:var(--amber)}
+/* Forecast comparison box */
+.forecast-box{background:transparent;padding:0;margin:2rem 0}
+.forecast-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.25rem}
+.forecast-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.25rem}
+.forecast-row:last-child{margin-bottom:0}
+.forecast-pane{padding:1rem 1.25rem;border-radius:2px}
+.forecast-pane.predicted{background:#dbeafe;border:1px solid #93c5fd;border-left:3px solid var(--blue)}
+.forecast-pane.confirmed{background:#dcfce7;border:1px solid #86efac;border-left:3px solid var(--green)}
+.forecast-pane-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem}
+.forecast-pane.predicted .forecast-pane-label{color:var(--blue)}
+.forecast-pane.confirmed .forecast-pane-label{color:var(--green)}
+.forecast-text{font-family:var(--serif);font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* Code block */
+.code-block{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto}
+.code-block pre{font-family:var(--mono);font-size:.72rem;color:#94a3b8;line-height:1.8;white-space:pre;margin:0}
+.code-block .comment{color:#4a5568}
+.code-block .string{color:#86efac}
+.code-block .keyword{color:#60a5fa}
+.code-block .danger{color:#ef4444}
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){.wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}.mast-meta{grid-template-columns:1fr 1fr}.stat-num-grid{grid-template-columns:1fr 1fr}.split-visual,.forecast-row{grid-template-columns:1fr}.figure-body{padding:1.25rem 1rem}h2{font-size:1.55rem}h3{font-size:1.1rem}.bio{grid-template-columns:1fr;padding:2rem 1.75rem}footer{flex-direction:column;text-align:center;padding:1.5rem}}
+@media(max-width:480px){.wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}.back-nav{padding:.55rem 1.1rem}.mast-bar{padding:.55rem 1.1rem;font-size:.62rem}.mast-meta{grid-template-columns:1fr}.stat-num-grid{grid-template-columns:1fr 1fr}h1.title{font-size:1.45rem}h2{font-size:1.2rem}.bio{padding:1.5rem 1.1rem}footer{padding:1.25rem 1.1rem}}
+@media(max-width:390px){html{font-size:16px}.wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}.back-nav{padding:.5rem .9rem}.mast-bar{padding:.5rem .9rem;font-size:.6rem}.stat-num-grid{grid-template-columns:1fr 1fr}.stat-num{font-size:1.1rem}h1.title{font-size:1.3rem}h2{font-size:1.1rem}.bio{padding:1.25rem .9rem}footer{padding:1rem .9rem;font-size:.62rem}}
+@media(min-width:768px) and (orientation:landscape){.mobile-notice{display:none}}
+</style>
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()</script>
+</head>
+<body>
+
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<header class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Threat Intelligence Analysis · Russia · Nation-State</div>
+    <div class="mast-kicker" style="color:#ef4444;margin-top:.3rem">Series · Part 3 of 3</div>
+    <h1 class="title">The Forecast Was Right —<br><em>OWAReaper and the Microsoft&nbsp;Pivot</em></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">August 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Threat Actor</div><div class="value">TA488 · Void Blizzard · Laundry Bear</div></div>
+      <div class="meta-item"><div class="label">CVE</div><div class="value">CVE-2026-42897 · OWA XSS</div></div>
+      <div class="meta-item"><div class="label">Implant</div><div class="value">OWAReaper · Survives Reimaging</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    Zero interaction · survives reimaging · Microsoft OWA · active exploitation · no links · no attachments
+  </div>
+</header>
+
+<!-- SECTION 01 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>The Forecast</h2>
+
+  <p>On August 1, 2026, I published <a href="roundpress_part2.html">Part 2</a> of this series — an analysis of five post-compromise capabilities enabled by persistent Zimbra mailbox access, and a datestamped 60-day forecast of where the campaign would go next. One of the specific predictions in that forecast: TA488 would pivot from self-hosted Zimbra and Roundcube installations to Microsoft infrastructure, specifically Outlook Web Access, because the target population in government and aerospace increasingly runs Exchange.</p>
+
+  <p>The forecast was correct. On July 22, 2026 — nine days before <a href="roundpress_part2.html">Part 2</a> published, while I was still writing it — TA488 launched a new wave of attacks against Microsoft Outlook Web Access. The campaign deployed a previously unknown browser implant called OWAReaper, which Proofpoint describes as the most sophisticated backdoor delivered via half-click exploits to date. It is an evolution of ZimReaper, the implant documented in <a href="roundpress_analysis.html">Part 1</a>, sharing significant source code and behavioral overlaps while adding persistence mechanisms that survive both credential rotation and complete device reimaging.</p>
+
+  <p>The timing matters because it confirms the pattern, not the prediction. I did not know on August 1 that OWAReaper had already launched nine days earlier. What I did know was that TA488's operational history — four months of Zimbra zero-day exploitation before disclosure, deliberate actor discipline, targeted collection against government and aerospace — made the Microsoft pivot structurally predictable. The same actor, the same technique, the same intelligence objectives, pointed at the next logical target. The forecast held because the pattern was sound.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Series context:</strong> <a href="roundpress_analysis.html">Part 1</a> documented the half-click exploit — opening an email in a vulnerable Zimbra installation fires JavaScript that steals credentials, 2FA codes, and 90 days of email with zero interaction from the victim. <a href="roundpress_part2.html">Part 2</a> analyzed five post-compromise capabilities enabled by persistent mailbox access and published a 60-day forecast. This Part 3 documents where the campaign went next — the technique evolution, the new target platform, and what OWAReaper does that ZimReaper could not.</p>
+  </div>
+
+  <div class="stat-num-grid">
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">July 22</div>
+      <div class="stat-num-label">OWAReaper<br>Launch Date</div>
+      <div class="stat-num-sub">Nine days before <a href="roundpress_part2.html">Part 2</a> of this series published. TA488 did not wait for the disclosure cycle.</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">March</div>
+      <div class="stat-num-label">Infrastructure<br>Created</div>
+      <div class="stat-num-sub">Two months before Microsoft disclosed CVE-2026-42897. Possible zero-day exploitation window.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">5+</div>
+      <div class="stat-num-label">Sectors<br>Targeted</div>
+      <div class="stat-num-sub">Government, telecom, finance, hospitality, aerospace — unusually broad for TA488.</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">∞</div>
+      <div class="stat-num-label">Persistence<br>After Reimaging</div>
+      <div class="stat-num-sub">OWAReaper grants owner-level Exchange permissions that survive password resets and endpoint reimaging.</div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SECTION 02 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>The Forecast vs. What Happened</h2>
+
+  <p><a href="roundpress_part2.html">Part 2</a> closed with five datestamped predictions about where the campaign would go in the 60 days following August 1, 2026. Three of those predictions are directly testable against the OWAReaper campaign that was already underway when <a href="roundpress_part2.html">Part 2</a> published. The comparison is uncomfortable in the best possible way — not because the prediction was impressive, but because the pattern was that readable.</p>
+
+  <div style="font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-left:3px solid var(--red);padding:.6rem 1rem;margin-bottom:1.25rem;font-weight:600">Forecast (August 1, 2026) vs. Confirmed Activity (July 22 — August&nbsp;2026)</div>
+  <div class="forecast-box">
+    <div class="forecast-row">
+      <div class="forecast-pane predicted">
+        <div class="forecast-pane-label">Predicted — August 1</div>
+        <div class="forecast-text">"TA488 will pivot from self-hosted Zimbra and Roundcube to Microsoft OWA. The target population in government and aerospace increasingly runs Exchange, and TA488 has demonstrated the capability to develop XSS exploits for new webmail platforms within months of operational need."</div>
+      </div>
+      <div class="forecast-pane confirmed">
+        <div class="forecast-pane-label">Confirmed — July 22</div>
+        <div class="forecast-text">TA488 launched OWAReaper against Outlook Web Access nine days before this forecast published. CVE-2026-42897 is an OWA XSS vulnerability. Infrastructure was created in March — the pivot was already in motion when <a href="roundpress_analysis.html">Part 1</a> disclosed.</div>
+      </div>
+    </div>
+    <div class="forecast-row">
+      <div class="forecast-pane predicted">
+        <div class="forecast-pane-label">Predicted — August 1</div>
+        <div class="forecast-text">"The next implant will have improved persistence — specifically mailbox-level persistence that survives password rotation. ZimReaper's credential theft requires a fresh exploit after password reset. A more sophisticated implant would establish server-side permissions that persist independently."</div>
+      </div>
+      <div class="forecast-pane confirmed">
+        <div class="forecast-pane-label">Confirmed — July 30</div>
+        <div class="forecast-text">OWAReaper grants itself Owner-level permissions on every mail folder via Exchange APIs. This persists after password reset, session revocation, and complete device reimaging. Proofpoint confirmed credential rotation does not remove access.</div>
+      </div>
+    </div>
+    <div class="forecast-row">
+      <div class="forecast-pane predicted">
+        <div class="forecast-pane-label">Predicted — August 1</div>
+        <div class="forecast-text">"The breadth of targeting will increase. The initial Zimbra campaigns were highly targeted — 12 infected systems, selective C2 interaction. As the toolset matures and the infrastructure scales, expect wider initial distribution with the same selective follow-on engagement."</div>
+      </div>
+      <div class="forecast-pane confirmed">
+        <div class="forecast-pane-label">Confirmed — July 22</div>
+        <div class="forecast-text">Proofpoint noted that "the volume of messages and breadth of targeting is unusual for TA488" — government, telecom, finance, hospitality, and aerospace across the US and Europe. The wide distribution was deliberate, designed to blend with mass-mailing spam.</div>
+      </div>
+    </div>
+  </div>
+
+  <p>The pattern recognition here is not sophisticated threat intelligence work. It is the application of a basic principle: actors with demonstrated capability and specific intelligence objectives do not stop when a campaign is disclosed. They evolve. The disclosure of Operation RoundPress on July 23 did not interrupt TA488 — OWAReaper launched the day before the joint Proofpoint/NSA advisory went public.</p>
+</div></div>
+
+<!-- SECTION 03 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>How OWAReaper Works — The Technique&nbsp;Evolution</h2>
+
+  <p>ZimReaper, documented in Part 1, used <code>@import</code> tag-splitting to bypass Zimbra's HTML sanitizer. The technique fragments HTML tags with CSS <code>@import</code> directives — the sanitizer strips the <code>@import</code> sequences, and the browser reassembles the remaining characters into valid executable markup. It is detectable because the fragmentation pattern is distinctive and the <code>@import</code> sequences leave artifacts in the email HTML.</p>
+
+  <p>OWAReaper uses a completely different technique — one that is harder to detect because it exploits valid HTML semantics rather than sanitizer confusion.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 1 — OWAReaper Payload Assembly: The Image Fragment Technique</div>
+    <div class="figure-body">
+      <div class="attack-chain">
+        <div class="chain-step chain-normal">
+          <div class="chain-num">01</div>
+          <div class="chain-body">
+            <div class="chain-label">The Email Arrives — No Links, No Attachments</div>
+            <div class="chain-desc">TA488 sends emails with subject lines referencing semiconductor supply chains, global gas markets, public health surveillance, tourism metrics, and nuclear energy updates. The emails are deliberately vague and informational — designed to be opened and skimmed without suspicion. There are no links to click, no attachments to open. Standard security training offers no protection because there is nothing to warn about.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-normal">
+          <div class="chain-num">02</div>
+          <div class="chain-body">
+            <div class="chain-label">Social Media Icons — Payload Fragments Hidden in Plain Sight</div>
+            <div class="chain-desc">The email body contains social media icons — Facebook, LinkedIn, X icons at the bottom, the kind found in every corporate newsletter. The <code>src</code> attribute of each image tag contains a valid Base64-encoded image followed by a <code>#</code> symbol and a payload fragment. The browser stops parsing the <code>src</code> at the <code>#</code> — it renders a normal image. The payload fragment after the <code>#</code> is ignored by the browser's image renderer but is readable by JavaScript as part of the DOM.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">03</div>
+          <div class="chain-body">
+            <div class="chain-label">The onload= Trigger — CVE-2026-42897</div>
+            <div class="chain-desc">The email HTML contains an <code>onload=</code> event handler — a JavaScript execution trigger that fires when the element loads. OWA's HTML sanitizer was supposed to strip <code>onload=</code> and other event handlers from email content. CVE-2026-42897 is specifically a failure in that sanitization — OWA does not adequately sanitize HTML in the message body when rendered in the reading pane. The <code>onload=</code> handler fires the moment the victim opens the email. No click required.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">04</div>
+          <div class="chain-body">
+            <div class="chain-label">Fragment Assembly — The Loader Reconstructs the Payload</div>
+            <div class="chain-desc">The <code>onload=</code> handler executes a small JavaScript loader that queries the DOM for all image tags in the email body, reads the content after each <code>#</code> symbol in their <code>src</code> attributes, concatenates those fragments in order, Base64-decodes the result, and executes it as JavaScript inside the victim's authenticated OWA browser session. The full OWAReaper implant is assembled in memory from fragments that individually look like corrupted image data.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">05</div>
+          <div class="chain-body">
+            <div class="chain-label">OWAReaper Executes — Inside the Authenticated Session</div>
+            <div class="chain-desc">OWAReaper runs inside the victim's authenticated OWA browser context with access to their active session token. It immediately takes two stealth actions: it uses Outlook Exchange APIs to rewrite the email on the Exchange server and remove the exploit content — the email in the victim's inbox is now clean, with no trace of the attack payload — and it disables OWA pop-ups and right-click functionality during its run to prevent accidental discovery.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">06</div>
+          <div class="chain-body">
+            <div class="chain-label">Persistence — Owner-Level Exchange Permissions</div>
+            <div class="chain-desc">OWAReaper checks for installed Outlook add-ins with ReadWriteMailbox permissions. If found, it uses them to steal OAuth tokens and grant itself Owner-level permissions on the Default user of every mail folder. This permission lives on the Exchange server — not the device, not the browser, not the session. Password reset does not remove it. Session revocation does not remove it. Complete endpoint reimaging does not remove it. The attacker retains full mailbox access until an administrator explicitly audits and revokes folder permissions on Exchange.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Attack chain based on Proofpoint analysis "Cleaning Out Inboxes: TA488 Comes for Outlook with Another Half-Click Exploit" (July 30, 2026) and Bleeping Computer reporting (July 30, 2026).</div>
+  </div>
+</div></div>
+
+<!-- SECTION 04 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>ZimReaper vs. OWAReaper — The Evolution</h2>
+
+  <p>These are not two separate campaigns. They are two generations of the same tool, built by the same actor, using the same half-click exploit philosophy, refined over eighteen months of operational learning. The comparison between them reveals how TA488 incorporates defensive feedback into its tooling — each new version addresses the detection gaps that closed the previous one.</p>
+
+  <div class="split-visual">
+    <div class="split-panel left">
+      <div class="split-panel-title">ZimReaper — Generation 1</div>
+      <p><strong>Target:</strong> Zimbra, Roundcube, mDaemon, SOGo — self-hosted webmail</p>
+      <p><strong>CVE:</strong> CVE-2025-66376 (Zimbra) — exploited as zero-day for ~4 months</p>
+      <p><strong>Technique:</strong> @import tag-splitting — CSS fragments reassemble into executable markup after sanitizer strips @import sequences</p>
+      <p><strong>Detection signal:</strong> Distinctive @import fragmentation pattern in email HTML — detectable at the email layer</p>
+      <p><strong>Persistence:</strong> Credential theft — access lost after password rotation</p>
+      <p><strong>Self-cleaning:</strong> No — exploit content remains in email</p>
+      <p><strong>Post-compromise:</strong> Credential theft, 2FA interception, calendar C2 (HOLLOWGRAPH)</p>
+    </div>
+    <div class="split-panel right">
+      <div class="split-panel-title">OWAReaper — Generation 2</div>
+      <p><strong>Target:</strong> Microsoft Outlook Web Access — on-premises Exchange</p>
+      <p><strong>CVE:</strong> CVE-2026-42897 (OWA XSS) — infrastructure created March 2026, disclosed May 14</p>
+      <p><strong>Technique:</strong> onload= event handler + Base64 fragments hidden after # in image src attributes — no sanitizer confusion required</p>
+      <p><strong>Detection signal:</strong> Fragments hidden inside valid image attributes — significantly harder to detect at email layer</p>
+      <p><strong>Persistence:</strong> Owner-level Exchange folder permissions — survives password reset, session revocation, endpoint reimaging</p>
+      <p><strong>Self-cleaning:</strong> Yes — rewrites email on Exchange server to remove exploit content immediately after execution</p>
+      <p><strong>Post-compromise:</strong> Full persistent mailbox access, OAuth token theft, two C2 channels, two exfiltration protocols</p>
+    </div>
+  </div>
+
+  <p>Every weakness that made ZimReaper detectable has been addressed in OWAReaper. The tag-splitting pattern that anchored the RoundPress detection rule — and the rule I submitted to Sublime Security's open-source ruleset — does not appear in OWAReaper. The exploit content that would survive in the victim's inbox for forensic analysis is immediately overwritten. The access that would be revoked by a password reset now lives on the Exchange server independently of credentials.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Detection gap:</strong> The <code>@import</code> tag-splitting rule submitted to Sublime Security in PR #4981 covers ZimReaper delivery specifically. OWAReaper uses a different technique — <code>onload=</code> event handlers and Base64 payload fragments in image <code>src</code> attributes — that requires a separate detection rule. Both rules are needed. Neither covers the other's attack surface. A companion rule targeting OWAReaper delivery patterns is in development and will be submitted as a fast-follow PR.</p>
+  </div>
+</div></div>
+
+<!-- SECTION 05 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>Key Findings</h2>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">OWAReaper Survives Everything Except an Exchange Audit</div>
+        <div class="finding-desc">The persistence mechanism is the most significant capability advance over ZimReaper. By granting itself Owner-level permissions on Exchange mail folders via OAuth tokens stolen from installed add-ins, OWAReaper creates a persistence layer that lives on the Exchange server itself. Standard incident response procedures — password reset, session revocation, MFA re-enrollment, endpoint reimaging — do not touch Exchange folder permissions. An organization that discovers OWAReaper activity and follows standard credential-reset procedures is still fully compromised. Recovery requires explicit audit and revocation of folder permissions directly on Exchange, which is not part of most incident response playbooks.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">The Attack Destroys Its Own Evidence</div>
+        <div class="finding-desc">Immediately after OWAReaper executes, it uses Outlook Exchange APIs to rewrite the original email on the Exchange server — removing the exploit payload from the message. The email in the victim's inbox is now clean. A forensic analyst examining the victim's mailbox after the fact sees a vague informational email about semiconductor supply chains with no suspicious content. The exploit that fired when the email was opened is gone. This directly undermines email-based forensic investigation and makes it significantly harder to identify the scope of a compromise after the fact.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">"We Use Microsoft 365" Does Not Mean You Are Safe</div>
+        <div class="finding-desc">CVE-2026-42897 affects on-premises Exchange OWA — not Exchange Online as a managed Microsoft service. Organizations that have fully migrated to Microsoft 365 cloud are not in scope for this specific vulnerability. However, hybrid organizations — those running a mix of on-premises Exchange and cloud — may still expose on-premises OWA to this attack even if most users are on Exchange Online. "We use Microsoft 365" does not complete the inventory. Security teams should confirm whether any on-premises OWA endpoints remain and whether the CVE-2026-42897 patches have been applied across all Exchange servers including management tooling.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">4</div>
+      <div>
+        <div class="finding-title">Security Training Cannot Protect Against This Attack</div>
+        <div class="finding-desc">The standard pillars of security awareness training — do not click suspicious links, do not open unexpected attachments, verify sender identity — offer zero protection against OWAReaper. The emails contain no links. They contain no attachments. They arrive from compromised legitimate accounts with established sender reputations. The lure content is boring by design — supply chain metrics, energy market indicators — calibrated to be opened without suspicion and dismissed without reporting. The attack surface is the act of opening an email in a vulnerable OWA instance. There is nothing in the email that a trained user would recognize as suspicious.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">5</div>
+      <div>
+        <div class="finding-title">The Detection Gap at the Email Layer Is Real and Unaddressed</div>
+        <div class="finding-desc">Sublime Security's production ruleset has no coverage for OWAReaper delivery patterns. The existing XSS rule targets mass-campaign spam with 10+ recipients and raw script tags in the subject — the opposite of OWAReaper's targeted, clean-looking delivery. The RoundPress rule in PR #4981 targets @import tag-splitting specific to ZimReaper. OWAReaper's onload= event handler combined with Base64 payload fragments in image src attributes is a different signal set requiring a separate rule. Both rules are necessary and neither substitutes for the other.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SECTION 06 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>Immediate Response Actions</h2>
+
+  <p>For organizations running on-premises Exchange OWA, the standard credential-reset incident response is insufficient. The following actions are specific to OWAReaper and are not covered by most IR playbooks.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Action</th><th>Why</th><th>Priority</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Apply CVE-2026-42897 patches to all on-premises Exchange servers</strong></td>
+          <td>Microsoft shipped emergency mitigations and a permanent patch on June 9, 2026. Unpatched OWA instances remain vulnerable to initial compromise.</td>
+          <td class="red">IMMEDIATE</td>
+        </tr>
+        <tr>
+          <td><strong>Audit Exchange folder permissions — specifically Default and Anonymous</strong></td>
+          <td>OWAReaper grants Owner-level permissions to the Default user on every mail folder. Standard credential reset does not remove these. Explicit permission audit and revocation on Exchange is required.</td>
+          <td class="red">IMMEDIATE</td>
+        </tr>
+        <tr>
+          <td><strong>Review and revoke Outlook add-in tokens with ReadWriteMailbox permissions</strong></td>
+          <td>OWAReaper uses installed add-ins with ReadWriteMailbox to steal OAuth tokens and establish persistence. Review all add-ins with this permission scope and revoke any that cannot be verified as legitimate.</td>
+          <td class="red">IMMEDIATE</td>
+        </tr>
+        <tr>
+          <td><strong>Clear OWA offline cache and browser storage on potentially affected endpoints</strong></td>
+          <td>OWAReaper establishes persistence in browser storage in addition to Exchange server permissions. Clearing OWA offline cache and browser localStorage/IndexedDB removes this layer.</td>
+          <td class="amber">HIGH</td>
+        </tr>
+        <tr>
+          <td><strong>Identify OWA users and messages opened during the exposure window</strong></td>
+          <td>The exposure window extends back to March 2026 if zero-day exploitation is confirmed. Exchange logs will show which users opened emails in OWA during this period.</td>
+          <td class="amber">HIGH</td>
+        </tr>
+        <tr>
+          <td><strong>Preserve browser evidence before remediation</strong></td>
+          <td>OWAReaper rewrites the malicious email to remove exploit content. Browser localStorage and IndexedDB may contain implant artifacts that are not preserved by standard email forensics.</td>
+          <td class="amber">HIGH</td>
+        </tr>
+        <tr>
+          <td><strong>Confirm hybrid Exchange inventory</strong></td>
+          <td>"We use Microsoft 365" is not a complete answer. Identify any on-premises Exchange OWA endpoints including management tooling. CVE-2026-42897 affects on-premises OWA, not Exchange Online.</td>
+          <td class="amber">HIGH</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div></div>
+
+<!-- SECTION 07 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 07</div>
+  <h2>What Comes Next — An Updated Forecast</h2>
+
+  <p>The previous forecast held. The pattern that generated it has not changed. TA488 is an actor with demonstrated zero-day capability, operational discipline, and specific intelligence collection objectives against government, aerospace, and critical infrastructure targets. OWAReaper is not the end of this campaign — it is the current generation of a maturing toolset.</p>
+
+  <p>The following observations about the next 60 days are analytical hypotheses, not confirmed intelligence. They are datestamped August 24, 2026.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Forecast — August 24, 2026</strong></p>
+    <p style="margin-top:.75rem"><strong>1. Cloud pivot:</strong> CVE-2026-42897 affects on-premises Exchange OWA. As organizations patch and migrate to Exchange Online, TA488 will need a new initial access vector for cloud-hosted OWA. Expect research into Exchange Online's HTML sanitization behavior — the same class of vulnerability in a cloud-managed service would have significantly broader impact.</p>
+    <p style="margin-top:.75rem"><strong>2. Add-in supply chain:</strong> OWAReaper's persistence mechanism requires a pre-installed Outlook add-in with ReadWriteMailbox permissions to steal OAuth tokens. TA488 may move toward compromising legitimate add-ins — the same supply chain pattern documented in the npm ecosystem — to ensure the persistence prerequisite is already in place before the half-click exploit fires.</p>
+    <p style="margin-top:.75rem"><strong>3. Self-cleaning will become standard:</strong> OWAReaper's most significant operational innovation is the immediate deletion of exploit content from the Exchange server after execution. This technique — using the victim's own authenticated APIs to destroy evidence — will appear in other implant families. Defenders who rely on mailbox forensics to identify compromise will face increasing blind spots.</p>
+  </div>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis is based on publicly available information including Proofpoint's "Cleaning Out Inboxes: TA488 Comes for Outlook with Another Half-Click Exploit" (July 30, 2026), Bleeping Computer's OWAReaper coverage (July 30, 2026), Breachroad's CVE-2026-42897 technical analysis, and Hacker News and Cyber Press reporting on the campaign. The forecast in Section 07 represents independent analytical hypothesis — not confirmed intelligence — and is datestamped August 24, 2026. The detection gap noted in Finding 5 reflects a rule currently in development for submission to Sublime Security's open-source ruleset as a companion to PR #4981. Part 1 of this series is available at <a href="roundpress_analysis.html">yanaivanov.com/analysis/roundpress_analysis.html</a>. Part 2 is available at <a href="roundpress_part2.html">yanaivanov.com/analysis/roundpress_part2.html</a>.</p>
+</div></div>
+
+<div class="wrap"></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." Before security I spent 15 years designing enterprise software. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>The Forecast Was Right · OWAReaper · Yana Ivanov · August 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+</body>
+</html>
