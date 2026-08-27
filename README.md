@@ -46,6 +46,7 @@ Open-source detection rules contributed to [Sublime Security's production rulese
 
 | Rule | Gist | Status |
 |------|------|--------|
+| Homoglyph BEC domain impersonation | [PR #4596](https://github.com/sublime-security/sublime-rules/pull/4596) | PR merged |
 | ClickFix clipboard hijack lure | [gist](https://gist.github.com/yana-ivanov/7dcd7bdb7c321f3b42117e6104603ee7) | PR merged |
 | pkpass Apple Wallet phishing | [gist](https://gist.github.com/yana-ivanov/b3e4ee146561d05f63e71618a6ba366e) | PR open |
 | RoundPress XSS webmail exploit | [gist](https://gist.github.com/yana-ivanov/7edf45c26bacf957dfaf5d6ba96df5eb) | PR open |
