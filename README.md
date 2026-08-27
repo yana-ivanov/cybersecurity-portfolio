@@ -6,7 +6,8 @@ Active contributor to [Sublime Security's open-source email detection ruleset](h
 
 **Portfolio:** [yanaivanov.com](https://yanaivanov.com)  
 **GitHub:** [@yana-ivanov](https://github.com/yana-ivanov)  
-**X:** [@ArtemisHex_](https://x.com/ArtemisHex_)
+**X:** [@ArtemisHex_](https://x.com/ArtemisHex_)  
+**Discord:** ArtemisHex
 
 ---
 
