@@ -58,6 +58,10 @@ Open-source detection rules contributed to [Sublime Security's production rulese
 | PDF with AI-generated metadata — Kimsuky pattern | [gist](https://gist.github.com/yana-ivanov/4ebb6f4b726c8a7b6a73e04e29e65952) | In pipeline |
 | Framer-hosted credential phishing | [gist](https://gist.github.com/yana-ivanov/a2a8eac912af67bf84bebba54442a86f) | In pipeline |
 | Figma first-contact invite abuse | [gist](https://gist.github.com/yana-ivanov/3fc9d818d29e7227e959a4803ef7765f) | In pipeline |
+| OWAReaper onload= XSS delivery | [gist](https://gist.github.com/yana-ivanov/4f14e4f7163b53f00853066965221b6c) | In pipeline |
+| ShinyHunters .claims TLD IT impersonation | [gist](https://gist.github.com/yana-ivanov/78f5e40ab19842b0d760e00bf8945f42) | In pipeline |
+| EvilTokens device code body lure | [gist](https://gist.github.com/yana-ivanov/30916df7e16a170f4b689bcd4b07bac0) | In pipeline |
+| Jira Service Management PaaP phishing lure | [gist](https://gist.github.com/yana-ivanov/499ad4d3ff401488ee4414b9243046c8) | In pipeline |
 
 ---
 
