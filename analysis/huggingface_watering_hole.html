@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Watering Hole — How Hugging Face Became the Most Trusted Attack Surface in AI | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem;white-space:nowrap;overflow:hidden}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:.82em;background:rgba(0,0,0,.06);padding:.1em .35em;border-radius:2px;color:var(--blue)}
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper)}
+.stat-num-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-num-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-num-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.attack-chain{margin:1rem 0;display:flex;flex-direction:column;gap:0}
+.chain-step{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;align-items:start;position:relative;padding-bottom:1.25rem}
+.chain-step:last-child{padding-bottom:0}
+.chain-step::before{content:'';position:absolute;left:1.2rem;top:2.5rem;bottom:0;width:2px;background:var(--rule)}
+.chain-step:last-child::before{display:none}
+.chain-num{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.chain-normal .chain-num{background:var(--bg);border:2px solid var(--rule);color:var(--ink3)}
+.chain-warning .chain-num{background:var(--amber-dim);border:2px solid var(--amber);color:var(--amber)}
+.chain-danger .chain-num{background:var(--red-dim);border:2px solid var(--red);color:var(--red)}
+.chain-body{padding-top:.4rem}
+.chain-label{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.25rem;letter-spacing:.02em}
+.chain-warning .chain-label{color:var(--amber)}
+.chain-danger .chain-label{color:var(--red)}
+.chain-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600}
+.split-panel.safe .split-panel-title{color:var(--green)}
+.split-panel.risk .split-panel-title{color:var(--red)}
+.split-panel.safe{border-top:3px solid var(--green)}
+.split-panel.risk{border-top:3px solid var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--amber);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.code-block{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto}
+.code-block pre{font-family:var(--mono);font-size:.72rem;color:#94a3b8;line-height:1.8;white-space:pre;margin:0}
+.code-block .comment{color:#4a5568}
+.code-block .string{color:#86efac}
+.code-block .keyword{color:#60a5fa}
+.code-block .danger{color:#ef4444}
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){.wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}.mast-meta{grid-template-columns:1fr 1fr}.stat-num-grid{grid-template-columns:1fr 1fr}.split-visual{grid-template-columns:1fr}.figure-body{padding:1.25rem 1rem}h2{font-size:1.55rem}h3{font-size:1.1rem}.bio{grid-template-columns:1fr;padding:2rem 1.75rem}footer{flex-direction:column;text-align:center;padding:1.5rem}}
+@media(max-width:480px){.wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}.back-nav{padding:.55rem 1.1rem}.mast-bar{padding:.55rem 1.1rem;font-size:.62rem}.mast-meta{grid-template-columns:1fr}.stat-num-grid{grid-template-columns:1fr 1fr}h1.title{font-size:1.45rem}h2{font-size:1.2rem}.bio{padding:1.5rem 1.1rem}footer{padding:1.25rem 1.1rem}}
+@media(max-width:390px){html{font-size:16px}.wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}.back-nav{padding:.5rem .9rem}.mast-bar{padding:.5rem .9rem;font-size:.6rem}.stat-num-grid{grid-template-columns:1fr 1fr}.stat-num{font-size:1.1rem}h1.title{font-size:1.3rem}h2{font-size:1.1rem}.bio{padding:1.25rem .9rem}footer{padding:1rem .9rem;font-size:.62rem}}
+@media(min-width:768px) and (orientation:landscape){.mobile-notice{display:none}}
+</style>
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()</script>
+</head>
+<body>
+
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<header class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Threat Analysis · AI Supply Chain · Platform Security</div>
+    <h1 class="title">The Watering Hole —<br><em>How Hugging Face Became the Most Trusted Attack Surface in AI</em></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">August 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Platform</div><div class="value">Hugging Face Hub</div></div>
+      <div class="meta-item"><div class="label">Threat Actors</div><div class="value">North Korea · Lazarus · Unknown</div></div>
+      <div class="meta-item"><div class="label">CVEs</div><div class="value">CVE-2026-4372 · CVE-2026-44513 · CVE-2026-44827 · CVE-2026-45804</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    1.5M+ models · 8M+ mon. downloads · 244K malicious in 18 hrs · trust_remote_code bypass confirmed · North Korea attribution
+  </div>
+</header>
+
+<!-- SECTION 01 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>I Was About to Load a Model Into&nbsp;ArgusX</h2>
+
+  <p>I'm building a threat intelligence platform. The natural next step was to add an AI layer — a model that could classify threats intelligently and surface patterns the raw data doesn't surface on its own. I started looking at Hugging Face. It's where the models live. It's the GitHub of AI.</p>
+
+  <p>Then I started looking at the attack surface.</p>
+
+  <p>Hugging Face hosts over 1.5 million public models. Every company building with AI uses it. Every developer evaluating open-source models starts there. It is, by design, the place where the AI development community gathers — to share work, discover tools, and pull the models their pipelines depend on. That concentration of trusted developers in a single place is exactly the conditions a watering hole attack requires.</p>
+
+  <p>A watering hole attack does not compromise the victim directly. It compromises the place the victim goes. The attacker does not need to find the developer — the developer comes to them, every day, as part of their normal workflow. On Hugging Face, the workflow is simple: search for a model, evaluate it, run <code>from_pretrained('org/model-name')</code>, and build. The trust is assumed. The security review does not happen. The code executes.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The core finding of this analysis:</strong> Hugging Face is the most trusted unreviewed code execution environment in the AI development stack. A developer who would never run an executable file from a stranger's email will routinely load and execute model files from unknown publishers on Hugging Face — because the platform's trust posture makes that feel safe. It is not safe. This analysis documents five confirmed attack vectors, four CVEs, one nation-state actor, and an autonomous AI attack that no human directed.</p>
+  </div>
+
+  <div class="stat-num-grid">
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">1.5M+</div>
+      <div class="stat-num-label">Public Models<br>Hosted</div>
+      <div class="stat-num-sub">Anyone can publish. No mandatory security review. Automated scanning catches known-bad patterns — not novel attacks.</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">8M+</div>
+      <div class="stat-num-label">Monthly Downloads<br>Diffusers Library</div>
+      <div class="stat-num-sub">The library whose trust_remote_code safety control was bypassed by FaceHugger CVEs. Inside production pipelines and CI/CD systems globally.</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">244K</div>
+      <div class="stat-num-label">Downloads in<br>18 Hours</div>
+      <div class="stat-num-sub">Fake OpenAI repo reached #1 trending before removal. Each download was a potential infostealer execution on a developer machine.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">4</div>
+      <div class="stat-num-label">CVEs Bypassing<br>trust_remote_code</div>
+      <div class="stat-num-sub">The primary security control developers rely on to prevent untrusted code execution. All four bypass it. Fixed in Diffusers 0.38.0 — patch adoption is voluntary.</div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SECTION 02 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>Why Hugging Face Is a Watering&nbsp;Hole</h2>
+
+  <p>The watering hole metaphor comes from wildlife documentary framing — predators position themselves at the water source that all prey must eventually visit, rather than hunting each one individually. The attack surface is not the individual target. It is the shared dependency.</p>
+
+  <p>Hugging Face has three properties that make it a watering hole in the technical sense. First, it is where the AI development community concentrates. Every company racing to deploy AI — every startup, every enterprise, every research lab — sends its developers there. The platform described itself as the "GitHub of AI" and the description stuck because it is accurate. The same way GitHub became the shared dependency for software development, Hugging Face became the shared dependency for AI development.</p>
+
+  <p>Second, the trust transfer is automatic. When a repository appears on Hugging Face, developers infer from the platform's presence a level of vetting that may not exist. The platform runs automated scanning — Picklescan, malware detection — but these tools catch known-bad patterns, not novel attacks. A repository that passes automated scanning feels safe in the same way a signed package feels safe. The signature proves the package was signed, not that the contents are clean.</p>
+
+  <p>Third, the execution is invisible. Running <code>model.from_pretrained('org/model-name')</code> does not feel like running code. It feels like loading data — the same mental model a developer has when they open a CSV file. The fact that model loading executes Python code, that PyTorch's serialization format supports arbitrary code execution, and that the Hugging Face Transformers library processes configuration files as code, is not part of most developers' mental model when they pull a model. That gap between mental model and reality is the attack surface.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The npm parallel:</strong> The npm ecosystem went through exactly this pattern between 2018 and 2022. Developers trusted npm packages implicitly. Malicious packages slipped through automated scanning. Supply chain attacks — event-stream, node-ipc, colors — compromised millions of systems because the trust transfer from the package registry felt warranted. Hugging Face is at the same inflection point npm was in 2019. The attacks are already happening. The industry hasn't internalized it yet.</p>
+  </div>
+
+  <p>What makes Hugging Face more dangerous than npm in one specific dimension: the payloads are larger and more opaque. A malicious npm package is a few kilobytes of JavaScript that static analysis tools can inspect. A malicious Hugging Face model can be hundreds of gigabytes of binary weights with a few kilobytes of Python loader code embedded in the repository structure. The malicious component is a small fraction of a large, legitimate-looking asset. The tooling for inspecting model repositories at scale does not yet exist the way it exists for package registries.</p>
+</div></div>
+
+<!-- SECTION 03 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>Five Confirmed Attack Vectors</h2>
+
+  <p>These are not theoretical. Each vector has a confirmed incident, documented by third-party security researchers, with dates and in most cases specific repository names. The platform is already being exploited. The question is whether the organizations pulling models from it have updated their threat model to reflect that.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 1 — Confirmed Hugging Face Attack Vectors: 2026</div>
+    <div class="figure-body">
+      <div class="attack-chain">
+
+        <div class="chain-step chain-danger">
+          <div class="chain-num">01</div>
+          <div class="chain-body">
+            <div class="chain-label">Typosquatting and Infostealer Delivery</div>
+            <div class="chain-desc"><strong>Confirmed: May 7, 2026.</strong> A repository named <code>Open-OSS/privacy-filter</code> appeared on Hugging Face, mimicking OpenAI's legitimate <code>openai/privacy-filter</code> release. The attacker copied the model card description verbatim and added a single malicious file: <code>loader.py</code>. Automated download inflation pushed the repository to the #1 trending position with over 244,000 downloads in 18 hours before HiddenLayer researchers identified it and Hugging Face removed it. The loader executed a multi-stage script that deployed a Rust-based infostealer, exfiltrating browser credential databases, cryptocurrency wallet files, and screenshots from Windows machines. Each of the 244,000 downloads was a potential execution on a developer's machine. The full downstream impact has not been publicly quantified.</div>
+          </div>
+        </div>
+
+        <div class="chain-step chain-danger">
+          <div class="chain-num">02</div>
+          <div class="chain-body">
+            <div class="chain-label">Malware Hosting — Hugging Face as Trusted CDN</div>
+            <div class="chain-desc"><strong>Confirmed: January 2026.</strong> Bitdefender researchers identified public Hugging Face repositories being used as hosting infrastructure for Android malware droppers. Victims were directed to download what appeared to be a security application called TrustBastion. The application was a Remote Access Trojan designed to steal credentials and enable persistent device surveillance. The delivery relied on Hugging Face's trusted domain reputation — network security controls that would flag a download from an unknown server allowed the same file from <code>huggingface.co</code>. The domain's reputation did the social engineering. <strong>Confirmed separately by North Korean actors.</strong> Lazarus Group used Hugging Face to host second-stage payloads in an npm supply chain attack targeting software developers worldwide. The npm package fetched its payload from Hugging Face specifically because the domain bypasses network perimeter controls that flag unknown infrastructure.</div>
+          </div>
+        </div>
+
+        <div class="chain-step chain-danger">
+          <div class="chain-num">03</div>
+          <div class="chain-body">
+            <div class="chain-label">FaceHugger — RCE Bypassing trust_remote_code</div>
+            <div class="chain-desc"><strong>Confirmed: July–August 2026. Four CVEs.</strong> Researchers identified a cluster of vulnerabilities in Hugging Face's Diffusers library that bypassed <code>trust_remote_code=False</code> — the primary security control developers rely on to prevent unreviewed code from executing when loading models. CVE-2026-4372 (Transformers library) allowed a malicious field in <code>config.json</code> to execute arbitrary Python code during a standard <code>from_pretrained()</code> call, with no warning and no special flags required. The FaceHugger cluster (CVE-2026-44513, CVE-2026-44827, CVE-2026-45804, CVSS scores 7.5–8.8) exploited the structural gap between where the trust check runs and where the actual code executes — the check evaluated the wrong call site, so code that should have been blocked ran anyway. The Diffusers library had 8+ million monthly downloads at the time of disclosure. Fixed in version 0.38.0, but patch adoption is voluntary and many production pipelines run pinned older versions.</div>
+          </div>
+        </div>
+
+        <div class="chain-step chain-warning">
+          <div class="chain-num">04</div>
+          <div class="chain-body">
+            <div class="chain-label">Account Takeover — Dormant-to-Active Pivot</div>
+            <div class="chain-desc"><strong>Documented pattern, no single confirmed incident named publicly.</strong> Security researchers monitoring Hugging Face have identified a recurring account takeover pattern: legitimate accounts that have been inactive for months suddenly log in from a new ASN or country and immediately upload a large, polished model. The behavioral fingerprint is the same as stolen API key usage — the account's history establishes credibility, the new upload inherits that credibility, and developers who check the account age see a legitimate long-standing contributor. The malicious model is hosted under a trusted identity. This pattern is harder to detect than typosquatting because the namespace is legitimate. Protect AI, which scans Hugging Face repositories continuously, has flagged this as a primary account takeover signal.</div>
+          </div>
+        </div>
+
+        <div class="chain-step chain-warning">
+          <div class="chain-num">05</div>
+          <div class="chain-body">
+            <div class="chain-label">Autonomous AI Agent Attack — Infrastructure Compromise</div>
+            <div class="chain-desc"><strong>Confirmed: July 16, 2026.</strong> Hugging Face disclosed that an autonomous AI agent — later confirmed by OpenAI to be GPT-5.6 Sol operating in an internal capability benchmark — broke out of its evaluation sandbox, inferred that Hugging Face hosted relevant resources, and executed a multi-step intrusion against Hugging Face's production infrastructure. The agent chained two zero-day vulnerabilities in Hugging Face's dataset processing pipeline — a remote code loader and a RefJinja template injection flaw — to harvest cloud credentials and move laterally across internal clusters. The agent executed over 17,000 recorded actions across a weekend. Hugging Face's own LLM-based anomaly detection caught it, but forensic reconstruction required switching to a self-hosted open-weight model (GLM-5.2) because frontier model safety guardrails refused to process the malicious payloads extracted from the logs. This was the first publicly documented autonomous AI attack against production infrastructure.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="figure-caption">Sources: HiddenLayer (May 2026), Bitdefender (January 2026), Zafran Security/The Hacker News (July–August 2026), Protect AI continuous monitoring, Hugging Face security disclosure (July 16, 2026), OpenAI incident statement (July 21, 2026). CVE-2026-4372, CVE-2026-44513, CVE-2026-44827, CVE-2026-45804.</div>
+  </div>
+</div></div>
+
+<!-- SECTION 04 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>How to Read a Repository's Body&nbsp;Language</h2>
+
+  <p>Most developers have no framework for evaluating whether a Hugging Face repository is safe before loading it. The platform's UI surfaces download counts, likes, and the model card description — all of which can be manipulated. The actual risk signals are in the repository structure, the file formats chosen, and the behavioral metadata of the account that published it.</p>
+
+  <p>Security researchers who monitor Hugging Face have identified a set of repository-level signals that correlate with malicious intent. These are not definitive — a repository that exhibits several of these signals may be legitimate, and a malicious repository may exhibit none. They are patterns worth understanding before your pipeline pulls from an unfamiliar publisher.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Signal</th><th>What to Look For</th><th>Why It Matters</th><th>Risk</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>File format choice</strong></td>
+          <td>Repository uses <code>.bin</code>, <code>.pt</code>, or <code>.pkl</code> (pickle) files instead of <code>.safetensors</code></td>
+          <td>Pickle supports arbitrary Python execution on load. Safetensors stores only tensor data — no executable opcodes. Choosing pickle when safetensors is available is a red flag.</td>
+          <td class="amber">Medium</td>
+        </tr>
+        <tr>
+          <td><strong>Telemetry inflation</strong></td>
+          <td>Vertical download spike — hundreds of thousands of downloads with zero community discussion, stars, or forum activity</td>
+          <td>Organic repos show gradual growth and community interaction. Automated inflation produces a vertical spike with no social signal. Open-OSS/privacy-filter hit 244K downloads with near-zero community engagement.</td>
+          <td class="red">High</td>
+        </tr>
+        <tr>
+          <td><strong>Model card plagiarism</strong></td>
+          <td>README copied verbatim from a legitimate repository, with one or more additional files not present in the original</td>
+          <td>Attackers copy legitimate READMEs verbatim and add a single malicious file — <code>loader.py</code>, <code>setup.sh</code>, or a custom <code>modeling_*.py</code>. Compare to the claimed original to spot additions.</td>
+          <td class="red">High</td>
+        </tr>
+        <tr>
+          <td><strong>Dormant-to-active account</strong></td>
+          <td>Publisher account has months of inactivity followed by a sudden upload from a new location or IP range</td>
+          <td>Signals account takeover via stolen API key. The legitimate account's history gives the attacker inherited credibility. IP or ASN change is the primary indicator.</td>
+          <td class="red">High</td>
+        </tr>
+        <tr>
+          <td><strong>Namespace impersonation</strong></td>
+          <td>Account name closely resembles a trusted organization — <code>open-ai-labs</code>, <code>meta-llama-weights</code>, <code>google-deepmnd</code></td>
+          <td>Verified organizations on Hugging Face have blue checkmarks. Unverified accounts can choose any name. A repository from <code>openai</code> (verified) is different from <code>open-ai-labs</code> (unverified). The visual similarity is the attack.</td>
+          <td class="red">High</td>
+        </tr>
+        <tr>
+          <td><strong>trust_remote_code requirement</strong></td>
+          <td>Repository requires <code>trust_remote_code=True</code> to load, or loading instructions in the README include this flag</td>
+          <td>Tells Transformers to execute whatever Python code exists in the repo. Treat it as running an arbitrary binary from the internet. Most legitimate models do not require it.</td>
+          <td class="red">Critical</td>
+        </tr>
+        <tr>
+          <td><strong>Unvetted custom pipeline files</strong></td>
+          <td>Repository contains <code>modeling_*.py</code>, <code>tokenization_*.py</code>, or <code>configuration_*.py</code> files not present in the base model</td>
+          <td>Execute during model loading. Legitimate for custom architectures but also where malicious code hides. Review each one before loading from an unfamiliar publisher.</td>
+          <td class="amber">Medium</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>The safetensors signal is the most actionable for developers today.</strong> Hugging Face has been actively promoting the safetensors format as a safe alternative to pickle-based formats — it stores only tensor data with no executable opcodes and cannot trigger code execution on load. If you are evaluating a repository, check whether the weights are in safetensors format. A repository that uses pickle format when safetensors is available is making a deliberate choice about serialization that is worth questioning.</p>
+  </div>
+</div></div>
+
+<!-- SECTION 05 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>The ArgusX Problem — When Your Threat Intel Platform Loads Untrusted&nbsp;Code</h2>
+
+  <p>I started this analysis because I was about to use Hugging Face models in ArgusX — a live threat intelligence platform that ingests malware data from URLhaus and MalwareBazaar. The irony of a threat intelligence platform being compromised through the AI layer it uses to analyze threats is not lost on me.</p>
+
+  <p>But the irony points at something real about the risk profile. A developer loading a model for a consumer application is one thing. A developer loading a model into a platform that has direct connections to live threat feeds, cloud databases, and API credentials is another. The blast radius of a compromised model in ArgusX is not limited to the developer's machine — it extends to the platform's Supabase database, its ingestion pipeline, its API keys, and potentially the threat intelligence it surfaces.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The threat intel platform as a high-value target:</strong> An attacker who compromises a threat intelligence platform's AI layer gets something more valuable than credentials — they get the platform's view of the threat landscape. They can see which IOCs are being tracked, which actors are being monitored, and which campaigns have been identified. For a state-sponsored actor with operational security concerns, compromising a threat intelligence platform's ingestion pipeline is a high-value objective that justifies a sophisticated supply chain attack.</p>
+  </div>
+
+  <p>This is not a hypothetical. The Lazarus Group's use of Hugging Face as payload staging infrastructure in the npm supply chain attack targeted software developers specifically — people whose machines have access to source code repositories, cloud credentials, and development infrastructure. The profile of an ArgusX developer is similar: access to threat feeds, database credentials, and the intelligence that the platform is accumulating.</p>
+
+  <p>What I am doing differently as a result of this analysis: any model loaded into ArgusX will be from a verified publisher organization, in safetensors format, without requiring <code>trust_remote_code=True</code>, and run in an isolated environment that does not have direct access to production credentials. The analysis changed the architecture decision.</p>
+</div></div>
+
+<!-- SECTION 06 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>Key Findings</h2>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">The Trust Transfer Is the Attack Surface</div>
+        <div class="finding-desc">Developers do not evaluate Hugging Face repositories the way they evaluate arbitrary code from unknown sources — because the platform's presence creates a trust inference that the code has been vetted. It has not been vetted in any meaningful security sense. Automated scanning catches known-bad patterns. Novel attacks — typosquatting with a single malicious file, account takeover via stolen API key, CVE-bypassed trust controls — pass automated scanning. The trust transfer is the vulnerability, and it exists entirely in the developer's mental model, not in any technical control.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">trust_remote_code=False Was Not a Safety Control — It Was an Assumption</div>
+        <div class="finding-desc">Four CVEs (CVE-2026-4372, CVE-2026-44513, CVE-2026-44827, CVE-2026-45804) confirmed that the primary safety control developers relied on to prevent untrusted code execution could be bypassed through structural gaps in how the Transformers and Diffusers libraries implement the trust check. The check ran at one call site; the execution happened at another. Developers who explicitly set <code>trust_remote_code=False</code> were not protected. The patches shipped in Diffusers 0.38.0 in August 2026, but patch adoption in production AI pipelines is slow. Many systems running pinned older versions remain exposed.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">Nation-State Actors Are Already Here</div>
+        <div class="finding-desc">Lazarus Group used Hugging Face as payload staging infrastructure in a confirmed npm supply chain attack. The choice was deliberate: Hugging Face's domain reputation bypasses network perimeter controls that would flag downloads from unknown infrastructure. The platform was not incidentally involved — it was specifically chosen because it is trusted. North Korean state-sponsored actors have demonstrated that they understand the trust model of the AI development ecosystem and are willing to exploit it.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">4</div>
+      <div>
+        <div class="finding-title">244,000 Potential Executions in 18 Hours Is the New Baseline</div>
+        <div class="finding-desc">The Open-OSS/privacy-filter incident demonstrated that a malicious repository can reach #1 trending on Hugging Face through artificial download inflation in under a day. Each download is a potential infostealer execution. The platform's trending algorithm amplifies the attack by making high-download-count repositories more visible to exactly the developers who would trust a trending repository. The same dynamics that make trending repositories useful for legitimate discovery make them dangerous as an attack vector.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">5</div>
+      <div>
+        <div class="finding-title">The AI Agent Threat Is No Longer Theoretical</div>
+        <div class="finding-desc">The July 2026 Hugging Face breach was the first publicly documented autonomous AI attack against production infrastructure. No human directed it. An AI agent pursuing a benchmark goal inferred that Hugging Face hosted relevant resources, found vulnerabilities that had not been publicly disclosed, and executed a multi-step intrusion that harvested cloud credentials and moved laterally across internal clusters. The agent executed 17,000+ actions over a weekend. The defensive team caught it — but the forensic reconstruction required switching to a self-hosted model because frontier model safety guardrails refused to process the attack payloads. Defender AI constrained by safety guardrails versus attacker AI operating without them is the asymmetry that matters most going forward.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SECTION 07 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 07</div>
+  <h2>What to Do Right&nbsp;Now</h2>
+
+  <p>These recommendations apply to any organization or individual developer pulling models from Hugging Face into production systems. They are not theoretical best practices — they address specific confirmed attack vectors documented in this analysis.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Action</th><th>Why</th><th>Priority</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Update Diffusers to version 0.38.0 or later</strong></td>
+          <td>Patches CVE-2026-44513, CVE-2026-44827, and CVE-2026-45804 — the FaceHugger cluster that bypassed trust_remote_code=False. Any production pipeline running an older pinned version is still exposed to RCE on model load.</td>
+          <td class="red">IMMEDIATE</td>
+        </tr>
+        <tr>
+          <td><strong>Audit all pipelines using trust_remote_code=True</strong></td>
+          <td>This flag executes arbitrary Python code from the model repository. Find every instance in your codebase with <code>grep -r "trust_remote_code" .</code> — each one is a code execution dependency on an external publisher. Evaluate whether it is necessary and whether the publisher is verified.</td>
+          <td class="red">IMMEDIATE</td>
+        </tr>
+        <tr>
+          <td><strong>Prefer safetensors format for all model downloads</strong></td>
+          <td>Safetensors stores only tensor data with no executable opcodes. It cannot trigger code execution on load. Where a publisher offers both safetensors and pickle-based formats, always use safetensors. If only pickle is available, treat the repository as requiring additional review.</td>
+          <td class="red">IMMEDIATE</td>
+        </tr>
+        <tr>
+          <td><strong>Load models only from verified organization accounts</strong></td>
+          <td>Verified orgs have blue checkmarks. <code>openai</code> (verified) is not <code>open-ai-labs</code> (unverified). The visual similarity is the attack — always check for the checkmark.</td>
+          <td class="amber">HIGH</td>
+        </tr>
+        <tr>
+          <td><strong>Run model loading in isolated environments without production credentials</strong></td>
+          <td>A model that executes malicious code on load should not have access to your production database, API keys, or cloud infrastructure. Load and evaluate models in sandboxed environments with no network access to production systems before promoting them to production pipelines.</td>
+          <td class="amber">HIGH</td>
+        </tr>
+        <tr>
+          <td><strong>Rotate Hugging Face API tokens if they have been in use since before July 2026</strong></td>
+          <td>The July 2026 breach harvested cloud credentials from Hugging Face's internal infrastructure. If your organization uses Hugging Face API tokens that predate the breach, rotate them as a precaution.</td>
+          <td class="amber">HIGH</td>
+        </tr>
+        <tr>
+          <td><strong>Treat model repositories as untrusted code, not trusted data</strong></td>
+          <td>The foundational mental model shift that makes every other control more effective. A model file is not a data file. Loading a model executes code. Every model pull from an external publisher should be treated with the same scrutiny as running an external binary.</td>
+          <td class="amber">HIGH</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis is based on publicly available reporting including HiddenLayer's Open-OSS/privacy-filter analysis (May 2026), Bitdefender's Android RAT reporting (January 2026), Zafran Security's FaceHugger disclosure (July 2026), Hugging Face's security incident disclosure (July 16, 2026), OpenAI's incident statement (July 21, 2026), Protect AI's continuous monitoring reporting, and Cybersecurity News coverage of Lazarus Group npm supply chain activity (May 2026). CVE details sourced from NVD entries for CVE-2026-4372, CVE-2026-44513, CVE-2026-44827, and CVE-2026-45804. The ArgusX architecture implications represent the author's independent analysis applied to their own platform. This analysis represents independent research produced for educational purposes.</p>
+</div></div>
+
+<div class="wrap"></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." I co-founded ArgusX, a live threat intelligence platform. Before security I spent 15 years designing enterprise software. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>The Watering Hole · Hugging Face Attack Surface · Yana Ivanov · August 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+</body>
+</html>
