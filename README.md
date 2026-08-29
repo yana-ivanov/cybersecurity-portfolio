@@ -64,6 +64,7 @@ Open-source detection rules contributed to [Sublime Security's production rulese
 | ShinyHunters .claims TLD IT impersonation | [gist](https://gist.github.com/yana-ivanov/78f5e40ab19842b0d760e00bf8945f42) | In pipeline |
 | EvilTokens device code body lure | [gist](https://gist.github.com/yana-ivanov/30916df7e16a170f4b689bcd4b07bac0) | In pipeline |
 | Jira Service Management PaaP phishing lure | [gist](https://gist.github.com/yana-ivanov/499ad4d3ff401488ee4414b9243046c8) | In pipeline |
+| Hugging Face model share — AI supply chain delivery | [gist](https://gist.github.com/yana-ivanov/57e884d35c47e695d2abbe4073b65041) | In pipeline |
 
 ---
 
