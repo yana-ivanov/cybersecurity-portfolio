@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>The Trusted Pass — pkpass Abuse and the Travel Sector's Fastest-Growing Attack Surface | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker: max 2 items, single line */
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+
+/* Red bar — wraps naturally, no overflow hidden */
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT GRID — improved number typography ── */
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper)}
+.stat-num-item:last-child{border-right:none}
+/* Numbers use display-clean (IBM Plex Serif) — clean, data-forward */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-num-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-num-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.ioc-table{width:100%;border-collapse:collapse;font-size:.75rem;font-family:var(--mono)}
+.ioc-table th{background:#0a0f1a;color:#fff;padding:.65rem 1rem;text-align:left;font-size:.68rem;letter-spacing:.08em}
+.ioc-table td{padding:.6rem 1rem;border-bottom:1px solid var(--rule);vertical-align:top;word-break:break-all}
+.ioc-table tr:nth-child(even) td{background:rgba(0,0,0,.02)}
+.status-online{color:#dc2626;font-weight:700;white-space:nowrap}
+.status-offline{color:#6b7280;white-space:nowrap}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── ATTACK CHAIN — vertical stepped layout (cleaner than 5-col grid) ── */
+.attack-chain{margin:1rem 0;display:flex;flex-direction:column;gap:0}
+.chain-step{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;align-items:start;position:relative;padding-bottom:1.25rem}
+.chain-step:last-child{padding-bottom:0}
+.chain-step::before{content:'';position:absolute;left:1.2rem;top:2.5rem;bottom:0;width:2px;background:var(--rule)}
+.chain-step:last-child::before{display:none}
+.chain-num{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.chain-normal .chain-num{background:var(--bg);border:2px solid var(--rule);color:var(--ink3)}
+.chain-warning .chain-num{background:var(--amber-dim);border:2px solid var(--amber);color:var(--amber)}
+.chain-danger .chain-num{background:var(--red-dim);border:2px solid var(--red);color:var(--red)}
+.chain-body{padding-top:.4rem}
+.chain-label{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.25rem;letter-spacing:.02em}
+.chain-warning .chain-label{color:var(--amber)}
+.chain-danger .chain-label{color:var(--red)}
+.chain-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── GLYPH DEMO (for homoglyph/domain spoofing reports) ── */
+.glyph-demo{background:#0a0f1a;border-radius:4px;padding:1.75rem 2rem;margin:2rem 0}
+.glyph-demo-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.25rem}
+.glyph-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.25rem}
+.glyph-row:last-child{margin-bottom:0}
+.glyph-pane{padding:1rem 1.25rem;border-radius:3px}
+.glyph-pane.real{background:rgba(20,90,50,.2);border:1px solid rgba(74,222,128,.2)}
+.glyph-pane.fake{background:rgba(192,57,43,.15);border:1px solid rgba(239,68,68,.2)}
+.glyph-pane-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem}
+.glyph-pane.real .glyph-pane-label{color:#4ade80}
+.glyph-pane.fake .glyph-pane-label{color:#ef4444}
+.glyph-domain{font-family:var(--mono);font-size:1.1rem;letter-spacing:.05em;margin-bottom:.4rem}
+.glyph-pane.real .glyph-domain{color:#e2e8f0}
+.glyph-pane.fake .glyph-domain{color:#fca5a5}
+.glyph-unicode{font-family:var(--mono);font-size:.65rem;color:#64748b;line-height:1.6}
+.glyph-pane.fake .glyph-unicode{color:#ef4444}
+
+/* ── SPLIT VISUAL ── */
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+
+/* ── TIMELINE ── */
+.timeline{margin:1.5rem 0;position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:.45rem;top:0;bottom:0;width:2px;background:var(--rule)}
+.tl-item{position:relative;margin-bottom:1.25rem;padding-left:1.25rem}
+.tl-item::before{content:'';position:absolute;left:-1.6rem;top:.4rem;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tl-date{font-family:var(--mono);font-size:.62rem;color:var(--red);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem}
+.tl-title{font-weight:700;color:var(--ink);font-size:.9rem;margin-bottom:.2rem;font-family:var(--display)}
+.tl-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── FINDINGS LIST ── */
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--amber);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--amber-dim);color:var(--amber)}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── TOOL EMBED (for reports with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .split-visual{grid-template-columns:1fr}
+  .figure-body{padding:1.25rem 1rem}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .figure-body{padding:1rem .85rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.62rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-num-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .tbl-wrap{font-size:.75rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<header class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-kicker">Threat Analysis · Active Campaign · RMM Abuse</div>
+
+    <h1 class="title">The Tool You Trust —<br><em>ScreenConnect RMM Abuse and the Email Delivery Gap</em></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">August 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Attack Vector</div><div class="value">Email · Signed Installer · RMM</div></div>
+      <div class="meta-item"><div class="label">Targets</div><div class="value">Enterprise — All Sectors</div></div>
+      <div class="meta-item"><div class="label">Severity</div><div class="value">Critical — Active Infrastructure Confirmed</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    1,300+ ScreenConnect IOCs since April 2025 &nbsp;·&nbsp; Signed installer bypasses EDR &nbsp;·&nbsp; Email is the last reliable interception point
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT
+     ════════════════════════════════════════════════════════════ -->
+
+<!-- SECTION 01 -->
+<section class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>I run a private threat intelligence pipeline that ingests public feeds. During a routine infrastructure review this week, URLhaus data surfaced a pattern that stopped me: multiple IPs on the same /24 subnet serving ConnectWise ScreenConnect installers, two cloud-hosted <code>*.screenconnect.com</code> C2 instances still live as of August 22, 2026, and a separate Amadey dropper infrastructure active on the same day. I ran the queries. Then I started digging.</p>
+
+  <p>What I found is not a new vulnerability. It is something more persistent and more difficult to stop: the systematic weaponization of trusted remote access software as a post-phishing persistence mechanism. ScreenConnect is legitimate IT software, signed by ConnectWise, trusted by endpoint security tools, and widely deployed across enterprise environments. Attackers are not exploiting a flaw in ScreenConnect — they are exploiting the trust that organizations have placed in it.</p>
+
+  <p>Over 1,300 indicators of compromise mimicking ScreenConnect download paths and binaries have emerged since mid-April 2025. Multiple distinct campaigns — SMOKE#SCREEN, SILENTCONNECT, and a Microsoft-documented phishing operation using AI-generated company names on Extended Validation certificates — all converge on the same final payload: a ScreenConnect client connecting to attacker-controlled infrastructure, giving the operator persistent, trusted remote access to the victim machine.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The core problem:</strong> Once ScreenConnect is installed and connected, it is nearly impossible to distinguish from legitimate IT remote access. The software is digitally signed. It communicates over encrypted channels. It appears in no malware database. The window to stop this attack is the email that delivers it — before the installer runs. After that, the attacker is inside and trusted.</p>
+  </div>
+
+</div>
+</section>
+
+<!-- SECTION 02 -->
+<section class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>What the Data Showed — Live Infrastructure, August 2026</h2>
+
+  <p>The URLhaus public feed — a community-maintained registry of active malware distribution URLs — surfaced the following on August 21-22, 2026. All of this data comes from the public API; it is available to any researcher who queries it.</p>
+
+  <div class="figure">
+    <table class="ioc-table">
+      <thead>
+        <tr><th>Infrastructure</th><th>Payload</th><th>Status</th><th>First Seen</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>94.154.32.41</code></td><td>support.client.exe</td><td class="status-online">Online</td><td>2026-08-22</td></tr>
+        <tr><td><code>94.154.32.34</code></td><td>ScreenConnect.ClientSetup.exe, support.client.exe</td><td class="status-online">Online</td><td>2026-08-22</td></tr>
+        <tr><td><code>94.154.32.205</code></td><td>ScreenConnect.ClientSetup.exe, support.client.exe</td><td class="status-offline">Offline</td><td>2026-08-21</td></tr>
+        <tr><td><code>94.154.32.68</code></td><td>ScreenConnect.ClientSetup.exe, support.client.exe</td><td class="status-offline">Offline</td><td>2026-08-21</td></tr>
+        <tr><td><code>94.154.32.180</code></td><td>ScreenConnect.ClientSetup.exe, support.client.exe</td><td class="status-offline">Offline</td><td>2026-08-21</td></tr>
+        <tr><td><code>nimblenumbers.screenconnect.com</code></td><td>ScreenConnect cloud C2</td><td class="status-online">Online</td><td>2026-08-21</td></tr>
+        <tr><td><code>paretandassociates.screenconnect.com</code></td><td>ScreenConnect cloud C2</td><td class="status-online">Online</td><td>2026-08-20</td></tr>
+        <tr><td><code>91.92.242.236</code></td><td>Amadey second-stage payloads (hex-named .exe)</td><td class="status-online">Partial</td><td>2026-08-21</td></tr>
+      </tbody>
+    </table>
+    <div class="figure-caption">IOCs sourced from URLhaus public API, August 21-22, 2026. All defanged for publication. Status as of time of observation — may have changed.</div>
+  </div>
+
+  <p>Three patterns stand out. First, the <code>94.154.32.0/24</code> subnet is coordinated — multiple IPs activated within hours of each other, all serving the same two file paths. This is not coincidence. It is infrastructure provisioned for a campaign.</p>
+
+  <p>Second, the <code>*.screenconnect.com</code> subdomains — <code>nimblenumbers</code> and <code>paretandassociates</code> — are attacker-registered ConnectWise cloud instances. ConnectWise allows anyone to create a free cloud-hosted ScreenConnect deployment at a <code>*.screenconnect.com</code> subdomain. Attackers use this to host their C2 on a trusted domain that passes every reputation check. An email security tool scanning outbound connections would see traffic to <code>screenconnect.com</code> — a legitimate enterprise software platform — and pass it.</p>
+
+  <p>Third, the Amadey infrastructure at <code>91.92.242.236</code> is consistent with a known dropper-to-RMM chain. Amadey is delivered via phishing email, establishes initial access, and then downloads secondary payloads — in many documented cases, ScreenConnect installers. The two infrastructure clusters may be part of the same campaign.</p>
+
+</div>
+</section>
+
+<!-- SECTION 03 -->
+<section class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>The Email Delivery Layer — Three Documented Vectors</h2>
+
+  <p>URLhaus captures the download infrastructure — step three in the attack chain. The phishing email is step one. This section documents the three email delivery vectors confirmed in 2026 ScreenConnect campaigns, all of which land in the inbox before the installer ever runs.</p>
+
+  <h3>Vector 1 — Workplace Lure Phishing with Signed Malware</h3>
+  <p>In February 2026, Microsoft Defender Experts documented multiple phishing campaigns using workplace meeting lures and PDF attachments to deliver signed malware. The executables were digitally signed using an Extended Validation certificate issued to "TrustConnect Software PTY LTD" — a company name that reads as AI-generated: plausible, professional, forgettable, and entirely fictional. Extended Validation certificates require identity verification, but attackers have found ways to register shell entities and obtain legitimate EV certificates for them. The signature passes every automated check. The only defense is the human reading the email — or the email security tool that intercepts it before that human sees it.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The AI-generated trust signal:</strong> "TrustConnect Software PTY LTD" follows the same pattern as AI-generated cover commits in the <a href="/analysis/glassworm_analysis.html">Glassworm supply chain campaign</a> — plausible-looking legitimacy signals generated at scale to defeat human review. Attackers are using AI to manufacture trust artifacts: company names, commit messages, certificate subjects, email prose. The pace of AI capability development means this will only accelerate. Defense is running behind by definition.</p>
+  </div>
+
+  <h3>Vector 2 — ClickFix Clipboard Hijack</h3>
+  <p>The ClickFix social engineering technique — documented in my <a href="/writing/clickfix_field_note.html">ClickFix field note</a> and the subject of a pending Sublime Security detection rule (<a href="https://github.com/sublime-security/sublime-rules/pull/4921" style="color:var(--red)">PR #4921</a>) — is a confirmed delivery mechanism for ScreenConnect installers. The attack delivers a phishing email with a fake CAPTCHA or verification prompt, instructs the victim to copy and paste a command into their terminal, and the pasted command downloads a ScreenConnect installer from infrastructure like the <code>94.154.32.0/24</code> subnet observed this week. The victim does not realize they have installed remote access software. From the attacker's perspective, the victim performed the installation themselves.</p>
+
+  <h3>Vector 3 — SMOKE#SCREEN: Fake Software Update Lures</h3>
+  <p>Securonix documented SMOKE#SCREEN, active since early 2026, which uses fake Adobe and Zoom software update lures, business document review prompts, and system maintenance notifications to trick employees into downloading ScreenConnect. The campaign uses VBScript droppers, batch file loaders, and compiled .NET executables — a multi-stage chain that culminates in a ScreenConnect agent beaconing to attacker-controlled relay servers. The email that starts this chain looks like a routine software update notification. Recipients who have been trained to "trust software from known vendors" are the intended targets — because the lure impersonates exactly those vendors.</p>
+
+</div>
+</section>
+
+<!-- SECTION 04 -->
+<section class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>Why Email Is the Right Detection Layer</h2>
+
+  <p>Every campaign documented in this analysis produces the same outcome: a signed ScreenConnect client running on the victim machine and connecting to attacker infrastructure. At that point, from the perspective of endpoint security:</p>
+
+  <ul style="margin:1rem 0 1rem 1.5rem;line-height:1.9;color:var(--ink2)">
+    <li>The process is digitally signed by ConnectWise — a legitimate, trusted vendor</li>
+    <li>The network traffic goes to <code>*.screenconnect.com</code> or a registered cloud instance — a legitimate domain</li>
+    <li>The behavior (remote access, file transfer, screen sharing) matches legitimate IT support activity</li>
+    <li>No malware signature matches — because it is not malware, it is legitimate software being misused</li>
+  </ul>
+
+  <p>Endpoint detection and response tools are not designed to block legitimate remote access software. Network monitoring tools will not flag traffic to a trusted vendor domain. Identity and access management tools have no visibility into what a trusted IT support session is doing. By the time ScreenConnect is installed and connected, every downstream technical control has been bypassed — not defeated, just made irrelevant.</p>
+
+  <p>The email is the last reliable interception point. The phishing email, the ClickFix lure, the fake software update notification — all of these reach the inbox before a single line of malicious code runs on the endpoint. Catching the delivery mechanism at the email layer is not just one detection option among many. For this attack class, it is the only technical control with a realistic chance of stopping the attack before it succeeds.</p>
+
+  <h3>The Current Coverage Gap</h3>
+  <p>Sublime Security's existing <code>link_screenconnect.yml</code> rule detects emails containing links to ScreenConnect installers where the embedded relay domain does not match the sender or organization — a sophisticated check that catches many campaigns. The gap revealed by this week's URLhaus data is the <code>*.screenconnect.com</code> cloud C2 variant. When an attacker registers their own ConnectWise cloud instance at <code>nimblenumbers.screenconnect.com</code>, the relay domain IS <code>screenconnect.com</code> — and it matches. The existing rule does not fire. A phishing email linking to a <code>*.screenconnect.com</code> subdomain, from an unsolicited sender, is currently undetected. A complementary rule targeting this pattern is in development.</p>
+
+  <p>We opened Pandora's box. AI capabilities are accelerating every attack vector simultaneously — better phishing prose, AI-generated company names for code signing certificates, cover commits that fool code reviewers, chatbot poisoning for software distribution. Defense cannot match that pace everywhere. What defense can do is close the gaps at the layers that still have reliable signal, before the payload ever runs. Email is that layer. These rules are that signal.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>August 2026 update — GitHub delivery vector confirmed:</strong> Threat intelligence data surfaced a related campaign in late August 2026. A GitHub organization created 17 repositories impersonating crypto wallet and fintech brands — ELLIPAL, DCENT, YouTrust, DocuSign, COLDCARD, Swan, Bull Bitcoin — each delivering a ScreenConnect installer ZIP named InstallerBundle.zip at version 1.1. GitHub removed the organization and all URLs are now offline, but the pattern confirms GitHub releases as an active delivery vector for ScreenConnect-based attacks, targeting crypto and fintech users specifically. The consistent naming convention and version pinning across all 17 repos indicates a single organized campaign rather than opportunistic activity.</p>
+  </div>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">IOCs sourced from URLhaus public API (abuse.ch), queried August 21-22, 2026. Campaign context sourced from: Microsoft Security Blog (February 2026, May 2026), Securonix Threat Research (SMOKE#SCREEN, August 2026), Elastic Security Labs (SILENTCONNECT, March 2026), Maltiverse threat intelligence advisory (April 2025), Broadcom/Symantec protection bulletin (July 2025), and Infosecurity Magazine (August 2025). All domains and IPs defanged for publication. The *.screenconnect.com detection gap and fast-follow PR represent the author's original analytical contribution. This analysis represents independent research produced as a contribution to the security community. References: <a href="/writing/clickfix_field_note.html" style="color:var(--red)">ClickFix Field Note</a> · <a href="/analysis/glassworm_analysis.html" style="color:var(--red)">Glassworm Analysis</a></p>
+
+</div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap">
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>Yana Ivanov &nbsp;·&nbsp; August 2026 &nbsp;·&nbsp; Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+</body>
+</html>
