@@ -56,8 +56,8 @@ code{font-family:var(--mono);font-size:.82em;background:rgba(0,0,0,.06);padding:
 .callout-green{background:var(--green-dim);border-color:var(--green)}
 .callout p{margin:0;font-size:.92rem;line-height:1.7}
 .callout strong{color:var(--ink)}
-.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
-table{width:100%;border-collapse:collapse;font-size:.88rem}
+.tbl-wrap{margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem;table-layout:fixed}
 thead tr{background:#0a0f1a;color:#fff}
 th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
 td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
@@ -223,49 +223,49 @@ footer span{color:#94a3b8}
           <td><strong>GitHub</strong><br><span class="code" style="font-size:.75rem">Payload staging · C2</span></td>
           <td>Malware hosted in GitHub releases. Attackers create repos impersonating trusted brands. Domain reputation: trusted. HTTPS: valid. Content: malware.</td>
           <td>kaswareteam org (17 repos, ScreenConnect delivery). Shapecluneedle/jubilant-engine (Vidar + SheetRAT). Kimsuky LNK delivery via raw.githubusercontent.com.</td>
-          <td class="amber">Partial — LNK/GitHub C2 rule submitted</td>
+          <td class="amber">Partial</td>
         </tr>
         <tr>
           <td><strong>Azure Blob Storage</strong><br><span class="code" style="font-size:.75rem">Phishing page hosting</span></td>
           <td>HTML credential harvesting pages uploaded to public blob containers. Sits on blob.core.windows.net — a Microsoft domain with a Microsoft SSL certificate. Security tools see legitimate Microsoft infrastructure.</td>
           <td>Ongoing campaigns impersonating Microsoft 365, OneDrive, Entra ID. Confirmed by Microsoft Threat Intelligence, Nopal Cyber, CYFIRMA (2025-2026).</td>
-          <td class="red">Gap — existing rule only catches new-domain spam</td>
+          <td class="red">Gap</td>
         </tr>
         <tr>
           <td><strong>Cloudflare Workers</strong><br><span class="code" style="font-size:.75rem">PhaaS infrastructure · Evasion</span></td>
           <td>EvilTokens PhaaS serves AES-GCM encrypted phishing pages via Cloudflare Workers. Keys rotate on every request, defeating sandbox replay. Cloudflare domain passes every perimeter control.</td>
           <td>EvilTokens — M365 device code phishing, OAuth token theft. Confirmed by Sekoia TDR, Abnormal AI (2026).</td>
-          <td class="amber">Partial — device code body lure rule written</td>
+          <td class="amber">Partial</td>
         </tr>
         <tr>
           <td><strong>Hugging Face</strong><br><span class="code" style="font-size:.75rem">Payload staging · Malware hosting</span></td>
           <td>Malicious model repos published on the AI community's primary hub. Trusted implicitly by developers loading models as part of normal workflow. 244K downloads of one malicious repo in 18 hours.</td>
           <td>Open-OSS/privacy-filter typosquatting (May 2026). North Korea Lazarus Group payload staging. Android RAT via TrustBastion (Jan 2026). FaceHugger CVEs (Aug 2026).</td>
-          <td class="amber">Partial — Hugging Face first-contact rule written</td>
+          <td class="amber">Partial</td>
         </tr>
         <tr>
           <td><strong>Framer</strong><br><span class="code" style="font-size:.75rem">Phishing page hosting</span></td>
           <td>Credential harvesting pages built on Framer's free platform. Served from framer.com — SPF, DKIM, and DMARC all pass. Legitimate sending domain, malicious content.</td>
           <td>Active campaigns using Framer-hosted phishing pages targeting Microsoft 365 credentials. Confirmed in Sublime Security telemetry (2026).</td>
-          <td class="amber">Partial — Framer hosting rule written</td>
+          <td class="amber">Partial</td>
         </tr>
         <tr>
           <td><strong>Figma</strong><br><span class="code" style="font-size:.75rem">Email delivery · Invite abuse</span></td>
           <td>Figma's invite notification system delivers phishing email from no-reply@email.figma.com. Passes SPF, DKIM, and DMARC. Invite links to a malicious Figma file.</td>
           <td>Figma invite phishing targeting first-contact recipients. Figma plugin ecosystem abuse via CVE-2025-53967 (MCP RCE). Documented in field notes (2026).</td>
-          <td class="amber">Partial — Figma first-contact rule written</td>
+          <td class="amber">Partial</td>
         </tr>
         <tr>
           <td><strong>Jira Service Management</strong><br><span class="code" style="font-size:.75rem">Email delivery</span></td>
           <td>Free Jira projects with phishing content in the welcome message. Invite Customers delivers email from Atlassian's own infrastructure. Passes every authentication check.</td>
           <td>Documented by Cisco Talos (April 2026). Billing lure, invoice phishing, callback scam content delivered via Atlassian-signed email.</td>
-          <td class="amber">Partial — Jira PaaP rule written</td>
+          <td class="amber">Partial</td>
         </tr>
         <tr>
           <td><strong>ScreenConnect</strong><br><span class="code" style="font-size:.75rem">C2 · Remote access</span></td>
           <td>Free *.screenconnect.com subdomains with no verification. Attackers register them as C2 infrastructure. Domain passes every reputation check — it's a legitimate enterprise platform.</td>
           <td>TELEPUZ ClickFix campaign. SMOKE#SCREEN fake Adobe/Zoom updates. kaswareteam GitHub delivery. Multiple active subdomains confirmed via URLhaus (Aug 2026).</td>
-          <td class="amber">Partial — ScreenConnect cloud C2 rule written</td>
+          <td class="amber">Partial</td>
         </tr>
       </tbody>
     </table>
