@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Trust Tax — How Attackers Stopped Building Infrastructure and Started Borrowing Ours | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem;white-space:nowrap;overflow:hidden}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:.82em;background:rgba(0,0,0,.06);padding:.1em .35em;border-radius:2px;color:var(--blue)}
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper)}
+.stat-num-item:last-child{border-right:none}
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-num-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-num-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.attack-chain{margin:1rem 0;display:flex;flex-direction:column;gap:0}
+.chain-step{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;align-items:start;position:relative;padding-bottom:1.25rem}
+.chain-step:last-child{padding-bottom:0}
+.chain-step::before{content:'';position:absolute;left:1.2rem;top:2.5rem;bottom:0;width:2px;background:var(--rule)}
+.chain-step:last-child::before{display:none}
+.chain-num{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.chain-normal .chain-num{background:var(--bg);border:2px solid var(--rule);color:var(--ink3)}
+.chain-warning .chain-num{background:var(--amber-dim);border:2px solid var(--amber);color:var(--amber)}
+.chain-danger .chain-num{background:var(--red-dim);border:2px solid var(--red);color:var(--red)}
+.chain-body{padding-top:.4rem}
+.chain-label{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.25rem;letter-spacing:.02em}
+.chain-warning .chain-label{color:var(--amber)}
+.chain-danger .chain-label{color:var(--red)}
+.chain-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600}
+.split-panel.safe .split-panel-title{color:var(--green)}
+.split-panel.risk .split-panel-title{color:var(--red)}
+.split-panel.safe{border-top:3px solid var(--green)}
+.split-panel.risk{border-top:3px solid var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--amber);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.code-block{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto}
+.code-block pre{font-family:var(--mono);font-size:.72rem;color:#94a3b8;line-height:1.8;white-space:pre;margin:0}
+.code-block .comment{color:#4a5568}
+.code-block .string{color:#86efac}
+.code-block .keyword{color:#60a5fa}
+.code-block .danger{color:#ef4444}
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){.wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}.mast-meta{grid-template-columns:1fr 1fr}.stat-num-grid{grid-template-columns:1fr 1fr}.split-visual{grid-template-columns:1fr}.figure-body{padding:1.25rem 1rem}h2{font-size:1.55rem}h3{font-size:1.1rem}.bio{grid-template-columns:1fr;padding:2rem 1.75rem}footer{flex-direction:column;text-align:center;padding:1.5rem}}
+@media(max-width:480px){.wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}.back-nav{padding:.55rem 1.1rem}.mast-bar{padding:.55rem 1.1rem;font-size:.62rem}.mast-meta{grid-template-columns:1fr}.stat-num-grid{grid-template-columns:1fr 1fr}h1.title{font-size:1.45rem}h2{font-size:1.2rem}.bio{padding:1.5rem 1.1rem}footer{padding:1.25rem 1.1rem}}
+@media(max-width:390px){html{font-size:16px}.wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}.back-nav{padding:.5rem .9rem}.mast-bar{padding:.5rem .9rem;font-size:.6rem}.stat-num-grid{grid-template-columns:1fr 1fr}.stat-num{font-size:1.1rem}h1.title{font-size:1.3rem}h2{font-size:1.1rem}.bio{padding:1.25rem .9rem}footer{padding:1rem .9rem;font-size:.62rem}}
+@media(min-width:768px) and (orientation:landscape){.mobile-notice{display:none}}
+</style>
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()</script>
+</head>
+<body>
+
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<header class="masthead">
+  <div class="mast-inner">
+    <div class="mast-kicker">Threat Analysis · Trusted Infrastructure Phishing · Platform Abuse</div>
+    <h1 class="title">The Trust Tax —<br><em>How Attackers Stopped Building Infrastructure and Started Borrowing Ours</em></h1>
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">August 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Attack Class</div><div class="value">Trusted Infrastructure Phishing (TIP)</div></div>
+      <div class="meta-item"><div class="label">Threat Actors</div><div class="value">Multiple · Nation-State · Criminal · PhaaS</div></div>
+      <div class="meta-item"><div class="label">Framework</div><div class="value">Trusted Infrastructure Phishing (TIP)</div></div>
+    </div>
+  </div>
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    8 trusted platforms weaponized · github · azure · framer · figma · jira · hugging face · screenconnect · cloudflare workers
+  </div>
+</header>
+
+<!-- SECTION 01 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>The Infrastructure Problem Nobody Is&nbsp;Naming</h2>
+
+  <p>Building malicious infrastructure is expensive and risky. You register a domain — it gets flagged. You stand up a server — it gets blacklisted. You buy an SSL certificate — it gets revoked. Every piece of custom infrastructure you build as an attacker leaves a trail and has a shelf life measured in days.</p>
+
+  <p>Attackers solved this problem. They stopped building their own infrastructure. They started borrowing ours.</p>
+
+  <p>The shift is structural, not tactical. Across eight different platforms in the last eighteen months, the same pattern appears: take a legitimate, widely trusted service that developers, designers, or business users depend on daily, and use it exactly as designed — to host files, send notifications, deliver invitations, or provide remote access. The platform's trust becomes the attack surface. The victim never lands on a suspicious domain. The email never comes from an unknown sender. The link never goes somewhere flagged by reputation tools. Everything looks clean because it is clean — the infrastructure is legitimate. Only the intent is not.</p>
+
+  <p>This analysis documents eight confirmed instances of what I'm calling Trusted Infrastructure Phishing — a framework that names what is actually happening across campaigns that are currently being treated as unrelated incidents. They are not unrelated. They are the same attack, executed across different platforms.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The Trust Tax:</strong> Organizations pay a trust tax every time they allow a third-party platform — a file host, a project management tool, a design platform, a remote access tool — into their environment. That trust is earned by the platform through years of legitimate use. Attackers borrow it for free. The tax is paid by defenders who cannot block the platform without breaking legitimate workflows, and by victims who have no way to distinguish a legitimate notification from a weaponized one.</p>
+  </div>
+
+  <div class="stat-num-grid">
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">8</div>
+      <div class="stat-num-label">Trusted Platforms<br>Confirmed Weaponized</div>
+      <div class="stat-num-sub">GitHub, Azure Blob, Framer, Figma, Jira, Hugging Face, ScreenConnect, Cloudflare Workers. Each documented with confirmed campaigns in 2025-2026.</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">$0</div>
+      <div class="stat-num-label">Infrastructure Cost<br>to Attacker</div>
+      <div class="stat-num-sub">Every platform on this list offers a free tier. Free accounts, free hosting, free email delivery. The attacker's infrastructure cost is zero.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">100%</div>
+      <div class="stat-num-label">Pass Rate<br>Reputation Checks</div>
+      <div class="stat-num-sub">Links to github.com, blob.core.windows.net, and framer.com pass every URL reputation check. The domains are trusted by every security tool.</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">∞</div>
+      <div class="stat-num-label">Defender's<br>Dilemma</div>
+      <div class="stat-num-sub">You cannot block GitHub, Microsoft Azure, or Figma without breaking your organization's legitimate workflows. The platform's value is the attacker's shield.</div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SECTION 02 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>The Eight Platforms — A&nbsp;Taxonomy</h2>
+
+  <p>These are not eight separate campaigns. They are eight instances of the same attack philosophy applied to different platforms at different layers of the attack chain. Some platforms are used to send the email. Some are used to host the phishing page. Some are used to stage the malware payload. Some are used as command and control infrastructure. The platform layer varies. The trust exploitation does not.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Platform</th><th>Layer</th><th>How Trust Is Exploited</th><th>Confirmed Campaign</th><th>Detection</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>GitHub</strong></td>
+          <td class="code">Payload staging · C2</td>
+          <td>Malware hosted in GitHub releases. Attackers create repos impersonating crypto wallet brands or gaming tools. Domain reputation: trusted. HTTPS: valid. Content: malware.</td>
+          <td>kaswareteam org (17 repos, ScreenConnect delivery). Shapecluneedle/jubilant-engine (Vidar + SheetRAT). Kimsuky LNK delivery via raw.githubusercontent.com.</td>
+          <td class="amber">Partial — LNK/GitHub C2 rule submitted</td>
+        </tr>
+        <tr>
+          <td><strong>Azure Blob Storage</strong></td>
+          <td class="code">Phishing page hosting</td>
+          <td>Attackers upload HTML credential harvesting pages to publicly readable blob containers. The page sits on blob.core.windows.net — a Microsoft domain with a Microsoft SSL certificate. Browsers show a valid padlock. Security tools see Microsoft infrastructure.</td>
+          <td>Ongoing campaigns impersonating Microsoft 365, OneDrive, Entra ID. Confirmed by Microsoft Threat Intelligence, Nopal Cyber, CYFIRMA (2025-2026).</td>
+          <td class="red">Gap — existing rule only catches new-domain spam</td>
+        </tr>
+        <tr>
+          <td><strong>Cloudflare Workers</strong></td>
+          <td class="code">PhaaS infrastructure · Evasion</td>
+          <td>EvilTokens PhaaS uses Cloudflare Workers to serve AES-GCM encrypted phishing pages that rotate keys on every request, defeating sandbox replay. The Cloudflare domain passes every perimeter control.</td>
+          <td>EvilTokens — M365 device code phishing, OAuth token theft. Confirmed by Sekoia TDR, Abnormal AI (2026).</td>
+          <td class="amber">Partial — device code body lure rule written</td>
+        </tr>
+        <tr>
+          <td><strong>Hugging Face</strong></td>
+          <td class="code">Payload staging · Malware hosting</td>
+          <td>Attackers publish malicious model repositories on the AI community's primary hub. The platform is trusted implicitly by developers who load models as part of normal workflow. 244,000 downloads of one malicious repo in 18 hours before removal.</td>
+          <td>Open-OSS/privacy-filter typosquatting (May 2026). North Korea Lazarus Group payload staging. Android RAT via TrustBastion (Jan 2026). FaceHugger CVEs (Aug 2026).</td>
+          <td class="amber">Partial — Hugging Face first-contact rule written</td>
+        </tr>
+        <tr>
+          <td><strong>Framer</strong></td>
+          <td class="code">Phishing page hosting</td>
+          <td>Attackers build credential harvesting pages on Framer's free publishing platform. The page is served from framer.com or a custom domain connected through Framer. SPF, DKIM, and DMARC all pass because Framer is a legitimate sending domain.</td>
+          <td>Active campaigns using Framer-hosted phishing pages targeting Microsoft 365 credentials. Confirmed in Sublime Security telemetry (2026).</td>
+          <td class="amber">Partial — Framer hosting rule written</td>
+        </tr>
+        <tr>
+          <td><strong>Figma</strong></td>
+          <td class="code">Email delivery · Invite abuse</td>
+          <td>Attackers use Figma's file sharing and invite notification system to deliver phishing email. The email comes from Figma's own infrastructure — no-reply@email.figma.com — passes SPF, DKIM, and DMARC. The invite links to a malicious Figma file.</td>
+          <td>Figma invite phishing targeting first-contact recipients. Figma plugin ecosystem abuse via CVE-2025-53967 (MCP RCE). Documented in field notes (2026).</td>
+          <td class="amber">Partial — Figma first-contact rule written</td>
+        </tr>
+        <tr>
+          <td><strong>Jira Service Management</strong></td>
+          <td class="code">Email delivery</td>
+          <td>Attackers create free Jira Service Management projects, embed phishing content in the welcome message, and use Invite Customers to deliver email from Atlassian's own infrastructure. The email passes every authentication check because Atlassian sent it.</td>
+          <td>Documented by Cisco Talos (April 2026). Billing lure, invoice phishing, callback scam content delivered via Atlassian-signed email.</td>
+          <td class="amber">Partial — Jira PaaP rule written</td>
+        </tr>
+        <tr>
+          <td><strong>ScreenConnect</strong></td>
+          <td class="code">C2 · Remote access</td>
+          <td>ConnectWise allows anyone to create a free cloud-hosted ScreenConnect deployment at a *.screenconnect.com subdomain with no verification. Attackers register these as C2 infrastructure. The domain passes every reputation check because screenconnect.com is a legitimate enterprise platform.</td>
+          <td>TELEPUZ ClickFix campaign. SMOKE#SCREEN fake Adobe/Zoom updates. kaswareteam GitHub delivery. Multiple active subdomains confirmed via URLhaus (Aug 2026).</td>
+          <td class="amber">Partial — ScreenConnect cloud C2 rule written</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div></div>
+
+<!-- SECTION 03 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>Why It Works — The Three Laws of Trusted Infrastructure Phishing</h2>
+
+  <p>These eight campaigns share three structural properties that explain why the technique works and why it is spreading. Each property is a feature of legitimate platform design that becomes a vulnerability when exploited.</p>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">Law 1 — The Domain Is the Defense</div>
+        <div class="finding-desc">Email security tools, web proxies, and endpoint controls make decisions based on domain reputation. github.com, blob.core.windows.net, framer.com, and figma.com all have excellent reputation scores built over years of legitimate use. When an attacker hosts malicious content on these platforms, the domain reputation protects them the same way it protects legitimate users. There is no technical distinction between a legitimate GitHub release and a malicious one at the domain reputation layer — both resolve to github.com. The security tool's domain-based decision cannot catch the difference.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">Law 2 — Free Tiers Fund the Attack</div>
+        <div class="finding-desc">Every platform on this list offers a free tier with enough capability to run a phishing campaign. A free GitHub account can host unlimited public repositories. A free Framer account can publish a phishing page. A free ConnectWise account gets a *.screenconnect.com subdomain. A free Jira Service Management project can invite unlimited customers. A free Hugging Face account can publish unlimited models. The attacker's infrastructure cost is zero — and the platform's economics require offering free tiers to grow their user base, creating an inherent tension between growth and security. Restricting free tiers would disadvantage the platform competitively. So the free tier stays, and attackers use it.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">Law 3 — Blocking Is Breaking</div>
+        <div class="finding-desc">A defender who identifies GitHub as a malware delivery vector cannot block github.com without breaking every developer's workflow. A defender who identifies Figma as a phishing vector cannot block figma.com without breaking design handoffs. A defender who identifies Azure Blob Storage as a phishing host cannot block blob.core.windows.net without breaking Microsoft's own services. The attacker has positioned themselves inside the defender's blast radius — any block that hits the attacker also hits the organization's legitimate users. This is the Trust Tax. The defender must pay it in the form of precision detection work rather than simple domain blocking, because the simple answer breaks the business.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SECTION 04 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>The Detection Gap — What Exists and What Doesn't</h2>
+
+  <p>Detection for Trusted Infrastructure Phishing cannot be domain-based. The domain is the problem — it's trusted. Detection has to be behavioral: who is sending the email, what is the relationship between sender and recipient, what signals inside the email suggest the platform is being abused rather than legitimately used.</p>
+
+  <p>For each platform in the taxonomy, I have either written a detection rule for Sublime Security's open-source ruleset or identified the gap. The common pattern across all eight: the existing rules are too narrow, catching only the most obvious abuse while missing the wider campaign.</p>
+
+  <div class="split-visual">
+    <div class="split-panel left">
+      <div class="split-panel-title">What Detection Exists</div>
+      <p><strong>GitHub:</strong> LNK/ZIP GitHub raw C2 rule — targets Kimsuky-specific delivery pattern via raw.githubusercontent.com</p>
+      <p><strong>Cloudflare:</strong> Six rules covering Cloudflare Workers, tunnels, and service abuse</p>
+      <p><strong>Firebase:</strong> Two rules covering Firebase sender abuse and redirect patterns</p>
+      <p><strong>Azure Blob:</strong> One spam rule — new domains only, single non-org recipient</p>
+      <p><strong>Framer, Figma, Jira, Hugging Face, ScreenConnect:</strong> Rules written and submitted or in pipeline</p>
+    </div>
+    <div class="split-panel right">
+      <div class="split-panel-title">What's Missing</div>
+      <p><strong>Azure Blob — body link:</strong> No rule for blob.core.windows.net links in email body from unsolicited senders with credential theft signals</p>
+      <p><strong>AWS S3 — body link:</strong> S3 link in PDF attachment covered; email body link not covered</p>
+      <p><strong>Firebase Storage:</strong> firebasestorage.googleapis.com not covered separately from Firebase sender rules</p>
+      <p><strong>Cross-platform TIP detection:</strong> No rule that identifies the pattern across platforms — a rule that catches "trusted platform + first-contact sender + credential theft signal" regardless of which platform</p>
+    </div>
+  </div>
+
+  <div class="callout callout-amber">
+    <p><strong>The hardest gap to fill:</strong> A cross-platform TIP detection rule — one that catches the pattern regardless of which trusted platform is being abused — would require matching a large list of trusted hosting domains against first-contact sender and credential theft signals. The FP risk is high because legitimate use of these platforms is common. But the signal combination of trusted-platform-hosted link + first-contact sender + NLU credential theft intent is genuinely distinctive. This is the detection architecture that would close the gap across all eight platforms simultaneously.</p>
+  </div>
+</div></div>
+
+<!-- SECTION 05 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>Key Findings</h2>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">Trusted Infrastructure Phishing Is a Category, Not a Campaign</div>
+        <div class="finding-desc">The eight platforms documented here are treated in security reporting as eight separate issues. They are not. They share the same attack philosophy, the same structural properties, and the same detection gap. Naming the category matters because it changes how defenders think about the problem — from "block this specific domain" to "build behavioral detection that works regardless of which trusted platform the attacker chooses next." The attacker's next platform is already out there. It's trusted, it's free, and it accepts signups without identity verification.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">The Free Tier Is the Attack Vector</div>
+        <div class="finding-desc">Every platform on this list offers a free tier with enough capability to run a phishing campaign at scale. Platform security teams are aware of this and run abuse detection — but the detection is reactive, not preventive. A malicious Hugging Face repo runs for 18 hours and accumulates 244,000 downloads before removal. A kaswareteam GitHub org runs 17 repos before GitHub takes it down. The abuse is detected and removed, but the damage happens during the window between deployment and takedown. Prevention requires identity verification for free account creation — a business model decision most platforms are not willing to make.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">Email Is Still the Last Reliable Interception Point</div>
+        <div class="finding-desc">For six of the eight platforms documented here, the attack chain includes an email delivery step — an invitation, a notification, a lure, or a link. That email is the last point where the attack can be interrupted before the victim clicks. Once the victim clicks a link to a trusted platform, domain-based controls offer no protection. The email layer, with behavioral detection on sender history, recipient relationship, and content signals, is where Trusted Infrastructure Phishing can be stopped before it reaches the browser.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">4</div>
+      <div>
+        <div class="finding-title">The Next Platform Is Already Trusted</div>
+        <div class="finding-desc">The eight platforms documented here are not a complete list — they are the confirmed cases as of September 2026. The attack philosophy requires no novel technique. Any platform that offers free hosting, free email delivery, or free remote access with a trusted domain is a candidate. Notion, Airtable, Linear, Loom, Canva, and dozens of other widely used platforms have the same structural properties. The attacker's next campaign is a free account signup away.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+
+<!-- SECTION 06 -->
+<div class="section"><div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>What Defenders Can&nbsp;Do</h2>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Action</th><th>Why</th><th>Priority</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Build behavioral detection, not domain blocklists</strong></td>
+          <td>Domain blocking cannot work when the domain is legitimate. Detection must be based on sender history, recipient relationship, and content signals — not whether the link goes to GitHub or Azure.</td>
+          <td class="red">IMMEDIATE</td>
+        </tr>
+        <tr>
+          <td><strong>Flag first-contact emails containing trusted-platform links</strong></td>
+          <td>The combination of a first-contact sender and a link to a trusted hosting platform (GitHub releases, blob.core.windows.net, framer.com) with credential theft language is the core TIP signal. Flag for review rather than deliver silently.</td>
+          <td class="red">IMMEDIATE</td>
+        </tr>
+        <tr>
+          <td><strong>Audit your platform exposure — which trusted services does your organization use?</strong></td>
+          <td>If your organization uses Figma, attackers can deliver phishing via Figma invites. If your developers use Hugging Face, attackers can deliver malware via model sharing. Map your trusted platform dependencies and apply appropriate controls for each.</td>
+          <td class="amber">HIGH</td>
+        </tr>
+        <tr>
+          <td><strong>Train users on trusted-platform lures specifically</strong></td>
+          <td>Standard security awareness training focuses on suspicious links and unknown senders. TIP attacks use trusted links and often known platforms. Training needs to cover "why does this Figma invite from someone I've never worked with contain a billing alert?"</td>
+          <td class="amber">HIGH</td>
+        </tr>
+        <tr>
+          <td><strong>Use a password manager and treat failed auto-fill as a red flag</strong></td>
+          <td>Password managers bind credentials to specific domains. A credential harvesting page hosted on blob.core.windows.net will not auto-fill Microsoft credentials — because the domain doesn't match login.microsoftonline.com. If your password manager doesn't offer to fill on a login page, stop and verify the URL.</td>
+          <td class="amber">HIGH</td>
+        </tr>
+        <tr>
+          <td><strong>Report platform abuse directly to the platform</strong></td>
+          <td>GitHub, Microsoft, Atlassian, Figma, and Framer all have abuse reporting mechanisms. A reported malicious repo or page gets taken down within hours in most cases. Reporting reduces the takedown window during which victims can be compromised.</td>
+          <td class="green">MEDIUM</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis synthesizes original research published across this portfolio between March and September 2026, including analyses of ScreenConnect RMM abuse, Hugging Face supply chain attacks, Figma platform abuse (Parts 1 and 2), Jira Service Management PaaP delivery, and kaswareteam GitHub infrastructure. Campaign data sourced from URLhaus and MalwareBazaar via ArgusX threat intelligence platform. Third-party sources include Microsoft Security Blog, Cisco Talos, Sekoia TDR, CYFIRMA, Nopal Cyber, HiddenLayer, and Bitdefender. The "Trusted Infrastructure Phishing" framework and "Trust Tax" framing represent the author's original analytical contribution. Detection rules referenced are available in Sublime Security's open-source ruleset and at the author's GitHub. This analysis represents independent research produced for educational purposes.</p>
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." I co-founded ArgusX, a live threat intelligence platform. Before security I spent 15 years designing enterprise software. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<footer>
+  <span>The Trust Tax · Trusted Infrastructure Phishing · Yana Ivanov · September 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+</body>
+</html>
