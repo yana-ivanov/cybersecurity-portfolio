@@ -66,6 +66,7 @@ Open-source detection rules contributed to [Sublime Security's production rulese
 | Jira Service Management PaaP phishing lure | [gist](https://gist.github.com/yana-ivanov/499ad4d3ff401488ee4414b9243046c8) | In pipeline |
 | Hugging Face model share — AI supply chain delivery | [gist](https://gist.github.com/yana-ivanov/57e884d35c47e695d2abbe4073b65041) | In pipeline |
 | Azure Blob Storage credential phishing | [gist](https://gist.github.com/yana-ivanov/b588b43e61e541448a76fe36e010d8a0) | In pipeline |
+| Azure Blob Storage credential phishing | [gist](https://gist.github.com/yana-ivanov/b588b43e61e541448a76fe36e010d8a0) | In pipeline |
 
 ---
 
