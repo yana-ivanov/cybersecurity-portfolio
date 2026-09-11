@@ -69,6 +69,7 @@ Open-source detection rules contributed to [Sublime Security's production rulese
 | VBScript direct delivery — double extension lure | [gist](https://gist.github.com/yana-ivanov/d994206428f2fd0ffb29d33cdaf8bec1) | In pipeline |
 | Cloud storage malware delivery — Azure Blob, DigitalOcean, S3 | [gist](https://gist.github.com/yana-ivanov/0fd34b894af2aa590274ca46946a3aef) | In pipeline |
 | N-able N-central RMM brand impersonation | [gist](https://gist.github.com/yana-ivanov/1c5ba3060d752516eacf86fb4e04f28f) | In pipeline |
+| Amazon/AWS typosquat domain — Coruna campaign | [gist](https://gist.github.com/yana-ivanov/a95f2df6d6c9b381d8cfc215d15a1a22) | In pipeline |
 
 ---
 
