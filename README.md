@@ -94,6 +94,6 @@ Published analyses at [yanaivanov.com](https://yanaivanov.com):
 
 ## About
 
-I am a security researcher and detection engineer in Connecticut. Before security I spent 15 years as a senior UX/product designer. I co-founded [ArgusX](https://yanaivanov.com), a live threat intelligence platform. Security+ in progress.
+I am a security researcher and detection engineer in Connecticut. Before security I spent 15 years as a senior UX/product designer. I co-founded [ArgusX](https://yanaivanov.com/writing/argusx-field-notes.html), a live threat intelligence platform. Security+ in progress.
 
 Everything here is independent research shared as a contribution to the security community.
