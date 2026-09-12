@@ -580,6 +580,10 @@ footer span{color:#94a3b8}
     <p><strong>If you receive a request to change banking details or initiate a wire transfer by email:</strong> Stop. Pick up the phone. Call the requestor at a number you already have — not a number provided in the email. Confirm the request verbally. This single step, applied consistently, makes BEC economically unviable regardless of how convincing the email appears. It costs nothing. It works every time.</p>
   </div>
 
+  <div class="callout callout-amber">
+    <p><strong>September 2026 update — Unicode homoglyphs in malware filenames:</strong> The same Unicode confusable technique documented in this analysis for email sender impersonation has been confirmed in malware filenames. A Vidar infostealer sample observed in MalwareBazaar (September 12, 2026) used mathematical bold italic Unicode characters to spell <code>𝙎𝙀𝙏𝙐𝙋.exe</code> — visually identical to SETUP.exe but bypassing filename-based string detection. The technique is the same. The target layer is different — attackers are now applying Unicode confusables at the filesystem level to evade security tools that match on attachment filenames. A companion detection rule targeting <code>strings.replace_confusables()</code> on attachment filenames is in development.</p>
+  </div>
+
   <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">All statistics in this report are sourced from publicly available data including the FBI IC3 2024 Annual Report, Palo Alto Networks Unit 42 threat research, LevelBlue SpiderLabs BEC trend analysis, AFP 2025 Fraud and Control Survey, and Microsoft Digital Crimes Unit reporting. This report represents the author's independent analysis for educational purposes.</p>
 
 </div></div>
