@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>The Closing Table — Real Estate Wire Fraud and the BEC Attack That Targets the Most Trusted Email in a Transaction | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker: max 2 items, single line */
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+
+/* Red bar — wraps naturally, no overflow hidden */
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT GRID — improved number typography ── */
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper)}
+.stat-num-item:last-child{border-right:none}
+/* Numbers use display-clean (IBM Plex Serif) — clean, data-forward */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-num-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-num-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── ATTACK CHAIN — vertical stepped layout (cleaner than 5-col grid) ── */
+.attack-chain{margin:1rem 0;display:flex;flex-direction:column;gap:0}
+.chain-step{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;align-items:start;position:relative;padding-bottom:1.25rem}
+.chain-step:last-child{padding-bottom:0}
+.chain-step::before{content:'';position:absolute;left:1.2rem;top:2.5rem;bottom:0;width:2px;background:var(--rule)}
+.chain-step:last-child::before{display:none}
+.chain-num{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.chain-normal .chain-num{background:var(--bg);border:2px solid var(--rule);color:var(--ink3)}
+.chain-warning .chain-num{background:var(--amber-dim);border:2px solid var(--amber);color:var(--amber)}
+.chain-danger .chain-num{background:var(--red-dim);border:2px solid var(--red);color:var(--red)}
+.chain-body{padding-top:.4rem}
+.chain-label{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.25rem;letter-spacing:.02em}
+.chain-warning .chain-label{color:var(--amber)}
+.chain-danger .chain-label{color:var(--red)}
+.chain-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── GLYPH DEMO (for homoglyph/domain spoofing reports) ── */
+.glyph-demo{background:#0a0f1a;border-radius:4px;padding:1.75rem 2rem;margin:2rem 0}
+.glyph-demo-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.25rem}
+.glyph-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.25rem}
+.glyph-row:last-child{margin-bottom:0}
+.glyph-pane{padding:1rem 1.25rem;border-radius:3px}
+.glyph-pane.real{background:rgba(20,90,50,.2);border:1px solid rgba(74,222,128,.2)}
+.glyph-pane.fake{background:rgba(192,57,43,.15);border:1px solid rgba(239,68,68,.2)}
+.glyph-pane-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem}
+.glyph-pane.real .glyph-pane-label{color:#4ade80}
+.glyph-pane.fake .glyph-pane-label{color:#ef4444}
+.glyph-domain{font-family:var(--mono);font-size:1.1rem;letter-spacing:.05em;margin-bottom:.4rem}
+.glyph-pane.real .glyph-domain{color:#e2e8f0}
+.glyph-pane.fake .glyph-domain{color:#fca5a5}
+.glyph-unicode{font-family:var(--mono);font-size:.65rem;color:#64748b;line-height:1.6}
+.glyph-pane.fake .glyph-unicode{color:#ef4444}
+
+/* ── SPLIT VISUAL ── */
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+
+/* ── TIMELINE ── */
+.timeline{margin:1.5rem 0;position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:.45rem;top:0;bottom:0;width:2px;background:var(--rule)}
+.tl-item{position:relative;margin-bottom:1.25rem;padding-left:1.25rem}
+.tl-item::before{content:'';position:absolute;left:-1.6rem;top:.4rem;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tl-date{font-family:var(--mono);font-size:.62rem;color:var(--red);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem}
+.tl-title{font-weight:700;color:var(--ink);font-size:.9rem;margin-bottom:.2rem;font-family:var(--display)}
+.tl-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── FINDINGS LIST ── */
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--amber);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--amber-dim);color:var(--amber)}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── TOOL EMBED (for reports with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .split-visual{grid-template-columns:1fr}
+  .figure-body{padding:1.25rem 1rem}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .figure-body{padding:1rem .85rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.62rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-num-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .tbl-wrap{font-size:.75rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<header class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-kicker">Threat Analysis · BEC · Real Estate Wire Fraud</div>
+
+    <h1 class="title">The Closing Table —<br><em>Real Estate Wire Fraud and the BEC Attack That Targets the Most Trusted Email in a Transaction</em></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">July 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Attack Type</div><div class="value">BEC · Wire Fraud · Impersonation</div></div>
+      <div class="meta-item"><div class="label">Sector</div><div class="value">Real Estate · Title · Legal · Financial</div></div>
+      <div class="meta-item"><div class="label">Severity</div><div class="value">Critical — $275M in 2025 Losses</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    $275.1M in real estate wire fraud losses in 2025 &nbsp;·&nbsp; 12,368 FBI IC3 complaints &nbsp;·&nbsp; 58% recovery rate — 42% gone permanently
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT — each section in its own .section > .wrap block
+     ════════════════════════════════════════════════════════════ -->
+
+<!-- SECTION 01 — EXECUTIVE SUMMARY -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>Real estate wire fraud is one of the most financially damaging and emotionally devastating cybercrimes in the United States — not because it is technically sophisticated, but because it exploits the single most trusted moment in a real estate transaction: the closing wire. The FBI's 2025 IC3 Annual Report documented 12,368 complaints and $275.1 million in losses from real estate wire fraud — a 59% increase from $173 million in 2024 and a 90% increase from $145 million in 2023. Even with the FBI's Recovery Asset Team successfully freezing funds in some cases, the recovery rate is approximately 58%. The remaining 42% is gone permanently.</p>
+
+  <p>The attack is a variant of Business Email Compromise (BEC) in which the attacker impersonates a trusted party to the transaction — a title company, a closing attorney, a real estate agent, or a lender — and sends fraudulent wire instructions at the exact moment the buyer is expecting them. The email arrives at the right time, references the correct transaction details, and creates urgency around a deadline the buyer already knows is real. Nothing about it feels wrong. Because the money moves via wire transfer, which is designed to be final and irreversible, recovery is the exception rather than the rule.</p>
+
+  <p>Current email security detection for this specific attack vector is a gap. Existing BEC rules target generic patterns — new sender domains, invoice language, executive impersonation — but none specifically address the real estate closing wire scenario, where the timing of the email, the impersonated parties, and the specific language around "closing," "escrow," and "wire instructions" are the detection signals.</p>
+
+  <div class="stat-num-grid">
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">$275M</div>
+      <div class="stat-num-label">2025 Losses</div>
+      <div class="stat-num-sub">FBI IC3 2025 Annual Report. Up from $173M in 2024 and $145M in 2023.</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">12,368</div>
+      <div class="stat-num-label">FBI Complaints</div>
+      <div class="stat-num-sub">Reported real estate wire fraud incidents in 2025. Actual losses estimated significantly higher.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">42%</div>
+      <div class="stat-num-label">Unrecovered</div>
+      <div class="stat-num-sub">Of attempted wire fraud intercepts, 42% of funds are permanently lost even with FBI intervention.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">90%</div>
+      <div class="stat-num-label">3-Year Increase</div>
+      <div class="stat-num-sub">Cumulative rise in real estate wire fraud losses from 2023 to 2025. Category growing faster than BEC overall.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 02 — BACKGROUND -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>Why Real Estate Transactions Are the Perfect BEC Target</h2>
+
+  <p>A real estate closing involves a predictable sequence of high-value wire transfers between parties who have often never interacted before, operating under strict deadlines, using email as the primary communication channel. The buyer expects to receive wire instructions from their title company, closing attorney, or escrow agent in the days before closing. The wire amount is large — often the single largest financial transaction of a person's life. The timeline is fixed and non-negotiable. The urgency is built into the legitimate transaction.</p>
+
+  <p>Attackers exploit every one of these structural conditions. They monitor compromised email accounts belonging to title companies, real estate attorneys, mortgage brokers, or buyers' agents — waiting for the right moment. When a transaction approaches closing, they send fraudulent wire instructions that appear to come from the expected party, at the expected time, referencing the correct transaction details. The buyer wires the funds. By the time the fraud is discovered — often at the closing table when the real parties ask where the money is — the funds have already moved through multiple accounts and are effectively gone.</p>
+
+  <div class="callout callout-red">
+    <p><strong>IC3 documented case, August 2025:</strong> A couple closing on a home received an email impersonating their legitimate attorneys with modified wire instructions. They wired over $449,000 to the fraudulent account. The FBI's Recovery Asset Team initiated the Financial Fraud Kill Chain immediately upon receiving the IC3 complaint — but recovery was not guaranteed. This is not an edge case. The FBI's RAT handles hundreds of these incidents annually.</p>
+  </div>
+
+  <p>The FBI has specifically designated Real Estate Wire Fraud (REWF) as a sub-category of BEC due to its prevalence and financial impact. Victims include buyers, sellers, title companies, law firms, real estate agents, and lenders — every party to a transaction is a potential target. The attack does not require technical sophistication. It requires access to one party's email, knowledge of the transaction timeline, and a wire instruction email sent at the right moment.</p>
+
+  <div class="split-visual">
+    <div class="split-panel left">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">check_circle</span> Legitimate Closing Wire Email</div>
+      <p><strong>Sender:</strong> titleco@firstamericantitle.com — known domain, established relationship, DMARC passing</p>
+      <p><strong>Timing:</strong> Sent 3-5 days before closing date as expected</p>
+      <p><strong>Content:</strong> Wire instructions to the title company's escrow account, correct bank name, routing and account numbers the buyer has verified previously</p>
+      <p><strong>Tone:</strong> Professional, references specific property address and closing date, no unusual urgency</p>
+    </div>
+    <div class="split-panel right">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">warning</span> Fraudulent Closing Wire Email</div>
+      <p><strong>Sender:</strong> titleco@firstamericantitle-closings.com — lookalike domain registered days earlier, DMARC not established</p>
+      <p><strong>Timing:</strong> Sent just before closing — urgency framing around same-day or next-day wire deadline</p>
+      <p><strong>Content:</strong> "Updated" wire instructions with different bank, routing, and account numbers. References same property address and closing date. Asks buyer to disregard previous instructions.</p>
+      <p><strong>Tone:</strong> Adds urgency — "funds must be received by 2pm to proceed with closing" — mirroring real transaction pressure</p>
+    </div>
+  </div>
+  <p style="font-size:.78rem;color:#94a3b8;font-family:var(--mono);margin-top:.75rem">Attack model based on FBI IC3 2025 Annual Report documented cases and FBI Congressional Report on BEC and Real Estate Wire Fraud.</p>
+
+</div>
+</div>
+
+<!-- SECTION 03 — ATTACK CHAIN -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>The Attack Chain — How Real Estate Wire Fraud Executes</h2>
+
+  <div class="figure">
+    <div class="figure-title">Figure 1 — Real Estate Wire Fraud Attack Chain</div>
+    <div class="figure-body">
+      <div class="attack-chain">
+        <div class="chain-step chain-normal">
+          <div class="chain-num">01</div>
+          <div class="chain-body">
+            <div class="chain-label">Reconnaissance — Finding the Target Transaction</div>
+            <div class="chain-desc">The attacker monitors compromised email accounts at title companies, real estate law firms, mortgage lenders, or buyers' agents — looking for active transactions approaching closing. Public records, MLS listings, and social media provide additional intelligence about upcoming closings. AI tools now enable attackers to monitor and reconnoitre many small organizations simultaneously and cheaply, making the attack viable against targets of any size — not just large commercial transactions. A couple buying their first home is as viable a target as a corporate real estate acquisition.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-normal">
+          <div class="chain-num">02</div>
+          <div class="chain-body">
+            <div class="chain-label">Domain Registration — The Lookalike Infrastructure</div>
+            <div class="chain-desc">The attacker registers a lookalike domain — firstamericantitle-closings.com, stewart-title-closing.net, escrow-closingteam.com — typically days or weeks before the attack. The domain is configured with basic email infrastructure. DMARC may or may not be set up; many attackers skip it to save time, relying on the visual similarity of the display name and domain to fool recipients who are not scrutinizing the exact sender address. The time pressure of a closing — "funds must be received today" — reduces the likelihood the buyer will pause to verify the address character by character.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">03</div>
+          <div class="chain-body">
+            <div class="chain-label">Delivery — The Wire Instruction Email</div>
+            <div class="chain-desc">The attacker sends a professional, well-formatted email from the lookalike domain — or from a compromised legitimate account — with "updated" wire instructions. The email references the correct property address, closing date, and buyer and seller names (all available from the compromised inbox or public records). The wire instructions themselves look normal — bank name, routing number, account number — but the account belongs to a money mule controlled by the attacker. The email arrives when the buyer expects closing communications and contains exactly what they are looking for.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">04</div>
+          <div class="chain-body">
+            <div class="chain-label">Execution — The Wire Transfer</div>
+            <div class="chain-desc">The buyer or their bank initiates the wire transfer to the fraudulent account. Wire transfers are designed to be fast and final — the funds move within hours. The fraudulent account is typically a "funnel account" controlled by a domestic money mule, which immediately re-wires the funds through additional accounts — sometimes internationally — making recovery exponentially harder with every transfer. By the time the fraud is discovered at the closing table when the title company confirms they have not received funds, the money has often already left the first fraudulent account.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">05</div>
+          <div class="chain-body">
+            <div class="chain-label">Laundering — The Recovery Window Closes</div>
+            <div class="chain-desc">The FBI's Recovery Asset Team operates a Financial Fraud Kill Chain (FFKC) that can freeze fraudulent accounts if notified quickly enough. In the August 2025 case documented in the IC3 Annual Report, the RAT was able to initiate a freeze — but the same fraudulent account was later used in a $6 million fraud against an Oregon city government, demonstrating that even partially disrupted fraud infrastructure continues operating. The 42% of funds that are not recovered represent cases where the laundering chain moved faster than the recovery process.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Attack model based on FBI IC3 2025 Annual Report, FBI Congressional Report on BEC and Real Estate Wire Fraud, and documented case studies from Stewart Title and other industry sources. MITRE ATT&CK: T1566.002 (Spearphishing Link), T1586.002 (Compromise Email Accounts), T1036 (Masquerading), T1657 (Financial Theft).</div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 04 — FINDINGS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>Key Findings</h2>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">No Dedicated Detection Rule Exists for Real Estate Closing Wire Fraud</div>
+        <div class="finding-desc">A review of major open-source email security rulesets reveals no rule specifically targeting the real estate closing wire fraud pattern — the combination of closing-related language, wire instruction content, impersonation of title companies or closing attorneys, and urgency framing around a closing date. Existing BEC rules target generic patterns: new sender domains, invoice language, executive impersonation. None address the specific lexicon and timing signals of a real estate closing wire. A lookalike domain impersonating a title company, sending updated wire instructions referencing a closing date and property address, passes every existing detection rule that does not specifically look for these signals.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">The Attack Is Accelerating Faster Than BEC Overall</div>
+        <div class="finding-desc">Real estate wire fraud losses grew 90% from 2023 to 2025 — compared to approximately 24% growth in overall BEC losses over the same period. The category is outpacing the broader BEC trend by a factor of nearly four. AI is a likely contributor: the democratization of BEC described by Cisco Talos in April 2026 applies directly to real estate fraud, where AI tools now enable attackers to identify approaching closings, craft personalized wire instruction emails matching the specific transaction details, and target any size transaction — not just large commercial deals. A couple's home purchase is as viable a target as a $50 million commercial acquisition.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">The Detection Window Is the Email — Before the Wire</div>
+        <div class="finding-desc">Once the wire transfer is initiated, recovery depends on the speed of FBI FFKC notification and the willingness of recipient banks to freeze accounts — a process that succeeds only about 58% of the time even with rapid response. The only reliable intervention point is before the wire is sent — which means detecting the fraudulent email before the buyer acts on it. Email security platforms operating at the delivery layer have a clean shot at the signals that distinguish a fraudulent closing wire email from a legitimate one: lookalike domain, recently registered sender, wire instruction language, closing urgency framing, and title company or attorney impersonation cues.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">4</div>
+      <div>
+        <div class="finding-title">The Reply-To Mismatch Is a Consistent Signal</div>
+        <div class="finding-desc">In many real estate wire fraud cases, the attacker sets the Reply-To header to a different address than the From header — allowing them to conduct the fraudulent conversation from a separate account while the display name shows a legitimate entity. This is a detectable signal: a message appearing to come from a title company or closing attorney, where replies would go to a different domain, is anomalous. Combined with wire instruction language and closing-related urgency, this mismatch is a high-confidence fraud indicator that is underutilized in existing detection logic.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+    <div class="finding fn-medium">
+      <div class="finding-num">5</div>
+      <div>
+        <div class="finding-title">The Victim Pool Is Expanding Downmarket</div>
+        <div class="finding-desc">Real estate wire fraud historically concentrated on commercial transactions where large wire amounts justified the attacker's time investment. AI-assisted BEC has changed this economics — smaller residential transactions are now equally viable targets. A $300,000 home purchase wire is worth the same to an attacker as a $300,000 commercial closing if the effort to target both is identical. This expansion means the victim population now includes first-time homebuyers, retirees downsizing, and any individual involved in a residential real estate transaction — not just corporate treasury departments and commercial real estate professionals.</div>
+        <span class="finding-tag">MEDIUM</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 05 — RECOMMENDATIONS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>Recommendations</h2>
+
+  <p>Defense against real estate wire fraud operates at two levels: individual transaction hygiene and email-layer detection. Both are necessary. Neither is sufficient alone.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Verify Wire Instructions by Phone — Every Time</div>
+        <div class="step-content-desc">No email instruction to wire funds should be acted on without a phone verification call to a number obtained independently — not from the email itself. This is the single most effective defense against real estate wire fraud and the one that failed in nearly every documented case. Call your title company or closing attorney using the number from their official website or a business card obtained in person. If they say they sent the email, the wire instructions are legitimate. If they did not, you have just prevented the fraud. This verification step should be standard practice for every real estate transaction regardless of how legitimate the email appears.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Scrutinize the Sender Domain — Not Just the Display Name</div>
+        <div class="step-content-desc">Email clients display the sender's name prominently and often hide the full email address behind it. "First American Title" as a display name tells you nothing about where the email actually came from. Click on the sender name to reveal the full email address, and examine the domain character by character. A hyphen, a different TLD, or an extra word in the domain — firstamericantitle-closings.com vs firstam.com — is a fraud signal. On mobile where the full address is often hidden, be especially cautious about wire instructions and always verify by phone before acting.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">Treat "Updated Wire Instructions" as a Red Flag</div>
+        <div class="step-content-desc">Legitimate title companies rarely change wire instructions mid-transaction. An email asking you to disregard previously provided wire details and use new account information is one of the highest-risk signals in a real estate transaction. Even if the email appears to come from the correct sender, even if it references the correct property and closing date, any change to wire instructions should trigger an immediate phone verification call. The FBI specifically notes that attackers time these emails to create urgency — "funds must be received by 3pm today" — to prevent the buyer from pausing to verify.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">For Security Teams: Add Real Estate Closing Wire Detection</div>
+        <div class="step-content-desc">Email security platforms operating at the delivery layer can detect the pattern before the buyer ever sees the email. The combination of signals — wire instruction language, closing-related urgency, title company or attorney impersonation, recently registered sender domain, and reply-to mismatch — is detectable and specific enough to produce high-confidence alerts with low false positive rates against legitimate closing communications. A companion detection rule targeting this pattern is in development and will be submitted to Sublime Security's open-source rule feed.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-content-label">If You Are Victimized — Report Immediately</div>
+        <div class="step-content-desc">Time is the critical factor in wire fraud recovery. File a complaint at ic3.gov immediately upon discovering the fraud. Contact your bank's wire transfer department simultaneously and request a recall. The FBI's Recovery Asset Team can initiate the Financial Fraud Kill Chain to freeze fraudulent accounts — but every hour reduces the probability of recovery as funds move through additional accounts. In the documented August 2025 case, rapid FFKC initiation successfully froze $1.3 million. Speed of reporting is the primary determinant of whether the 58% recovery rate applies to your case.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Detection Signals Summary</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Signal</th><th>Indicator</th><th>Confidence</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Sender domain age</td><td class="code">network.whois().days_old &lt; 30</td><td class="red">High</td><td>New domains impersonating established title companies</td></tr>
+        <tr><td>Reply-to mismatch</td><td class="code">reply_to domain ≠ sender domain</td><td class="red">High</td><td>Attacker routes replies to separate fraudulent account</td></tr>
+        <tr><td>Wire instruction language</td><td class="code">routing number + account number pattern</td><td class="amber">Medium-High</td><td>Regex pattern for bank routing/account number strings</td></tr>
+        <tr><td>Closing urgency language</td><td class="code">"closing," "wire by," "funds due"</td><td class="amber">Medium</td><td>Combined with other signals — alone too broad</td></tr>
+        <tr><td>Title company impersonation</td><td class="code">Display name ≠ sender domain</td><td class="red">High</td><td>Known title company names in display name from unknown domain</td></tr>
+        <tr><td>Updated instructions framing</td><td class="code">"updated wire," "new account," "disregard previous"</td><td class="red">High</td><td>Extremely specific to fraud — rarely in legitimate closing email</td></tr>
+        <tr><td>BEC NLU intent</td><td class="code">ml.nlu_classifier intent == "bec"</td><td class="amber">Medium</td><td>Supports other signals — not sufficient alone</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 06 — CONCLUSION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>The Gap Between What Exists and What Is Needed</h2>
+
+  <p>Real estate wire fraud is not a new attack. It has been documented by the FBI since at least 2015, and the FBI has run a dedicated congressional reporting category for it since 2022. The losses have grown every year. The attack pattern is well understood. And yet a dedicated email security detection rule for the specific signals of a closing wire fraud email does not exist in any major open-source ruleset.</p>
+
+  <p>This is not because the problem is technically hard to detect. The signals are specific and identifiable: a recently registered domain impersonating a title company, wire instruction language with routing and account numbers, urgency framing around a closing date, and a reply-to mismatch routing the conversation to a separate fraudulent account. These signals are not present in normal business email. They are present in real estate wire fraud emails. The combination is detectable at the email layer before any wire transfer occurs.</p>
+
+  <p>The 90% growth in losses over three years suggests the attack is scaling faster than awareness and detection are keeping up. AI has made the targeting cheaper and the personalization more convincing — the Cisco Talos "democratisation" observation applies directly here. An attacker no longer needs to spend hours researching a target. They need access to one email account, enough public information to reference the correct transaction, and a lookalike domain registered the week before.</p>
+
+  <p>The email is still the only reliable intervention point. Once the wire is sent, the recovery window is measured in hours and closes quickly. The detection rule that catches this before delivery is straightforward to write. The analysis that explains why it matters is this one.</p>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis is based on publicly available information including the FBI IC3 2025 Annual Report, the FBI Congressional Report on Business Email Compromise and Real Estate Wire Fraud, Cisco Talos Threat Source newsletter (April 2026), and industry documentation from Stewart Title and First American. A companion Sublime Security detection rule targeting real estate closing wire fraud email patterns is in development and will be submitted to the open-source rule feed when complete. This analysis represents independent research produced as a contribution to the security community.</p>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap">
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- EDIT: footer spans — report title · author · date on left; classification note on right -->
+<footer>
+  <span>The Closing Table &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; July 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+</body>
+</html>
