@@ -47,10 +47,10 @@ Open-source detection rules contributed to [Sublime Security's production rulese
 
 | Rule | Gist | Status | Analysis |
 |------|------|--------|----------|
-| Homoglyph BEC domain impersonation | [PR #4596](https://github.com/sublime-security/sublime-rules/pull/4596) | PR merged | [Homoglyph BEC](https://yanaivanov.com/analysis/homoglyph_bec_analysis.html) |
-| ClickFix clipboard hijack lure | [gist](https://gist.github.com/yana-ivanov/7dcd7bdb7c321f3b42117e6104603ee7) | PR merged | [ClickFix Field Note](https://yanaivanov.com/writing/clickfix_field_note.html) |
-| pkpass Apple Wallet phishing | [gist](https://gist.github.com/yana-ivanov/b3e4ee146561d05f63e71618a6ba366e) | PR open | [The Trusted Pass](https://yanaivanov.com/analysis/pkpass_analysis.html) |
-| RoundPress XSS webmail exploit | [gist](https://gist.github.com/yana-ivanov/7edf45c26bacf957dfaf5d6ba96df5eb) | PR open | [OWAReaper Part 3](https://yanaivanov.com/analysis/roundpress_part3.html) |
+| Homoglyph BEC domain impersonation | [PR #4596](https://github.com/sublime-security/sublime-rules/pull/4596) | [PR merged](https://github.com/sublime-security/sublime-rules/pull/4596) | [Homoglyph BEC](https://yanaivanov.com/analysis/homoglyph_bec_analysis.html) |
+| ClickFix clipboard hijack lure | [gist](https://gist.github.com/yana-ivanov/7dcd7bdb7c321f3b42117e6104603ee7) | [PR merged](https://github.com/sublime-security/sublime-rules/pull/4921) | [ClickFix Field Note](https://yanaivanov.com/writing/clickfix_field_note.html) |
+| pkpass Apple Wallet phishing | [gist](https://gist.github.com/yana-ivanov/b3e4ee146561d05f63e71618a6ba366e) | [PR open](https://github.com/sublime-security/sublime-rules/pull/5120) | [The Trusted Pass](https://yanaivanov.com/analysis/pkpass_analysis.html) |
+| RoundPress XSS webmail exploit | [gist](https://gist.github.com/yana-ivanov/7edf45c26bacf957dfaf5d6ba96df5eb) | [PR open](https://github.com/sublime-security/sublime-rules/pull/4981) | [OWAReaper Part 3](https://yanaivanov.com/analysis/roundpress_part3.html) |
 | CSS injection webmail sanitizer bypass | [gist](https://gist.github.com/yana-ivanov/8bf1e78d3f6f3166521403acb0447e48) | In pipeline | [CSS Field Note](https://yanaivanov.com/writing/css_field_note.html) |
 | CaptiveCrunch M365 doppelganger — Storm-2945 | [gist](https://gist.github.com/yana-ivanov/8b4770f07ab638cec1cf49bb276bd2b6) | In pipeline | [CaptiveCrunch Field Note](https://yanaivanov.com/writing/captivecrunch_field_note.html) |
 | PDF job offer lure + YARA — Operation Dream Job | [gist](https://gist.github.com/yana-ivanov/678d779716643c68cbc2fee789e42f07) | In pipeline | — |
