@@ -74,6 +74,7 @@ Open-source detection rules contributed to [Sublime Security's production rulese
 | GoToResolve RMM brand impersonation | [gist](https://gist.github.com/yana-ivanov/4b800844d51a93b1d31c633cc53a7197) | In pipeline | — |
 | Unicode homoglyph attachment filename | [gist](https://gist.github.com/yana-ivanov/ebeb127807de0569812e924c969652d3) | In pipeline | [Homoglyph BEC](https://yanaivanov.com/analysis/homoglyph_bec_analysis.html) |
 | BeaverTail developer recruitment lure | [gist](https://gist.github.com/yana-ivanov/66d204e0b79156328ca87f0bc99f0964) | In pipeline | [LinkedIn Open Door](https://yanaivanov.com/analysis/linkedin_open_door.html) |
+| Real estate wire fraud — closing impersonation | [gist](https://gist.github.com/yana-ivanov/a99229aaa9d3bc7543bad7d0eac1e628) | In pipeline | [The Closing Table](https://yanaivanov.com/analysis/rewf_analysis.html) |
 
 ---
 
