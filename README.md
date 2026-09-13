@@ -47,34 +47,34 @@ Open-source detection rules contributed to [Sublime Security's production rulese
 
 | Rule | Gist | Status | Analysis |
 |------|------|--------|----------|
-| Homoglyph BEC domain impersonation | [PR #4596](https://github.com/sublime-security/sublime-rules/pull/4596) | [PR merged](https://github.com/sublime-security/sublime-rules/pull/4596) | [Homoglyph BEC](https://yanaivanov.com/analysis/homoglyph_bec_analysis.html) |
-| ClickFix clipboard hijack lure | [gist](https://gist.github.com/yana-ivanov/7dcd7bdb7c321f3b42117e6104603ee7) | [PR merged](https://github.com/sublime-security/sublime-rules/pull/4921) | [ClickFix Field Note](https://yanaivanov.com/writing/clickfix_field_note.html) |
-| pkpass Apple Wallet phishing | [gist](https://gist.github.com/yana-ivanov/b3e4ee146561d05f63e71618a6ba366e) | [PR open](https://github.com/sublime-security/sublime-rules/pull/5120) | [The Trusted Pass](https://yanaivanov.com/analysis/pkpass_analysis.html) |
-| RoundPress XSS webmail exploit | [gist](https://gist.github.com/yana-ivanov/7edf45c26bacf957dfaf5d6ba96df5eb) | [PR open](https://github.com/sublime-security/sublime-rules/pull/4981) | [OWAReaper Part 3](https://yanaivanov.com/analysis/roundpress_part3.html) |
-| CSS injection webmail sanitizer bypass | [gist](https://gist.github.com/yana-ivanov/8bf1e78d3f6f3166521403acb0447e48) | In pipeline | [CSS Field Note](https://yanaivanov.com/writing/css_field_note.html) |
-| CaptiveCrunch M365 doppelganger — Storm-2945 | [gist](https://gist.github.com/yana-ivanov/8b4770f07ab638cec1cf49bb276bd2b6) | In pipeline | [CaptiveCrunch Field Note](https://yanaivanov.com/writing/captivecrunch_field_note.html) |
-| PDF job offer lure + YARA — Operation Dream Job | [gist](https://gist.github.com/yana-ivanov/678d779716643c68cbc2fee789e42f07) | In pipeline | — |
-| ScreenConnect cloud C2 subdomain | [gist](https://gist.github.com/yana-ivanov/cba5b9561d05f14d0dbefb56e2558484) | In pipeline | [ScreenConnect Analysis](https://yanaivanov.com/analysis/screenconnect_analysis.html) |
-| India tax authority impersonation — ITR/GST | [gist](https://gist.github.com/yana-ivanov/e7a0e6898b1bd64e5b41dd9b5da90cd1) | In pipeline | — |
-| ZIP+LNK with GitHub Raw C2 — Operation GitPower | [gist](https://gist.github.com/yana-ivanov/567ddfffe0aa5a345786db0ae735e97e) | In pipeline | [Kimsuky GitPower](https://yanaivanov.com/analysis/kimsuky_gitpower_analysis.html) |
-| PDF with AI-generated metadata — Kimsuky pattern | [gist](https://gist.github.com/yana-ivanov/4ebb6f4b726c8a7b6a73e04e29e65952) | In pipeline | [Kimsuky GitPower](https://yanaivanov.com/analysis/kimsuky_gitpower_analysis.html) |
-| PDF dangerous key structures | [gist](https://gist.github.com/yana-ivanov/d775369a72608a011db7ab4b9642daa3) | In pipeline | — |
-| Framer-hosted credential phishing | [gist](https://gist.github.com/yana-ivanov/a2a8eac912af67bf84bebba54442a86f) | In pipeline | — |
-| Figma first-contact invite abuse | [gist](https://gist.github.com/yana-ivanov/3fc9d818d29e7227e959a4803ef7765f) | In pipeline | [The App I Trust Most](https://yanaivanov.com/writing/figma_field_note.html) |
-| OWAReaper onload= XSS delivery | [gist](https://gist.github.com/yana-ivanov/4f14e4f7163b53f00853066965221b6c) | In pipeline | [OWAReaper Part 3](https://yanaivanov.com/analysis/roundpress_part3.html) |
-| ShinyHunters .claims TLD IT impersonation | [gist](https://gist.github.com/yana-ivanov/78f5e40ab19842b0d760e00bf8945f42) | In pipeline | [ShinyHunters Lifecycle](https://yanaivanov.com/analysis/shinyhunters-operational-lifecycle.html) |
-| EvilTokens device code body lure | [gist](https://gist.github.com/yana-ivanov/30916df7e16a170f4b689bcd4b07bac0) | In pipeline | — |
-| Jira Service Management PaaP phishing lure | [gist](https://gist.github.com/yana-ivanov/499ad4d3ff401488ee4414b9243046c8) | In pipeline | — |
-| Hugging Face model share — AI supply chain delivery | [gist](https://gist.github.com/yana-ivanov/57e884d35c47e695d2abbe4073b65041) | In pipeline | [The Watering Hole](https://yanaivanov.com/analysis/huggingface_watering_hole.html) |
-| Azure Blob Storage credential phishing | [gist](https://gist.github.com/yana-ivanov/b588b43e61e541448a76fe36e010d8a0) | In pipeline | — |
-| VBScript direct delivery — double extension lure | [gist](https://gist.github.com/yana-ivanov/d994206428f2fd0ffb29d33cdaf8bec1) | In pipeline | — |
-| Cloud storage malware delivery — Azure Blob, DigitalOcean, S3 | [gist](https://gist.github.com/yana-ivanov/0fd34b894af2aa590274ca46946a3aef) | In pipeline | — |
-| N-able N-central RMM brand impersonation | [gist](https://gist.github.com/yana-ivanov/1c5ba3060d752516eacf86fb4e04f28f) | In pipeline | — |
-| Amazon/AWS typosquat domain — Coruna campaign | [gist](https://gist.github.com/yana-ivanov/a95f2df6d6c9b381d8cfc215d15a1a22) | In pipeline | — |
-| GoToResolve RMM brand impersonation | [gist](https://gist.github.com/yana-ivanov/4b800844d51a93b1d31c633cc53a7197) | In pipeline | — |
-| Unicode homoglyph attachment filename | [gist](https://gist.github.com/yana-ivanov/ebeb127807de0569812e924c969652d3) | In pipeline | [Homoglyph BEC](https://yanaivanov.com/analysis/homoglyph_bec_analysis.html) |
-| BeaverTail developer recruitment lure | [gist](https://gist.github.com/yana-ivanov/66d204e0b79156328ca87f0bc99f0964) | In pipeline | [LinkedIn Open Door](https://yanaivanov.com/analysis/linkedin_open_door.html) |
-| Real estate wire fraud — closing impersonation | [gist](https://gist.github.com/yana-ivanov/a99229aaa9d3bc7543bad7d0eac1e628) | In pipeline | [The Closing Table](https://yanaivanov.com/analysis/rewf_analysis.html) |
+| Homoglyph BEC domain impersonation | [PR #4596](https://github.com/sublime-security/sublime-rules/pull/4596) | ✅ [PR #4596](https://github.com/sublime-security/sublime-rules/pull/4596) | [Homoglyph BEC](https://yanaivanov.com/analysis/homoglyph_bec_analysis.html) |
+| ClickFix clipboard hijack lure | [gist](https://gist.github.com/yana-ivanov/7dcd7bdb7c321f3b42117e6104603ee7) | ✅ [PR #4921](https://github.com/sublime-security/sublime-rules/pull/4921) | [ClickFix Field Note](https://yanaivanov.com/writing/clickfix_field_note.html) |
+| pkpass Apple Wallet phishing | [gist](https://gist.github.com/yana-ivanov/b3e4ee146561d05f63e71618a6ba366e) | 🔄 [PR #5120](https://github.com/sublime-security/sublime-rules/pull/5120) | [The Trusted Pass](https://yanaivanov.com/analysis/pkpass_analysis.html) |
+| RoundPress XSS webmail exploit | [gist](https://gist.github.com/yana-ivanov/7edf45c26bacf957dfaf5d6ba96df5eb) | 🔄 [PR #4981](https://github.com/sublime-security/sublime-rules/pull/4981) | [OWAReaper Part 3](https://yanaivanov.com/analysis/roundpress_part3.html) |
+| CSS injection webmail sanitizer bypass | [gist](https://gist.github.com/yana-ivanov/8bf1e78d3f6f3166521403acb0447e48) | ⏳ | [CSS Field Note](https://yanaivanov.com/writing/css_field_note.html) |
+| CaptiveCrunch M365 doppelganger — Storm-2945 | [gist](https://gist.github.com/yana-ivanov/8b4770f07ab638cec1cf49bb276bd2b6) | ⏳ | [CaptiveCrunch Field Note](https://yanaivanov.com/writing/captivecrunch_field_note.html) |
+| PDF job offer lure + YARA — Operation Dream Job | [gist](https://gist.github.com/yana-ivanov/678d779716643c68cbc2fee789e42f07) | ⏳ | — |
+| ScreenConnect cloud C2 subdomain | [gist](https://gist.github.com/yana-ivanov/cba5b9561d05f14d0dbefb56e2558484) | ⏳ | [ScreenConnect Analysis](https://yanaivanov.com/analysis/screenconnect_analysis.html) |
+| India tax authority impersonation — ITR/GST | [gist](https://gist.github.com/yana-ivanov/e7a0e6898b1bd64e5b41dd9b5da90cd1) | ⏳ | — |
+| ZIP+LNK with GitHub Raw C2 — Operation GitPower | [gist](https://gist.github.com/yana-ivanov/567ddfffe0aa5a345786db0ae735e97e) | ⏳ | [Kimsuky GitPower](https://yanaivanov.com/analysis/kimsuky_gitpower_analysis.html) |
+| PDF with AI-generated metadata — Kimsuky pattern | [gist](https://gist.github.com/yana-ivanov/4ebb6f4b726c8a7b6a73e04e29e65952) | ⏳ | [Kimsuky GitPower](https://yanaivanov.com/analysis/kimsuky_gitpower_analysis.html) |
+| PDF dangerous key structures | [gist](https://gist.github.com/yana-ivanov/d775369a72608a011db7ab4b9642daa3) | ⏳ | — |
+| Framer-hosted credential phishing | [gist](https://gist.github.com/yana-ivanov/a2a8eac912af67bf84bebba54442a86f) | ⏳ | — |
+| Figma first-contact invite abuse | [gist](https://gist.github.com/yana-ivanov/3fc9d818d29e7227e959a4803ef7765f) | ⏳ | [The App I Trust Most](https://yanaivanov.com/writing/figma_field_note.html) |
+| OWAReaper onload= XSS delivery | [gist](https://gist.github.com/yana-ivanov/4f14e4f7163b53f00853066965221b6c) | ⏳ | [OWAReaper Part 3](https://yanaivanov.com/analysis/roundpress_part3.html) |
+| ShinyHunters .claims TLD IT impersonation | [gist](https://gist.github.com/yana-ivanov/78f5e40ab19842b0d760e00bf8945f42) | ⏳ | [ShinyHunters Lifecycle](https://yanaivanov.com/analysis/shinyhunters-operational-lifecycle.html) |
+| EvilTokens device code body lure | [gist](https://gist.github.com/yana-ivanov/30916df7e16a170f4b689bcd4b07bac0) | ⏳ | — |
+| Jira Service Management PaaP phishing lure | [gist](https://gist.github.com/yana-ivanov/499ad4d3ff401488ee4414b9243046c8) | ⏳ | — |
+| Hugging Face model share — AI supply chain delivery | [gist](https://gist.github.com/yana-ivanov/57e884d35c47e695d2abbe4073b65041) | ⏳ | [The Watering Hole](https://yanaivanov.com/analysis/huggingface_watering_hole.html) |
+| Azure Blob Storage credential phishing | [gist](https://gist.github.com/yana-ivanov/b588b43e61e541448a76fe36e010d8a0) | ⏳ | — |
+| VBScript direct delivery — double extension lure | [gist](https://gist.github.com/yana-ivanov/d994206428f2fd0ffb29d33cdaf8bec1) | ⏳ | — |
+| Cloud storage malware delivery — Azure Blob, DigitalOcean, S3 | [gist](https://gist.github.com/yana-ivanov/0fd34b894af2aa590274ca46946a3aef) | ⏳ | — |
+| N-able N-central RMM brand impersonation | [gist](https://gist.github.com/yana-ivanov/1c5ba3060d752516eacf86fb4e04f28f) | ⏳ | — |
+| Amazon/AWS typosquat domain — Coruna campaign | [gist](https://gist.github.com/yana-ivanov/a95f2df6d6c9b381d8cfc215d15a1a22) | ⏳ | — |
+| GoToResolve RMM brand impersonation | [gist](https://gist.github.com/yana-ivanov/4b800844d51a93b1d31c633cc53a7197) | ⏳ | — |
+| Unicode homoglyph attachment filename | [gist](https://gist.github.com/yana-ivanov/ebeb127807de0569812e924c969652d3) | ⏳ | [Homoglyph BEC](https://yanaivanov.com/analysis/homoglyph_bec_analysis.html) |
+| BeaverTail developer recruitment lure | [gist](https://gist.github.com/yana-ivanov/66d204e0b79156328ca87f0bc99f0964) | ⏳ | [LinkedIn Open Door](https://yanaivanov.com/analysis/linkedin_open_door.html) |
+| Real estate wire fraud — closing impersonation | [gist](https://gist.github.com/yana-ivanov/a99229aaa9d3bc7543bad7d0eac1e628) | ⏳ | [The Closing Table](https://yanaivanov.com/analysis/rewf_analysis.html) |
 
 ---
 
