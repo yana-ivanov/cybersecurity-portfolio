@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>Operation GitPower — Kimsuky's AI Lab, the Russia Alliance, and the Detection Gap Nobody Is Talking About | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker: max 2 items, single line */
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+
+/* Red bar — wraps naturally, no overflow hidden */
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT GRID — improved number typography ── */
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper)}
+.stat-num-item:last-child{border-right:none}
+/* Numbers use display-clean (IBM Plex Serif) — clean, data-forward */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-num-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-num-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── ATTACK CHAIN — vertical stepped layout (cleaner than 5-col grid) ── */
+.attack-chain{margin:1rem 0;display:flex;flex-direction:column;gap:0}
+.chain-step{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;align-items:start;position:relative;padding-bottom:1.25rem}
+.chain-step:last-child{padding-bottom:0}
+.chain-step::before{content:'';position:absolute;left:1.2rem;top:2.5rem;bottom:0;width:2px;background:var(--rule)}
+.chain-step:last-child::before{display:none}
+.chain-num{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.chain-normal .chain-num{background:var(--bg);border:2px solid var(--rule);color:var(--ink3)}
+.chain-warning .chain-num{background:var(--amber-dim);border:2px solid var(--amber);color:var(--amber)}
+.chain-danger .chain-num{background:var(--red-dim);border:2px solid var(--red);color:var(--red)}
+.chain-body{padding-top:.4rem}
+.chain-label{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.25rem;letter-spacing:.02em}
+.chain-warning .chain-label{color:var(--amber)}
+.chain-danger .chain-label{color:var(--red)}
+.chain-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── GLYPH DEMO (for homoglyph/domain spoofing reports) ── */
+.glyph-demo{background:#0a0f1a;border-radius:4px;padding:1.75rem 2rem;margin:2rem 0}
+.glyph-demo-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.25rem}
+.glyph-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.25rem}
+.glyph-row:last-child{margin-bottom:0}
+.glyph-pane{padding:1rem 1.25rem;border-radius:3px}
+.glyph-pane.real{background:rgba(20,90,50,.2);border:1px solid rgba(74,222,128,.2)}
+.glyph-pane.fake{background:rgba(192,57,43,.15);border:1px solid rgba(239,68,68,.2)}
+.glyph-pane-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem}
+.glyph-pane.real .glyph-pane-label{color:#4ade80}
+.glyph-pane.fake .glyph-pane-label{color:#ef4444}
+.glyph-domain{font-family:var(--mono);font-size:1.1rem;letter-spacing:.05em;margin-bottom:.4rem}
+.glyph-pane.real .glyph-domain{color:#e2e8f0}
+.glyph-pane.fake .glyph-domain{color:#fca5a5}
+.glyph-unicode{font-family:var(--mono);font-size:.65rem;color:#64748b;line-height:1.6}
+.glyph-pane.fake .glyph-unicode{color:#ef4444}
+
+/* ── SPLIT VISUAL ── */
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+
+/* ── TIMELINE ── */
+.timeline{margin:1.5rem 0;position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:.45rem;top:0;bottom:0;width:2px;background:var(--rule)}
+.tl-item{position:relative;margin-bottom:1.25rem;padding-left:1.25rem}
+.tl-item::before{content:'';position:absolute;left:-1.6rem;top:.4rem;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tl-date{font-family:var(--mono);font-size:.62rem;color:var(--red);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem}
+.tl-title{font-weight:700;color:var(--ink);font-size:.9rem;margin-bottom:.2rem;font-family:var(--display)}
+.tl-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── FINDINGS LIST ── */
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--amber);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--amber-dim);color:var(--amber)}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── TOOL EMBED (for reports with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .split-visual{grid-template-columns:1fr}
+  .figure-body{padding:1.25rem 1rem}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .figure-body{padding:1rem .85rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.62rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-num-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .tbl-wrap{font-size:.75rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<header class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-kicker">Threat Analysis · North Korea · AI-Enabled Operations · Supply Chain</div>
+
+    <h1 class="title">Operation GitPower —<br><em>Kimsuky's AI Lab, the Russia Alliance, and the Detection Gap Nobody Is Talking About</em></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">August 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Threat Actor</div><div class="value">Kimsuky · RGB · North Korea</div></div>
+      <div class="meta-item"><div class="label">Active Since</div><div class="value">Early 2026 — Ongoing</div></div>
+      <div class="meta-item"><div class="label">Severity</div><div class="value">High · First documented state-hosted LLM operation</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    First documented state-sponsored APT with self-hosted LLM &nbsp;·&nbsp; GitHub used as encrypted C2 &nbsp;·&nbsp; Russia-NK treaty includes AI cooperation
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT — each section in its own .section > .wrap block
+     ════════════════════════════════════════════════════════════ -->
+
+<!-- SECTION 01 — EXECUTIVE SUMMARY -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>On August 10, 2026, South Korean cybersecurity firm Genians Security Center published findings that represent a first in documented threat intelligence: a state-sponsored APT group — Kimsuky, operating under North Korea's Reconnaissance General Bureau — has built and is operating a self-hosted large language model environment on its own attack infrastructure. Running Ollama, GPT4All, and a retrieval-augmented generation pipeline trained on stolen documents, Kimsuky is using AI not as a novelty but as an operational capability integrated across its attack chain.</p>
+
+  <p>The campaign, tracked as Operation GitPower, delivers AI-generated decoy documents via ZIP archives containing weaponized LNK files. GitHub and GitLab repositories serve as both payload distribution channels and C2 infrastructure, hosting RC4-encrypted .NET AsyncRAT payloads disguised as image files. The traffic blends into legitimate developer activity.</p>
+
+  <p>Two things make this analysis different from the standard Kimsuky coverage. First: the metadata detection gap — AI-generated documents leave forensic traces in file metadata that are currently unaddressed by any email security rule. Second: the Russia connection. The November 2024 Comprehensive Strategic Partnership Treaty between North Korea and Russia includes explicit provisions for cooperation in AI and information security. On July 28, 2025, security monitoring systems detected a shared IP address linking Gamaredon (Russian FSB) and Lazarus (North Korean RGB). These are not parallel threats. They are a connected ecosystem.</p>
+
+  <div class="stat-num-grid">
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">1st</div>
+      <div class="stat-num-label">State-Hosted<br>LLM Operation</div>
+      <div class="stat-num-sub">First documented case of a state-sponsored APT building a self-hosted LLM environment for offensive operations. Genians, August 10, 2026.</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">700+</div>
+      <div class="stat-num-label">Malicious npm<br>Packages</div>
+      <div class="stat-num-sub">Russian AI slopsquatting campaign publishing AI-generated typosquatted packages simultaneously with Kimsuky disclosure. August 7, 2026.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">Jul 28</div>
+      <div class="stat-num-label">Shared IP<br>Confirmed</div>
+      <div class="stat-num-sub">Gamaredon and Lazarus detected using the same IP — operational coordination between Russian FSB and North Korean RGB. July 28, 2025.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">0</div>
+      <div class="stat-num-label">Rules for<br>AI Metadata</div>
+      <div class="stat-num-sub">Detection rules targeting AI-generated document metadata in major open-source email security rulesets as of August 2026.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 02 — BACKGROUND -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>Why North Korea Built Its Own AI — and What That Decision Tells Us</h2>
+
+  <p>Kimsuky has operated since at least 2012, consistently targeting South Korean government entities, think tanks, academics, and defense-related organizations. What has changed in 2026 is the scale and quality of that targeting — specifically, the quality of the lure documents used to deliver the payload.</p>
+
+  <p>North Korea is now running Ollama, GPT4All, and a retrieval-augmented generation pipeline on its own attack infrastructure. The decision to build locally is a deliberate OPSEC decision.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Analyst observation:</strong> Every nation that handles state secrets has the same problem with commercial AI: the model is hosted by a foreign company in a foreign jurisdiction. Using OpenAI or Anthropic to generate phishing lures would mean sending that content to US servers. North Korea building its own local LLM is the same sovereignty logic that drives Eastern European governments to run their own Zimbra servers instead of using Gmail — except in this case, the data being protected is an active espionage operation. The same infrastructure sovereignty argument that made RoundPress victims vulnerable is driving Kimsuky's AI build.</p>
+  </div>
+
+  <p>The RAG pipeline is the specific capability worth understanding. RAG allows the LLM to search a local document database before generating output. Kimsuky's database is built from stolen documents. When the AI generates a phishing lure targeting a South Korean policy researcher, it draws on real policy documents, real organizational structures, real personnel names, and real project terminology stolen from previous operations. The lure is not generic AI output. It is AI output trained on the victim's own organizational reality.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 1 — Operation GitPower: Attack Chain</div>
+    <div class="figure-body">
+      <div class="attack-chain">
+        <div class="chain-step chain-normal">
+          <div class="chain-num">01</div>
+          <div class="chain-body">
+            <div class="chain-label">AI Document Generation — The Lure Is Built Locally</div>
+            <div class="chain-desc">Kimsuky's local LLM generates sector-specific decoy documents — investment briefs, virtual asset analyses, game development proposals, policy papers. The RAG pipeline draws on stolen documents to ensure the content matches the target's professional vocabulary and organizational context. The output is grammatically perfect and formatted to match legitimate documents the target has likely seen before.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-normal">
+          <div class="chain-num">02</div>
+          <div class="chain-body">
+            <div class="chain-label">Delivery — ZIP Archive Containing LNK File</div>
+            <div class="chain-desc">The AI-generated document is packaged inside a ZIP archive alongside a Windows shortcut file (.lnk) disguised as an ordinary document. When the target double-clicks what appears to be a document, the LNK executes concealed PowerShell while opening the legitimate-looking AI-generated PDF as a decoy. The target sees the expected document. The compromise has already begun.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">03</div>
+          <div class="chain-body">
+            <div class="chain-label">Reconnaissance — GitHub as Information Collection</div>
+            <div class="chain-desc">PowerShell fetches follow-on scripts from GitHub's Raw Content service, collecting OS details, hardware identifiers, boot history, running processes, and network configuration. Using GitHub means the traffic is indistinguishable from routine developer activity. No dedicated C2 infrastructure required at this phase.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">04</div>
+          <div class="chain-body">
+            <div class="chain-label">Payload — AsyncRAT Hidden as Image Files</div>
+            <div class="chain-desc">Public GitHub repositories contain apple.png, fox.png, lion.png, rabbit.png, and wolf.png — RC4-encrypted .NET AsyncRAT payloads disguised with image extensions. AsyncRAT provides full remote access: keylogging, screen capture, file exfiltration, credential theft, and persistent remote shell access.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">05</div>
+          <div class="chain-body">
+            <div class="chain-label">Persistence — The Loop Closes</div>
+            <div class="chain-desc">AsyncRAT establishes persistence via scheduled task. Collected documents feed back into the RAG pipeline, improving future lures against the same target's contacts. Each successful compromise makes the next one more convincing.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Source: Genians Security Center, August 10, 2026. MITRE ATT&amp;CK: T1566.001, T1059.001, T1195.001, T1071.004, T1053.005, T1113, T1056.001.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 03 — RUSSIA-NK ALLIANCE -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>Two Philosophies, One Ecosystem</h2>
+
+  <p>In <a href="https://yanaivanov.com/analysis/signal_whatsapp_analysis.html">my analysis of Russia's Signal campaign</a>, I described the approach as exploiting structural gaps — the patch cycle failure, the sovereignty trap, the distance between what a system is supposed to do and what humans actually do with it. <a href="https://yanaivanov.com/analysis/roundpress_analysis.html">RoundPress</a> worked because organizations chose self-hosted email for sovereignty and could not maintain it. The human did not do anything wrong. The infrastructure did.</p>
+
+  <p>Kimsuky's approach is different. North Korea needs you to do something — open a file, run a script, believe what you are receiving is real. The AI-generated lure is the latest evolution of a consistent strategy: make the bait indistinguishable from legitimate content so the target cooperates willingly. Russia finds the gap in infrastructure. North Korea finds the gap in human perception. Two nation-states, same objective, completely different philosophies about where the vulnerability lives.</p>
+
+  <p>What has changed in 2026 is that these are no longer parallel operations.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Documented coordination:</strong> On July 28, 2025, security monitoring systems detected IP address 144.172.112.106 linking Gamaredon (Russian FSB) and Lazarus Group (North Korean RGB) — the same day Moscow and Pyongyang announced new direct passenger flights. The November 2024 Comprehensive Strategic Partnership Treaty includes explicit provisions for mutual defense in cyberspace and cooperation in artificial intelligence. The North Korean Reconnaissance General Bureau reorganized in 2026 while senior officials increased contacts with Russian security institutions. This is not inference. It is documented coordination.</p>
+  </div>
+
+  <div class="split-visual">
+    <div class="split-panel left">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">flag</span> Russia — Exploit the Infrastructure Gap</div>
+      <p><strong>Philosophy:</strong> Find the gap between what the system should do and what humans actually maintain.</p>
+      <p><strong>RoundPress:</strong> Self-hosted Zimbra chosen for sovereignty, left unpatched. The exploit fires on email open. No mistake required from the target.</p>
+      <p><strong>AI use:</strong> Accelerating CVE discovery — finding the next zero-day faster than defenders can patch the previous one.</p>
+    </div>
+    <div class="split-panel right">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">flag</span> North Korea — Exploit Human Perception</div>
+      <p><strong>Philosophy:</strong> Make the bait so convincing the target cooperates willingly. The infrastructure is fine. The human is the target.</p>
+      <p><strong>Operation GitPower:</strong> AI lures trained on stolen data from the target's own organization. Opens because it looks exactly like what they expected.</p>
+      <p><strong>AI use:</strong> Generating lures at scale, RAG pipelines on stolen documents, improving with each successful operation.</p>
+    </div>
+  </div>
+
+  <p style="margin-top:1.5rem">The treaty covers cooperation in science, technology, information security, and AI. If Kimsuky's local LLM capabilities were informed by Russian technical expertise — and Russian CVE discovery is accelerating with AI assistance — the two approaches are converging toward a combined threat model where the infrastructure gap and the human perception gap are exploited simultaneously by actors sharing tools and intelligence.</p>
+
+</div>
+</div>
+
+<!-- SECTION 04 — FINDINGS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>Key Findings</h2>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">AI-Generated Lures Remove the Last Reliable Human Detection Signal</div>
+        <div class="finding-desc">Security awareness training teaches people to look for poor grammar, awkward phrasing, generic content, and formatting inconsistencies. An AI-generated lure trained on stolen documents from the target's own organization has none of them. The grammar is perfect. The terminology is correct. The content references real projects, real colleagues, real priorities. Defenders who rely on security awareness training as a primary control against Kimsuky-style AI-generated lures are relying on a control that no longer works against this threat.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">The Metadata Detection Gap — AI Tools Leave Forensic Traces Nobody Is Checking</div>
+        <div class="finding-desc">PDF and Office documents generated by AI tools leave detectable traces in file metadata — creator strings, producer fields, XMP toolkit entries, content type identifiers. Genians found forensic metadata evidence of AI generation in the Operation GitPower decoy documents. Sublime Security already uses exiftool metadata analysis via <code>attachment_pdf_malicious_creator_juliep.yml</code>. The same capability can detect AI-generated documents: known local LLM tool strings (Ollama, GPT4All), completely absent metadata on unsolicited attachments, internally inconsistent metadata, or language/locale mismatch between claimed creator tool and document text. Zero email security rules currently target any of these signals.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">GitHub as C2 Infrastructure Is Underdetected at the Email Layer</div>
+        <div class="finding-desc">No existing Sublime Security rule targets the combination of a LNK file in a ZIP attachment with a <code>raw.githubusercontent.com</code> link in the email body. This combination is highly anomalous — a legitimate developer communication does not arrive as a ZIP containing a shortcut file alongside a GitHub raw link. The detection signal exists and is currently uncaptured.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">4</div>
+      <div>
+        <div class="finding-title">Russia and North Korea Are Operating as a Connected Ecosystem</div>
+        <div class="finding-desc">The Gamaredon-Lazarus shared IP event is the most concrete public evidence of operational coordination between Russian and North Korean state-backed actors. The treaty's AI cooperation provisions create a framework for sharing exactly the capabilities both actors are developing. Simultaneously with the Kimsuky LLM disclosure, a Russian campaign published 700+ AI-generated malicious npm packages — the same AI capability applied in a different domain on the same week.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+    <div class="finding fn-medium">
+      <div class="finding-num">5</div>
+      <div>
+        <div class="finding-title">The Self-Reinforcing Intelligence Loop</div>
+        <div class="finding-desc">Kimsuky's RAG pipeline trained on stolen documents creates a self-reinforcing loop. Each successful compromise adds more organizational documents to the training data, improving future lures against the same organization's partners and contacts. This is not a static threat. It improves with each victim.</div>
+        <span class="finding-tag">MEDIUM</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 05 — RECOMMENDATIONS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>Recommendations</h2>
+
+  <p>The standard recommendation against spearphishing — train your employees to recognize suspicious emails — does not apply to AI-generated lures indistinguishable from legitimate communications. The recommendations below address what actually works.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Never Open LNK Files from ZIP Archives in Email</div>
+        <div class="step-content-desc">The delivery mechanism for Operation GitPower is consistent: a ZIP archive containing a Windows shortcut (.lnk) file. This combination is almost never used in legitimate business communications. Any ZIP archive received via email containing a .lnk file should be treated as malicious regardless of how legitimate the email appears. Security teams should configure email security tools to flag or block this combination.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Shift From Content-Based to Behavioral Detection</div>
+        <div class="step-content-desc">AI-generated lures defeat content-based detection. Behavioral detection does not: LNK file execution, PowerShell invocation, outbound connections to GitHub Raw Content, scheduled task creation — these behavioral indicators remain consistent regardless of how convincing the lure was. EDR tools configured to alert on PowerShell spawned from a shortcut file or outbound connections to raw.githubusercontent.com after document execution are the correct detection layer.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">For Security Teams: Add Document Metadata Analysis</div>
+        <div class="step-content-desc">The existing <code>attachment_pdf_malicious_creator_juliep.yml</code> rule demonstrates that PDF creator metadata is readable and actionable at the email delivery layer. The same capability should extend to AI-generated document signatures: known local LLM tool strings, completely absent metadata on unsolicited attachments from new senders, and internally inconsistent metadata fields. A companion detection rule targeting these signals is in development.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">Monitor GitHub Raw Content Access Following Email Delivery</div>
+        <div class="step-content-desc">Connections to <code>raw.githubusercontent.com</code> in the minutes immediately following an email attachment opening — particularly when the email contained a ZIP — should be treated as a high-priority indicator. SIEM correlation rules joining email gateway logs with proxy or DNS logs can surface this pattern without requiring real-time blocking of GitHub traffic.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-content-label">Treat the Russia-NK Alliance as a Combined Threat Model</div>
+        <div class="step-content-desc">Threat intelligence teams maintaining separate Russia and North Korea threat actor profiles should begin treating documented cooperation as a combined threat model. The Gamaredon-Lazarus shared IP demonstrates operational coordination is already occurring. A detection rule firing on Russian-attributed infrastructure should trigger a review of North Korean actor patterns, and vice versa.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 06 — CONCLUSION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>The Last Signal</h2>
+
+  <p>Every analysis of AI-enabled phishing arrives at the same conclusion: the traditional detection signals are eroding. Poor grammar is gone. Generic content is gone. Formatting inconsistencies are gone. What remains is behavior — the LNK file that executes PowerShell, the shortcut that spawns a shell, the GitHub connection that follows the document open. Behavior does not improve because the lure improved.</p>
+
+  <p>The metadata signal is what this analysis adds to that picture. AI tools leave traces. Local LLM environments leave different traces than commercial tools — or leave no traces at all, which is itself a trace. A PDF with completely absent metadata from an unsolicited sender is not normal. Genians found forensic metadata evidence of AI generation in the Operation GitPower documents. That evidence exists because nobody thought to clean it.</p>
+
+  <p>The Russia-North Korea dimension is the one I find most significant for the long term. The <a href="https://yanaivanov.com/analysis/signal_whatsapp_analysis.html">Signal campaign</a> was Russia finding the gap in human behavior. <a href="https://yanaivanov.com/analysis/roundpress_analysis.html">RoundPress</a> was Russia finding the gap in infrastructure maintenance. Operation GitPower is North Korea finding the gap in human perception. These are not competing approaches. They are complementary ones — and the actors deploying them have signed a treaty, shared infrastructure, and are operating in the same geopolitical moment with the same adversary in mind.</p>
+
+  <p>The metadata detection gap can be addressed now, at the email delivery layer. The Julie P. rule exists because someone found a consistent creator field value and built a rule around it. The same approach applied to AI tool signatures is the next step.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>September 2026 update — Campaign confirmation via ArgusX OTX:</strong> Operation GitPower remains active. ArgusX threat intelligence (OTX, September 7, 2026) confirms 13 new LNK variants collected August 11-19 with significant campaign evolution: AI-generated decoys now produced using the <code>opencode</code> AI coding agent with HeadlessChrome PDF conversion — placeholder text left unreviewed in the generated documents is a detectable forensic artifact. Pastebin added as backup C2 alongside GitHub PAT-based raw content retrieval. Anti-VM routines detecting virtualization tools added. Persistence established via hidden scheduled tasks masquerading as BitLocker and MATLAB. Despite increased sophistication, the core GitHub PAT-based C2 pattern remains unchanged and detectable.</p>
+  </div>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis is based on publicly available information including Genians Security Center's Operation GitPower report (August 10, 2026), Royal United Services Institute research on DPRK-Russia cyber cooperation (March 2026), Chainalysis cryptocurrency laundering analysis (June 2025), CSIS analysis of North Korean cyber operations (April 2025), GBHackers reporting on Gamaredon-Lazarus infrastructure overlap (November 2025), and the Russia-DPRK Comprehensive Strategic Partnership Treaty (November 2024). The Russia-North Korea coordination section is based on documented events and does not represent speculation about unconfirmed operational details. A companion detection rule targeting AI-generated document metadata signals is in development. This analysis represents independent research produced as a contribution to the security community.</p>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap">
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- EDIT: footer spans — report title · author · date on left; classification note on right -->
+<footer>
+  <span>Operation GitPower &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; August 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+</body>
+</html>
