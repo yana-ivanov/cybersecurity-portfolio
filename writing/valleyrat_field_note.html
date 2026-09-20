@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>裁员名单: The Document No One Was Supposed to See | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker with decorative lines — blue theme style */
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+
+/* Blue bar — wraps naturally */
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.blue{color:var(--blue);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT CARD (blue theme uses mat-card wrapper) ── */
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+/* Numbers: IBM Plex Serif, clean editorial style */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-red .stat-num{color:var(--red)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE (for diagrams, screenshots, code blocks) ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── TIMELINE (horizontal grid — blue theme style) ── */
+.timeline{margin:0;display:grid;gap:0;border:1px solid var(--rule)}
+.tl-item{display:grid;grid-template-columns:140px 1fr;border-bottom:1px solid var(--rule)}
+.tl-item:last-child{border-bottom:none}
+.tl-left{padding:1.5rem 1.25rem;border-right:1px solid var(--rule);background:#f8fafc}
+.tl-date{font-family:var(--mono);font-size:.72rem;color:var(--blue);font-weight:700;margin-bottom:.3rem}
+.tl-tag{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.tl-right{padding:1.5rem}
+.tl-title{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3}
+.tl-body{font-size:.88rem;color:var(--ink3);line-height:1.7;margin:0}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── CODE BLOCKS (lab logs only) ── */
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.code-block{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.code-block .prompt{color:#4a9eff}
+.code-block .comment{color:#64748b}
+.code-block .highlight{color:#4ade80}
+.code-block .warning{color:#ef4444}
+.code-block .error{color:#f97316}
+/* shorthand color spans for inline use */
+.co{color:#94a3b8}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+
+/* ── TERMINAL WINDOW (macOS-style, for script output) ── */
+.terminal{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.terminal-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-left:.5rem}
+.terminal pre{font-family:var(--mono);font-size:.76rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#e2e8f0}
+/* terminal text color classes */
+.t-red{color:#ef4444;font-weight:bold}
+.t-orange{color:#fb923c;font-weight:bold}
+.t-blue{color:#60a5fa;font-weight:bold}
+.t-green{color:#4ade80}
+.t-dim{color:#94a3b8} /* was #475569 — bumped for legibility */
+.t-bold{color:#e2e8f0;font-weight:bold}
+
+/* ── HOST CARD (dark card for IP/host data) ── */
+.host-card{background:#0a0f1a;border-radius:2px;padding:1.5rem;margin:1.75rem 0;display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.hf-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.hf-value{font-family:var(--mono);font-size:.9rem;color:#4a9eff;font-weight:600}
+.hf-value.red{color:#ef4444}
+.hf-value.green{color:#4ade80}
+.hf-value.amber{color:#fbbf24}
+
+/* ── LAB ENVIRONMENT BOX (lab logs only) ── */
+.env-box{background:var(--paper);border:1px solid var(--rule);padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+
+/* ── COMPARE GRID (side-by-side comparison) ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.left{border-top:3px solid var(--blue)}
+.compare-box.right{border-top:3px solid var(--amber)}
+.compare-box.danger{border-top-color:var(--red)}
+.compare-box.safe{border-top-color:var(--green)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.left .compare-label{color:var(--blue)}
+.compare-box.right .compare-label{color:var(--amber)}
+.compare-box.danger .compare-label{color:var(--red)}
+.compare-box.safe .compare-label{color:var(--green)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+
+/* ── FUNCTION CARDS GRID (for script/tool documentation) ── */
+.fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.75rem 0}
+.fn-card{background:var(--paper);border:1px solid var(--rule);padding:1rem 1.1rem;border-top:2px solid var(--blue)}
+.fn-name{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--blue);margin-bottom:.3rem}
+.fn-desc{font-size:.82rem;color:var(--ink3);line-height:1.55}
+
+/* ── NIST MAPPING BOX (lab logs only) ── */
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:90px 1fr;gap:1rem;align-items:start}
+.nist-control{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--blue);padding-top:.15rem}
+.nist-desc{font-size:.88rem;color:var(--ink3);line-height:1.7}
+.nist-desc strong{color:var(--ink)}
+
+/* ── TOOL EMBED (for pages with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .tl-item{grid-template-columns:1fr}
+  .tl-left{border-right:none;border-bottom:1px solid var(--rule);padding:1rem 1.25rem}
+  .env-grid{grid-template-columns:1fr}
+  .nist-item{grid-template-columns:80px 1fr}
+  .compare-grid{grid-template-columns:1fr}
+  .fn-grid{grid-template-columns:1fr}
+  .host-card{grid-template-columns:1fr}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .mast-bar{padding:.55rem 1.5rem;font-size:.62rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.6rem}
+  .mast-meta{grid-template-columns:1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .timeline .tl-left{padding:.75rem .9rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .code-block,.terminal{padding:.85rem .9rem;font-size:.7rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<div class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-label">Field Notes &nbsp;·&nbsp; <span style="color:#4a9eff">Threat Analysis · Social Engineering</span></div>
+
+    <h1 class="title">裁员名单<br><span>The Document No One Was Supposed to&nbsp;See</span></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">September 2026</div></div>
+      <div class="meta-item"><div class="label">Category</div><div class="value">Field Notes · Threat Analysis</div></div>
+      <div class="meta-item"><div class="label">Malware Family</div><div class="value">ValleyRAT · Winos 4.0</div></div>
+      <div class="meta-item"><div class="label">Technique</div><div class="value">HR Lure · Trojanized Installers</div></div>
+      <div class="meta-item"><div class="label">Data Source</div><div class="value">Own Research · MalwareBazaar</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    SILVERFOX · VALLEYRAT · 15 SAMPLES
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>The File Everyone Would&nbsp;Open</h2>
+
+  <p>The scene below is illustrative. The filename in it is&nbsp;real.</p>
+
+  <p>It is a weekday morning in the Shanghai office of a US company. For months there have been rumors about headcount. Nobody in management will confirm anything, and everybody has a theory about which team goes first. Then a file shows up in a chat window or an inbox, forwarded by someone, or appearing to&nbsp;be:</p>
+
+  <p><strong>2026.裁员名单及补偿方案WPS.exe</strong></p>
+
+  <p>To anyone who reads Chinese, the meaning lands instantly: <em>2026 Layoff List and Compensation Plan.</em> The "WPS" suggests a document made in WPS Office, the Kingsoft office suite that is standard on a great many machines in China. With Windows hiding known file extensions by default, the ".exe" at the end may never be seen at all. What the employee sees is a document that answers the only question on their mind: am I on the&nbsp;list?</p>
+
+  <p>There is no list. The file is a Windows executable, and in the malware data I track it is tagged <strong>ValleyRAT</strong>, a remote access trojan that gives an attacker control of the machine it runs&nbsp;on.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>This lure does not need to be clever. It needs to be relevant.</strong> Security awareness training asks people to pause before opening something unexpected. A file that claims to decide whether you still have a job is not something most people pause on. It is exactly the kind of document a nervous employee has been waiting for, and the click happens before the question of whether it is safe comes&nbsp;up.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>What My Data&nbsp;Showed</h2>
+
+  <p>As part of my own research, I built a threat intelligence platform called ArgusX that collects public threat feeds into a single database I can search. One of those feeds is MalwareBazaar, a public repository where security researchers share malware samples along with tags describing what they are. I searched it for every sample tagged ValleyRAT or SilverFox and pulled the 15 most recent. They were first seen between September 17 and September 19, 2026, a window of about 50 hours. The layoff file was one of them. The other fourteen tell a broader&nbsp;story.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Author's Research · MalwareBazaar Samples · ValleyRAT / SilverFox Tags · September 17–19, 2026</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-red">
+        <div class="stat-num">15</div>
+        <div class="stat-label">Samples</div>
+        <div class="stat-sub">14 tagged ValleyRAT, 1 tagged&nbsp;Gh0stRAT</div>
+      </div>
+      <div class="stat-item stat-blue">
+        <div class="stat-num">~50 hrs</div>
+        <div class="stat-label">First-Seen Window</div>
+        <div class="stat-sub">Sept 17 17:49 to Sept 19 19:51&nbsp;UTC</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Lure Families</div>
+        <div class="stat-sub">Plus 2 samples with no lure&nbsp;name</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">1</div>
+        <div class="stat-label">Signed Binary</div>
+        <div class="stat-sub">LetsVPN.exe, tagged&nbsp;signed</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Lure Family · Meaning</th>
+          <th>Filename (as Submitted)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Workplace fear</strong><br>1 sample<br><em>2026 layoff list and compensation&nbsp;plan</em></td>
+          <td class="code">2026.裁员名单及补偿方案WPS.exe</td>
+        </tr>
+        <tr>
+          <td><strong>Language pack</strong><br>3 samples<br><em>"Click to install" a Chinese language&nbsp;pack</em></td>
+          <td class="code">点击安装简体中文包.msi<br>点击安装中文语言包z.exe<br>点击此处安装中文语言包!!A.exe</td>
+        </tr>
+        <tr>
+          <td><strong>Trusted software</strong><br>3 samples<br><em>LetsVPN; Sandboxie Plus "from the 360&nbsp;store"</em></td>
+          <td class="code">LetsVPN.exe<br>Letspn_<wbr>latest_<wbr>1.7.5.exe<br>sandboxieplus_<wbr>install_<wbr>assistant_<wbr>2.1.0_<wbr>360store.exe</td>
+        </tr>
+        <tr>
+          <td><strong>Generic installer</strong><br>6 samples<br><em>Numbered, no&nbsp;brand</em></td>
+          <td class="code">install_<wbr>s.6.01.exe<br>install_<wbr>s.6.02.exe&nbsp;(×2)<br>install_<wbr>s.6.03.exe<br>install_<wbr>s.6.06.exe<br>install_<wbr>a.8.15.exe</td>
+        </tr>
+        <tr>
+          <td><strong>No lure name</strong><br>2 samples<br><em>A DLL and a hash-named&nbsp;file</em></td>
+          <td class="code">PDFCORE8.dll<br>c48ff5d56bb26fbc<wbr>25742d5eef45ea12<wbr>.exe</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Four details stood out to&nbsp;me.</p>
+
+  <p><strong>The language pack lure is not new.</strong> In April 2026, researchers documented a Silver Fox MSI named <strong>点击安装中文语言包a.msi</strong> ("Click to Install Chinese Language Pack a"), posing as a Telegram Chinese language pack and delivering ValleyRAT along with a kernel rootkit. The September sample <strong>点击安装中文语言包z.exe</strong> uses the same wording with a different letter suffix. Five months later, the same lure is still&nbsp;circulating.</p>
+
+  <p><strong>The installers are numbered.</strong> install_s.6.01, 6.02, 6.03, 6.06, and install_a.8.15 read like build numbers. install_s.6.02.exe appears twice with two different hashes, one first seen September 17 and one September 18. The same name with a different hash means the file was rebuilt without being&nbsp;renamed.</p>
+
+  <p><strong>One sample is signed.</strong> LetsVPN.exe carries a "signed" tag. A valid-looking signature makes a file more convincing to a user and can lower suspicion in some automated checks. LetsVPN is a VPN client widely used by Chinese-speaking users, and Silver Fox has impersonated it in earlier, publicly documented&nbsp;campaigns.</p>
+
+  <p><strong>One sample can be traced to a download site.</strong> My platform also collects URLhaus, a public feed of URLs used to distribute malware. On September 19, MalwareBazaar first saw <strong>sandboxieplus_<wbr>install_<wbr>assistant_<wbr>2.1.0_<wbr>360store.exe</strong> at 15:32 UTC. Sixteen minutes later, URLhaus logged <strong>sandboxle.<wbr>com.<wbr>cn/<wbr>sandboxieplus_<wbr>install_<wbr>assistant_<wbr>2.<wbr>1.<wbr>0_<wbr>360store.<wbr>zip</strong>, tagged SilverFox and ValleyRAT. The domain swaps the "i" in Sandboxie for an "l". The two files share a name, one as an executable and one as a zip. That is consistent with the zip carrying the executable, but I have not confirmed the zip's&nbsp;contents.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>What this data does and does not show.</strong> MalwareBazaar's first-seen time is when a sample was submitted, not when a victim received it. Several of these samples were submitted within minutes of each other (the three language-pack files within four minutes on September 19, and five files within about four minutes on September 18), which looks like a researcher uploading a batch, not the attacker's delivery schedule. MalwareBazaar also does not record how a file reached its victim, so this data cannot tell me whether the layoff file arrived by email, by chat app, or from a download page. And a ValleyRAT tag is not proof of Silver Fox: the ValleyRAT builder leaked publicly on GitHub in March 2025, so other operators can build it too. Twelve of the fifteen samples carry a SilverFox tag as well; that tag is the submitter's attribution, not&nbsp;mine.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>Who This Is Built&nbsp;For</h2>
+
+  <p>Every lure name in this set is aimed at a Chinese-speaking Windows user. The filenames are in Simplified Chinese. The software being impersonated (a Chinese language pack, LetsVPN, a program labeled as coming from the 360 software store, a document made in WPS) is what someone working in the Chinese software ecosystem would expect to see. Public reporting on earlier Silver Fox installer lures describes locale checks built into the malware, which fits the same&nbsp;targeting.</p>
+
+  <p>That matches what is documented about Silver Fox more broadly. ESET reports the group initially focused on Chinese-speaking targets before expanding its operations across Asia. Over the past year it has been reported sending tax-authority lures to organizations in India and Russia, and spearphishing Japanese companies with lures about salary adjustments, job position changes, and employee stock plans. Sekoia describes the group as running both espionage-style and profit-driven operations at the same&nbsp;time.</p>
+
+  <p>The layoff file belongs to that same family of lures. It does not pretend to be from a bank or a delivery service. It pretends to be from inside your own company, about the thing people at work are most afraid of. ESET's Japan reporting shows Silver Fox has already used salary and HR themes against companies. A layoff list is the same idea, turned&nbsp;up.</p>
+
+  <h3>Why a US security team should care</h3>
+
+  <p>It is easy to read "Chinese-language lure, Chinese-speaking targets" and conclude this is someone else's problem. For any US company with offices, staff, or contractors in China, it is not. The employees in those offices use the same local software ecosystem these lures imitate, read the same news about layoffs, and connect to the same corporate network as everyone else. I have no evidence that this particular file was sent to a US company. The point is simpler: if it were, nothing about it would look out of place to the person receiving&nbsp;it.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>The practical question for a defender is not "does this campaign target us?"</strong> It is "would our tooling, and our people, notice a lure written in a language most of our security team cannot read?" If the analyst triaging an alert needs a translation tool to understand the filename, the lure has already bought&nbsp;time.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>What a Defender Can Actually&nbsp;Use</h2>
+
+  <p>My first idea for a detection rule was the combination above: a Chinese filename, an executable, and a document-style lure name. Before writing it, I checked it against the open-source Sublime Security detection ruleset. An executable inside an archive, a shortcut (LNK) file, an MSI installer, and a password-protected zip from an unsolicited sender each already have their own rule, and a program attached directly to an email is blocked by default by both Gmail and Microsoft 365. A filename-language rule would mostly repeat that coverage, and flagging email because it is written in Chinese, Arabic, Korean, or Russian would be both wrong and useless, because millions of legitimate business emails are written in those languages every&nbsp;day.</p>
+
+  <p>So I looked at how these files actually travel. I searched my data for PDF samples tagged ValleyRAT or SilverFox and found none. I then pulled the 20 most recent URLhaus download links with those tags that end in .exe, .msi, .zip, or .rar, added between August 27 and September 19, 2026. Every one is a web download. They include lookalike software sites (<strong>sandboxle.com.cn</strong> for Sandboxie, and <strong>download-sougou.com.cn</strong> serving a misspelled "sougouExpiorerr" installer for the Sogou browser), an archive named <strong>BraveBrows.zip</strong>, a file hosted on Volcano Engine, ByteDance's cloud storage, and a group of zips and executables on random-looking domains. The ValleyRAT sample I analyzed in an earlier lab pulled its payload from Tencent cloud storage the same way. My data does not show this campaign arriving by&nbsp;email.</p>
+
+  <div class="callout callout-green">
+    <p><strong>Defensible takeaway:</strong> For staff, treat any program (.exe, .msi, or the same inside an archive) whose name promises a document, such as a layoff list, a salary notice, or a tax form, as a verify-first file regardless of where it came from. Confirm with HR or the sender through a separate channel. No legitimate HR process delivers a layoff list as a program you run. For security teams, the delivery this data shows is lookalike download sites and abused cloud storage, so the controls that matter are installing software only from official sources or an internal software portal, and web filtering that catches lookalike and newly registered domains. On the email side, existing rules already cover the main ways these files could arrive, so this campaign does not call for a new&nbsp;one.</p>
+  </div>
+
+  <h3>Indicators</h3>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Filename · SHA256</th>
+          <th>First Seen (UTC)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="code"><strong>2026.裁员名单及补偿方案WPS.exe</strong><br>832e3c40bb74c638<wbr>477556205a69addb<wbr>2f773ef2ae887ac2<wbr>6e0418dcc90ac2fa</td><td>2026-09-18&nbsp;15:54</td></tr>
+        <tr><td class="code"><strong>LetsVPN.exe</strong><br>5385a2b091db5ae1<wbr>2804074a1d0736f4<wbr>444d9996ca590452<wbr>4f0393034424d5e8</td><td>2026-09-19&nbsp;19:51</td></tr>
+        <tr><td class="code"><strong>sandboxieplus_<wbr>install_<wbr>assistant_<wbr>2.1.0_<wbr>360store.exe</strong><br>12c2b43d44bd9238<wbr>8f4da0e595df3b29<wbr>a05879a7f7efe757<wbr>eac713e32af219a5</td><td>2026-09-19&nbsp;15:32</td></tr>
+        <tr><td class="code"><strong>点击此处安装中文语言包!!A.exe</strong><br>f01277ab480cde96<wbr>2cacb636c1634470<wbr>7fe8b34a5a74a1e4<wbr>305730bb56713730</td><td>2026-09-19&nbsp;12:34</td></tr>
+        <tr><td class="code"><strong>点击安装中文语言包z.exe</strong><br>d3f5b2ed1b616c63<wbr>02341f7a7736490e<wbr>11b4b63081a22e61<wbr>53d4a4c0a53d0a40</td><td>2026-09-19&nbsp;12:32</td></tr>
+        <tr><td class="code"><strong>点击安装简体中文包.msi</strong><br>fab24a3d4dccd29c<wbr>00dd21c86c0e66c2<wbr>535dfe61c2b03314<wbr>126f7fbaf2c7008b</td><td>2026-09-19&nbsp;12:31</td></tr>
+        <tr><td class="code"><strong>Letspn_<wbr>latest_<wbr>1.7.5.exe</strong><br>7da191c3d8b15e0c<wbr>19d6913f884daee5<wbr>d8fd358622647cdd<wbr>1814ba14da493877</td><td>2026-09-18&nbsp;15:58</td></tr>
+        <tr><td class="code"><strong>install_<wbr>s.6.06.exe</strong><br>7b08f5cc5f06bb80<wbr>19310967d1b4ad10<wbr>3e72720e2d165b9e<wbr>d2f9bd503f513697</td><td>2026-09-18&nbsp;15:57</td></tr>
+        <tr><td class="code"><strong>install_<wbr>s.6.02.exe</strong><br>aaa2332239867048<wbr>d28a693803438a51<wbr>a28cfd5cd3305997<wbr>7a36a3d5565a73f5</td><td>2026-09-18&nbsp;15:56</td></tr>
+        <tr><td class="code"><strong>install_<wbr>a.8.15.exe</strong><br>c9b9c20fd7ef5a89<wbr>8dbcfe72dbff0cfe<wbr>ad360cf68e61d556<wbr>80b517e6298ceadb</td><td>2026-09-18&nbsp;15:56</td></tr>
+        <tr><td class="code"><strong>PDFCORE8.dll</strong><br>7c1ab2209ed95a0a<wbr>98fb5c23e007b3bf<wbr>3e8a7e7f8424a5cf<wbr>5ff3331dac6ae4d7</td><td>2026-09-18&nbsp;11:10</td></tr>
+        <tr><td class="code"><strong>c48ff5d56bb26fbc<wbr>25742d5eef45ea12<wbr>.exe</strong><br>6d44eb601b419e43<wbr>aaadd2e92c0a40a9<wbr>54e877c1b6f1334a<wbr>bd090877d004dda3</td><td>2026-09-18&nbsp;05:58</td></tr>
+        <tr><td class="code"><strong>install_<wbr>s.6.03.exe</strong><br>e95116115fba848a<wbr>25fc0255f118054e<wbr>e47a06a1790e01fe<wbr>0da4ce7e51934e5f</td><td>2026-09-17&nbsp;17:51</td></tr>
+        <tr><td class="code"><strong>install_<wbr>s.6.02.exe</strong><br>fc155f603f547eab<wbr>fc1b4c8435e9c1cb<wbr>1ff9cff813f62677<wbr>99b7b45c95097fc1</td><td>2026-09-17&nbsp;17:50</td></tr>
+        <tr><td class="code"><strong>install_<wbr>s.6.01.exe</strong><br>a828a86c9ad60a78<wbr>84500e4ea54e8eec<wbr>0e698bb051320a7c<wbr>ac5412ada6c8fbc7</td><td>2026-09-17&nbsp;17:49</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>The most effective part of this campaign is not technical. It is a filename that speaks directly to a fear, in the language of the person reading it. That costs the attacker almost nothing to write, and it is the part that gets the file&nbsp;opened.</p>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">Sample data from the author's own research, collected through ArgusX, a threat intelligence platform the author built to gather public threat feeds (source feeds: MalwareBazaar, 15 most recent samples tagged ValleyRAT or SilverFox, first seen September 17–19, 2026; URLhaus, 20 most recent ValleyRAT, SilverFox, or Winos download URLs ending in .exe, .msi, .zip, or .rar, added August 27 to September 19, 2026, all offline at time of query). Tags and attribution are as submitted to MalwareBazaar and URLhaus. April 2026 Telegram Chinese language pack campaign reported by GBHackers and Cybersecurity News (April 9, 2026). Silver Fox targeting of Chinese-speaking users, HR and salary lures against Japanese businesses: ESET (March 2026). Tax-themed campaigns against India and Russia: Kaspersky Securelist (2026). Dual espionage and cybercrime model: Sekoia (2026). Prior LetsVPN impersonation, locale checks, and the March 2025 ValleyRAT builder leak: Malwarebytes (February 2026) and Cybereason. Sublime Security ruleset review performed by the author against the public repository, September 2026. ValleyRAT sample pulling its payload from Tencent cloud storage: the author's earlier lab analysis. Default attachment blocking: Google Gmail and Microsoft Outlook documentation. The opening scene is illustrative. This field note represents independent research produced for educational&nbsp;purposes.</p>
+
+</div>
+
+</div></div></div></div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- EDIT: footer spans — for WRITING: left=title/date, right=classification note -->
+<!-- For LAB LOGS: left=title/date/environment, right=← Portfolio link -->
+<!-- Writing footer example: -->
+<footer>
+  <span>Yana Ivanov &nbsp;·&nbsp; September 2026 &nbsp;·&nbsp; Based on independent research &nbsp;·&nbsp; For educational use</span>
+</footer>
+
+<!-- Lab log footer example (swap above footer for this):
+<footer>
+  <span>Lab Log [N] — [Lab Title] &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; [Date] &nbsp;·&nbsp; Controlled lab environment &nbsp;·&nbsp; Educational use only</span>
+  <a href="../index.html" style="color:#4a9eff;text-decoration:none;white-space:nowrap">← Portfolio</a>
+</footer>
+-->
+
+</body>
+</html>
+
+<!-- ════════════════════════════════════════════════════════════
+     LAB LOG COMPONENTS — copy-paste as needed
+     ════════════════════════════════════════════════════════════
+
+── CODE LABEL + BLOCK ──────────────────────────────────────────
+<div class="code-label">Command</div>
+<div class="code-block"><pre><span class="prompt">┌──(root㉿kali)-[/]
+└─# </span>nmap -sV 172.17.0.1
+
+<span class="comment"># -sV : Service version detection
+# Target: 172.17.0.1</span></pre></div>
+
+<div class="code-label">Output</div>
+<div class="code-block"><pre>PORT    STATE SERVICE VERSION
+<span class="highlight">111/tcp open  rpcbind 2-4 (RPC #100000)</span>
+<span class="warning">65471/tcp open  status  1 (RPC #100024)</span></pre></div>
+
+── TERMINAL WINDOW (macOS-style, for script output) ────────────
+<div class="terminal">
+  <div class="terminal-bar">
+    <div class="terminal-dot" style="background:#ef4444"></div>
+    <div class="terminal-dot" style="background:#fbbf24;margin-left:4px"></div>
+    <div class="terminal-dot" style="background:#4ade80;margin-left:4px"></div>
+    <div class="terminal-title">python3 script.py ~/Desktop/zeek-logs</div>
+  </div>
+  <pre><span class="t-bold">============================================================
+  ZEEK TRIAGE REPORT
+============================================================</span>
+
+<span class="t-blue">[ INFECTED HOST IDENTITY ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  IP Address : 10.1.21.58
+  Hostname   : DESKTOP-ES9F3ML
+  Username   : <span class="t-red">suspicious_user</span>
+
+<span class="t-blue">[ SEVERITY SUMMARY ]</span>
+<span class="t-dim">------------------------------------------------------------</span>
+  Overall severity : <span class="t-red">CRITICAL</span></pre>
+</div>
+
+── HOST CARD (dark card for IP/host summary data) ──────────────
+<div class="host-card">
+  <div>
+    <div class="hf-label">IP Address</div>
+    <div class="hf-value">10.1.21.58</div>
+  </div>
+  <div>
+    <div class="hf-label">Hostname</div>
+    <div class="hf-value">DESKTOP-ES9F3ML</div>
+  </div>
+  <div>
+    <div class="hf-label">Threat Score</div>
+    <div class="hf-value red">CRITICAL</div>
+  </div>
+  <div>
+    <div class="hf-label">IOCs Found</div>
+    <div class="hf-value">5 domains</div>
+  </div>
+</div>
+
+── ENV BOX ─────────────────────────────────────────────────────
+<div class="env-box">
+  <div class="env-box-title">Environment Configuration</div>
+  <div class="env-grid">
+    <div class="env-item">
+      <div class="env-label">Scanning Host</div>
+      <div class="env-value">Kali Linux (kali-rolling) · Docker Container</div>
+    </div>
+    <div class="env-item">
+      <div class="env-label">Target Host</div>
+      <div class="env-value">macOS Sequoia · Apple M1 · Docker Host</div>
+    </div>
+  </div>
+</div>
+
+── COMPARE GRID (side-by-side) ─────────────────────────────────
+<div class="compare-grid">
+  <div class="compare-box left">
+    <div class="compare-label">[Left Panel Title]</div>
+    <p><strong>[Attribute]:</strong> [Description]</p>
+    <p><strong>[Attribute]:</strong> [Description]</p>
+  </div>
+  <div class="compare-box right">
+    <div class="compare-label">[Right Panel Title]</div>
+    <p><strong>[Attribute]:</strong> [Description]</p>
+    <p><strong>[Attribute]:</strong> [Description]</p>
+  </div>
+</div>
+
+── FUNCTION CARDS GRID ─────────────────────────────────────────
+<div class="fn-grid">
+  <div class="fn-card">
+    <div class="fn-name">function_name()</div>
+    <div class="fn-desc">What this function does and why it matters.</div>
+  </div>
+  <div class="fn-card">
+    <div class="fn-name">another_function()</div>
+    <div class="fn-desc">Description of second function.</div>
+  </div>
+</div>
+
+── NIST MAPPING BOX ────────────────────────────────────────────
+<div class="nist-box">
+  <div class="nist-box-title">Applicable NIST SP 800-171 Controls</div>
+  <div class="nist-items">
+    <div class="nist-item">
+      <span class="nist-control">3.13.6</span>
+      <span class="nist-desc"><strong>Deny by default.</strong> Implement deny-by-default / allow-by-exception for network communications.</span>
+    </div>
+    <div class="nist-item">
+      <span class="nist-control">3.4.6</span>
+      <span class="nist-desc"><strong>Least functionality.</strong> Configure systems to provide only essential capabilities.</span>
+    </div>
+  </div>
+</div>
+
+════════════════════════════════════════════════════════════ -->
