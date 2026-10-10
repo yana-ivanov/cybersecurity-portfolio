@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>Open by Default — Why Self-Hosted AI Tools Ship Without Authentication and End Up Exposed | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker: max 2 items, single line */
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+
+/* Red bar — wraps naturally, no overflow hidden */
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT GRID — improved number typography ── */
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper)}
+.stat-num-item:last-child{border-right:none}
+/* Numbers use display-clean (IBM Plex Serif) — clean, data-forward */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-num-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-num-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── ATTACK CHAIN — vertical stepped layout (cleaner than 5-col grid) ── */
+.attack-chain{margin:1rem 0;display:flex;flex-direction:column;gap:0}
+.chain-step{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;align-items:start;position:relative;padding-bottom:1.25rem}
+.chain-step:last-child{padding-bottom:0}
+.chain-step::before{content:'';position:absolute;left:1.2rem;top:2.5rem;bottom:0;width:2px;background:var(--rule)}
+.chain-step:last-child::before{display:none}
+.chain-num{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.chain-normal .chain-num{background:var(--bg);border:2px solid var(--rule);color:var(--ink3)}
+.chain-warning .chain-num{background:var(--amber-dim);border:2px solid var(--amber);color:var(--amber)}
+.chain-danger .chain-num{background:var(--red-dim);border:2px solid var(--red);color:var(--red)}
+.chain-body{padding-top:.4rem}
+.chain-label{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.25rem;letter-spacing:.02em}
+.chain-warning .chain-label{color:var(--amber)}
+.chain-danger .chain-label{color:var(--red)}
+.chain-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── GLYPH DEMO (for homoglyph/domain spoofing reports) ── */
+.glyph-demo{background:#0a0f1a;border-radius:4px;padding:1.75rem 2rem;margin:2rem 0}
+.glyph-demo-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.25rem}
+.glyph-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.25rem}
+.glyph-row:last-child{margin-bottom:0}
+.glyph-pane{padding:1rem 1.25rem;border-radius:3px}
+.glyph-pane.real{background:rgba(20,90,50,.2);border:1px solid rgba(74,222,128,.2)}
+.glyph-pane.fake{background:rgba(192,57,43,.15);border:1px solid rgba(239,68,68,.2)}
+.glyph-pane-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem}
+.glyph-pane.real .glyph-pane-label{color:#4ade80}
+.glyph-pane.fake .glyph-pane-label{color:#ef4444}
+.glyph-domain{font-family:var(--mono);font-size:1.1rem;letter-spacing:.05em;margin-bottom:.4rem}
+.glyph-pane.real .glyph-domain{color:#e2e8f0}
+.glyph-pane.fake .glyph-domain{color:#fca5a5}
+.glyph-unicode{font-family:var(--mono);font-size:.65rem;color:#64748b;line-height:1.6}
+.glyph-pane.fake .glyph-unicode{color:#ef4444}
+
+/* ── SPLIT VISUAL ── */
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+
+/* ── TIMELINE ── */
+.timeline{margin:1.5rem 0;position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:.45rem;top:0;bottom:0;width:2px;background:var(--rule)}
+.tl-item{position:relative;margin-bottom:1.25rem;padding-left:1.25rem}
+.tl-item::before{content:'';position:absolute;left:-1.6rem;top:.4rem;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tl-date{font-family:var(--mono);font-size:.62rem;color:var(--red);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem}
+.tl-title{font-weight:700;color:var(--ink);font-size:.9rem;margin-bottom:.2rem;font-family:var(--display)}
+.tl-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── FINDINGS LIST ── */
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--amber);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--amber-dim);color:var(--amber)}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── TOOL EMBED (for reports with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .split-visual{grid-template-columns:1fr}
+  .figure-body{padding:1.25rem 1rem}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .figure-body{padding:1rem .85rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.62rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-num-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .tbl-wrap{font-size:.75rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<header class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-kicker">Threat Analysis · AI Infrastructure · Exposure & Misconfiguration</div>
+
+    <h1 class="title">Open by Default —<br><em>Why Self-Hosted AI Tools Ship Without Authentication and End Up&nbsp;Exposed</em></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">October 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Attack Type</div><div class="value">Unauthenticated Access · RCE · Supply Chain</div></div>
+      <div class="meta-item"><div class="label">Sector</div><div class="value">AI/ML Infrastructure · Self-Hosted Tools</div></div>
+      <div class="meta-item"><div class="label">Severity</div><div class="value">Critical — Actively Exploited</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    ai tools ship with no auth by default · exposed instances are actively exploited
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT — each section in its own .section > .wrap block
+     ════════════════════════════════════════════════════════════ -->
+
+<!-- SECTION 01 — EXECUTIVE SUMMARY -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>The tools teams use to build and run AI applications — local model servers, visual flow builders, experiment trackers, vector databases — share a design inheritance that is quietly dangerous. Almost all of them began as developer tools meant to run on one person's machine, where there is no one else to keep out. So they ship with no authentication by default, trusting that only the person at the keyboard can reach them. That assumption is reasonable on a laptop. It breaks the moment the tool is moved to a shared server and exposed to a network, which is exactly what happens as a prototype turns into something a team depends on.</p>
+
+  <p>The result is a large and growing population of AI infrastructure sitting on the public internet with no front door lock. This is not a theoretical concern. Security researchers have repeatedly found exposed instances of these tools numbering in the thousands, and attackers have industrialized the hunt for them. The failure is rarely a single exotic bug. It is the ordinary gap between how a tool is secured by its vendor and how it is actually deployed by the people who use it, the shared-responsibility gap where most real breaches live.</p>
+
+  <p>A review of the public vulnerability record shows the pattern is both widespread and under active exploitation. Ollama, a popular local model server, requires no authentication by default. Langflow, a visual AI app builder, shipped an unauthenticated remote-code-execution flaw that is on CISA's actively-exploited list and was used to recruit servers into a botnet. MLflow and the vector databases behind modern AI apps carry their own long trail of exposure and path-traversal flaws. The common thread is that the only reliable place to catch the problem is the deployment itself, not the vendor's release notes.</p>
+
+  <div class="stat-num-grid">
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">46</div>
+      <div class="stat-num-label">Ollama CVEs</div>
+      <div class="stat-num-sub">Records in the National Vulnerability Database. Ollama requires no authentication by default.</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">6</div>
+      <div class="stat-num-label">Langflow on CISA KEV</div>
+      <div class="stat-num-sub">Langflow entries on CISA's Known Exploited Vulnerabilities catalog — confirmed exploited in the wild.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">82</div>
+      <div class="stat-num-label">MLflow CVEs</div>
+      <div class="stat-num-sub">NVD records for MLflow, a widely self-hosted ML tool with a long history of exposure and path-traversal flaws.</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">57</div>
+      <div class="stat-num-label">Vector-DB CVEs</div>
+      <div class="stat-num-sub">Across Pinecone, Qdrant, Milvus and Chroma. The data layer behind AI apps is accruing its own exposure surface.</div>
+    </div>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>Note on data and method:</strong> The vulnerability counts here come from my own review of the National Vulnerability Database (NVD) and CISA's Known Exploited Vulnerabilities (KEV) catalog, queried through ArgusX, a threat-intelligence platform I build that aggregates public security feeds into one searchable corpus. Every figure traces back to a public record; ArgusX is the lens, not the source.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 02 — BACKGROUND -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>Why Self-Hosted AI Tools Ship Without a&nbsp;Lock</h2>
+
+  <p>To understand the exposure, start with where these tools come from. A local model server like Ollama is built so a developer can run a large language model on their own machine with a single command. In that setting there is exactly one user, the API answers on <span style="font-family:var(--mono);font-size:.85rem">localhost</span>, and requiring a login would be friction with no security benefit. Nobody else can reach <span style="font-family:var(--mono);font-size:.85rem">127.0.0.1</span> anyway. So the tool ships open, and that default is correct for the environment it was designed for.</p>
+
+  <p>The problem is that these tools do not stay on the laptop. They get popular, a team wants to share one, and someone deploys it to a server, a cloud virtual machine, or a container. In the move, the one assumption the design rested on, that only a trusted local user can reach it, silently stops being true. The server now binds to a public address, the port is reachable from anywhere, and no one went back to add the authentication that was never there. The tool is doing exactly what it always did; the environment around it changed.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The shared-responsibility gap:</strong> A vendor secures the software it ships. The customer secures how they deploy and configure it. Exposed AI tools are a cousin of public cloud storage buckets and internet-facing databases with no password: the capability to lock the door exists, the deploying team just never used it. This gap is not incompetence so much as the predictable result of insecure defaults meeting fast-moving teams, and it is where the large majority of real-world compromises actually happen.</p>
+  </div>
+
+  <p>Two forces make the AI case sharper than the usual misconfiguration story. First, several of these tools execute code or load models by design, so reaching them unauthenticated is not just data exposure, it is a path to running code and replacing the weights an application trusts. Second, the write surface and the browser are both in play: an attacker can poison what the server serves, and even a server bound only to loopback can be reached through a user's own browser via permissive cross-origin settings or DNS rebinding. "It's only on localhost" is not the protection it sounds like.</p>
+
+  <div class="split-visual">
+    <div class="split-panel left">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">check_circle</span> As the Tool Assumes It&nbsp;Runs</div>
+      <p><strong>Binding:</strong> Loopback only (<span style="font-family:var(--mono)">127.0.0.1</span>), reachable only from the machine it runs on</p>
+      <p><strong>Users:</strong> One developer, on one trusted host</p>
+      <p><strong>Auth:</strong> None, and that is fine, because no one else can route to it</p>
+      <p><strong>Browser paths:</strong> Cross-origin and host-header checks still matter, but the blast radius is one machine</p>
+    </div>
+    <div class="split-panel right">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">warning</span> As It Actually Gets&nbsp;Deployed</div>
+      <p><strong>Binding:</strong> Public or all-interfaces (<span style="font-family:var(--mono)">0.0.0.0</span>), reachable from the internet</p>
+      <p><strong>Users:</strong> Anyone who finds the open port</p>
+      <p><strong>Auth:</strong> Still none, because the default was never changed on the way to the server</p>
+      <p><strong>Browser paths:</strong> Permissive CORS or missing rebinding protection let a visited web page drive the API too</p>
+    </div>
+  </div>
+  <p style="font-size:.78rem;color:#94a3b8;font-family:var(--mono);margin-top:.75rem">Deployment model drawn from the default behavior documented for common self-hosted AI tools and from public exposure research.</p>
+
+</div>
+</div>
+
+<!-- SECTION 03 — ATTACK CHAIN -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>The Attack Chain — How an Exposed AI Server Gets Taken&nbsp;Over</h2>
+
+  <div class="figure">
+    <div class="figure-title">Figure 1 — Exposed AI Infrastructure Attack&nbsp;Chain</div>
+    <div class="figure-body">
+      <div class="attack-chain">
+        <div class="chain-step chain-normal">
+          <div class="chain-num">01</div>
+          <div class="chain-body">
+            <div class="chain-label">Reconnaissance — Scanning for Open AI&nbsp;Endpoints</div>
+            <div class="chain-desc">Attackers sweep the internet for the default ports and API signatures of popular AI tools using mass-scanning services. An exposed model server or flow builder answers an unauthenticated request and identifies itself, so building a target list of live, reachable instances is cheap and continuous. No prior knowledge of any specific victim is needed; the scan finds whoever left the door open.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-normal">
+          <div class="chain-num">02</div>
+          <div class="chain-body">
+            <div class="chain-label">Fingerprinting — Reading the&nbsp;Version</div>
+            <div class="chain-desc">The same unauthenticated access that lists models or flows usually reveals the running version. That version maps directly to the published advisories that apply to it, so the attacker knows before sending a single exploit whether an instance is patched or vulnerable, and which flaw to use. An instance running a version behind the fix is selected; a patched one is skipped or revisited later.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">03</div>
+          <div class="chain-body">
+            <div class="chain-label">Access — Walking Through the Unlocked&nbsp;Door</div>
+            <div class="chain-desc">With no authentication in the way, the attacker uses the API as intended but against the owner. On a model server, that means reading the installed models and their configuration, and, where the write surface is also open, creating, pulling, and deleting models. On a flow builder like Langflow, an unauthenticated endpoint meant only to validate custom code actually executed it, turning access into code execution outright (CVE-2025-3248, fixed in 1.3.0).</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">04</div>
+          <div class="chain-body">
+            <div class="chain-label">Execution — Code, Weights, and&nbsp;Data</div>
+            <div class="chain-desc">The payoff takes three forms. Remote code execution hands the attacker the host outright. Replacing the model weights an application serves is a silent supply-chain compromise: every later prompt is answered by weights the attacker controls, with the model name and tag unchanged. And the prompts and completions moving through the server, often carrying proprietary data and source code, are readable in transit when transport is unencrypted.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">05</div>
+          <div class="chain-body">
+            <div class="chain-label">Abuse — Botnets, Mining, and&nbsp;Pivoting</div>
+            <div class="chain-desc">A taken-over AI server is valuable beyond its data. Its GPU and inference capacity is hijacked for the attacker's own workloads or for cryptomining, and the host becomes a foothold to pivot deeper into the network. In the Langflow case, exploited servers were recruited into the Flodrix botnet, the clearest sign that this is automated, at-scale abuse of the installed base rather than targeted, hand-crafted intrusion.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Attack model based on public vulnerability reporting and exploitation research, including the Langflow CVE-2025-3248 campaign. MITRE ATT&CK: T1595.002 (Vulnerability Scanning), T1190 (Exploit Public-Facing Application), T1059 (Command and Scripting Interpreter), T1195.002 (Compromise Software Supply Chain), T1496 (Resource Hijacking).</div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 04 — FINDINGS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>Key Findings</h2>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">Authentication Is Off by Default Across the&nbsp;Category</div>
+        <div class="finding-desc">The exposure is not a one-off bug in one product; it is a shared default. Ollama requires no authentication out of the box, and the same local-first design choice runs through flow builders, experiment trackers, and notebook servers. The secure option generally exists, a login, a reverse proxy, a loopback binding, but it is opt-in, and the path of least resistance deploys the tool exactly as it ships. A default that is safe on a laptop becomes a liability the instant the tool is put on a network.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">Exposed Instances Are Being Exploited Now, Not&nbsp;Hypothetically</div>
+        <div class="finding-desc">Six Langflow entries sit on CISA's Known Exploited Vulnerabilities catalog, which means the U.S. government has confirmed active exploitation in the wild, not merely that a flaw exists. The flagship flaw, an unauthenticated remote-code-execution bug, was used to enlist exposed servers into the Flodrix botnet. Automated campaigns scanning for and compromising open AI infrastructure are a present-tense reality, and the population they feed on is the set of instances that were never patched or locked down.</div>
+        <span class="finding-tag">CRITICAL</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">The Vendor Fix Does Not Reach the Installed&nbsp;Base</div>
+        <div class="finding-desc">Langflow closed its remote-code-execution flaw in version 1.3.0, and that is the right fix. But a patch only protects the instances that apply it, and the exploited population is precisely the servers still running older versions or deployed with authentication disabled. "The vendor fixed it" and "organizations are still being compromised by it" are both true at once. The gap between a fix existing in a release and that fix reaching a running deployment is where the ongoing risk lives.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">4</div>
+      <div>
+        <div class="finding-title">The Write Surface and the Browser Are the Underrated&nbsp;Risks</div>
+        <div class="finding-desc">Unauthenticated reads are bad; unauthenticated writes are worse. On a model server, an open write surface lets an attacker replace the weights an application serves, a model-supply-chain substitution that is invisible because the model name never changes. Separately, permissive cross-origin settings and missing DNS-rebinding protection let a web page the user merely visits drive even a loopback-bound instance through the user's own browser. A server that looks unexposed on the network can still be reachable from the web.</div>
+        <span class="finding-tag">HIGH</span>
+      </div>
+    </div>
+    <div class="finding fn-medium">
+      <div class="finding-num">5</div>
+      <div>
+        <div class="finding-title">Only the Deployment Can Answer Whether It Is&nbsp;Safe</div>
+        <div class="finding-desc">Because the risk is the product of a vendor-side default and a customer-side deployment choice, neither party alone can certify safety. The vendor cannot know whether your instance is exposed, authenticated, and patched; a vulnerability feed cannot see your network bindings. The only reliable signal comes from inspecting the actual running deployment, is it reachable, does it require authentication, is it on a fixed version, which is why posture assessment of the instance itself, rather than trust in the release notes, is the control that closes the gap.</div>
+        <span class="finding-tag">MEDIUM</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 05 — RECOMMENDATIONS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>Recommendations</h2>
+
+  <p>Defense operates at two levels: how an individual instance is deployed, and whether an organization can see its own exposure at all. Both are necessary. Neither is sufficient alone.</p>
+
+  <div class="step-list">
+    <div class="step-item">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-content-label">Keep AI Tools Off Public Interfaces by&nbsp;Default</div>
+        <div class="step-content-desc">Bind self-hosted AI tools to loopback unless there is a concrete reason to serve other hosts, and never expose their native ports directly to the internet. For a model server that means setting the host explicitly to <span style="font-family:var(--mono);font-size:.85rem">127.0.0.1</span>. The single most common root cause in every exposure case is a tool reachable from a network it never needed to be on. Closing that removes the attack surface entirely, no matter what flaws the version carries.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-content-label">Put Authentication in Front — Do Not Rely on the&nbsp;Default</div>
+        <div class="step-content-desc">Where a tool genuinely must serve a team or a network, place it behind a reverse proxy that enforces authentication, and forward only authenticated traffic to the tool on loopback. Assume the tool itself provides no access control, because by default most of these do not. Terminate client connections at the proxy, require a login or token there, and treat the tool's own port as internal-only.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-content-label">Patch to a Fixed Version and Track What You&nbsp;Run</div>
+        <div class="step-content-desc">The exploited population is the unpatched one. Upgrade past known-exploited flaws, Langflow 1.3.0 or later for CVE-2025-3248 is the clear example, and maintain an inventory of which AI tools and versions run where. A fix you have not deployed protects no one. Version tracking is also what lets you react in hours, not weeks, the next time one of these tools lands on the exploited list.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-content-label">Close the Browser-Borne&nbsp;Paths</div>
+        <div class="step-content-desc">Restrict cross-origin access to an explicit allowlist rather than leaving it open to every origin, and run versions that validate the host header so a loopback instance cannot be reached by DNS rebinding. These controls matter even for instances you believe are local-only, because the browser is a route into localhost that network firewalls do not cover. Treat "bound to loopback" as necessary but not sufficient.</div>
+      </div>
+    </div>
+    <div class="step-item">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-content-label">For Security Teams: Scan the Deployment, Not the&nbsp;Vendor</div>
+        <div class="step-content-desc">Inventory your own AI infrastructure and assess each instance for the signals below, is it network-reachable, does it require authentication for reads and writes, is transport encrypted, is it on a fixed version. This is the one control that catches the gap the vendor cannot see and a CVE feed cannot measure. Find your exposed instances before an internet-wide scan does, because the scan is already running.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Detection Signals&nbsp;Summary</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Signal</th><th>Indicator</th><th>Confidence</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Unauthenticated reads</td><td class="code">auth_required == false</td><td class="red">High</td><td>Network-reachable instance answers with no credentials</td></tr>
+        <tr><td>Unauthenticated writes</td><td class="code">write_auth == false</td><td class="red">Critical</td><td>Model weights can be created, pulled, or replaced</td></tr>
+        <tr><td>Plaintext transport</td><td class="code">tls == false</td><td class="red">High</td><td>Prompts, completions, and tokens travel in the clear</td></tr>
+        <tr><td>Network-reachable bind</td><td class="code">is_local == false</td><td class="amber">High</td><td>Served beyond loopback, reachable off-host</td></tr>
+        <tr><td>Open cross-origin</td><td class="code">cors_any_origin == true</td><td class="amber">Med-High</td><td>Any visited web page can drive the API</td></tr>
+        <tr><td>Vulnerable version</td><td class="code">version &lt; patched</td><td class="red">Critical</td><td>e.g. Langflow &lt; 1.3.0 (CVE-2025-3248)</td></tr>
+        <tr><td>Running weights changed</td><td class="code">running_digest ≠ installed</td><td class="amber">Medium</td><td>Model substituted under an unchanged name</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 06 — CONCLUSION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>The Gap Between What Ships and What Is&nbsp;Deployed</h2>
+
+  <p>Exposed AI infrastructure is not a hard problem to understand. The tools are built for a trusted local machine, they ship without authentication because that is correct for a laptop, and they end up on servers where that assumption no longer holds. The flaws that follow, unauthenticated reads and writes, plaintext transport, browser-reachable loopback instances, and in Langflow's case outright remote code execution, are the predictable consequence, not a surprise.</p>
+
+  <p>What makes the category urgent is that the exploitation is already industrialized. Scanning for open AI endpoints is cheap and continuous, versions are readable before a single exploit is sent, and compromised servers are folded into botnets. The installed base, not the current release, is the attack surface, and it grows every time a team stands up another instance in a hurry and moves on.</p>
+
+  <p>The reason this keeps happening is structural. A vendor can only secure the code it ships; it cannot reach into a customer's environment and decide how the tool is exposed. A vulnerability feed can tell you a flaw exists; it cannot tell you whether your particular instance is reachable, authenticated, or patched. The one place those two views meet is the running deployment, and until something looks at the deployment, the gap stays open regardless of how responsibly the vendor behaves.</p>
+
+  <p>The controls that close it are not exotic: bind to loopback, require authentication at a proxy, patch to a fixed version, restrict the browser-borne paths, and, for a security team, inventory and assess the instances directly. The checks that detect these conditions are straightforward to write. The analysis that explains why they matter is this one.</p>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis is based on publicly available information, including the National Vulnerability Database, CISA's Known Exploited Vulnerabilities catalog, vendor advisories and release notes for the tools discussed, and public exploitation reporting on CVE-2025-3248 and related campaigns. Vulnerability counts reflect my own review of the NVD and KEV corpora. A companion set of deployment-posture checks for self-hosted AI tools is in development as a contribution to the open-source security community. This analysis represents independent research produced as a contribution to that community.</p>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap">
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- EDIT: footer spans — report title · author · date on left; classification note on right -->
+<footer>
+  <span>Open by Default &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; October 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+</body>
+</html>

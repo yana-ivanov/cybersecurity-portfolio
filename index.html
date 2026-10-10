@@ -190,12 +190,29 @@ footer a:hover{color:#60a5fa}
 
       <!-- Stock exchange espionage — information is the only edge -->
 
-      <a href="analysis/trust_tax_analysis.html" class="card card-featured portfolio-item" id="latest-report-card" data-featured="true"
+      <!-- Open by Default — self-hosted AI tool exposure -->
+
+      <a href="analysis/ai_exposure_analysis.html" class="card card-featured portfolio-item" id="latest-report-card" data-featured="true"
+         data-tags="threat-analysis infrastructure supply-chain"
+         data-title="open by default self-hosted AI tools authentication exposure ollama langflow mlflow vector database no auth default localhost shared responsibility CISA KEV CVE-2025-3248 unauthenticated RCE model weights supply chain posture misconfiguration">
+        <div class="card-accent red"></div>
+        <div class="card-body">
+          <div class="card-featured-badge">Latest Report</div>
+          <div class="card-category red">Threat Analysis · AI Infrastructure · Exposure</div>
+          <div class="card-title">Open by Default — Why Self-Hosted AI Tools Ship Without Authentication and End Up Exposed</div>
+          <div class="card-desc">The tools teams use to build and run AI apps — local model servers, flow builders, experiment trackers, vector databases — mostly began as developer tools for one machine, so they ship with no authentication by default. That assumption is fine on a laptop and breaks the moment the tool is moved to a server and exposed. The result is a large, growing population of AI infrastructure on the public internet with no front-door lock, and attackers have industrialized the hunt for it. Ollama ships with no auth, Langflow's unauthenticated RCE sits on CISA's actively-exploited list, and the only reliable place to catch it is the deployment itself.</div>
+          <div class="card-footer">
+            <div class="card-tags"><span class="card-tag">No-Auth Defaults</span><span class="card-tag">Ollama</span><span class="card-tag">Langflow</span><span class="card-tag">CISA KEV</span></div>
+            <div class="card-arrow">→</div>
+          </div>
+        </div>
+      </a>
+
+      <a href="analysis/trust_tax_analysis.html" class="card portfolio-item"
          data-tags="threat-analysis infrastructure supply-chain"
          data-title="trust tax trusted infrastructure phishing TIP platform abuse GitHub Azure Blob Framer Figma Jira Hugging Face ScreenConnect Cloudflare Workers free tier domain reputation defender dilemma blocking breaking">
         <div class="card-accent red"></div>
         <div class="card-body">
-          <div class="card-featured-badge">Latest Report</div>
           <div class="card-category red">Threat Analysis · Trusted Infrastructure Phishing · Platform Abuse</div>
           <div class="card-title">The Trust Tax — How Attackers Stopped Building Infrastructure and Started Borrowing Ours</div>
           <div class="card-desc">Attackers stopped building malicious infrastructure. They started borrowing ours. Across eight confirmed platforms — GitHub, Azure Blob Storage, Cloudflare Workers, Hugging Face, Framer, Figma, Jira, and ScreenConnect — the same attack philosophy appears: use a legitimate trusted platform exactly as designed, and let the platform's reputation do the social engineering. The domain is always clean. The SSL certificate is always valid. The security tool always says safe. Because it is safe. The infrastructure is legitimate. Only the intent is not.</div>
