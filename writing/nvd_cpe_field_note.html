@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>Rated, Triaged, Attached to Nothing | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker with decorative lines — blue theme style */
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+
+/* Blue bar — wraps naturally */
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.blue{color:var(--blue);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT CARD (blue theme uses mat-card wrapper) ── */
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+/* Numbers: IBM Plex Serif, clean editorial style */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-red .stat-num{color:var(--red)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE (for diagrams, screenshots, code blocks) ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── TIMELINE (horizontal grid — blue theme style) ── */
+.timeline{margin:0;display:grid;gap:0;border:1px solid var(--rule)}
+.tl-item{display:grid;grid-template-columns:140px 1fr;border-bottom:1px solid var(--rule)}
+.tl-item:last-child{border-bottom:none}
+.tl-left{padding:1.5rem 1.25rem;border-right:1px solid var(--rule);background:#f8fafc}
+.tl-date{font-family:var(--mono);font-size:.72rem;color:var(--blue);font-weight:700;margin-bottom:.3rem}
+.tl-tag{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.tl-right{padding:1.5rem}
+.tl-title{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3}
+.tl-body{font-size:.88rem;color:var(--ink3);line-height:1.7;margin:0}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── CODE BLOCKS (lab logs only) ── */
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.code-block{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.code-block .prompt{color:#4a9eff}
+.code-block .comment{color:#64748b}
+.code-block .highlight{color:#4ade80}
+.code-block .warning{color:#ef4444}
+.code-block .error{color:#f97316}
+/* shorthand color spans for inline use */
+.co{color:#94a3b8}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+
+/* ── TERMINAL WINDOW (macOS-style, for script output) ── */
+.terminal{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.terminal-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-left:.5rem}
+.terminal pre{font-family:var(--mono);font-size:.76rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#e2e8f0}
+/* terminal text color classes */
+.t-red{color:#ef4444;font-weight:bold}
+.t-orange{color:#fb923c;font-weight:bold}
+.t-blue{color:#60a5fa;font-weight:bold}
+.t-green{color:#4ade80}
+.t-dim{color:#94a3b8} /* was #475569 — bumped for legibility */
+.t-bold{color:#e2e8f0;font-weight:bold}
+
+/* ── HOST CARD (dark card for IP/host data) ── */
+.host-card{background:#0a0f1a;border-radius:2px;padding:1.5rem;margin:1.75rem 0;display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.hf-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.hf-value{font-family:var(--mono);font-size:.9rem;color:#4a9eff;font-weight:600}
+.hf-value.red{color:#ef4444}
+.hf-value.green{color:#4ade80}
+.hf-value.amber{color:#fbbf24}
+
+/* ── LAB ENVIRONMENT BOX (lab logs only) ── */
+.env-box{background:var(--paper);border:1px solid var(--rule);padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+
+/* ── COMPARE GRID (side-by-side comparison) ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.left{border-top:3px solid var(--blue)}
+.compare-box.right{border-top:3px solid var(--amber)}
+.compare-box.danger{border-top-color:var(--red)}
+.compare-box.safe{border-top-color:var(--green)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.left .compare-label{color:var(--blue)}
+.compare-box.right .compare-label{color:var(--amber)}
+.compare-box.danger .compare-label{color:var(--red)}
+.compare-box.safe .compare-label{color:var(--green)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+
+/* ── FUNCTION CARDS GRID (for script/tool documentation) ── */
+.fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.75rem 0}
+.fn-card{background:var(--paper);border:1px solid var(--rule);padding:1rem 1.1rem;border-top:2px solid var(--blue)}
+.fn-name{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--blue);margin-bottom:.3rem}
+.fn-desc{font-size:.82rem;color:var(--ink3);line-height:1.55}
+
+/* ── NIST MAPPING BOX (lab logs only) ── */
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:90px 1fr;gap:1rem;align-items:start}
+.nist-control{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--blue);padding-top:.15rem}
+.nist-desc{font-size:.88rem;color:var(--ink3);line-height:1.7}
+.nist-desc strong{color:var(--ink)}
+
+/* ── TOOL EMBED (for pages with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .tl-item{grid-template-columns:1fr}
+  .tl-left{border-right:none;border-bottom:1px solid var(--rule);padding:1rem 1.25rem}
+  .env-grid{grid-template-columns:1fr}
+  .nist-item{grid-template-columns:80px 1fr}
+  .compare-grid{grid-template-columns:1fr}
+  .fn-grid{grid-template-columns:1fr}
+  .host-card{grid-template-columns:1fr}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .mast-bar{padding:.55rem 1.5rem;font-size:.62rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.6rem}
+  .mast-meta{grid-template-columns:1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .timeline .tl-left{padding:.75rem .9rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .code-block,.terminal{padding:.85rem .9rem;font-size:.7rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<div class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-label">Field Notes &nbsp;·&nbsp; <span style="color:#4a9eff">Vulnerability Management · Data Analysis</span></div>
+
+    <h1 class="title">Rated, Triaged,<br><span>Attached to&nbsp;Nothing</span></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">October 2026</div></div>
+      <div class="meta-item"><div class="label">Category</div><div class="value">Field Notes · Data Analysis</div></div>
+      <div class="meta-item"><div class="label">Data Source</div><div class="value">Own Research · NVD · CISA KEV</div></div>
+      <div class="meta-item"><div class="label">Corpus</div><div class="value">386,837 CVEs · 107 Actor Packets</div></div>
+      <div class="meta-item"><div class="label">Method</div><div class="value">CPE Extraction · KEV Join</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    NVD · 40% OF CVES NAME NO PRODUCT
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>I Started With Spoiled&nbsp;Food</h2>
+
+  <p>On 12 October 2026, refrigeration failed across four competing French supermarket chains at once. Intermarché, Super U, E.Leclerc and Metro, plus independent stores, all in the same window. Around 150 Intermarché locations were affected. One Super U in Haguenau reported €220,000 of lost stock, one Intermarché €50,000. Some units were driven to 50°C, hot enough to start&nbsp;fires.</p>
+
+  <p>Danfoss, which makes the controllers involved, said the affected equipment was mostly the AK-SM800 and AK-SC355. Both are end of life. A bulletin in June 2023 closed out that product range, so no software or security update exists for&nbsp;them.</p>
+
+  <p>Separately, in August 2026, Claroty's Team82 published three vulnerabilities in the current AK-SM 8xxA line. The first, CVE-2025-41450, is an authentication bypass through a hidden date-based administrator login. It requires no credentials. Censys showed 2,765 of those devices reachable from the open&nbsp;internet.</p>
+
+  <p>My first question was the obvious one: if this works on supermarkets, what about hospital and pharmacy cold storage, where a temperature excursion is invisible in the vial? I started looking for evidence that anyone was tracking this class of equipment at&nbsp;all.</p>
+
+  <p>I did not find the answer I expected. I found something about the national vulnerability database&nbsp;instead.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>This note is not about refrigerators.</strong> Refrigeration is where I started, and it turned out to be a clean example of a much larger problem: a growing share of published vulnerabilities in the US National Vulnerability Database carry no record of what product they affect. Before 2024 that share was zero. It is now around&nbsp;40%.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>What My Data&nbsp;Showed</h2>
+
+  <p>For my own research I keep a local database of public vulnerability and threat feeds, so I can query them together rather than one web interface at a time. One of those feeds is the National Vulnerability Database, run by NIST. It is where most of the security industry goes to find out what a CVE affects, because it adds structured product identifiers to each vulnerability. Those identifiers are called CPE, and they are what lets a scanner connect "this vulnerability exists" to "and you are running the affected&nbsp;thing."</p>
+
+  <p>I went looking for refrigeration vendors and noticed something odd in passing: the Danfoss vulnerabilities from the Claroty disclosure were missing from my results. So I stopped looking at refrigeration and looked at the database&nbsp;itself.</p>
+
+  <p>My copy held 405,310 CVE records at the time of query. Removing the 18,473 marked Rejected, which are withdrawn identifiers rather than real vulnerabilities, leaves 386,837. I grouped them by the year the CVE was published and counted how many had no CPE product&nbsp;data.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Author's Research · NVD Snapshot · CVEs Without CPE Product Identification · October 2026</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-green">
+        <div class="stat-num">0%</div>
+        <div class="stat-label">No Product ID, 2016–2023</div>
+        <div class="stat-sub">Eight consecutive years, every CVE&nbsp;enriched</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">40.4%</div>
+        <div class="stat-label">No Product ID, 2024–2026</div>
+        <div class="stat-sub">67,041 of 166,063 published&nbsp;CVEs</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">55,288</div>
+        <div class="stat-label">Marked Deferred</div>
+        <div class="stat-sub">None published before&nbsp;2024</div>
+      </div>
+      <div class="stat-item stat-blue">
+        <div class="stat-num">254</div>
+        <div class="stat-label">Controller Vendor CVEs</div>
+        <div class="stat-sub">Across seven vendors, none ever in&nbsp;KEV</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Year Published</th>
+          <th>CVEs</th>
+          <th>No Product ID</th>
+          <th>Share</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>2016</td><td>6,449</td><td>0</td><td class="green">0.0%</td></tr>
+        <tr><td>2017</td><td>14,642</td><td>0</td><td class="green">0.0%</td></tr>
+        <tr><td>2018</td><td>16,510</td><td>0</td><td class="green">0.0%</td></tr>
+        <tr><td>2019</td><td>17,305</td><td>0</td><td class="green">0.0%</td></tr>
+        <tr><td>2020</td><td>18,322</td><td>0</td><td class="green">0.0%</td></tr>
+        <tr><td>2021</td><td>20,149</td><td>0</td><td class="green">0.0%</td></tr>
+        <tr><td>2022</td><td>25,073</td><td>0</td><td class="green">0.0%</td></tr>
+        <tr><td>2023</td><td>28,816</td><td>0</td><td class="green">0.0%</td></tr>
+        <tr><td><strong>2024</strong></td><td>39,953</td><td>7,769</td><td class="amber">19.4%</td></tr>
+        <tr><td><strong>2025</strong></td><td>48,152</td><td>17,961</td><td class="red">37.3%</td></tr>
+        <tr><td><strong>2026</strong> <em>partial</em></td><td>77,958</td><td>41,311</td><td class="red">53.0%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Eight years at exactly zero, then a cliff. Every CVE published between 2016 and 2023 in my copy has product identification. Not most. All of&nbsp;them.</p>
+
+  <h3>Why this is not just processing lag</h3>
+
+  <p>My first thought was that newer vulnerabilities simply have not been processed yet, which would make the trend an artifact of age rather than a real change. The data rules that out, and it does so&nbsp;cleanly.</p>
+
+  <p>NVD assigns each CVE a status. <strong>Deferred</strong> means it is not scheduled for enrichment. <strong>Awaiting Analysis</strong> and <strong>Received</strong> mean it is still in the queue. For 2024, the share marked Deferred and the share with no product identification are the same number: 19.4% and 19.4%. For 2025, the same: 37.3% and 37.3%. There is no queue left for those years. Every vulnerability from 2024 and 2025 has already been dispositioned, either enriched or set&nbsp;aside.</p>
+
+  <p>Which means those figures are final. <strong>19.4% of 2024 vulnerabilities and 37.3% of 2025 vulnerabilities will not get product identification.</strong> Deferred is not a waiting room. It is an&nbsp;outcome.</p>
+
+  <p>For 2026 the two numbers separate, 37.9% Deferred against 53.0% with no product data. That 15-point gap is the genuine backlog still being worked, so 2026 will settle somewhere between those two&nbsp;figures.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Checking my own denominators.</strong> A table like this is only worth reading if the counts are complete, so I compared mine against published tallies. For the two years the argument rests on, they match closely: Jerry Gamblin's annual CVE data review gives 39,962 for 2024 against my 39,953, and 48,185 for 2025 against my 48,152. That is a gap of nine records and thirty-three records, and his figures exclude rejected CVEs as mine do. For 2026, an independent publication-year count puts the total near 70,000 against my 77,958, so the figure differs but the surge itself is corroborated and widely&nbsp;discussed.</p>
+    <p style="margin-top:.75rem"><strong>What this data does and does not show.</strong> These figures describe my own copy of NVD as queried in October 2026, not NVD's live state at every moment. I grouped by NVD publication date rather than by the year in the CVE identifier, which is why my earlier-year counts differ from tallies built the other way: a CVE-2016 identifier published to NVD in 2018 lands in my 2018 row. For that reason the pre-2024 finding is a rate rather than a count. I am not claiming to hold every vulnerability from those years, I am reporting that every one I do hold carries product identification. 2026 is not a complete year. I filtered to 2016 and later, so I make no claim about earlier years. And a CVE without CPE data is not necessarily unfixable or unknown. It simply cannot be matched to an installed product by anything that relies on NVD's structured&nbsp;identifiers.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>A Vulnerability That Belongs to&nbsp;Nothing</h2>
+
+  <p>Here is what Deferred looks like in practice. I queried NVD's live API for CVE-2025-41450, the Danfoss authentication bypass, on 13 October&nbsp;2026.</p>
+
+  <div class="host-card">
+    <div>
+      <div class="hf-label">Identifier</div>
+      <div class="hf-value">CVE-2025-41450</div>
+    </div>
+    <div>
+      <div class="hf-label">NVD Status</div>
+      <div class="hf-value amber">Deferred</div>
+    </div>
+    <div>
+      <div class="hf-label">CVSS v3.1</div>
+      <div class="hf-value red">8.2 · Present</div>
+    </div>
+    <div>
+      <div class="hf-label">CISA SSVC Decision</div>
+      <div class="hf-value">Present</div>
+    </div>
+    <div>
+      <div class="hf-label">Weakness</div>
+      <div class="hf-value">CWE-287 · Improper Auth</div>
+    </div>
+    <div>
+      <div class="hf-label">Product Identification</div>
+      <div class="hf-value red">None</div>
+    </div>
+  </div>
+
+  <p>Read that combination again. The vulnerability has a severity score. It has a CISA decision about how urgently it should be handled. It is an authentication bypass requiring no credentials, in equipment with thousands of instances reachable from the internet, on a product line the vendor stopped supporting in&nbsp;2023.</p>
+
+  <p><strong>Someone rated how bad it is. Someone decided how urgently to treat it. Nobody recorded what it&nbsp;affects.</strong></p>
+
+  <p>The same is true of CVE-2025-41451 and CVE-2025-41452 from the same disclosure, CVE-2025-52551 in the Copeland E2 line, and CVE-2026-15203 in Danfoss iC7 drives. All Deferred, all without product identification. One from the same research, CVE-2025-6519 in the Copeland E3, is marked Analyzed and does have product&nbsp;data.</p>
+
+  <h3>How a vulnerability ends up here</h3>
+
+  <p>NVD has published a prioritization policy, effective 15 April 2026. Enrichment is prioritized for three categories: vulnerabilities in CISA's Known Exploited Vulnerabilities catalogue, with a target of one business day; software used within the federal government; and critical software under Executive Order 14028. Everything else is labelled lowest priority. NVD states its backlog began in early 2024 and has not been&nbsp;cleared.</p>
+
+  <p>That policy is reasonable on its own terms. Finite staff, rising submissions, triage by risk. But follow what it implies for a specific kind of&nbsp;equipment.</p>
+
+  <div class="callout callout-red">
+    <p><strong>The loop.</strong> Enrichment is prioritized for vulnerabilities already in KEV. Entry into KEV requires evidence of exploitation. Evidence of exploitation requires telemetry, and refrigeration controllers, building automation panels and similar embedded equipment produce almost none: no endpoint agent, no equivalent of Sysmon, no log stream reaching a security operations centre. So exploitation goes unobserved, the vulnerability never enters KEV, it is never enriched, it carries no product identifier, no scanner can match it to an installed device, no operator learns by automation that they are affected, and no exploitation is detected. The loop closes on&nbsp;itself.</p>
+  </div>
+
+  <p>One further detail worth stating, because it changes what Deferred means. NVD introduced the label in April 2025 and described it as applying to vulnerabilities published before 1 January 2018, as part of clearing historical backlog. In my copy, <strong>not one Deferred record was published before 2024.</strong> The 55,288 Deferred CVEs break down as 7,769 from 2024, 17,960 from 2025 and 29,559 from 2026, and those three figures sum exactly to the total. The pre-2018 group was moved to a different status in April 2026. The label now holds the current&nbsp;backlog.</p>
+
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>The Equipment Class Nobody Is&nbsp;Watching</h2>
+
+  <p>Having found the mechanism, I went back to the original question and measured the equipment class itself. Two independent checks, each with a control, because a result of zero is only meaningful if the method would have found something had it been&nbsp;there.</p>
+
+  <h3>Check one: does this class ever reach KEV?</h3>
+
+  <p>I extracted vendor names from the CPE identifiers in my NVD copy and counted vulnerabilities per building automation and refrigeration vendor, then joined against the KEV&nbsp;catalogue.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Vendor</th>
+          <th>CVEs in NVD</th>
+          <th>In KEV</th>
+          <th>Span</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Honeywell</strong></td><td>103</td><td class="red">0</td><td>2007–2026</td></tr>
+        <tr><td><strong>Johnson Controls</strong></td><td>72</td><td class="red">0</td><td>2012–2026</td></tr>
+        <tr><td><strong>Copeland</strong></td><td>32</td><td class="red">0</td><td>2025–2026</td></tr>
+        <tr><td><strong>Tridium</strong></td><td>20</td><td class="red">0</td><td>2012–2025</td></tr>
+        <tr><td><strong>Carel</strong></td><td>11</td><td class="red">0</td><td>2011–2023</td></tr>
+        <tr><td><strong>Danfoss</strong></td><td>10</td><td class="red">0</td><td>2023</td></tr>
+        <tr><td><strong>Automated Logic</strong></td><td>6</td><td class="red">0</td><td>2017–2022</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>254 vulnerabilities. None of them have ever entered KEV. Honeywell and Johnson Controls are diversified well beyond building systems, so the conservative figure is the five pure-play vendors: 79 vulnerabilities across fifteen years, none in&nbsp;KEV.</p>
+
+  <p>Searching the whole KEV catalogue for twenty-two vendor and keyword patterns across this sector returned exactly three records. Siemens SIMATIC CP and Rockwell are industrial process control rather than building systems. <strong>One genuine building automation entry exists in the entire catalogue:</strong> Schneider Electric U.motion Builder, CVE-2018-7841, added April&nbsp;2022.</p>
+
+  <p>The control for that search is the catalogue's own composition. Its largest contributors are Microsoft at 389 entries, Cisco at 100, Apple at 95, Adobe at 82 and Google at 75, running down through D-Link at 26, Synacor at 19 and QNAP at 11. Mass-market software, network edge devices, consumer hardware. Not one building automation vendor appears in the top&nbsp;25.</p>
+
+  <h3>Check two: has any tracked threat actor used it?</h3>
+
+  <p>Alongside those feeds I keep structured research packets I build by hand for named threat actors, drawing on vendor reporting and government advisories. I have 107 of them. I counted how many mention each vendor and&nbsp;technology.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Search Term</th>
+          <th>Packets</th>
+          <th>Role in This Test</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="code">esxi</td><td class="blue">17</td><td>Control</td></tr>
+        <tr><td class="code">fortinet</td><td class="blue">16</td><td>Control</td></tr>
+        <tr><td class="code">vmware</td><td class="blue">16</td><td>Control</td></tr>
+        <tr><td class="code">citrix</td><td class="blue">9</td><td>Control</td></tr>
+        <tr><td class="code">screenconnect</td><td class="blue">8</td><td>Control</td></tr>
+        <tr><td class="code">sonicwall</td><td class="blue">6</td><td>Control</td></tr>
+        <tr><td class="code">ivanti · moveit</td><td class="blue">3 each</td><td>Control</td></tr>
+        <tr><td class="code">danfoss · copeland · carel</td><td class="red">0</td><td>Refrigeration</td></tr>
+        <tr><td class="code">dixell · eliwell · bitzer</td><td class="red">0</td><td>Refrigeration</td></tr>
+        <tr><td class="code">tridium · distech</td><td class="red">0</td><td>Building automation</td></tr>
+        <tr><td class="code">metasys · automated logic</td><td class="red">0</td><td>Building automation</td></tr>
+        <tr><td class="code">bacnet · modbus</td><td class="red">0</td><td>Building protocols</td></tr>
+        <tr><td class="code">hvac · refrigerat*</td><td class="red">0</td><td>Generic terms</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>The first pass produced a handful of apparent hits that all dissolved under inspection, and the reasons are worth recording because they are the kind of thing that turns a null result into a false&nbsp;one.</p>
+
+  <p><strong>Substring matches.</strong> "abb" appeared four times and "carel" once, both as fragments inside ordinary English words. Both went to zero once I required whole-word&nbsp;matches.</p>
+
+  <p><strong>Name collisions.</strong> "Niagara" matched once, but as GOLD NIAGARA, a vendor alias for the group FIN7, not the Tridium Niagara building automation&nbsp;framework.</p>
+
+  <p><strong>Wrong equipment class.</strong> Siemens, Schneider and Rockwell each matched, and all three matches are in the same single packet, covering an Iranian-linked group targeting programmable logic controllers in water, wastewater and energy facilities. That is industrial process control, not building&nbsp;systems.</p>
+
+  <p><strong>And one that tells its own story.</strong> "Johnson Controls" matched once. Not as an access vector, but as a victim: the building automation vendor was itself breached through a hypervisor encryptor. The company that builds building control systems was compromised through VMware ESXi, like everyone&nbsp;else.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The honest limit of a null result.</strong> My actor packets are weighted toward ransomware operations, so a reader could reasonably ask whether this zero reflects what I chose to research rather than what exists. Two things answer that. The one industrial-control case in the corpus is present rather than excluded, so the category is represented. And the KEV result is entirely independent of my packet selection, because I did not build KEV. What these measurements show is an absence of <em>documented</em> targeting. The French attack is precisely the evidence that documented and actual are not the same&nbsp;thing.</p>
+  </div>
+
+  <h3>A detail I did not expect</h3>
+
+  <p>Look at the date spans in the vendor table. Copeland has 32 vulnerabilities, every one published between September 2025 and February 2026, and nothing before. Danfoss has 10, every one inside a single two-month window in mid-2023, nothing before or after. Carel's most recent is July 2023. Automated Logic's is April&nbsp;2022.</p>
+
+  <p>Those are not security histories. They are the shapes of individual research projects. Copeland's controllers did not become insecure in September 2025, when a security firm published ten findings against them. They became&nbsp;examined.</p>
+
+  <p>Which means the 254 figure is not a measure of how much is wrong with this equipment. It is a measure of how much of it has been looked&nbsp;at.</p>
+
+  <p>And the Danfoss count makes the point sharper still. Those 10 vulnerabilities are three from 2015 in a solar inverter product and seven from 2023 in an energy monitoring unit. <strong>Not one of them is in the AK-SM controller family involved in the French attack.</strong> That product line's vulnerabilities are the Deferred ones, which carry no product identifier, which is why they do not appear in a vendor count at all. In the national database, the equipment that failed across four supermarket chains has vulnerabilities attached to&nbsp;nothing.</p>
+
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>What a Defender Can Actually&nbsp;Use</h2>
+
+  <p>The instinct here is to write a detection rule, and I checked whether one was warranted. It is not, or not yet. A setpoint change on a refrigeration controller is a legitimate administrative action that an authorised engineer performs routinely, and the telemetry that would distinguish an authorised change from a malicious one largely does not exist in these environments. There is nothing to write a rule&nbsp;against.</p>
+
+  <p>What this analysis does support is narrower and more&nbsp;useful.</p>
+
+  <div class="callout callout-green">
+    <p><strong>Defensible takeaway.</strong> If your vulnerability management programme resolves "am I affected?" through CPE matching, it is now blind to roughly 40% of recently published vulnerabilities, and that blindness is not random. It falls hardest on equipment that produces no telemetry, which is the same equipment least likely to be covered by anything else you&nbsp;own.</p>
+    <p style="margin-top:.75rem">Three things follow. <strong>Treat NVD as one source rather than the source:</strong> the CVE Program record, vendor advisories and CISA's ICS advisory stream carry affected-version information for vulnerabilities NVD has not enriched. <strong>Maintain an asset inventory for building and facility equipment by name and firmware version,</strong> separately from your IT inventory, because a scanner will not build it for you. And <strong>subscribe to advisories by equipment type, not only by your own sector:</strong> CISA filed both the Danfoss and the Carel advisories under Commercial Facilities, so a hospital filtering for Healthcare and Public Health would have seen&nbsp;neither.</p>
+  </div>
+
+  <p>One further point for anyone running medical or pharmaceutical cold storage, which is where I started. That sector already mandates something retail does not have. CDC's vaccine storage requirements call for a digital data logger on every storage unit, with a buffered probe sited among the product, minimum and maximum recording, calibration against a certificate, and three years of log retention. A logger that is not on the network cannot be altered by an attacker who controls the&nbsp;refrigeration.</p>
+
+  <p>That independent record is the most valuable control in the room, and it is already required. The gap worth noting is that the existing regime is built around thresholds, an alarm when temperature leaves a band, while the harder problem is rate: a slow drift that stays inside the permitted range and still degrades the product. That is a measurement problem rather than a detection one, and it is where I would look&nbsp;next.</p>
+
+  <h3>What I would want to know next</h3>
+
+  <p>Three questions this analysis raises and does not&nbsp;answer.</p>
+
+  <p>Whether the pattern holds outside building automation. The enrichment policy is not sector-specific, so any equipment class without telemetry should show the same signature. Medical devices, industrial sensors and network appliances at the low end of the market are the obvious places to&nbsp;check.</p>
+
+  <p>Whether lifecycle status can be measured at scale. Both the Danfoss and Copeland product lines involved here were end of life, with no patch available at any price. No public dataset records support status for this class of equipment, which means "unfixable" is currently a judgement rather than a&nbsp;field.</p>
+
+  <p>And how much of the exposed population is running unsupported firmware. Claroty's figure of 2,765 internet-reachable Danfoss devices is a count of instances, not of versions. The share of those already past end of support is the number that would turn this from a structural argument into a&nbsp;forecast.</p>
+
+  <p>I came to this expecting to write about hospital refrigerators. The more durable finding was upstream of that: a vulnerability can now be scored, triaged by a federal agency, and left with no record of what it affects, and the equipment most likely to end up in that state is the equipment nothing else is watching&nbsp;either.</p>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">Vulnerability counts, status distributions and vendor figures from the author's own research, queried against a local database of public vulnerability and threat feeds maintained by the author. NVD corpus as queried October 2026: 405,310 records, 386,837 after removing those marked Rejected; records grouped by NVD publication date rather than by the year in the CVE identifier; CPE vendor names extracted from the configurations structure of each record; KEV join performed on CVE identifier against the CISA Known Exploited Vulnerabilities catalogue as ingested. All year cohorts in this corpus were fetched within the same window, 9 September to 13 October 2026. Annual totals cross-checked against Jerry Gamblin's 2025 CVE Data Review, which gives 39,962 published CVEs for 2024 and 48,185 for 2025 excluding rejected CVEs, and against publication-year counts at cve-explore.com; the 2026 surge is also the subject of Trend Micro's analysis of what it terms the "vulnpocalypse" (2026). Threat actor packet counts from 107 enriched research packets built by the author from vendor reporting and government advisories; counts are whole-word case-insensitive file matches, with the false positives described in Section 04 removed. CVE-2025-41450 status, metrics and absence of product data retrieved from the NVD API on 13 October 2026. NVD enrichment prioritization policy effective 15 April 2026, Deferred status introduction in April 2025 and its stated pre-2018 scope: NIST NVD programme documentation; Deferred rollout and its effect on CVSS, CWE and CPE data also reported by Socket, Dark Reading and SecurityWeek (April 2025). French supermarket refrigeration incident of 12 October 2026, affected chains, store counts and loss figures: contemporaneous French press reporting; Danfoss statement on the AK-SM800 and AK-SC355 being end of life and the June 2023 product bulletin as relayed in that reporting. CVE-2025-41450, CVE-2025-41451 and CVE-2025-41452, including the 2,765 Censys exposure figure: Claroty Team82 (9 August 2026) and CISA advisory ICSA-25-140-03 (20 May 2025). Copeland E2 and E3 vulnerabilities, the October 2024 E2 end-of-life declaration and firmware 2.31F01: Armis Labs, Frostbyte10 (September 2025). CAREL Boss-Mini: CISA advisory ICSA-24-172-02. Vaccine storage monitoring requirements, digital data logger specification and log retention: CDC Vaccine Storage and Handling Toolkit. No conclusion is drawn here about the entry route used in the French incident, which has not been published by any party. This field note represents independent research produced for educational&nbsp;purposes.</p>
+
+</div>
+
+</div></div></div></div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- EDIT: footer spans — for WRITING: left=title/date, right=classification note -->
+<footer>
+  <span>Yana Ivanov &nbsp;·&nbsp; October 2026 &nbsp;·&nbsp; Based on independent research &nbsp;·&nbsp; For educational use</span>
+</footer>
+
+</body>
+</html>
