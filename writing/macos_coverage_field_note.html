@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>The Only Thing macOS Detection Watches | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker with decorative lines — blue theme style */
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+
+/* Blue bar — wraps naturally */
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.blue{color:var(--blue);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT CARD (blue theme uses mat-card wrapper) ── */
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+/* Numbers: IBM Plex Serif, clean editorial style */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-red .stat-num{color:var(--red)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE (for diagrams, screenshots, code blocks) ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── TIMELINE (horizontal grid — blue theme style) ── */
+.timeline{margin:0;display:grid;gap:0;border:1px solid var(--rule)}
+.tl-item{display:grid;grid-template-columns:140px 1fr;border-bottom:1px solid var(--rule)}
+.tl-item:last-child{border-bottom:none}
+.tl-left{padding:1.5rem 1.25rem;border-right:1px solid var(--rule);background:#f8fafc}
+.tl-date{font-family:var(--mono);font-size:.72rem;color:var(--blue);font-weight:700;margin-bottom:.3rem}
+.tl-tag{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.tl-right{padding:1.5rem}
+.tl-title{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3}
+.tl-body{font-size:.88rem;color:var(--ink3);line-height:1.7;margin:0}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── CODE BLOCKS (lab logs only) ── */
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.code-block{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.code-block .prompt{color:#4a9eff}
+.code-block .comment{color:#64748b}
+.code-block .highlight{color:#4ade80}
+.code-block .warning{color:#ef4444}
+.code-block .error{color:#f97316}
+/* shorthand color spans for inline use */
+.co{color:#94a3b8}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+
+/* ── TERMINAL WINDOW (macOS-style, for script output) ── */
+.terminal{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.terminal-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-left:.5rem}
+.terminal pre{font-family:var(--mono);font-size:.76rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#e2e8f0}
+/* terminal text color classes */
+.t-red{color:#ef4444;font-weight:bold}
+.t-orange{color:#fb923c;font-weight:bold}
+.t-blue{color:#60a5fa;font-weight:bold}
+.t-green{color:#4ade80}
+.t-dim{color:#94a3b8} /* was #475569 — bumped for legibility */
+.t-bold{color:#e2e8f0;font-weight:bold}
+
+/* ── HOST CARD (dark card for IP/host data) ── */
+.host-card{background:#0a0f1a;border-radius:2px;padding:1.5rem;margin:1.75rem 0;display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.hf-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.hf-value{font-family:var(--mono);font-size:.9rem;color:#4a9eff;font-weight:600}
+.hf-value.red{color:#ef4444}
+.hf-value.green{color:#4ade80}
+.hf-value.amber{color:#fbbf24}
+
+/* ── LAB ENVIRONMENT BOX (lab logs only) ── */
+.env-box{background:var(--paper);border:1px solid var(--rule);padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+
+/* ── COMPARE GRID (side-by-side comparison) ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.left{border-top:3px solid var(--blue)}
+.compare-box.right{border-top:3px solid var(--amber)}
+.compare-box.danger{border-top-color:var(--red)}
+.compare-box.safe{border-top-color:var(--green)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.left .compare-label{color:var(--blue)}
+.compare-box.right .compare-label{color:var(--amber)}
+.compare-box.danger .compare-label{color:var(--red)}
+.compare-box.safe .compare-label{color:var(--green)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+
+/* ── FUNCTION CARDS GRID (for script/tool documentation) ── */
+.fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.75rem 0}
+.fn-card{background:var(--paper);border:1px solid var(--rule);padding:1rem 1.1rem;border-top:2px solid var(--blue)}
+.fn-name{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--blue);margin-bottom:.3rem}
+.fn-desc{font-size:.82rem;color:var(--ink3);line-height:1.55}
+
+/* ── NIST MAPPING BOX (lab logs only) ── */
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:90px 1fr;gap:1rem;align-items:start}
+.nist-control{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--blue);padding-top:.15rem}
+.nist-desc{font-size:.88rem;color:var(--ink3);line-height:1.7}
+.nist-desc strong{color:var(--ink)}
+
+/* ── TOOL EMBED (for pages with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .tl-item{grid-template-columns:1fr}
+  .tl-left{border-right:none;border-bottom:1px solid var(--rule);padding:1rem 1.25rem}
+  .env-grid{grid-template-columns:1fr}
+  .nist-item{grid-template-columns:80px 1fr}
+  .compare-grid{grid-template-columns:1fr}
+  .fn-grid{grid-template-columns:1fr}
+  .host-card{grid-template-columns:1fr}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .mast-bar{padding:.55rem 1.5rem;font-size:.62rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.6rem}
+  .mast-meta{grid-template-columns:1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .timeline .tl-left{padding:.75rem .9rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .code-block,.terminal{padding:.85rem .9rem;font-size:.7rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<div class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-label">Field Notes &nbsp;·&nbsp; <span style="color:#4a9eff">Detection Engineering · Platform Coverage</span></div>
+
+    <h1 class="title">The Only Thing<br><span>macOS Detection&nbsp;Watches</span></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">October 2026</div></div>
+      <div class="meta-item"><div class="label">Category</div><div class="value">Field Notes · Detection Engineering</div></div>
+      <div class="meta-item"><div class="label">Data Source</div><div class="value">Own Research · SigmaHQ Ruleset</div></div>
+      <div class="meta-item"><div class="label">Corpus</div><div class="value">3,203 Rules · 3 Platforms</div></div>
+      <div class="meta-item"><div class="label">Method</div><div class="value">Logsource Product · Category Count</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    SIGMA · 38 WINDOWS RULES PER MACOS
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>I Started With One Missing&nbsp;Rule</h2>
+
+  <p>ClickFix is the technique where a victim is talked into pasting a prepared command into their own terminal. A fake error message, a fake CAPTCHA, a fake driver update, and the instruction to copy this and run it to fix the problem. The user authorises everything. No exploit is involved at&nbsp;all.</p>
+
+  <p>SigmaHQ, the open-source detection rule project, covers it well on Windows. Thirteen rules, including the RunMRU and TypedPaths registry artifacts the Run dialog leaves behind, the whitespace padding attackers use to push the malicious part of a command out of view, the FileFix variant, and the finger.exe delivery&nbsp;trick.</p>
+
+  <p>On macOS the same technique runs through Terminal instead of the Run dialog, and it is in active use. The only file in the macOS ruleset matching the word "clickfix" is an Atomic Stealer rule where the word appears in a reference URL rather than in any detection&nbsp;logic.</p>
+
+  <p>So I wrote one. A rule for the chain where content is fetched with curl, decoded with base64 or gunzip, and piped into a shell, with the decode step as the thing that separates it from the legitimate installer one-liners that Homebrew and rustup use. I submitted it to the project in&nbsp;October.</p>
+
+  <p>Before submitting I had to check it did not overlap anything existing, which is a project requirement. That check is what started this. I went looking for three or four neighbouring rules and ended up counting the whole&nbsp;ruleset.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>This note is not about ClickFix.</strong> ClickFix is where I started, and it turned out to be a clean example of something structural: macOS detection coverage is not merely thinner than Windows coverage, it is built on a single kind of observation. Of the 76 macOS rules in the project, 71 watch the same thing&nbsp;happen.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>What the Ruleset&nbsp;Showed</h2>
+
+  <p>Sigma rules declare a <em>logsource</em>, which names the platform the rule applies to and the kind of event it reads. That makes the ruleset countable. I cloned the repository and counted rules by declared platform across the three rule directories: the main set, emerging threats, and threat&nbsp;hunting.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Author's Research · SigmaHQ Ruleset · Rules by Declared Platform and Category · October 2026</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-red">
+        <div class="stat-num">38:1</div>
+        <div class="stat-label">Windows Rules Per macOS Rule</div>
+        <div class="stat-sub">2,878 against&nbsp;76</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">93%</div>
+        <div class="stat-label">macOS Rules in One Category</div>
+        <div class="stat-sub">71 of 76 watch a process&nbsp;start</div>
+      </div>
+      <div class="stat-item stat-blue">
+        <div class="stat-num">270</div>
+        <div class="stat-label">Windows Rules, No macOS Peer</div>
+        <div class="stat-sub">In categories that exist on both&nbsp;platforms</div>
+      </div>
+      <div class="stat-item stat-green">
+        <div class="stat-num">3.3×</div>
+        <div class="stat-label">Linux Coverage vs macOS</div>
+        <div class="stat-sub">249 rules against&nbsp;76</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Platform</th>
+          <th>Rules</th>
+          <th>Share</th>
+          <th>Event Categories</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Windows</strong></td><td>2,878</td><td class="blue">89.9%</td><td>at least 20</td></tr>
+        <tr><td><strong>Linux</strong></td><td>249</td><td class="amber">7.8%</td><td>several</td></tr>
+        <tr><td><strong>macOS</strong></td><td>76</td><td class="red">2.4%</td><td class="red">2</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>The ratio is the headline, but it is the least interesting number here, because a reader can fairly object that Windows is the bigger target and has more attack surface. That objection is real and I deal with it in the next&nbsp;section.</p>
+
+  <h3>The comparison that is harder to explain away</h3>
+
+  <p>Linux has 249 rules. That is 3.3 times the macOS coverage, and Linux desktops are considerably rarer in the enterprises these rules are written&nbsp;for.</p>
+
+  <p>What Linux has that macOS does not is instrumentation. Linux endpoints are overwhelmingly servers, and servers are monitored by default: auditd, eBPF tooling, and a long tradition of shipping logs somewhere. Macs are desktops sitting on the laps of designers, marketers and engineers, managed by an MDM for patching and otherwise unobserved by anyone in a security&nbsp;role.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>What this count does and does not show.</strong> These figures describe the SigmaHQ repository as cloned in October 2026, counted by the <span class="code">product:</span> value each rule declares in its logsource block. The three platforms shown sum to 3,203 rules; the full ruleset is larger, because rules targeting cloud and SaaS platforms declare other products and some rules declare none. The Windows category figures below are the twenty largest, which account for 2,481 of the 2,878 Windows rules, so the remaining 397 sit in categories not&nbsp;listed. Sigma is one project rather than the whole of detection engineering. Commercial endpoint products carry macOS detections that are not public, and this count says nothing about&nbsp;those.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>Two Categories Out of&nbsp;Twenty</h2>
+
+  <p>The second thing a logsource declares is the <em>category</em>: what kind of event the rule reads. Process creation, file events, network connections, DNS queries, and so&nbsp;on.</p>
+
+  <p>Windows rules span at least twenty of them. Process creation is the largest at 1,426, which is 50% of the Windows total. The other half is spread across registry writes, PowerShell script blocks, library loads, network connections, named pipes, DNS queries, driver loads and&nbsp;more.</p>
+
+  <p>macOS rules span two. Seventy-one process creation, five file events, and nothing&nbsp;else.</p>
+
+  <p>So Windows detection has roughly twenty ways of noticing something. macOS detection has one, plus a trace of a second. That is a difference in kind rather than in&nbsp;degree.</p>
+
+  <h3>Giving Windows its due</h3>
+
+  <p>Some of those twenty categories have no macOS equivalent, and it would be dishonest to count them as missing coverage. There is no registry on a Mac, no PowerShell, no WMI. Those categories account for 564 Windows rules, and I set them&nbsp;aside.</p>
+
+  <p>The rest do have equivalents. A Mac loads libraries, opens network connections, resolves DNS names, reads other processes' memory, and deletes files. These are not Windows concepts. They are things every operating system&nbsp;does.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Event Category</th>
+          <th>Windows</th>
+          <th>macOS</th>
+          <th>Exists on macOS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>process_creation</td><td>1,426</td><td>71</td><td class="green">Yes</td></tr>
+        <tr><td>file_event</td><td>221</td><td>5</td><td class="green">Yes</td></tr>
+        <tr><td><strong>image_load</strong></td><td>125</td><td class="red">0</td><td class="green">Yes</td></tr>
+        <tr><td><strong>network_connection</strong></td><td>61</td><td class="red">0</td><td class="green">Yes</td></tr>
+        <tr><td><strong>process_access</strong></td><td>29</td><td class="red">0</td><td class="green">Yes</td></tr>
+        <tr><td><strong>dns_query</strong></td><td>28</td><td class="red">0</td><td class="green">Yes</td></tr>
+        <tr><td><strong>file_delete</strong></td><td>14</td><td class="red">0</td><td class="green">Yes</td></tr>
+        <tr><td><strong>file_access</strong></td><td>13</td><td class="red">0</td><td class="green">Yes</td></tr>
+        <tr><td>registry_set</td><td>227</td><td>0</td><td class="amber">No</td></tr>
+        <tr><td>ps_script</td><td>181</td><td>0</td><td class="amber">No</td></tr>
+        <tr><td>wmi_event</td><td>3</td><td>0</td><td class="amber">No</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p><strong>Two hundred and seventy Windows rules sit in categories that apply identically to a Mac, and macOS has none of them.</strong> No rule anywhere in the project watches a macOS process load a malicious dylib, open a connection to a command-and-control server, resolve a suspicious domain, or read another process's&nbsp;memory.</p>
+
+  <p>Not because those things do not happen on Macs. Because nobody has the data to write the rules&nbsp;against.</p>
+
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>The Door Everyone&nbsp;Uses</h2>
+
+  <p>Five file-event rules is a small enough number to read in full, so here is what macOS file-based detection consists of, in its&nbsp;entirety.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Rule</th>
+          <th>Watches</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>MacOS Emond Launch Daemon</td><td>emond persistence</td><td class="amber">Legacy mechanism</td></tr>
+        <tr><td>Startup Item File Created</td><td>StartupItems persistence</td><td class="amber">Legacy mechanism</td></tr>
+        <tr><td>Atomic MacOS Stealer</td><td>AMOS persistence paths</td><td class="red">Campaign indicator</td></tr>
+        <tr><td>Axios NPM Compromise</td><td>Campaign file paths</td><td class="red">Campaign indicator</td></tr>
+        <tr><td>Python Path Configuration</td><td><span class="code">.pth</span> file creation</td><td class="blue">Generic technique</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Two of the five are campaign indicators: lists of paths and filenames from one specific piece of malware. Those stop working the moment the operator changes a directory name. Two more watch emond and StartupItems, both superseded by launchd long ago. One, the Python <span class="code">.pth</span> rule, is a genuine generic&nbsp;technique.</p>
+
+  <p>What is missing from that list is the mechanism almost everything actually uses. On macOS, persistence means a property list dropped into <span class="code">~/Library/LaunchAgents</span> or <span class="code">/Library/LaunchDaemons</span>. MITRE tracks it as T1543.001. It is the first thing a stealer&nbsp;does.</p>
+
+  <p>It is covered, but only from one side. Three rules watch the <em>process</em> side: running <span class="code">launchctl</span>, using <span class="code">PlistBuddy</span> to modify a plist, and unloading security tools. One file-event rule covers it, and that is the Atomic Stealer campaign&nbsp;rule.</p>
+
+  <div class="callout callout-red">
+    <p><strong>Why the process side is not enough.</strong> An attacker does not have to run <span class="code">launchctl</span>. A plist written into LaunchAgents is picked up by launchd at the next login with no command executed at all; <span class="code">launchctl</span> is only needed to load it immediately in the current session. So malware that is willing to wait for the user to log out, which is most of it, writes a file and nothing generic&nbsp;fires.</p>
+  </div>
+
+  <h3>The same shape, everywhere I looked</h3>
+
+  <p>This is not confined to persistence. The project's coverage of npm supply chain attacks, which is the current route onto developer machines, consists of four rule sets, one per campaign: Shai-Hulud, the Axios compromise, TanStack, and the TeamPCP backdoor of&nbsp;LiteLLM.</p>
+
+  <p>Every one of them is a list of indicators. The Shai-Hulud rule matches a hardcoded inventory of roughly eight hundred <span class="code">package@version</span> strings, and it was last extended in October 2026, which means somebody is maintaining that list by&nbsp;hand.</p>
+
+  <p>None of them detects the behaviour underneath: a package manager installing from a remote URL rather than from the registry, which is what lets a tarball with a malicious install script run in the first&nbsp;place.</p>
+
+  <p>Indicator rules are not wrong. They are fast to write, they fire accurately during a live campaign, and they are often all the information available in the first week. But they decay, and a ruleset composed mostly of them is a record of past campaigns rather than a defence against the next&nbsp;one.</p>
+
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>What a Defender Can Actually&nbsp;Use</h2>
+
+  <p>The reason for all of this is not that nobody noticed Macs. It is&nbsp;telemetry.</p>
+
+  <p>Windows detection engineering runs on Sysmon. It is free, it comes from Microsoft, it installs anywhere, and it emits process creation with full command lines, image loads, network connections, DNS queries, registry writes and named pipes. Anyone can put it on a test machine, write a rule, and confirm it fires in ten&nbsp;minutes.</p>
+
+  <p>macOS has Apple's Endpoint Security Framework, which requires a notarised system extension and is consumed mostly by commercial endpoint products, each mapping it to its own schema. There is no free, universal, install-anywhere equivalent. So a rule author cannot easily test a macOS rule, and the field names a rule should use depend on which product the reader happens to&nbsp;own.</p>
+
+  <p>That explains the shape precisely. Process creation is the one category almost every macOS agent exposes in a comparable way. So that is where the rules are. Not because process creation is where the threats are, but because it is where the data&nbsp;is.</p>
+
+  <div class="callout callout-green">
+    <p><strong>Defensible takeaway.</strong> If your Mac fleet is covered by open detection content, that coverage is almost entirely one signal: a process starting with a suspicious command line. Anything that does not involve launching a process is, in open rules, invisible. That includes the most common macOS persistence mechanism when established by file&nbsp;write.</p>
+    <p style="margin-top:.75rem">Three things follow. <strong>Know which category your Mac telemetry actually delivers</strong> before assuming a rule pack covers you, because a rule that reads image loads is inert if your agent does not emit them. <strong>Treat file-event coverage as a gap to close explicitly,</strong> starting with LaunchAgents and LaunchDaemons, since that is one directory to watch and it catches the step nearly every stealer takes. And <strong>prefer behavioural rules over indicator lists where the behaviour is stable:</strong> package names rotate weekly, but installing from a URL instead of a registry does&nbsp;not.</p>
+  </div>
+
+  <h3>What I would want to know next</h3>
+
+  <p>Three questions this count raises and does not&nbsp;answer.</p>
+
+  <p>Whether commercial coverage has the same shape. These figures are from open rules only. If vendor-maintained macOS detections are also concentrated in process creation, the gap is an industry-wide consequence of the telemetry rather than a property of one open-source&nbsp;project.</p>
+
+  <p>Whether the ratio is changing. A single snapshot cannot show direction. The same count run against the repository's history, year by year, would say whether macOS coverage is catching up, holding steady, or falling further&nbsp;behind.</p>
+
+  <p>And what a file-event rule for LaunchAgents would cost in false positives. Legitimate software installs launch agents constantly, so the question is whether path, filename and writing-process together separate the two cleanly enough to be usable. That is the rule I would try to write&nbsp;next.</p>
+
+  <p>I came to this intending to add one macOS rule. The more durable finding was upstream of that: a platform can be well defended against malware and still be almost entirely unwatched, and the shape of the detection that does exist is decided by the shape of the telemetry rather than by the shape of the&nbsp;threat.</p>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">Rule counts, platform shares and category distributions from the author's own research against a local clone of the SigmaHQ repository, counted in October 2026 across the rules, rules-emerging-threats and rules-threat-hunting directories. Platform counts are files declaring <span class="code">product: windows</span>, <span class="code">product: macos</span> or <span class="code">product: linux</span> in their logsource block, giving 2,878, 76 and 249 respectively, summing to 3,203; the repository contains more rules than this, as rules targeting cloud and SaaS platforms declare other products. Category counts are <span class="code">category:</span> declarations within those files. macOS resolves to 71 process_creation and 5 file_event, with no other category present. Windows category figures are the twenty largest, totalling 2,481 of 2,878, so 397 Windows rules sit in categories not listed here; of the twenty, registry_set, ps_script, registry_event, ps_module, pipe_created, create_remote_thread, ps_classic_start, registry_delete, driver_load, create_stream_hash, wmi_event and registry_add have no macOS equivalent and account for 564 rules, which are excluded from the 270 figure. The thirteen Windows ClickFix rules and the absence of a macOS equivalent were counted by the author during overlap review for a rule submitted to the project in October 2026. The five macOS file_event rules are listed in full. launchd coverage determined by searching all three rule directories for launchctl, LaunchAgents and LaunchDaemons, returning three process_creation rules and one campaign-specific file_event rule. Launch agent persistence and its loading behaviour: MITRE ATT&amp;CK T1543.001. Emond is tracked separately as T1546.014 and is described by Apple and by MITRE as a legacy mechanism; StartupItems has been superseded by launchd. npm supply chain rule sets counted as Shai-Hulud, Axios NPM Compromise, TanStack Supply Chain and TeamPCP LiteLLM; the Shai-Hulud package inventory was counted from the rule file itself. Sysmon and Endpoint Security Framework characterisations from Microsoft and Apple developer documentation respectively. This count reflects one open-source project at one point in time and makes no claim about detection content maintained privately by commercial vendors. This field note represents independent research produced for educational&nbsp;purposes.</p>
+
+</div>
+
+</div></div></div></div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- EDIT: footer spans — for WRITING: left=title/date, right=classification note -->
+<footer>
+  <span>Yana Ivanov &nbsp;·&nbsp; October 2026 &nbsp;·&nbsp; Based on independent research &nbsp;·&nbsp; For educational use</span>
+</footer>
+
+</body>
+</html>
