@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>Twenty-Five Rules I Had Never Run | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#1e2d45;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker with decorative lines — blue theme style */
+.mast-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.2em;color:#60a5fa;text-transform:uppercase;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem}
+.mast-label::before,.mast-label::after{content:'';display:inline-block;width:32px;height:1px;background:#60a5fa}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title span{color:#60a5fa}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 3rem;border-top:1px solid rgba(255,255,255,.12);margin-top:2rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
+
+/* Blue bar — wraps naturally */
+.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem;text-transform:uppercase;white-space:nowrap;overflow:hidden}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.content{padding:4rem 0}
+.section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--rule)}
+.section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--blue);text-transform:uppercase;margin-bottom:.75rem}
+h2{font-family:var(--display);font-size:1.75rem;font-weight:700;color:var(--ink);line-height:1.25;margin-bottom:1.5rem;letter-spacing:-.01em}
+h3{font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+p em{font-style:italic;color:var(--ink2)}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:4px solid}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.blue{color:var(--blue);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT CARD (blue theme uses mat-card wrapper) ── */
+.mat-card{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.mat-card-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:.75rem 1.25rem;border-bottom:1px solid var(--rule);background:#f8fafc}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center}
+.stat-item:last-child{border-right:none}
+/* Numbers: IBM Plex Serif, clean editorial style */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-red .stat-num{color:var(--red)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE (for diagrams, screenshots, code blocks) ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── TIMELINE (horizontal grid — blue theme style) ── */
+.timeline{margin:0;display:grid;gap:0;border:1px solid var(--rule)}
+.tl-item{display:grid;grid-template-columns:140px 1fr;border-bottom:1px solid var(--rule)}
+.tl-item:last-child{border-bottom:none}
+.tl-left{padding:1.5rem 1.25rem;border-right:1px solid var(--rule);background:#f8fafc}
+.tl-date{font-family:var(--mono);font-size:.72rem;color:var(--blue);font-weight:700;margin-bottom:.3rem}
+.tl-tag{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.06em;text-transform:uppercase;line-height:1.4}
+.tl-right{padding:1.5rem}
+.tl-title{font-family:var(--display);font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;line-height:1.3}
+.tl-body{font-size:.88rem;color:var(--ink3);line-height:1.7;margin:0}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── CODE BLOCKS (lab logs only) ── */
+.code-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:.5rem}
+.code-block{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.code-block pre{font-family:var(--mono);font-size:.8rem;color:#e2e8f0;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.code-block .prompt{color:#4a9eff}
+.code-block .comment{color:#64748b}
+.code-block .highlight{color:#4ade80}
+.code-block .warning{color:#ef4444}
+.code-block .error{color:#f97316}
+/* shorthand color spans for inline use */
+.co{color:#94a3b8}.hi{color:#4ade80}.wa{color:#ef4444}.ke{color:#fbbf24}.va{color:#4a9eff}
+
+/* ── TERMINAL WINDOW (macOS-style, for script output) ── */
+.terminal{background:#0a0f1a;border-radius:2px;padding:1.25rem 1.5rem;margin:1.5rem 0;overflow-x:auto;border-left:3px solid #1a4fa0}
+.terminal-bar{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid rgba(255,255,255,.08)}
+.terminal-dot{width:10px;height:10px;border-radius:50%}
+.terminal-title{font-family:var(--mono);font-size:.6rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-left:.5rem}
+.terminal pre{font-family:var(--mono);font-size:.76rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#e2e8f0}
+/* terminal text color classes */
+.t-red{color:#ef4444;font-weight:bold}
+.t-orange{color:#fb923c;font-weight:bold}
+.t-blue{color:#60a5fa;font-weight:bold}
+.t-green{color:#4ade80}
+.t-dim{color:#94a3b8} /* was #475569 — bumped for legibility */
+.t-bold{color:#e2e8f0;font-weight:bold}
+
+/* ── HOST CARD (dark card for IP/host data) ── */
+.host-card{background:#0a0f1a;border-radius:2px;padding:1.5rem;margin:1.75rem 0;display:grid;grid-template-columns:repeat(2,1fr);gap:1.25rem}
+.hf-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;color:#94a3b8;text-transform:uppercase;margin-bottom:.3rem}
+.hf-value{font-family:var(--mono);font-size:.9rem;color:#4a9eff;font-weight:600}
+.hf-value.red{color:#ef4444}
+.hf-value.green{color:#4ade80}
+.hf-value.amber{color:#fbbf24}
+
+/* ── LAB ENVIRONMENT BOX (lab logs only) ── */
+.env-box{background:var(--paper);border:1px solid var(--rule);padding:1.5rem;margin:1.75rem 0}
+.env-box-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--rule)}
+.env-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.env-item .env-label{font-family:var(--mono);font-size:.62rem;color:#94a3b8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem}
+.env-item .env-value{font-family:var(--mono);font-size:.82rem;color:var(--ink)}
+
+/* ── COMPARE GRID (side-by-side comparison) ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.75rem 0}
+.compare-box{background:var(--paper);border:1px solid var(--rule);padding:1.25rem}
+.compare-box.left{border-top:3px solid var(--blue)}
+.compare-box.right{border-top:3px solid var(--amber)}
+.compare-box.danger{border-top-color:var(--red)}
+.compare-box.safe{border-top-color:var(--green)}
+.compare-label{font-family:var(--mono);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;margin-bottom:.75rem}
+.compare-box.left .compare-label{color:var(--blue)}
+.compare-box.right .compare-label{color:var(--amber)}
+.compare-box.danger .compare-label{color:var(--red)}
+.compare-box.safe .compare-label{color:var(--green)}
+.compare-box p{font-size:.88rem;color:var(--ink3);margin-bottom:.5rem;line-height:1.6}
+.compare-box p:last-child{margin-bottom:0}
+
+/* ── FUNCTION CARDS GRID (for script/tool documentation) ── */
+.fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.75rem 0}
+.fn-card{background:var(--paper);border:1px solid var(--rule);padding:1rem 1.1rem;border-top:2px solid var(--blue)}
+.fn-name{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--blue);margin-bottom:.3rem}
+.fn-desc{font-size:.82rem;color:var(--ink3);line-height:1.55}
+
+/* ── NIST MAPPING BOX (lab logs only) ── */
+.nist-box{background:var(--blue-dim);border:1px solid rgba(26,79,160,.2);padding:1.25rem 1.5rem;margin:1.75rem 0}
+.nist-box-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.15em;color:var(--blue);text-transform:uppercase;margin-bottom:.85rem;font-weight:700}
+.nist-items{display:grid;gap:.85rem}
+.nist-item{display:grid;grid-template-columns:90px 1fr;gap:1rem;align-items:start}
+.nist-control{font-family:var(--mono);font-size:.75rem;font-weight:700;color:var(--blue);padding-top:.15rem}
+.nist-desc{font-size:.88rem;color:var(--ink3);line-height:1.7}
+.nist-desc strong{color:var(--ink)}
+
+/* ── TOOL EMBED (for pages with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-item{border-bottom:1px solid var(--rule)}
+  .tl-item{grid-template-columns:1fr}
+  .tl-left{border-right:none;border-bottom:1px solid var(--rule);padding:1rem 1.25rem}
+  .env-grid{grid-template-columns:1fr}
+  .nist-item{grid-template-columns:80px 1fr}
+  .compare-grid{grid-template-columns:1fr}
+  .fn-grid{grid-template-columns:1fr}
+  .host-card{grid-template-columns:1fr}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .mast-bar{padding:.55rem 1.5rem;font-size:.62rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.6rem}
+  .mast-meta{grid-template-columns:1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .timeline .tl-left{padding:.75rem .9rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .code-block,.terminal{padding:.85rem .9rem;font-size:.7rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<div class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-label">Field Notes &nbsp;·&nbsp; <span style="color:#4a9eff">Detection Engineering · Rule Validation</span></div>
+
+    <h1 class="title">Twenty-Five Rules<br><span>I Had Never&nbsp;Run</span></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">October 2026</div></div>
+      <div class="meta-item"><div class="label">Category</div><div class="value">Field Notes · Detection Engineering</div></div>
+      <div class="meta-item"><div class="label">Data Source</div><div class="value">Own Research · Own Mailbox</div></div>
+      <div class="meta-item"><div class="label">Corpus</div><div class="value">4,033 Messages · 30 Days</div></div>
+      <div class="meta-item"><div class="label">Method</div><div class="value">Retroactive Hunt · Per Rule</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    25 RULES · 27 MATCHES · 0 ATTACKS
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     CONTENT
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap"><div class="content">
+
+<!-- SECTION 01 -->
+<div class="section">
+  <div class="section-num">Section 01</div>
+  <h2>Why I Published Rules I Had Never&nbsp;Run</h2>
+
+  <p>For the past few months I have been writing email detection rules in MQL, the query language Sublime Security's platform uses, and collecting them in gists. A few went upstream as pull requests. Most sat in a folder waiting on a review that had not come, and the pile kept&nbsp;growing.</p>
+
+  <p>At some point keeping them private stopped making sense. If I believed some of them were useful, the honest thing was to put them where anyone could read them, run them, and tell me they were wrong. So I published them as a rule feed: a public repository that my own Sublime instance subscribes to, and that anyone else can subscribe to as&nbsp;well.</p>
+
+  <p>Setting that up took an afternoon. What it exposed took longer to&nbsp;accept.</p>
+
+  <p>Not one of the twenty-five rules had ever run against a real message. I had written them, read them back, satisfied myself the logic held, and submitted several for review. None of that is testing. It is proofreading, and the two are easy to confuse when you are working&nbsp;alone.</p>
+
+  <div class="callout callout-blue">
+    <p><strong>What this note is.</strong> A record of what happened when I ran twenty-five of my own detection rules against thirty days of my own mail for the first time. Two of them fired. Between them they produced twenty-seven matches, and not one of those matches was an&nbsp;attack.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 02 -->
+<div class="section">
+  <div class="section-num">Section 02</div>
+  <h2>Setting It Up, Start to&nbsp;Finish</h2>
+
+  <p>The whole stack is free and runs on a laptop, so this part is reproducible by anyone who wants to test their own rules. Four&nbsp;steps.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Step</th>
+          <th>What It Does</th>
+          <th>Reference</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Publish the rules</strong></td><td>Public repo, one YAML file per rule</td><td><a href="https://github.com/yana-ivanov/custom-sublime-rules">My feed</a></td></tr>
+        <tr><td><strong>Run the platform</strong></td><td>Self-hosted Sublime in Docker</td><td><a href="https://github.com/sublime-security/sublime-platform">sublime-platform</a></td></tr>
+        <tr><td><strong>Connect a mailbox</strong></td><td>IMAP source pointed at real mail</td><td><a href="https://docs.sublime.security/docs/add-message-source">Message sources</a></td></tr>
+        <tr><td><strong>Add the feed</strong></td><td>Instance subscribes to the repo</td><td><a href="https://docs.sublime.security/docs/api-keys">Platform docs</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p><strong>The repository layout is the only thing that has to be exact.</strong> A folder named <span class="code">detection-rules</span> at the root, one <span class="code">.yml</span> file per rule. Each file needs a name, a type, a severity, a source block holding the MQL, and a UUID. That is the entire contract. I matched the layout used by two existing community feeds rather than inventing&nbsp;one.</p>
+
+  <p><strong>The platform installs with a single command</strong> and runs as a set of Docker containers, so <a href="https://docs.docker.com/desktop/">Docker Desktop</a> has to be running first. The dashboard comes up on <span class="code">localhost:3000</span> and the API on <span class="code">localhost:8000</span>. Nothing leaves the&nbsp;machine.</p>
+
+  <p><strong>Connecting Gmail needs an app password</strong>, which in turn needs 2-Step Verification switched on. Google documents the process under <a href="https://support.google.com/accounts/answer/185833">signing in with app passwords</a>. One detail matters for the results: Sublime reads the <span class="code">\All</span> folder, and that folder excludes Spam and Trash. Everything Google had already classified as spam was gone before Sublime saw&nbsp;anything.</p>
+
+  <p>If you want to read MQL before writing any, Sublime's own <a href="https://sublime.security/blog/introduction-to-message-query-language-mql/">introduction to the language</a> is the clearest starting point, and the <a href="https://github.com/sublime-security/sublime-rules">production ruleset</a> is public, which makes it the best reference there&nbsp;is.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Limits worth knowing before you start.</strong> The Docker deployment is documented as being for small deployments and testing, capped at one hundred active mailboxes. Retroactive hunting reaches thirty days and no further, whatever date range you request, so a longer archive cannot be queried. Several API endpoints returned errors on this build, and I did not establish whether that reflects the self-hosted deployment or my own configuration. None of it blocked the test, but all of it shaped what the test could&nbsp;measure.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 03 -->
+<div class="section">
+  <div class="section-num">Section 03</div>
+  <h2>Six of Twenty-Five Could Never Have&nbsp;Run</h2>
+
+  <p>Installing a feed is also the first moment anything checks the rules. Six of the twenty-five failed&nbsp;validation.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>What I Wrote</th>
+          <th>Why It Could Not Run</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="code">strings.split(...)</td><td class="red">No such function exists in MQL</td></tr>
+        <tr><td class="code">subject</td><td class="red">The field is <span class="code">subject.subject</span></td></tr>
+        <tr><td class="code">.href_url.domain.fqdn</td><td class="red">No such accessor exists</td></tr>
+        <tr><td>Escaped quotes in a single-quoted string</td><td class="red">Single-quoted strings cannot contain them</td></tr>
+        <tr><td>A pattern broken across two lines</td><td class="red">Strings cannot span lines</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Six of twenty-five is twenty-four percent. None of these are style problems. A rule containing a function that does not exist does not fire less often than it should; it does not run at&nbsp;all.</p>
+
+  <p>I had been carrying these for three months. Several had been submitted for review. Nothing surfaced any of it, because nothing had ever tried to execute&nbsp;them.</p>
+
+  <div class="callout callout-red">
+    <p><strong>A rule that has never been parsed is not a rule.</strong> It is an intention, and the difference between the two is invisible until something tries to run it. That alone is an argument for publishing a feed even if nobody subscribes to it, because installation is the first real&nbsp;review.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 04 -->
+<div class="section">
+  <div class="section-num">Section 04</div>
+  <h2>Two Rules Fired, Neither Caught&nbsp;Anything</h2>
+
+  <p>With all twenty-five fixed and active, I ran each one across the corpus. Rules normally only evaluate mail as it arrives, which means mine had never seen the backfilled messages. Retroactive hunting runs a rule over mail already stored, and that is the only reason this test was possible at&nbsp;all.</p>
+
+  <p>Twenty-five rules, four thousand and thirty-three inbound messages, thirty days, one query per&nbsp;rule.</p>
+
+  <div class="mat-card">
+    <div class="mat-card-title">Author's Research · Own Rule Feed Against Own Mailbox · 30 Days · October 2026</div>
+    <div class="stat-grid">
+      <div class="stat-item stat-blue">
+        <div class="stat-num">25</div>
+        <div class="stat-label">Rules Tested</div>
+        <div class="stat-sub">Written over three&nbsp;months</div>
+      </div>
+      <div class="stat-item stat-amber">
+        <div class="stat-num">2</div>
+        <div class="stat-label">Rules That Fired At All</div>
+        <div class="stat-sub">The other twenty-three were&nbsp;silent</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">27</div>
+        <div class="stat-label">Total Matches</div>
+        <div class="stat-sub">Twenty-six from one&nbsp;rule</div>
+      </div>
+      <div class="stat-item stat-red">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Attacks Found</div>
+        <div class="stat-sub">Every match was&nbsp;benign</div>
+      </div>
+    </div>
+  </div>
+
+  <p>I read all twenty-seven and labelled each one. Here is what they&nbsp;were.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>What the Match Actually Was</th>
+          <th>Count</th>
+          <th>Verdict</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Security and developer newsletters</td><td>11</td><td class="red">False positive</td></tr>
+        <tr><td>AI industry newsletters</td><td>9</td><td class="red">False positive</td></tr>
+        <tr><td>Daily news digests</td><td>2</td><td class="red">False positive</td></tr>
+        <tr><td>Healthcare and civic notices</td><td>2</td><td class="red">False positive</td></tr>
+        <tr><td>Genuine recruiting correspondence</td><td>2</td><td class="red">False positive</td></tr>
+        <tr><td>Automated billing receipt</td><td>1</td><td class="red">False positive</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Twenty-six of the twenty-seven came from one rule, written to catch fake technical assessments sent to developers. <strong>Twenty-four of those twenty-six were newsletters.</strong> Security newsletters, developer newsletters, AI newsletters: the ones I subscribe to and read every&nbsp;week.</p>
+
+  <p>In hindsight it is obvious. A rule hunting for developer recruitment language alongside links to coding and assessment platforms describes a technology newsletter almost perfectly. I had not thought about newsletters once while writing&nbsp;it.</p>
+
+  <p>The twenty-seventh came from a rule looking for PDF attachments whose metadata suggests machine generation. It matched an antivirus subscription renewal receipt, because automated billing systems generate their invoices with exactly the kind of tooling that rule was watching&nbsp;for.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>The twenty-three silent rules prove nothing either way.</strong> They cover wire fraud at property closings, tax authority impersonation, remote monitoring tool abuse and cloud storage payload delivery. A pre-filtered personal mailbox contains none of that, and Google had already removed anything it considered spam before the platform ever saw it. Zero firings here is a statement about the corpus, not evidence the rules&nbsp;work.</p>
+  </div>
+
+</div>
+
+<!-- SECTION 05 -->
+<div class="section">
+  <div class="section-num">Section 05</div>
+  <h2>The Exclusion Everyone Uses Did&nbsp;Nothing</h2>
+
+  <p>Twenty-six false positives from one rule is a fixable problem, and the production ruleset has established ways of fixing it. I tested three of them against the identical corpus, changing nothing else, so the numbers are directly&nbsp;comparable.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Exclusion Added</th>
+          <th>Matches Left</th>
+          <th>Production Rules Using It</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>None, as originally written</td><td class="red">26</td><td>&mdash;</td></tr>
+        <tr><td class="code">not profile.by_sender().solicited</td><td class="red">26</td><td class="blue">177</td></tr>
+        <tr><td class="code">prevalence in ("new", "outlier")</td><td class="amber">3</td><td class="blue">70</td></tr>
+        <tr><td>No List-Unsubscribe header present</td><td class="green">2</td><td class="amber">10</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p><strong>The most widely used exclusion in the entire ruleset had no effect whatsoever.</strong> One hundred and seventy-seven of the 1,361 production rules carry a sender-solicitation check, more than any other false-positive control, and on my corpus it removed exactly zero&nbsp;matches.</p>
+
+  <p>The reason is specific rather than mysterious. Solicitation is derived from whether the organisation has corresponded with the sender before. My instance holds thirty days of backfilled mail and classifies none of it as outbound, so there is no correspondence history to derive anything&nbsp;from.</p>
+
+  <p>The check is not broken and it is not badly written. It assumes an organisational context that my mailbox does not have, and when that assumption fails it evaluates quietly to nothing rather than raising an&nbsp;error.</p>
+
+  <div class="callout callout-red">
+    <p><strong>An exclusion that silently evaluates to nothing is indistinguishable from one that is working.</strong> Had I copied that line into all twenty-five rules, which is what reading the production ruleset would naturally lead anyone to do, every one of them would have carried a control that did nothing at all, and the rules would still have looked correct on the&nbsp;page.</p>
+  </div>
+
+  <h3>What the two survivors tell you</h3>
+
+  <p>The header check cut twenty-six matches to two. Both survivors came from a recruiter at an established company, sent from that company's own domain, and the correspondence was entirely&nbsp;legitimate.</p>
+
+  <p>That is the limit of the rule, and no exclusion reaches it. A genuine technical assessment and a fabricated one are the same message at the level my rule was looking: recruitment language, a link, an invitation to run&nbsp;code.</p>
+
+  <h3>Narrowing at the front instead of filtering at the back</h3>
+
+  <p>The closest equivalent in the production ruleset does not attempt to solve that problem. It opens by requiring the sender's root domain to be one of thirteen specific abused hosting services. Everything after that only evaluates on mail that has already passed through a very narrow&nbsp;door.</p>
+
+  <p>A newsletter never reaches its content logic, so it never needs an exclusion for newsletters. Mine opens wide on content and would need exclusion after exclusion stacked behind it to compensate. That is not a stylistic preference between two valid approaches. It is the difference between a rule that is narrow by construction and one that is broad and then&nbsp;apologised for.</p>
+
+  <h3>What I would do next</h3>
+
+  <p>Three things, in&nbsp;order.</p>
+
+  <p>Test against a corpus that can actually falsify the other twenty-three. A personal mailbox cannot, and no amount of care in the measurement changes that. An organisational mailbox or a public phishing corpus&nbsp;could.</p>
+
+  <p>Rewrite the recruitment rule to narrow at the front rather than filter at the back, requiring the assessment link to sit on a domain unrelated to the sender's, and dropping the broad content matching that caught the&nbsp;newsletters.</p>
+
+  <p>And add author attribution to every rule in the feed, so that anything useful in it is traceable to a person rather than to a repository&nbsp;name.</p>
+
+  <p>I set out to publish a feed so that other people could use what I had written. What it produced first was an inventory of what was wrong with my own work: six rules that could not run, one rule that fired twenty-six times without being right once, and a false-positive control I would have copied straight from the production ruleset without ever noticing it was doing nothing. All of that cost one afternoon and a laptop, and none of it was available to me from reading my own rules back to&nbsp;myself.</p>
+
+  <p style="font-style:italic;color:#94a3b8;border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.88rem;line-height:1.7">All figures are from the author's own testing, conducted in October 2026 against a self-hosted Sublime Security platform running locally in Docker, connected by IMAP to the author's personal Gmail account. The corpus is 4,033 inbound messages across 3,162 message groups, read from the platform's hunt interface on 29 October 2026 over a rolling thirty-day window; because the mailbox continues to receive mail, this figure drifts by a few messages between runs. Per-rule counts were obtained through the platform's hunt API with the window pinned to 29 September 2026 through 29 October 2026, one query per rule, and are reported as total matching messages rather than message groups. The hunt API returns a maximum of fifty message groups per response, so per-rule counts are exact only because every rule returned fewer than fifty; the corpus total was therefore taken from the interface rather than the API. Retroactive hunting is capped at thirty days on this build regardless of the range requested. Rule validation failures were reported by the platform at feed installation; all six have since been corrected. The twenty-seven matches were individually read and labelled by the author. Exclusion comparisons were run against the identical pinned window with no other change to each rule. Counts of production rules using each exclusion were taken from a clone of the public sublime-security/sublime-rules repository containing 1,361 rule files, counted as files containing <span class="code">not profile.by_sender().solicited</span>, files containing a <span class="code">profile.by_sender().prevalence</span> check, and files referencing a List-Unsubscribe header, giving 177, 70 and 10 respectively. The thirteen-domain comparison rule is <span class="code">link_job_recruitment_lure_with_suspicious_hosting.yml</span> in that same repository. Sublime reads the <span class="code">\All</span> IMAP folder, which excludes Spam and Trash, so messages already classified as spam by Google were never presented to the platform. This note describes one ruleset tested against one mailbox at one point in time and makes no claim about how these rules would perform in an organisational environment. This field note represents independent research produced for educational&nbsp;purposes.</p>
+
+</div>
+
+</div></div></div></div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- EDIT: footer spans — for WRITING: left=title/date, right=classification note -->
+<footer>
+  <span>Yana Ivanov &nbsp;·&nbsp; October 2026 &nbsp;·&nbsp; Based on independent research &nbsp;·&nbsp; For educational use</span>
+</footer>
+
+</body>
+</html>
