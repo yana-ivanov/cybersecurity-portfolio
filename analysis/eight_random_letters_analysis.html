@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- EDIT: page title -->
+<title>Eight Random Letters: How a GitHub Account Factory Signs Its Own Work | Yana Ivanov</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════════════════
+   DESIGN TOKENS — do not edit
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
+  --red:#c0392b;--red-dim:rgba(192,57,43,0.08);--red-mid:rgba(192,57,43,0.15);
+  --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
+  --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
+  --green:#145a32;--green-dim:rgba(20,90,50,0.08);
+  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
+  --mono:'JetBrains Mono',monospace;
+  --serif:'Source Serif 4','Georgia',serif;
+  --display:'Playfair Display','Georgia',serif;
+  --display-clean:'IBM Plex Serif','Georgia',serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:20px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ── NAV ── */
+.back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
+.back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
+.back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
+.back-nav a::before,.back-nav-link::before{content:'←';font-size:.75rem}
+
+/* ── MASTHEAD ── */
+.masthead{background:#0a0f1a;color:#fff;padding:3.5rem 0 0;position:relative;overflow:hidden}
+.masthead::before{content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px),
+  repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,255,255,.025) 39px,rgba(255,255,255,.025) 40px);
+  pointer-events:none}
+.mast-inner{max-width:900px;margin:0 auto;padding:0 3rem;position:relative;z-index:1}
+
+/* Kicker: max 2 items, single line */
+.mast-kicker{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+h1.title{font-family:var(--display-clean);font-size:clamp(1.9rem,4vw,2.9rem);font-weight:600;line-height:1.15;margin-bottom:1.5rem;color:#fff}
+h1.title em{color:#ef4444;font-style:normal}
+.mast-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;padding:2rem 0 2.5rem;border-top:1px solid rgba(255,255,255,.1);margin-top:1.5rem}
+.meta-item .label{font-family:var(--mono);font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8;margin-bottom:.3rem}
+.meta-item .value{font-size:.88rem;color:#e2e8f0;font-weight:600;font-family:var(--mono)}
+
+/* Red bar — wraps naturally, no overflow hidden */
+.mast-bar{background:#ef4444;margin-top:0;padding:.6rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#fff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.wrap{max-width:900px;margin:0 auto;padding:0 3rem}
+.section{padding:3.5rem 0;border-bottom:1px solid var(--rule)}
+.section:last-of-type{border-bottom:none}
+.section-num{font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;color:var(--red);text-transform:uppercase;margin-bottom:.5rem}
+h2{font-family:var(--display);font-size:1.9rem;font-weight:700;color:#0a0f1a;margin-bottom:1.5rem;line-height:1.2}
+h3{font-family:var(--display);font-size:1.25rem;font-weight:700;color:var(--ink2);margin:2rem 0 .75rem}
+p{margin-bottom:1.25rem;color:var(--ink3)}
+p strong{color:var(--ink);font-weight:600}
+
+/* ── CALLOUTS ── */
+.callout{padding:1.25rem 1.5rem;border-radius:2px;margin:1.75rem 0;border-left:3px solid}
+.callout-red{background:var(--red-dim);border-color:var(--red)}
+.callout-amber{background:var(--amber-dim);border-color:var(--amber)}
+.callout-blue{background:var(--blue-dim);border-color:var(--blue)}
+.callout-green{background:var(--green-dim);border-color:var(--green)}
+.callout p{margin:0;font-size:.92rem;line-height:1.7}
+.callout strong{color:var(--ink)}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead tr{background:#0a0f1a;color:#fff}
+th{padding:.75rem 1rem;text-align:left;font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+td{padding:.7rem 1rem;border-bottom:1px solid var(--rule);color:var(--ink3);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:rgba(0,0,0,.018)}
+td strong{color:var(--ink);font-weight:600}
+td.red{color:var(--red);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.amber{color:var(--amber);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.green{color:var(--green);font-weight:600;font-family:var(--mono);font-size:.82rem}
+td.code{font-family:var(--mono);font-size:.8rem;color:var(--blue)}
+
+/* ── STAT GRID — improved number typography ── */
+.stat-num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:2rem 0;border:1px solid var(--rule)}
+.stat-num-item{padding:1.75rem 1.5rem;border-right:1px solid var(--rule);text-align:center;background:var(--paper)}
+.stat-num-item:last-child{border-right:none}
+/* Numbers use display-clean (IBM Plex Serif) — clean, data-forward */
+.stat-num{font-family:var(--display-clean);font-size:1.4rem;font-weight:700;line-height:1;margin-bottom:.5rem;letter-spacing:-.01em}
+.stat-num-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:.35rem;line-height:1.4}
+.stat-num-sub{font-size:.75rem;color:#94a3b8;line-height:1.5;font-family:var(--serif)}
+.stat-red .stat-num{color:var(--red)}
+.stat-amber .stat-num{color:var(--amber)}
+.stat-blue .stat-num{color:var(--blue)}
+.stat-green .stat-num{color:var(--green)}
+
+/* ── FIGURE ── */
+.figure{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.figure.figure-dark{background:#0a0f1a;border-color:#1e2d45}
+.figure-title{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase}
+.figure.figure-dark .figure-title{background:#111827;border-bottom:1px solid #1e2d45}
+.figure-body{padding:1.75rem}
+.figure-caption{padding:.75rem 1.2rem;background:var(--bg);border-top:1px solid var(--rule);font-size:.78rem;color:var(--ink3);font-style:italic}
+.figure.figure-dark .figure-caption{background:#111827;border-top-color:#1e2d45;color:#64748b}
+
+/* ── ATTACK CHAIN — vertical stepped layout (cleaner than 5-col grid) ── */
+.attack-chain{margin:1rem 0;display:flex;flex-direction:column;gap:0}
+.chain-step{display:grid;grid-template-columns:2.5rem 1fr;gap:1.25rem;align-items:start;position:relative;padding-bottom:1.25rem}
+.chain-step:last-child{padding-bottom:0}
+.chain-step::before{content:'';position:absolute;left:1.2rem;top:2.5rem;bottom:0;width:2px;background:var(--rule)}
+.chain-step:last-child::before{display:none}
+.chain-num{width:2.5rem;height:2.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.7rem;font-weight:700;flex-shrink:0;position:relative;z-index:1}
+.chain-normal .chain-num{background:var(--bg);border:2px solid var(--rule);color:var(--ink3)}
+.chain-warning .chain-num{background:var(--amber-dim);border:2px solid var(--amber);color:var(--amber)}
+.chain-danger .chain-num{background:var(--red-dim);border:2px solid var(--red);color:var(--red)}
+.chain-body{padding-top:.4rem}
+.chain-label{font-family:var(--mono);font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:.25rem;letter-spacing:.02em}
+.chain-warning .chain-label{color:var(--amber)}
+.chain-danger .chain-label{color:var(--red)}
+.chain-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── GLYPH DEMO (for homoglyph/domain spoofing reports) ── */
+.glyph-demo{background:#0a0f1a;border-radius:4px;padding:1.75rem 2rem;margin:2rem 0}
+.glyph-demo-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.15em;color:#4a9eff;text-transform:uppercase;margin-bottom:1.25rem}
+.glyph-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.25rem}
+.glyph-row:last-child{margin-bottom:0}
+.glyph-pane{padding:1rem 1.25rem;border-radius:3px}
+.glyph-pane.real{background:rgba(20,90,50,.2);border:1px solid rgba(74,222,128,.2)}
+.glyph-pane.fake{background:rgba(192,57,43,.15);border:1px solid rgba(239,68,68,.2)}
+.glyph-pane-label{font-family:var(--mono);font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem}
+.glyph-pane.real .glyph-pane-label{color:#4ade80}
+.glyph-pane.fake .glyph-pane-label{color:#ef4444}
+.glyph-domain{font-family:var(--mono);font-size:1.1rem;letter-spacing:.05em;margin-bottom:.4rem}
+.glyph-pane.real .glyph-domain{color:#e2e8f0}
+.glyph-pane.fake .glyph-domain{color:#fca5a5}
+.glyph-unicode{font-family:var(--mono);font-size:.65rem;color:#64748b;line-height:1.6}
+.glyph-pane.fake .glyph-unicode{color:#ef4444}
+
+/* ── SPLIT VISUAL ── */
+.split-visual{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:1.5rem 0}
+.split-panel{padding:1.5rem;border:1px solid var(--rule);background:var(--paper)}
+.split-panel-title{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;margin-bottom:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
+.split-panel.left .split-panel-title{color:var(--green)}
+.split-panel.right .split-panel-title{color:var(--red)}
+.split-panel.left{border-top:3px solid var(--green)}
+.split-panel.right{border-top:3px solid var(--red)}
+.split-panel p{font-size:.85rem;margin-bottom:.65rem;color:var(--ink3)}
+.split-panel p:last-child{margin-bottom:0}
+
+/* ── TIMELINE ── */
+.timeline{margin:1.5rem 0;position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:.45rem;top:0;bottom:0;width:2px;background:var(--rule)}
+.tl-item{position:relative;margin-bottom:1.25rem;padding-left:1.25rem}
+.tl-item::before{content:'';position:absolute;left:-1.6rem;top:.4rem;width:10px;height:10px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.tl-date{font-family:var(--mono);font-size:.62rem;color:var(--red);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem}
+.tl-title{font-weight:700;color:var(--ink);font-size:.9rem;margin-bottom:.2rem;font-family:var(--display)}
+.tl-desc{font-size:.85rem;color:var(--ink3);line-height:1.6}
+
+/* ── FINDINGS LIST ── */
+.findings{display:grid;gap:1rem;margin:1.75rem 0}
+.finding{padding:1.25rem 1.5rem;border:1px solid var(--rule);background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.finding-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.8rem;font-weight:700;flex-shrink:0}
+.fn-critical .finding-num{background:var(--red);color:#fff}
+.fn-high .finding-num{background:#d97706;color:#fff}
+.fn-medium .finding-num{background:var(--amber);color:#fff}
+.finding-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;color:var(--ink)}
+.finding-desc{font-size:.88rem;color:var(--ink3);line-height:1.65;margin:0}
+.finding-tag{display:inline-block;margin-top:.5rem;font-family:var(--mono);font-size:.62rem;padding:.2rem .6rem;letter-spacing:.06em}
+.fn-critical .finding-tag{background:var(--red-dim);color:var(--red)}
+.fn-high .finding-tag{background:var(--amber-dim);color:var(--amber)}
+.fn-medium .finding-tag{background:var(--amber-dim);color:var(--amber)}
+
+/* ── STEP LIST ── */
+.step-list{margin:1.5rem 0}
+.step-item{display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;margin-bottom:1.25rem;align-items:start}
+.step-num{width:2.2rem;height:2.2rem;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.15rem}
+.step-content-label{font-family:var(--mono);font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:.3rem;letter-spacing:.02em}
+.step-content-desc{font-size:.85rem;color:var(--ink3);line-height:1.65}
+
+/* ── TOOL EMBED (for reports with interactive tools) ── */
+.tool-embed{background:var(--paper);border:1px solid var(--rule);margin:2rem 0;overflow:hidden}
+.tool-embed-header{background:#0a0f1a;color:#fff;padding:.7rem 1.2rem;font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem}
+.tool-embed-body{padding:1.75rem;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ── BIO ── */
+.bio{background:#0a0f1a;color:#fff;padding:3rem;display:grid;
+  grid-template-columns:auto 1fr;gap:2rem;align-items:start}
+.bio-avatar{width:64px;height:64px;border-radius:50%;background:#1a4fa0;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:1.5rem;font-weight:700;color:#fff;flex-shrink:0}
+.bio-name{font-family:var(--display);font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.bio-title{font-family:var(--mono);font-size:.7rem;color:#60a5fa;letter-spacing:.1em;margin-bottom:.75rem}
+.bio-text{font-size:.88rem;color:#cbd5e1;line-height:1.7;margin:0}
+
+/* ── FOOTER ── */
+footer{background:#1e2d45;color:#64748b;padding:1.5rem 3rem;
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem}
+footer span{color:#94a3b8}
+
+/* ── MOBILE NOTICE ── */
+.mobile-notice{display:none;background:#1e2d45;border-bottom:1px solid rgba(255,255,255,.08);padding:.55rem 1.5rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.06em;color:#94a3b8;text-align:center}
+.mobile-notice strong{color:#60a5fa}
+
+/* ════════════════════════════════════════════════════════════
+   RESPONSIVE — do not edit
+   ════════════════════════════════════════════════════════════ */
+@media(max-width:1024px){.mobile-notice{display:block}}
+@media(max-width:768px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.75rem;padding-right:1.75rem}
+  .mast-meta{grid-template-columns:1fr 1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .split-visual{grid-template-columns:1fr}
+  .figure-body{padding:1.25rem 1rem}
+  h2{font-size:1.55rem}
+  h3{font-size:1.1rem}
+  .bio{grid-template-columns:1fr;padding:2rem 1.75rem}
+  footer{flex-direction:column;text-align:center;padding:1.5rem}
+}
+@media(max-width:680px){
+  .wrap,.mast-inner,.back-nav{padding-left:1.5rem;padding-right:1.5rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.2rem}
+  .figure-body{padding:1rem .85rem}
+  h1.title{font-size:1.65rem}
+  h2{font-size:1.35rem}
+  .bio{padding:2rem 1.5rem}
+  footer{padding:1.5rem}
+}
+@media(max-width:480px){
+  .wrap,.mast-inner{padding-left:1.1rem;padding-right:1.1rem}
+  .back-nav{padding:.55rem 1.1rem}
+  .mast-bar{padding:.55rem 1.1rem;font-size:.62rem}
+  .mast-meta{grid-template-columns:1fr}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  h1.title{font-size:1.45rem}
+  h2{font-size:1.2rem}
+  .bio{padding:1.5rem 1.1rem}
+  footer{padding:1.25rem 1.1rem}
+}
+/* ── MODERN PHONES — iPhone 15/16 (390px), iPhone 14 Pro (393px) ── */
+@media(max-width:390px){
+  html{font-size:16px}
+  .wrap,.mast-inner{padding-left:.9rem;padding-right:.9rem}
+  .back-nav{padding:.5rem .9rem}
+  .mast-bar{padding:.5rem .9rem;font-size:.6rem}
+  .stat-num-grid{grid-template-columns:1fr 1fr}
+  .stat-num{font-size:1.1rem}
+  .stat-num-label{font-size:.55rem}
+  h1.title{font-size:1.3rem}
+  h2{font-size:1.1rem}
+  h3{font-size:.95rem}
+  .figure-body{padding:.75rem .65rem}
+  .bio{padding:1.25rem .9rem}
+  .bio-avatar{width:52px;height:52px;font-size:1.2rem}
+  footer{padding:1rem .9rem;font-size:.62rem}
+  .tbl-wrap{font-size:.75rem}
+  th{padding:.55rem .65rem;font-size:.6rem}
+  td{padding:.5rem .65rem}
+}
+@media(min-width:768px) and (orientation:landscape){
+  .mobile-notice{display:none}
+}
+</style>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
+    <script>
+      window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+      plausible.init()
+    </script>
+</head>
+<body>
+
+<!-- ══ MOBILE NOTICE ══ -->
+<div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
+
+<!-- ══ NAV ══ -->
+<div class="back-nav"><a href="/">Portfolio</a></div>
+
+<!-- ══ MASTHEAD ══ -->
+<header class="masthead">
+  <div class="mast-inner">
+
+    <div class="mast-kicker">Threat Analysis · Platform Abuse · Account Infrastructure</div>
+
+    <h1 class="title">Eight Random Letters<br><em>How a GitHub Account Factory Signs Its Own&nbsp;Work</em></h1>
+
+    <div class="mast-meta">
+      <div class="meta-item"><div class="label">Author</div><div class="value">Yana Ivanov</div></div>
+      <div class="meta-item"><div class="label">Published</div><div class="value">October 2026</div></div>
+      <div class="meta-item"><div class="label">Classification</div><div class="value">Public — Educational</div></div>
+      <div class="meta-item"><div class="label">Attack Type</div><div class="value">Platform Abuse · Malware Distribution</div></div>
+      <div class="meta-item"><div class="label">Sector</div><div class="value">Open Source · Developer Platforms</div></div>
+      <div class="meta-item"><div class="label">Severity</div><div class="value">High · Campaign Active</div></div>
+    </div>
+  </div>
+
+  <div class="mast-bar">
+    <div class="mast-bar-dot"></div>
+    20 of 20 accounts signed the same way · 98 of 100 still live
+  </div>
+</header>
+
+
+<!-- SECTION 01 — EXECUTIVE SUMMARY -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 01</div>
+  <h2>Executive Summary</h2>
+
+  <p>On 29 October 2026 I examined a set of GitHub accounts distributing malware through repositories that impersonate <strong>zapret</strong>, a real open-source tool used in Russia to restore access to Discord, YouTube and Telegram. The accounts were identified from public malware-URL submissions and then checked individually against GitHub's own public API. This analysis reports what that check&nbsp;found.</p>
+
+  <p>The campaign is not new and I did not discover it. The Russian-language zapret community has documented these clones since June 2026, and related GitHub distribution campaigns were published by Island in July and by Apiiro in October. What follows is not a discovery of the operation. It is a measurement of how its accounts are constructed, and that measurement produced a signature I have not found described&nbsp;anywhere.</p>
+
+  <p>Every account I examined signs itself the same way. It registers with no followers. On that same day it creates one repository whose name is exactly eight random lowercase letters and nothing else. It then goes dormant for somewhere between nine and ninety-six days. Finally it publishes its entire set of lure repositories in a single batch on one later date. Twenty accounts drawn at random followed that sequence without a single&nbsp;exception.</p>
+
+  <div class="stat-num-grid">
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">134,146</div>
+      <div class="stat-num-label">Downloads Recorded</div>
+      <div class="stat-num-sub">Across 834 release assets held by 100 sampled&nbsp;accounts</div>
+    </div>
+    <div class="stat-num-item stat-red">
+      <div class="stat-num">20 of 20</div>
+      <div class="stat-num-label">Accounts Signed Alike</div>
+      <div class="stat-num-sub">Eight-letter repository on registration day, lures on one later&nbsp;date</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">98 of 100</div>
+      <div class="stat-num-label">Still Live</div>
+      <div class="stat-num-sub">Checked against GitHub's public API on 29 October&nbsp;2026</div>
+    </div>
+    <div class="stat-num-item stat-amber">
+      <div class="stat-num">9 to 96</div>
+      <div class="stat-num-label">Days Dormant</div>
+      <div class="stat-num-sub">Between account registration and first lure&nbsp;publication</div>
+    </div>
+  </div>
+
+  <div class="callout callout-blue">
+    <p><strong>Method and scope.</strong> The candidate account list came from public URLhaus submissions between 20 and 29 October 2026, filtered to repository names matching the campaign's lure patterns. Verification was done by reading GitHub's public API: account creation dates, follower counts, repository names and creation dates, and release asset download counts. One hundred accounts were checked for liveness and download totals; twenty of those were examined in full for repository structure. I did not download any payload and did not interact with the infrastructure in any&nbsp;way.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 02 — THE LURE -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 02</div>
+  <h2>Why This Lure Works on This&nbsp;Audience</h2>
+
+  <p>zapret is a genuine open-source project. In Russia it is used to restore access to services subject to throttling or blocking, principally Discord, YouTube and Telegram. The best-known packaging of it is maintained under the GitHub account <span style="font-family:var(--mono);font-size:.85rem">Flowseal</span>, and the ordinary way to obtain it is to download a ZIP archive from a GitHub releases&nbsp;page.</p>
+
+  <p>That ordinary way is the entire attack. A person searching for a way to unblock Discord expects to find a GitHub repository, expects to download an archive from it, and expects to run an unsigned executable with administrator rights, because that is what the genuine tool legitimately requires. The audience is pre-selected for precisely the behavior the malware&nbsp;needs.</p>
+
+  <div class="split-visual">
+    <div class="split-panel left">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">check_circle</span> The Genuine&nbsp;Project</div>
+      <p><strong>Name:</strong> One canonical repository name, with forks that keep it</p>
+      <p><strong>Account:</strong> A maintainer with followers, history and other work</p>
+      <p><strong>Repositories:</strong> Source code, issues, commits over time</p>
+      <p><strong>Description:</strong> Written once, by a person</p>
+    </div>
+    <div class="split-panel right">
+      <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">warning</span> What I&nbsp;Measured</div>
+      <p><strong>Name:</strong> Dozens of permutations of the same words across unrelated accounts</p>
+      <p><strong>Account:</strong> Zero followers on 98 of the 100 I checked</p>
+      <p><strong>Repositories:</strong> Four to six, all published on one day, carrying release archives</p>
+      <p><strong>Description:</strong> The same adjectives reordered from repository to repository</p>
+    </div>
+  </div>
+
+  <h3>The naming is generated, and it shows</h3>
+
+  <p>The repository names in this set are permutations of what a user would type into a search box. Reading them in bulk makes the generator&nbsp;visible.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Technique</th><th>Examples Observed</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Word-order permutation</td><td class="code">discordzapret / zapretdiscord</td></tr>
+        <tr><td>Separator variation</td><td class="code">discord-fix / discordfix / fix-discord / fixdiscord</td></tr>
+        <tr><td>Version suffixes</td><td class="code">1.9.9c · 1.9.9d · 1.10.1 · 1.10.2 · 1.11.1</td></tr>
+        <tr><td>Qualifier suffixes</td><td class="code">DiscordFix-2026 / -New / -Stable / -Update / -Windows</td></tr>
+        <tr><td>Random case mangling</td><td class="code">dIsCoRdzapReT · tELeGRaM-ZaPrET</td></tr>
+        <tr><td>Maintainer's name</td><td class="code">flowseal-zapret-discord-youtube</td></tr>
+        <tr><td>Transliterated Russian</td><td class="code">obhod, from обход, meaning bypass</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>The descriptions are generated the same way. Three repositories on three different accounts carried the phrases <em>Стабильнее, быстрее, надежнее</em>, <em>Надежнее, быстрее, стабильнее</em> and <em>Быстрее, надежнее, стабильнее</em>. The same three adjectives, reordered. A reader who does not read Russian sees three plausible descriptions; a reader who does sees one sentence shuffled three&nbsp;ways.</p>
+
+  <div class="callout callout-amber">
+    <p><strong>Why the random case mangling matters.</strong> Names like <span style="font-family:var(--mono);font-size:.85rem">dIsCoRdzapReT</span> and <span style="font-family:var(--mono);font-size:.85rem">ZAPRET_gItHuB-DISCOrd_1.9.9C</span> are not sloppiness. Randomized capitalization defeats exact-string matching on repository names, which is the most obvious check a platform would run. The generator is built against the detection it&nbsp;expects.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 03 — ANATOMY -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 03</div>
+  <h2>How the Factory Signs Its&nbsp;Work</h2>
+
+  <p>The naming is noisy by design and varies account to account. The account lifecycle does not vary at all. Every one of the twenty accounts I examined in full followed the same five&nbsp;steps.</p>
+
+  <div class="figure">
+    <div class="figure-title">Figure 1 — Observed Account Lifecycle, 20 of 20&nbsp;Accounts</div>
+    <div class="figure-body">
+      <div class="attack-chain">
+        <div class="chain-step chain-normal">
+          <div class="chain-num">01</div>
+          <div class="chain-body">
+            <div class="chain-label">Register</div>
+            <div class="chain-desc">An account is created with a name built from two or three concatenated dictionary words, sometimes with trailing digits. WishLieutenantSlide, PatrolGiraffePipe, noblefreighterreduce. It has zero followers and it will never acquire any. Registration dates in my sample run from 1 June to 22 September 2026.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-normal">
+          <div class="chain-num">02</div>
+          <div class="chain-body">
+            <div class="chain-label">Sign</div>
+            <div class="chain-desc">On the same day it registers, the account creates exactly one repository whose name is eight random lowercase letters: bqwewudp, wxlloxmo, rurrumxe, alsazxkw, fszbyktv. It has no description and it is never touched again. This step appeared on 20 of 20 accounts examined, and it is the clearest marker in the entire campaign.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-warning">
+          <div class="chain-num">03</div>
+          <div class="chain-body">
+            <div class="chain-label">Wait</div>
+            <div class="chain-desc">Nothing happens for between nine and ninety-six days. The account is being aged. A newly registered account publishing a lookalike installer invites scrutiny; a three-month-old account with an existing repository does not. This is the step that makes account-age heuristics useless against this operation.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">04</div>
+          <div class="chain-body">
+            <div class="chain-label">Activate</div>
+            <div class="chain-desc">All of the account's lure repositories are created on one single date, typically three to six of them. Accounts registered on the same day activate on the same day with identical repository sets, which is cohort behavior rather than independent operators working in parallel.</div>
+          </div>
+        </div>
+        <div class="chain-step chain-danger">
+          <div class="chain-num">05</div>
+          <div class="chain-body">
+            <div class="chain-label">Serve</div>
+            <div class="chain-desc">Each repository carries a release with ZIP and RAR archives named after genuine zapret versions. GitHub records a download count on every release asset, and those counters are not zero. Across the 100 accounts I sampled, 834 assets had accumulated 134,146 downloads by 29 October 2026.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="figure-caption">Lifecycle derived from twenty accounts selected at random from the candidate set and examined in full through GitHub's public API on 29 October 2026. MITRE ATT&amp;CK: T1585.003 (Establish Accounts: Cloud Accounts), T1608.001 (Stage Capabilities: Upload Malware), T1204.002 (User Execution: Malicious File), T1036.005 (Masquerading: Match Legitimate Name or Location).</div>
+  </div>
+
+  <h3>Cohorts activate together</h3>
+
+  <p>The clearest evidence that this is one operation rather than many is that accounts registered on the same day are switched on together, with the same repositories, weeks&nbsp;later.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Registered</th><th>Accounts</th><th>Activated</th><th>Repository Set</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>30 Jul 2026</td><td class="code">Lacquergruraid, bandwidowbegin</td><td>16 Aug 2026</td><td class="red">Identical, 5 repos</td></tr>
+        <tr><td>6 Aug 2026</td><td class="code">wildstagekindle, SwiftSoundIdolize</td><td>23 Aug 2026</td><td class="red">Identical, 5 repos</td></tr>
+        <tr><td>9 Aug 2026</td><td class="code">SplendorEchoHatchet, StorageStudent</td><td>2 Sep 2026</td><td class="red">Identical, 5 repos</td></tr>
+        <tr><td>13 Aug 2026</td><td class="code">PatrolGiraffePipe, MoatSorcerer</td><td>20 Sep 2026</td><td class="red">Identical, 3 repos</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Two accounts with unrelated names, registered the same day, dormant for the same number of days, waking on the same day with the same five repository names. Four such pairs appeared inside a sample of twenty, which is not what independent activity looks&nbsp;like.</p>
+
+</div>
+</div>
+
+<!-- SECTION 04 — FINDINGS -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 04</div>
+  <h2>Key Findings</h2>
+
+  <div class="findings">
+    <div class="finding fn-critical">
+      <div class="finding-num">1</div>
+      <div>
+        <div class="finding-title">Every Account Carries the Same Eight-Character&nbsp;Marker</div>
+        <div class="finding-desc">Twenty of twenty accounts created a repository named with exactly eight random lowercase letters on the day the account was registered. No description, no content of consequence, never updated. A legitimate developer does not do this, and a fork of the genuine project cannot produce it. Of everything in this campaign, it is the one artifact that is both perfectly consistent and trivially checkable.</div>
+        <span class="finding-tag">OBSERVED 20/20</span>
+      </div>
+    </div>
+    <div class="finding fn-critical">
+      <div class="finding-num">2</div>
+      <div>
+        <div class="finding-title">134,146 Downloads Were Recorded on 100 Sampled&nbsp;Accounts</div>
+        <div class="finding-desc">GitHub publishes a download counter on every release asset. Across 834 assets held by 100 randomly sampled accounts, those counters totalled 134,146 on 29 October 2026, with a median of 1,297 per account. Two individual repositories checked earlier showed 341 and 355. The counter includes researchers, sandboxes and scanners as well as real users, so it is a measure of downloads rather than of infections, and it is a floor rather than a ceiling on exposure.</div>
+        <span class="finding-tag">MEASURED</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">3</div>
+      <div>
+        <div class="finding-title">The Accounts Are Aged Deliberately Before They Are&nbsp;Used</div>
+        <div class="finding-desc">Registration ran from June to September 2026 while the lure repositories appeared from August to October, with dormancy between nine and ninety-six days. These accounts were not created on demand for a campaign; they were stockpiled and drawn down. Any detection that keys on account age, "new account publishing an installer," fails against this by construction, and the operator appears to know it.</div>
+        <span class="finding-tag">OBSERVED 20/20</span>
+      </div>
+    </div>
+    <div class="finding fn-high">
+      <div class="finding-num">4</div>
+      <div>
+        <div class="finding-title">Cohorts Register Together and Activate&nbsp;Together</div>
+        <div class="finding-desc">Four pairs within a twenty-account sample shared a registration date, a dormancy period, an activation date and an identical repository set. Accounts with no visible relationship to one another behaving in lockstep across intervals of weeks is the signature of one scheduler, not of many unrelated actors arriving at the same idea.</div>
+        <span class="finding-tag">OBSERVED</span>
+      </div>
+    </div>
+    <div class="finding fn-medium">
+      <div class="finding-num">5</div>
+      <div>
+        <div class="finding-title">Ninety-Eight of a Hundred Accounts Were Still&nbsp;Live</div>
+        <div class="finding-desc">Of 100 accounts checked against GitHub's public API on 29 October 2026, 98 returned a valid profile and 2 returned 404. This was three weeks after related research was published by Apiiro and more than two months after the Russian-language zapret community began documenting the clones. I am reporting what the API returned on one date; I am not characterizing any platform's moderation process, which I have no visibility into.</div>
+        <span class="finding-tag">MEASURED, ONE DATE</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 05 — DETECTION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 05</div>
+  <h2>What Would Catch&nbsp;This</h2>
+
+  <p>Most of what is visible here is deliberately noisy. Names are permuted, capitalization is randomized, version numbers rotate. Those are the parts the operator varies, so they are the parts worth ignoring. The signal is in what does not&nbsp;vary.</p>
+
+  <h3>Detection signals summary</h3>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Signal</th><th>Indicator</th><th>Confidence</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Eight-character marker repo</td><td class="code">repo name matches ^[a-z]{8}$, created on account creation date</td><td class="red">High</td></tr>
+        <tr><td>Single-date activation</td><td class="code">all remaining repos share one creation date</td><td class="red">High</td></tr>
+        <tr><td>No social graph</td><td class="code">followers == 0 and following == 0</td><td class="amber">Medium</td></tr>
+        <tr><td>Dormancy before first lure</td><td class="code">activation date minus registration date, 9 to 96 days</td><td class="amber">Medium</td></tr>
+        <tr><td>Name-permutation clustering</td><td class="code">many accounts, few distinct names for one token</td><td class="amber">Medium</td></tr>
+        <tr><td>Release archive without source</td><td class="code">release asset present, repository has no code</td><td class="amber">Medium</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>No single row in that table is sufficient on its own. Plenty of real accounts have no followers, and plenty of real projects publish an archive. The first two rows together are a different matter: a repository named with eight random lowercase letters created on registration day, followed by a batch of repositories all created on one later date, is a sequence I have not been able to produce from any legitimate&nbsp;account.</p>
+
+  <p>The practical value of the first signal is that it costs nothing to check and the operator cannot vary it without redesigning the generator. The name permutations can be regenerated in an afternoon. The lifecycle is the part that has to stay&nbsp;fixed.</p>
+
+  <div class="callout callout-green">
+    <p><strong>For anyone looking for zapret or a Discord unblocker.</strong> Check the account, not the repository. A maintainer of a widely used tool has followers, a history, and other work. An account with none of those, holding four repositories created on one day, is not the project you were looking for, whatever the repository is&nbsp;called.</p>
+  </div>
+
+</div>
+</div>
+
+<!-- SECTION 06 — LIMITS AND CONCLUSION -->
+<div class="section">
+<div class="wrap">
+  <div class="section-num">Section 06</div>
+  <h2>What This Establishes, and What It Does&nbsp;Not</h2>
+
+  <p>I want to be precise about the boundary, because the interesting finding here is narrow and it is easy to overstate&nbsp;it.</p>
+
+  <p><strong>What I measured.</strong> One hundred accounts verified live or gone against GitHub's API on a single date. Eight hundred and thirty-four release assets and their recorded download counts. Twenty accounts examined in full, every one showing the same five-step lifecycle. Four cohort pairs within those twenty. Registration dates, follower counts and repository creation dates for all one&nbsp;hundred.</p>
+
+  <p><strong>What I did not establish.</strong> The candidate list contained 5,066 accounts and 19,597 repositories matching the campaign's naming patterns, but I verified 120 of them individually and I am not claiming the remainder. A name filter is an inference, not a finding, and the genuine project's own name appears inside several of those patterns, so some proportion of any name-matched list will be legitimate. I have not attributed this operation to anyone. I have not analyzed a payload. The malware family named by URLhaus on 17,220 of these URLs is SalatStealer, which is that database's classification rather than my&nbsp;determination.</p>
+
+  <p><strong>What changed while I was writing it.</strong> Three figures I initially believed did not survive checking. An account total of 19,763 collapsed to 5,066 once legitimate repositories were filtered out of it. A claim that three independent submitters had corroborated the account list collapsed to one submitter. A claim that this campaign delivered SmartLoader collapsed when the campaign-filtered data showed no SmartLoader at all. Each of those was caught by running one more query, and I mention them because a reader has no way to see the claims that were discarded, only the ones that&nbsp;remained.</p>
+
+  <p>What survives is small and specific. An operation distributing malware through GitHub builds its accounts on an assembly line, and the assembly line leaves a mark: eight random lowercase letters, created on day zero, never touched again. It is on every account I looked at. It is readable without authentication, without tooling, and without downloading anything. And it is still there on almost all of&nbsp;them.</p>
+
+  <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">Method: candidate accounts were drawn from public URLhaus submissions dated 20 to 29 October 2026, filtered to repository names matching this campaign's lure patterns, yielding 5,066 accounts across 19,597 repositories from a single submitter. One hundred accounts were selected at random from those carrying a zapret-named repository and checked against GitHub's public REST API on 29 October 2026 for existence, creation date, follower count, repository list and release asset download counts. Twenty of those hundred were examined in full for repository creation sequence. All figures reflect API responses on that date; download counters are cumulative since each release was published and include automated retrieval by researchers, sandboxes and scanners. No payload was downloaded, no archive was opened, and no interaction with the operation's infrastructure took place at any point. Prior public reporting on related GitHub distribution campaigns: Island, July 2026, 7,600 repositories; Apiiro, October 2026, 17,610 repositories; both describe SmartLoader and StealC rather than the payload classified here. The Russian-language zapret community wiki has documented clone repositories since June 2026 and is the earliest public record of this lure set that I could find. This analysis represents independent research produced for educational&nbsp;purposes.</p>
+
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BIO + FOOTER — do not move, must stay outside .wrap
+     ════════════════════════════════════════════════════════════ -->
+<div class="wrap">
+</div></div>
+
+<div class="bio">
+  <div class="bio-avatar">YI</div>
+  <div>
+    <div class="bio-name">Yana Ivanov</div>
+    <div class="bio-title">Security Analyst &nbsp;·&nbsp; Threat Intelligence &nbsp;·&nbsp; Detection Engineering</div>
+    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on "unknown." When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. I contribute detection rules to Sublime Security's open-source production ruleset. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
+    <p class="bio-text" style="margin-top:.75rem"><a href="/" class="back-nav-link">Portfolio</a></p>
+  </div>
+</div>
+
+<!-- EDIT: footer spans — report title · author · date on left; classification note on right -->
+<footer>
+  <span>Open by Default &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; October 2026</span>
+  <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
+</footer>
+
+</body>
+</html>
