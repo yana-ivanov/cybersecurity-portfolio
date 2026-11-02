@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>SteadyRides — Yana Ivanov</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ---------- RESET / BASE ---------- */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root{
+    /* SteadyRides app palette */
+    /* SteadyRides app palette, light theme */
+    --bg:#f8fafc;
+    --panel:#e2e8f0;
+    --text:#0f172a;        /* deep blue */
+    --muted:#475569;
+    --line:#cbd5e1;
+    --accent:#38bdf8;      /* vibrant cyan: dots, button */
+    --accent-text:#0369a1; /* darker cyan for text on light, readable contrast */
+    --maxw:1080px;
+  }
+  html{ scroll-behavior:smooth; }
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Manrope', 'Helvetica Neue', Arial, sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 28px; }
+  section{ padding:80px 0; }
+  img{ display:block; width:100%; height:auto; border-radius:12px; }
+
+  /* ---------- TOP BAR ---------- */
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:22px 28px; border-bottom:1px solid var(--line);
+    font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+  }
+  .topbar .name{ color:var(--text); font-weight:700; }
+
+  /* ---------- HERO ---------- */
+  .hero{ padding:100px 0 100px; }
+  .hero-title{
+    font-size:clamp(52px, 10vw, 120px);
+    line-height:.92; font-weight:800; letter-spacing:-.03em;
+    display:flex; align-items:center; gap:.18em;
+  }
+  .hero-title .accent{ color:var(--accent-text); }
+  .hero-title svg{ width:.82em; height:.82em; flex:none; }
+  .hero-tag{
+    color:var(--muted); font-size:18px; letter-spacing:.15em;
+    margin-top:22px; text-transform:uppercase; font-weight:600;
+  }
+  .hero-intro{
+    max-width:640px; margin-top:44px;
+    color:#334155; font-size:20px; line-height:1.75;
+  }
+
+  /* ---------- HERO IMAGE ---------- */
+  .hero-shot{ margin:32px 0 0; }
+
+  /* ---------- META ROW ---------- */
+  .meta{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:20px;
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    padding:26px 0; margin-top:8px;
+  }
+  .meta .label{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .meta .val{ font-size:13px; margin-top:8px; color:var(--text); }
+  @media(max-width:720px){ .meta{ grid-template-columns:repeat(2,1fr); row-gap:24px; } }
+
+  /* ---------- TEXT BLOCKS ---------- */
+  .kicker{
+    display:flex; align-items:center; gap:12px;
+    font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+    margin-top:0; margin-bottom:28px;
+  }
+  .kicker::before{ content:""; width:9px; height:9px; border-radius:50%; background:var(--accent); display:inline-block; }
+  .col2{
+    display:grid; grid-template-columns:1fr 1fr; gap:72px; align-items:start;
+  }
+  @media(max-width:820px){ .col2{ grid-template-columns:1fr; gap:28px; } }
+  .body-txt{ color:#334155; font-size:19px; line-height:1.8; }
+  .body-txt p + p{ margin-top:22px; }
+
+  /* ---------- FIGURE ---------- */
+  figure{ margin:32px 0 40px; }
+  figure + figure{ margin-top:56px; }
+  figcaption{ margin-top:14px; font-size:12px; color:var(--muted); letter-spacing:.03em; }
+
+  /* animated mocks: real screen recordings of the app */
+  .stage{ background:var(--panel); border-radius:12px; padding:48px 28px; }
+  .stage.wide{ padding:40px; }
+  .clips{ display:grid; gap:40px; margin:0 auto; justify-content:center; }
+  .clips.cols-2{ grid-template-columns:repeat(2, minmax(0, 300px)); }
+  .clips.cols-3{ grid-template-columns:repeat(3, minmax(0, 280px)); }
+  .phone{ display:flex; flex-direction:column; align-items:center; text-align:center; }
+  .phone video{
+    display:block; width:100%; height:auto; border-radius:28px;
+    border:3px solid var(--line); background:#fff;
+    box-shadow:0 10px 30px rgba(15,23,42,.14);
+  }
+  .phone .who{ margin-top:16px; font-size:11px; letter-spacing:.12em; text-transform:uppercase; font-weight:800; color:var(--accent-text); }
+  .phone .what{ margin-top:4px; font-size:14px; color:var(--muted); max-width:260px; }
+  .browser{ border-radius:12px; overflow:hidden; background:#fff; box-shadow:0 10px 30px rgba(15,23,42,.14); border:1px solid var(--line); }
+  .browser .bar{ display:flex; align-items:center; gap:7px; height:34px; padding:0 14px; background:#cbd5e1; }
+  .browser .bar i{ width:11px; height:11px; border-radius:50%; background:#f87171; }
+  .browser .bar i:nth-child(2){ background:#fbbf24; } .browser .bar i:nth-child(3){ background:#34d399; }
+  .browser .bar span{ margin-left:auto; margin-right:auto; font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#475569; transform:translateX(-20px); }
+  .browser video{ display:block; width:100%; height:auto; }
+  @media(max-width:700px){
+    .clips.cols-2, .clips.cols-3{ grid-template-columns:minmax(0, 300px); }
+    .stage, .stage.wide{ padding:28px 16px; }
+  }
+
+  .section-head{ margin-bottom:36px; }
+  .section-head h2{
+    font-size:clamp(34px,5vw,56px); font-weight:800; letter-spacing:-.02em; line-height:1.05;
+  }
+
+  /* ---------- FOOTER CTA ---------- */
+  .cta{
+    border-top:1px solid var(--line); padding:64px 0 48px; margin-top:24px;
+  }
+  .cta h2{
+    font-size:clamp(28px,4vw,44px); font-weight:800; letter-spacing:-.01em;
+    line-height:1.05;
+  }
+  .cta p{ color:var(--muted); margin-top:20px; max-width:520px; font-size:15px; }
+  .cta a.btn{
+    display:inline-block; margin-top:28px; padding:14px 26px;
+    background:var(--text); color:#ffffff; text-decoration:none;
+    font-size:13px; letter-spacing:.08em; text-transform:uppercase; font-weight:800; border-radius:6px;
+  }
+  .foot{
+    padding:28px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; font-size:11px;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+  }
+
+  /* visual separation before a new movement of the page */
+  section.section-divider{ border-top:1px solid var(--line); margin-top:0; padding-top:80px; }
+  section.tight{ padding-top:80px; padding-bottom:80px; }
+  section.problem-top{ padding-top:80px; padding-bottom:80px; }
+  section.ai-section{ padding-bottom:80px; }
+
+  /* prevent orphans: no single word stranded on its own line */
+  .body-txt p, .hero-intro, .section-head h2, .hero-title{ text-wrap: pretty; }
+  .section-head h2{ text-wrap: balance; }
+</style>
+</head>
+<body>
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <span class="name">Yana Ivanov</span>
+    <span>SteadyRides — Case Study</span>
+    <span>Product Design + Build</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="wrap">
+    <div class="hero">
+      <h1 class="hero-title">
+        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="50" fill="#1f2937"/><g transform="translate(50 50) scale(0.125) translate(-768 -455)" fill="#ffffff"><path d="M745 264 L983 264 L888 341 Q880 347 868 347 L705 347 Q668 352 670 378 Q672 395 690 402 L862 494 L690 494 Q600 488 565 445 Q545 405 593 352 L700 280 Q720 264 745 264 Z"/><path d="M760 390 L840 390 Q950 396 1000 460 Q1025 510 980 555 L885 620 Q850 645 800 645 L523 645 L655 545 Q665 537 680 537 L850 537 Q895 533 905 500 Q906 480 880 465 Z"/></g></svg>
+        <span>Steady<span class="accent">Rides</span></span>
+      </h1>
+      <div class="hero-tag">Rides you can count on.</div>
+      <p class="hero-intro">
+        SteadyRides is a booking and dispatch platform I designed and built for a Connecticut car service
+        that specializes in airport rides. Clients book in a few taps, drivers pick up the rides that fit their
+        car, and the owner runs the whole day from one dashboard. I designed every screen for all three
+        roles and built the working app end to end, from the booking flow to card payments.
+      </p>
+    </div>
+  </div>
+
+  <!-- HERO IMAGE -->
+  <div class="wrap">
+    <div class="hero-shot">
+      <img src="../images/steadyrides/hero.jpg" alt="SteadyRides on a phone: booking a round trip, a driver arranging a car seat handoff, and a client's trip on the morning of the flight">
+    </div>
+  </div>
+
+  <!-- META -->
+  <div class="wrap">
+    <div class="meta">
+      <div><div class="label">Project</div><div class="val">SteadyRides · Client Project</div></div>
+      <div><div class="label">Role</div><div class="val">Product Design + Build</div></div>
+      <div><div class="label">Timeline</div><div class="val">2026 · Ongoing</div></div>
+      <div><div class="label">Status</div><div class="val">In Testing</div></div>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section class="wrap problem-top">
+    <div class="col2">
+      <div>
+        <div class="kicker">The problem</div>
+        <div class="section-head"><h2>Airport rides have more moving parts than they look</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>A ride to the airport sounds simple. In practice, flights move, a round trip spans days and often
+        two different drivers, children need the right car seat by law, business travelers need an invoice
+        for their employer, and plans fall apart for real reasons: an expired passport, a cancelled flight,
+        a family emergency.</p>
+        <p>My client needed one place where clients could book, drivers could take rides, and the owner
+        could see and manage all of it, without the details falling through the cracks between them.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: RESEARCH -->
+  <section class="wrap section-divider tight">
+    <div class="col2">
+      <div>
+        <div class="kicker">01 — How I approached it</div>
+        <div class="section-head"><h2>Researching both sides of the ride</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>I wanted to understand the service from both seats before designing it, so as part of my research
+        I drove for Uber. It showed me what drivers need between rides, where they lose time at airports,
+        and what riders worry about on the way to a flight.</p>
+        <p>I paired that with how my client's business actually runs, and with Connecticut's rules for ride
+        services: fares have to be paid through the platform, and children under 8 or under 60 pounds must
+        ride in a car seat or booster. Those rules became part of the design rather than fine print.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: BOOKING -->
+  <section class="wrap">
+    <div class="col2">
+      <div>
+        <div class="kicker">02 — Booking</div>
+        <div class="section-head"><h2>One question per screen, the price always in view</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>Many riders book the night before a flight, on a phone, often in a hurry. So booking asks one
+        thing at a time: where you're flying, your flight, who's coming, where to pick you up. The pickup
+        time is worked out from the flight, and the price updates as you go.</p>
+        <p>Only cars with room for everyone, every bag and every car seat are offered. A round trip can come
+        home to a different airport, and each child gets the seat they need, from infant seat to no seat at all.</p>
+      </div>
+    </div>
+    <figure>
+      <div class="stage"><div class="clips cols-2">
+        <div class="phone"><video src="../images/steadyrides/anim-booking-1.mp4" poster="../images/steadyrides/anim-booking-1-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Booking a round trip with a child"></video><span class="who">Client</span><span class="what">Round trip, flights, who's coming, car seats</span></div>
+        <div class="phone"><video src="../images/steadyrides/anim-booking-2.mp4" poster="../images/steadyrides/anim-booking-2-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="Choosing a car and booking"></video><span class="who">Client</span><span class="what">Pickup, a car that fits, review and book</span></div>
+      </div></div>
+      <figcaption>Booking a round trip for two adults and a toddler, start to finish.</figcaption>
+    </figure>
+  </section>
+
+  <!-- SECTION: ROUND TRIP (centerpiece) -->
+  <section class="wrap">
+    <div class="col2">
+      <div>
+        <div class="kicker">03 — The centerpiece</div>
+        <div class="section-head"><h2>One trip, two drivers, one car seat</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>The hardest case shaped the whole system: a family with a toddler books a round trip, and the
+        driver who takes them to JFK isn't the one who picks them up a week later. They don't want to drag a
+        car seat through the airport.</p>
+        <p>Each leg of a round trip is its own ride, so any driver can take it. The client can ask the service
+        to keep the seat for a storage fee. The first driver sees "keep the seat and hand it to Priya," the second sees
+        "pick up the seat from Mike first," and the two can message and call each other in the app to arrange
+        it. The fee is split between them, and the owner sees the handoff on the board until it's done.</p>
+      </div>
+    </div>
+    <figure>
+      <div class="stage"><div class="clips cols-2">
+        <div class="phone"><video src="../images/steadyrides/anim-driver-accept.mp4" poster="../images/steadyrides/anim-driver-accept-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="A driver accepting the outbound ride"></video><span class="who">Driver 1</span><span class="what">Sees the car seat note, accepts the ride to JFK</span></div>
+        <div class="phone"><video src="../images/steadyrides/anim-handoff.mp4" poster="../images/steadyrides/anim-handoff-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The return driver arranging the car seat handoff"></video><span class="who">Driver 2</span><span class="what">Arranges the handoff, confirms she has the seat</span></div>
+      </div></div>
+      <figcaption>Two drivers, one car seat: each sees what to do with it, and they sort out the handoff in the app.</figcaption>
+    </figure>
+    <figure>
+      <img src="../images/steadyrides/handoff-board.jpg" alt="The owner's ride board flagging a car seat handoff between two drivers">
+      <figcaption>The owner sees the handoff on the board until both drivers confirm it.</figcaption>
+    </figure>
+  </section>
+
+  <!-- SECTION: THREE ROLES -->
+  <section class="wrap">
+    <div class="col2">
+      <div>
+        <div class="kicker">04 — Three roles, one system</div>
+        <div class="section-head"><h2>The client, the driver and the owner see the same ride</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>Every action in one role shows up in the others. When a driver taps "I'm on my way," the client
+        sees it in their trip, and the owner's board updates. A ride still unclaimed within 24 hours of
+        pickup is flagged as urgent so the owner can assign it.</p>
+        <p>The owner gets a live board, a calendar, quote requests for trips that aren't airport runs, a
+        client list that can import a spreadsheet, and a view of every driver's fees.</p>
+      </div>
+    </div>
+    <figure>
+      <div class="stage wide"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>Admin</span></div><video src="../images/steadyrides/anim-owner-assign.mp4" poster="../images/steadyrides/anim-owner-assign-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The owner assigning a driver to an urgent ride"></video></div></div>
+      <figcaption>Nobody claimed a ride within 24 hours, so the owner assigns a driver whose car fits.</figcaption>
+    </figure>
+    <figure>
+      <div class="stage wide"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>Admin</span></div><video src="../images/steadyrides/anim-owner-tour.mp4" poster="../images/steadyrides/anim-owner-tour-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The owner's calendar, client list and drivers"></video></div></div>
+      <figcaption>The calendar, adding a client, and the drivers with their fees.</figcaption>
+    </figure>
+    
+  </section>
+
+  <!-- SECTION: REAL LIFE -->
+  <section class="wrap">
+    <div class="col2">
+      <div>
+        <div class="kicker">05 — Designed for real life</div>
+        <div class="section-head"><h2>Built around what actually goes wrong</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>Most of the design work went into the moments that usually happen over the phone. A trip
+        checklist reminds travelers about passports and visas before they leave. Clients can ask to cancel
+        and say why; the owner approves it, with a full refund when there's enough notice.</p>
+        <p>Drivers get a guide for each airport: where they can wait for free instead of circling or risking
+        a ticket at the curb, with one tap to navigate there, plus a link to the flight's live status. Work
+        travelers confirm their invoice details after the trip, so booking never stops to ask.</p>
+      </div>
+    </div>
+    <figure>
+      <div class="stage"><div class="clips cols-2">
+        <div class="phone"><video src="../images/steadyrides/anim-client.mp4" poster="../images/steadyrides/anim-client-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="A client on the morning of the trip"></video><span class="who">Client</span><span class="what">Driver on the way, chat, trip checklist</span></div>
+        <div class="phone"><video src="../images/steadyrides/anim-cancel.mp4" poster="../images/steadyrides/anim-cancel-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="A client requesting a cancellation"></video><span class="who">Client</span><span class="what">Asks to cancel, with a reason</span></div>
+      </div></div>
+      <figcaption>Ride day for the client, and a cancellation request that waits for the owner's approval.</figcaption>
+    </figure>
+    <figure>
+      <div class="stage wide"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>Admin</span></div><video src="../images/steadyrides/anim-owner-approve.mp4" poster="../images/steadyrides/anim-owner-approve-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The owner approving a cancellation"></video></div></div>
+      <figcaption>The owner approves the cancellation with a full refund, then checks the car seat handoff.</figcaption>
+    </figure>
+    
+  </section>
+
+  <!-- SECTION: SYSTEMS THINKING -->
+  <section class="wrap">
+    <div class="col2">
+      <div>
+        <div class="kicker">06 — Systems thinking</div>
+        <div class="section-head"><h2>Business rules as settings, not code</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>The platform is meant to be licensed to car services in other states, and no two run the same way.
+        So the decisions that differ between businesses are settings the owner controls: whether payments
+        run through the app, the booking fee, how much notice earns a full refund, and the late
+        cancellation fee.</p>
+        <p>Drivers who carry their own commercial insurance pay a different plan than drivers covered by the
+        company, and each driver sees exactly what the app charges them. Tips are never charged.</p>
+      </div>
+    </div>
+    <figure>
+      <div class="stage wide"><div class="browser"><div class="bar"><i></i><i></i><i></i><span>Admin</span></div><video src="../images/steadyrides/anim-owner-settings.mp4" poster="../images/steadyrides/anim-owner-settings-poster.jpg" autoplay muted loop playsinline preload="metadata" aria-label="The owner changing settings"></video></div></div>
+      <figcaption>Business rules the owner controls: payments in the app, the booking fee, the cancellation notice.</figcaption>
+    </figure>
+    <figure>
+      <img src="../images/steadyrides/airport-guides.jpg" alt="The owner editing the airport guide for JFK">
+      <figcaption>Airport guides are written by the owner, so the local knowledge stays with the business.</figcaption>
+    </figure>
+  </section>
+
+  <!-- AI IN MY PROCESS -->
+  <section class="wrap ai-section">
+    <div class="col2">
+      <div>
+        <div class="kicker">07 — AI in my process</div>
+        <div class="section-head"><h2>AI as a design and build partner</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>I used Claude throughout, to build interfaces in code, to research Connecticut's rules, and to move
+        from an idea my client mentioned to a working screen the owner could try right away.</p>
+        <p>Every version was checked with automated browser tests that book rides, accept them as different
+        drivers, cancel, and pay, before it reached my client. That let me change the product quickly without
+        breaking what already worked, and spend my time on judgment: what a rider, a driver or an owner
+        actually needs to see.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEVELOPMENT -->
+  <section class="wrap section-divider tight">
+    <div class="col2">
+      <div>
+        <div class="kicker">Development</div>
+        <div class="section-head"><h2>Designed and built, end to end</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>SteadyRides is a web app that installs to a phone's home screen like a native app, built with
+        Next.js. Card payments run through Stripe, with the price checked again on the server so it can't be
+        changed in the browser. New bookings, quote requests and cancellation requests email the owners.</p>
+        <p>Building it myself meant every design decision was tested against a working product, not a
+        mockup, and the owner could click through every role before a single real ride was booked.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT'S NEXT -->
+  <section class="wrap section-divider tight">
+    <div class="col2">
+      <div>
+        <div class="kicker">What's next</div>
+        <div class="section-head"><h2>From a working demo to real rides</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>The next stage is accounts and a shared database, so clients, drivers and owners sign in and see
+        live data, followed by driver onboarding with document checks.</p>
+        <p>After that comes live flight data, so a delayed landing moves the pickup automatically and tells
+        both the driver and the client, and native apps for the App Store and Google Play.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAKEAWAY -->
+  <section class="wrap section-divider tight">
+    <div class="col2">
+      <div>
+        <div class="kicker">Takeaway</div>
+        <div class="section-head"><h2>Reliable is a design decision</h2></div>
+      </div>
+      <div class="body-txt">
+        <p>A ride service earns trust in the moments that go wrong: the seat that has to change hands, the
+        flight that's cancelled, the driver waiting at the airport. SteadyRides is built around those moments,
+        so the product feels as dependable as the people running it.</p>
+        <p>It also reflects how I work: understand the whole system and everyone in it, then make the hard
+        cases simple.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="wrap cta">
+    <h2>Let's talk</h2>
+    <p>I design and build products for real businesses, from the first conversation to working software.</p>
+    <a class="btn" href="mailto:yanaivanov@gmail.com">Get in touch</a>
+  </section>
+
+  <div class="foot">
+    <span>© 2026 SiteWave Studio LLC</span>
+    <span>Connecticut, USA</span>
+  </div>
+
+</body>
+</html>
