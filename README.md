@@ -51,7 +51,7 @@ Submitted to [Sublime Security's production ruleset](https://github.com/sublime-
 |------|--------|----------|
 | Homoglyph confusable character coverage | ✅ Merged — [#4596](https://github.com/sublime-security/sublime-rules/pull/4596) | [The Identical Lie](https://yanaivanov.com/analysis/homoglyph_bec_analysis.html) |
 | ClickFix clipboard hijack lure | ✅ Merged — [#4921](https://github.com/sublime-security/sublime-rules/pull/4921) | [Between Copy and Paste](https://yanaivanov.com/writing/clickfix_field_note.html) |
-| RoundPress XSS webmail exploit | 🔄 In review — [#4981](https://github.com/sublime-security/sublime-rules/pull/4981) | [The Pattern Held](https://yanaivanov.com/analysis/roundpress_part3.html) |
+| RoundPress XSS webmail exploit | ✅ Merged — [#4981](https://github.com/sublime-security/sublime-rules/pull/4981) | [The Pattern Held](https://yanaivanov.com/analysis/roundpress_part3.html) |
 | Suspicious download file types — msi, hta, ps1 | 🔄 In review — [#5622](https://github.com/sublime-security/sublime-rules/pull/5622) | — |
 | pkpass Apple Wallet phishing | ⏸ Closed — [#5120](https://github.com/sublime-security/sublime-rules/pull/5120) | [The Trusted Pass](https://yanaivanov.com/analysis/pkpass_analysis.html) |
 | Homoglyph BEC and Glassworm invisible Unicode | ⏸ Closed — [#4267](https://github.com/sublime-security/sublime-rules/pull/4267) | [The Invisible Threat](https://yanaivanov.com/analysis/glassworm_analysis.html) |
@@ -71,7 +71,7 @@ Submitted to [SigmaHQ](https://github.com/SigmaHQ/sigma). All four awaiting revi
 
 ### Custom rule feed
 
-[**custom-sublime-rules**](https://github.com/yana-ivanov/custom-sublime-rules) — 25 MQL rules maintained as a subscribable Sublime feed. Broadly applicable rules go upstream; this feed keeps the narrower lures, the specific brand impersonations, and the detections still collecting evidence.
+[**custom-sublime-rules**](https://github.com/yana-ivanov/custom-sublime-rules) — 24 MQL rules maintained as a subscribable Sublime feed. Broadly applicable rules go upstream; this feed keeps the narrower lures, the specific brand impersonations, and the detections still collecting evidence.
 
 Every rule in it has been run against a live mailbox: 4,033 inbound messages across 30 days, one hunt per rule. The results, including the false positives, are published in the repo README and written up in [Twenty-Five Rules I Had Never Run](https://yanaivanov.com/writing/rule_feed_field_note.html).
 
@@ -101,7 +101,6 @@ Every rule in it has been run against a live mailbox: 4,033 inbound messages acr
 | BeaverTail developer recruitment lure | [The Open Door](https://yanaivanov.com/analysis/linkedin_open_door.html) |
 | Real estate wire fraud — closing impersonation | [The Closing Table](https://yanaivanov.com/analysis/rewf_analysis.html) |
 | pkpass Apple Wallet pass from unsolicited sender | [The Trusted Pass](https://yanaivanov.com/analysis/pkpass_analysis.html) |
-| RoundPress and ZimReaper @import tag-splitting XSS | [The Pattern Held](https://yanaivanov.com/analysis/roundpress_part3.html) |
 
 ---
 
