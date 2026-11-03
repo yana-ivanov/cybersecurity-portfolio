@@ -16,6 +16,7 @@
   .wrap{max-width:var(--maxw);margin:0 auto;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
   section{padding:70px 0}
 
+  .sitehead{position:sticky;top:0;z-index:60;background:var(--bg)}
   /* TOP BAR (reused from case study) */
   .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;
     padding-top:20px;padding-bottom:20px;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px));
@@ -97,6 +98,7 @@
   :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:5px}
 </style>
 
+<header class="sitehead">
 <!-- TOP BAR -->
 <div class="topbar">
   <span class="name">Yana Ivanov</span>
@@ -115,6 +117,7 @@
     <a class="tab" href="cyber.html" aria-selected="false">Cyber Research</a>
   </div>
 </div></div>
+</header>
 
 <!-- ============ DESIGN PANEL ============ -->
 <div id="panel-design" class="panel" role="tabpanel" aria-labelledby="tab-design">
@@ -132,30 +135,30 @@
     <div class="section-head"><h2>Complex products, made usable</h2></div>
     <div class="cards" id="cards">
 
-      <a class="card" href="https://yanaivanov.com/case-studies/volumeleaders.html" target="_blank" rel="noopener">
-        <div class="card-img"><img src="images/volumeleaders/lifestyle-left-casual.jpg" alt="VolumeLeaders trading dashboard on a laptop" loading="lazy"></div>
-        <div class="badges"><div class="brow"><span class="badge">Fintech</span><span class="badge">Design system</span></div><div class="brow"><span class="badge plat">Desktop</span></div></div>
-        <h3>VolumeLeaders</h3>
-        <div class="cat">Data-dense dashboard &middot; Data visualization</div>
-        <p>A trading analytics platform. I designed real-time market heatmaps, complex filtering, and dense data tables into a clear, scannable interface, and built a scalable design system so the product stays consistent as it grows.</p>
-        <span class="more">View case study</span>
-      </a>
-
-      <a class="card" href="https://yanaivanov.com/case-studies/steadyrides.html" target="_blank" rel="noopener">
-        <div class="card-img"><img src="images/steadyrides/lifestyle-driver.jpg" alt="SteadyRides driver app mounted in a car" loading="lazy"></div>
-        <div class="badges"><div class="brow"><span class="badge">Product + Build</span><span class="badge">Workflows</span></div><div class="brow"><span class="badge plat">Mobile + Desktop</span></div></div>
-        <h3>SteadyRides</h3>
-        <div class="cat">Multi-role workflows &middot; AI-assisted build</div>
-        <p>A booking and dispatch platform I designed and built end to end across client, driver, and owner roles. Complex multi-step workflows and real-world edge cases, with business rules as configurable settings. Built with AI as a design and development partner.</p>
-        <span class="more">View case study</span>
-      </a>
-
       <a class="card" href="https://yanaivanov.com/argusx.html" target="_blank" rel="noopener">
         <div class="card-img"><img src="images/main_feed.png" alt="ArgusX threat-intelligence dashboard" loading="lazy"></div>
         <div class="badges"><div class="brow"><span class="badge">Cybersecurity</span><span class="badge">Explainable AI</span></div><div class="brow"><span class="badge plat">Desktop</span></div></div>
         <h3>ArgusX</h3>
         <div class="cat">Threat intelligence &middot; AI decision UX</div>
         <p>An AI-powered threat-intelligence platform I designed and built. It turns a flood of security data from 20+ sources into clear, prioritized, explainable signals, keeping analysts in control of automated decisions, with review, override, and trust built into the interface.</p>
+        <span class="more">View case study</span>
+      </a>
+
+      <a class="card" href="https://yanaivanov.com/case-studies/steadyrides.html" target="_blank" rel="noopener">
+        <div class="card-img"><img src="images/steadyrides/lifestyle-driver.jpg" alt="SteadyRides driver app mounted in a car" loading="lazy"></div>
+        <div class="badges"><div class="brow"><span class="badge">Product + Build</span><span class="badge">Workflows</span><span class="badge">AI</span></div><div class="brow"><span class="badge plat">Mobile + Desktop</span></div></div>
+        <h3>SteadyRides</h3>
+        <div class="cat">Multi-role workflows &middot; AI-assisted build</div>
+        <p>A booking and dispatch platform I designed and built end to end across client, driver, and owner roles. Complex multi-step workflows and real-world edge cases, with business rules as configurable settings. Built with AI as a design and development partner.</p>
+        <span class="more">View case study</span>
+      </a>
+
+      <a class="card" href="https://yanaivanov.com/case-studies/volumeleaders.html" target="_blank" rel="noopener">
+        <div class="card-img"><img src="images/volumeleaders/lifestyle-left-casual.jpg" alt="VolumeLeaders trading dashboard on a laptop" loading="lazy"></div>
+        <div class="badges"><div class="brow"><span class="badge">Fintech</span><span class="badge">Design system</span></div><div class="brow"><span class="badge plat">Desktop</span></div></div>
+        <h3>VolumeLeaders</h3>
+        <div class="cat">Data-dense dashboard &middot; Data visualization</div>
+        <p>A trading analytics platform. I designed real-time market heatmaps, complex filtering, and dense data tables into a clear, scannable interface, and built a scalable design system so the product stays consistent as it grows.</p>
         <span class="more">View case study</span>
       </a>
 

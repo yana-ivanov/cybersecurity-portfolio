@@ -99,6 +99,7 @@ footer a{color:var(--accent);text-decoration:none}footer a:hover{color:#7dd3fc}
 
 /* ===== shared chrome (matches landing) ===== */
 .wrap{max-width:1080px;margin:0 auto;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
+.sitehead{position:sticky;top:0;z-index:60;background:var(--bg)}
 .topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:20px;padding-bottom:20px;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px));border-bottom:1px solid var(--line);font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .topbar .name{color:var(--text);font-weight:800;font-size:13px}
 .topbar .links{display:flex;gap:20px}
@@ -135,6 +136,7 @@ footer a{color:var(--accent);text-decoration:none}footer a:hover{color:#7dd3fc}
 </head>
 <body>
 
+<header class="sitehead">
 <!-- TOP BAR -->
 <div class="topbar">
   <span class="name">Yana Ivanov</span>
@@ -153,13 +155,14 @@ footer a{color:var(--accent);text-decoration:none}footer a:hover{color:#7dd3fc}
     <a class="tab" href="cyber.html" aria-selected="true">Cyber Research</a>
   </div>
 </div></div>
+</header>
 
 <!-- HERO -->
 <div class="wrap">
   <div class="hero">
-    <h1 class="hero-title">Threat intel, <span class="accent">detection</span>, and the tools I build.</h1>
-    <div class="hero-tag">Detection Rules &middot; Threat Research &middot; CompTIA Security+ (in progress)</div>
-    <p class="hero-intro">I began a cybersecurity pivot in early 2026 and have been contributing real work since. It keeps me close to how analysts think and what makes automated security decisions trustworthy, which feeds straight back into how I design.</p>
+    <h1 class="hero-title">Threat research, <span class="accent">in depth</span>.</h1>
+    <div class="hero-tag">Analyses &middot; Field Notes &middot; Lab Logs &middot; Tools</div>
+    <p class="hero-intro">Independent investigation: tracing threat-actor behavior, pulling apart supply-chain attacks, and following the evidence even when it lands on &ldquo;unknown.&rdquo; Everything below is searchable.</p>
   </div>
 </div>
 

@@ -17,9 +17,24 @@
   .wrap{max-width:var(--maxw);margin:0 auto;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
   section{padding:80px 0}
   img{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--line)}
-  .topbar{display:flex;justify-content:space-between;align-items:center;gap:14px;padding-top:22px;padding-bottom:22px;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px));border-bottom:1px solid var(--line);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-  .topbar .name{color:var(--text);font-weight:700}
-  .topbar a{color:var(--muted);font-weight:600} .topbar a:hover{color:var(--accent)}
+  .sitehead{ position:sticky; top:0; z-index:60; background:var(--bg); }
+  .topbar{ display:flex; justify-content:space-between; align-items:center; padding:15px 28px; border-bottom:1px solid var(--line); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  .topbar .name{ color:var(--text); font-weight:800; text-decoration:none; }
+  .topbar .links{ display:flex; gap:20px; }
+  .topbar .links a{ color:var(--muted); text-decoration:none; }
+  .topbar .links a:hover{ color:var(--text); }
+  .tabbar{ border-bottom:1px solid var(--line); padding:0 28px; }
+  .tabs{ display:flex; gap:28px; }
+  .tab{ display:inline-block; text-decoration:none; border-bottom:2px solid transparent; padding:13px 2px; font-size:14px; font-weight:700; letter-spacing:.01em; color:var(--muted); text-transform:none; transition:color .15s; }
+  .tab:hover{ color:var(--text); }
+  .tab[aria-selected="true"]{ color:var(--text); border-bottom-color:var(--accent); }
+  .crumbbar{ display:flex; justify-content:space-between; align-items:center; padding:12px 28px; border-bottom:1px solid var(--line); font-size:12px; letter-spacing:.07em; text-transform:uppercase; }
+  .crumbs{ display:flex; gap:9px; align-items:center; color:var(--muted); }
+  .crumbs a{ color:var(--muted); text-decoration:none; font-weight:600; }
+  .crumbs a:hover{ color:var(--text); }
+  .crumbs .sep{ opacity:.45; }
+  .crumbs .current{ color:var(--text); font-weight:700; }
+  .crumbbar .role{ color:var(--muted); font-weight:600; }
   @media(max-width:560px){.topbar .mid{display:none}}
   .hero{padding:96px 0}
   .hero-title{font-size:clamp(52px,10vw,120px);line-height:.92;font-weight:800;letter-spacing:-.02em;text-transform:uppercase;font-family:'Space Grotesk','Inter',sans-serif}
@@ -56,11 +71,28 @@
 </style>
 </head>
 <body>
-<div class="topbar">
-  <span class="name">Yana Ivanov</span>
-  <span class="mid">VolumeLeaders — Case Study</span>
-  <a href="/">&larr; All work</a>
-</div>
+<!-- STICKY HEADER -->
+  <header class="sitehead">
+    <div class="topbar">
+      <a class="name" href="/">Yana Ivanov</a>
+      <span class="links">
+        <a href="/Yana_Ivanov_Design_Resume.pdf" target="_blank" rel="noopener">Resume</a>
+        <a href="https://www.linkedin.com/in/yanaivanov/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/yana-ivanov" target="_blank" rel="noopener">GitHub</a>
+      </span>
+    </div>
+    <div class="tabbar">
+      <div class="tabs">
+        <a class="tab" href="/" aria-selected="true">Design</a>
+        <a class="tab" href="/#cyber" aria-selected="false">Cyber Contributions</a>
+        <a class="tab" href="/cyber.html" aria-selected="false">Cyber Research</a>
+      </div>
+    </div>
+    <div class="crumbbar">
+      <nav class="crumbs"><a href="/">Design</a><span class="sep">/</span><span class="current">VolumeLeaders</span></nav>
+      <span class="role">Product Design</span>
+    </div>
+  </header>
 
 <div class="wrap"><div class="hero">
   <h1 class="hero-title">Volume<span class="dot">Leaders</span></h1>
