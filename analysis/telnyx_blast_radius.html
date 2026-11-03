@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Blast Radius — Part 2 | Yana Ivanov</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -17,13 +16,13 @@
   --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
   --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
   --shadow-md:0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
-  --mono:'JetBrains Mono',monospace;
+  --mono:'Manrope','Helvetica Neue',Arial,sans-serif;
   --serif:'Source Serif 4',Georgia,serif;
   --display:'Playfair Display',Georgia,serif;
   --display-clean:'IBM Plex Serif',Georgia,serif;
 }
-html{scroll-behavior:smooth;font-size:20px}
-body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+html{scroll-behavior:smooth;font-size:18px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.7;font-size:18px}
 .back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
 .back-nav a,.back-nav-link{font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;color:#4a9eff;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem;transition:color .2s}
 .back-nav a:hover,.back-nav-link:hover{color:#93c5fd}
@@ -100,6 +99,19 @@ footer span{color:#94a3b8}
   .bio{grid-template-columns:1fr}
   footer{flex-direction:column;text-align:center}
 }
+
+/* ── modern treatment: Manrope, no icons, clean tables (do not edit) ── */
+h1.title{font-weight:800;letter-spacing:-.02em}
+h2{font-weight:800;letter-spacing:-.015em}
+h3{font-weight:700}
+.section-num{font-weight:700}
+.figure,.tool-embed{border-radius:12px}
+.callout{border-radius:8px}
+.finding,.split-panel{border-radius:10px}
+.stat-num-grid,.fig-stat-row{border-radius:12px;overflow:hidden}
+th{white-space:nowrap}
+h1.title,h2,h3,.section-head h2{text-wrap:balance}
+p,li,.callout p,.finding-desc,.chain-desc,.tl-desc,.step-content-desc{text-wrap:pretty}
 </style>
     <!-- Privacy-friendly analytics by Plausible -->
     <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
@@ -111,7 +123,7 @@ footer span{color:#94a3b8}
 <body>
 
 <div class="mobile-notice">&#9888; Intentionally desktop-first &#8212; best experienced on a workstation</div>
-<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+<div class="back-nav"><a href="../cyber.html">Portfolio</a></div>
 
 <div class="masthead">
   <div class="mast-inner">
@@ -365,16 +377,6 @@ footer span{color:#94a3b8}
 </div>
 
 </div></div>
-
-<div class="bio">
-  <div class="bio-avatar">YI</div>
-  <div>
-    <div class="bio-name">Yana Ivanov</div>
-    <div class="bio-title">Security Researcher &nbsp;·&nbsp; Threat Intelligence &amp; Detection &nbsp;·&nbsp; SiteWave Studio</div>
-    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on “unknown.” When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
-    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
-  </div>
-</div>
 
 <footer>
   <span>The Blast Radius · Yana Ivanov · March 2026</span>

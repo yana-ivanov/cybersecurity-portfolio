@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Cascade &mdash; Coordinated Infrastructure Attack Analysis | Yana Ivanov</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
@@ -13,15 +12,15 @@
   --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
   --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
   --green:#145a32;--green-dim:rgba(20,90,50,0.08);
-  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
-  --mono:'JetBrains Mono',monospace;
-  --serif:'Source Serif 4','Georgia',serif;
-  --display:'Playfair Display','Georgia',serif;
-  --display-clean:'IBM Plex Serif','Georgia',serif;
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --serif:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --display:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --display-clean:'Manrope','Helvetica Neue',Arial,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;font-size:20px}
-body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+html{scroll-behavior:smooth;font-size:18px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.7;font-size:18px}
 a{color:var(--blue);text-decoration:none}
 a:hover{text-decoration:underline}
 .back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
@@ -165,6 +164,19 @@ footer span{color:#94a3b8}
   footer{padding:1rem .9rem;font-size:.62rem}
 }
 @media(min-width:768px) and (orientation:landscape){.mobile-notice{display:none}}
+
+/* ── modern treatment: Manrope, no icons, clean tables (do not edit) ── */
+h1.title{font-weight:800;letter-spacing:-.02em}
+h2{font-weight:800;letter-spacing:-.015em}
+h3{font-weight:700}
+.section-num{font-weight:700}
+.figure,.tool-embed{border-radius:12px}
+.callout{border-radius:8px}
+.finding,.split-panel{border-radius:10px}
+.stat-num-grid,.fig-stat-row{border-radius:12px;overflow:hidden}
+th{white-space:nowrap}
+h1.title,h2,h3,.section-head h2{text-wrap:balance}
+p,li,.callout p,.finding-desc,.chain-desc,.tl-desc,.step-content-desc{text-wrap:pretty}
 </style>
     <!-- Privacy-friendly analytics by Plausible -->
     <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
@@ -175,7 +187,7 @@ footer span{color:#94a3b8}
 </head>
 <body>
 <div class="mobile-notice"><strong>Intentionally desktop-first</strong> &mdash; best experienced on a workstation</div>
-<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+<div class="back-nav"><a href="../cyber.html">Portfolio</a></div>
 <header class="masthead">
   <div class="mast-inner">
     <div class="mast-kicker">Strategic Infrastructure Analysis &middot; Nation-State &middot; Civilian Risk</div>
@@ -202,21 +214,21 @@ footer span{color:#94a3b8}
   <p>This is not a disaster movie premise. It is the logical outcome of a coordinated attack on three infrastructure systems that the United States has spent the last two decades making faster, more connected, and more interdependent &mdash; while stripping away every analog backup that once provided resilience. The attack does not require nuclear weapons. It does not require boots on the ground. It requires pre-positioned access, a coordinated trigger, and the patience to wait for the right moment. <strong>All three of those conditions already exist.</strong></p>
   <div class="callout callout-red"><p><strong>Analytical Framing:</strong> This analysis is not a prediction of imminent catastrophe. It is a professional assessment of documented vulnerabilities, confirmed pre-positioning by nation-state actors, and the structural gaps in civilian preparedness that transform a technical attack into a societal crisis. Every vulnerability described in this report is publicly confirmed. Every gap is currently unfixed. Every recommendation is actionable today.</p></div>
   <div class="figure">
-    <div class="figure-title"><span class="material-icons">device_hub</span> Figure 1 &mdash; The Dependency Stack: Why Three Failures Become Everything</div>
+    <div class="figure-title">Figure 1 &mdash; The Dependency Stack: Why Three Failures Become Everything</div>
     <div class="figure-body">
       <div class="attack-chain">
-        <div class="chain-step chain-danger"><div class="chain-num"><span class="material-icons">cell_tower</span></div><div class="chain-body"><div class="chain-label">Phase 1 &mdash; Communications</div><div class="chain-desc">Cellular, Internet, EAS go dark. No signal, no news, no 911. The population cannot talk to each other. Emergency services cannot coordinate. The government cannot reach citizens.</div></div></div>
-        <div class="chain-step chain-danger"><div class="chain-num"><span class="material-icons">psychology</span></div><div class="chain-body"><div class="chain-label">Triggers &mdash; Panic and Disorientation</div><div class="chain-desc">No coordination. No situational awareness. Each person acts alone on incomplete information. Attacker achieves social fracture without firing a shot.</div></div></div>
+        <div class="chain-step chain-danger"><div class="chain-num">1</div><div class="chain-body"><div class="chain-label">Phase 1 &mdash; Communications</div><div class="chain-desc">Cellular, Internet, EAS go dark. No signal, no news, no 911. The population cannot talk to each other. Emergency services cannot coordinate. The government cannot reach citizens.</div></div></div>
+        <div class="chain-step chain-danger"><div class="chain-num">2</div><div class="chain-body"><div class="chain-label">Triggers &mdash; Panic and Disorientation</div><div class="chain-desc">No coordination. No situational awareness. Each person acts alone on incomplete information. Attacker achieves social fracture without firing a shot.</div></div></div>
       </div>
       <hr class="phase-divider">
       <div class="attack-chain">
-        <div class="chain-step chain-danger"><div class="chain-num"><span class="material-icons">bolt</span></div><div class="chain-body"><div class="chain-label">Phase 2 &mdash; Electric Grid</div><div class="chain-desc">Power and distribution fail. Water pumps stop. Food spoils within hours. Heat and cooling fail. Hospitals shift to generator power with fuel clocks running immediately.</div></div></div>
-        <div class="chain-step chain-danger"><div class="chain-num"><span class="material-icons">remove_shopping_cart</span></div><div class="chain-body"><div class="chain-label">Triggers &mdash; Scarcity Within 72 Hours</div><div class="chain-desc">Food gone. Water fails. Medications at risk. Generators depleting. An already divided population does not need to be pushed into chaos &mdash; it only needs to lose the thin infrastructure holding it together.</div></div></div>
+        <div class="chain-step chain-danger"><div class="chain-num">1</div><div class="chain-body"><div class="chain-label">Phase 2 &mdash; Electric Grid</div><div class="chain-desc">Power and distribution fail. Water pumps stop. Food spoils within hours. Heat and cooling fail. Hospitals shift to generator power with fuel clocks running immediately.</div></div></div>
+        <div class="chain-step chain-danger"><div class="chain-num">2</div><div class="chain-body"><div class="chain-label">Triggers &mdash; Scarcity Within 72 Hours</div><div class="chain-desc">Food gone. Water fails. Medications at risk. Generators depleting. An already divided population does not need to be pushed into chaos &mdash; it only needs to lose the thin infrastructure holding it together.</div></div></div>
       </div>
       <hr class="phase-divider">
       <div class="attack-chain">
-        <div class="chain-step chain-danger"><div class="chain-num"><span class="material-icons">train</span></div><div class="chain-body"><div class="chain-label">Phase 3 &mdash; Transportation</div><div class="chain-desc">Rail, aviation, and ports freeze. Supply chain halts entirely. No resupply possible. Goods in transit cannot be delivered. Emergency resources cannot be moved.</div></div></div>
-        <div class="chain-step chain-danger"><div class="chain-num"><span class="material-icons">dangerous</span></div><div class="chain-body"><div class="chain-label">Outcome &mdash; Society Cannot Defend Itself</div><div class="chain-desc">No communication. No food. No movement. Three failures close the trap. A society unable to coordinate, supply, or respond to an external threat &mdash; without a single shot fired.</div></div></div>
+        <div class="chain-step chain-danger"><div class="chain-num">1</div><div class="chain-body"><div class="chain-label">Phase 3 &mdash; Transportation</div><div class="chain-desc">Rail, aviation, and ports freeze. Supply chain halts entirely. No resupply possible. Goods in transit cannot be delivered. Emergency resources cannot be moved.</div></div></div>
+        <div class="chain-step chain-danger"><div class="chain-num">2</div><div class="chain-body"><div class="chain-label">Outcome &mdash; Society Cannot Defend Itself</div><div class="chain-desc">No communication. No food. No movement. Three failures close the trap. A society unable to coordinate, supply, or respond to an external threat &mdash; without a single shot fired.</div></div></div>
       </div>
     </div>
     <div class="figure-caption">Three failures cascade into one outcome: a society unable to coordinate, supply, or defend itself</div>
@@ -251,7 +263,7 @@ footer span{color:#94a3b8}
   <p>The analog copper landline has no software, no operating system, no remote attack surface. It cannot be jammed at scale. It does not require external power at the handset. The United States is deliberately dismantling it. AT&amp;T announced in December 2024 its intention to shut down virtually all POTS lines by 2029, saving $6 billion annually.</p>
   <div class="callout callout-amber"><p><strong>The Infrastructure Paradox:</strong> Decommissioning the most resilient communications infrastructure in the country, at the moment when nation-state adversaries have confirmed access to its cellular replacement, is not a technology upgrade. It is a preparedness failure disguised as modernization.</p></div>
   <div class="figure">
-    <div class="figure-title"><span class="material-icons">phone_disabled</span> Figure 2 &mdash; The Landline Collapse: A Century of Resilience Being Dismantled</div>
+    <div class="figure-title">Figure 2 &mdash; The Landline Collapse: A Century of Resilience Being Dismantled</div>
     <div class="figure-body">
       <div class="fig-timeline">
         <div class="fig-tl-item"><div class="fig-tl-left"><div class="fig-tl-date">2000</div><div class="fig-tl-stage">Peak coverage</div></div><div class="fig-tl-right"><div class="fig-tl-title">~95% of Homes Had a Landline</div><div class="fig-tl-body">Analog copper infrastructure &mdash; a century in the making. No software. No attack surface. Independent of external power at the handset. The most resilient communications technology in the country.</div></div></div>
@@ -293,14 +305,14 @@ footer span{color:#94a3b8}
   <div class="section-num">Section 07</div>
   <h2>The 72-Hour Collapse &mdash; Hour by Hour</h2>
   <div class="figure">
-    <div class="figure-title"><span class="material-icons">timer</span> Figure 3 &mdash; The 72-Hour Collapse Timeline</div>
+    <div class="figure-title">Figure 3 &mdash; The 72-Hour Collapse Timeline</div>
     <div class="figure-body">
       <div class="attack-chain">
-        <div class="chain-step chain-danger"><div class="chain-num"><span class="material-icons">play_circle</span></div><div class="chain-body"><div class="chain-label">Hour 0 &mdash; Grid Goes Dark</div><div class="chain-desc">Lights out. Traffic systems fail. Gas pumps stop. ATMs dark. Door access systems fail. Cellular towers running on battery backup &mdash; clock starts immediately.</div></div></div>
-        <div class="chain-step chain-warning"><div class="chain-num"><span class="material-icons">cell_tower</span></div><div class="chain-body"><div class="chain-label">Hours 1&ndash;4 &mdash; Communications Begin Failing</div><div class="chain-desc">Cellular towers exhaust battery backup. Internet goes dark. 911 goes silent. No emergency broadcasts. The information vacuum is complete.</div></div></div>
-        <div class="chain-step chain-warning"><div class="chain-num"><span class="material-icons">local_hospital</span></div><div class="chain-body"><div class="chain-label">Hour 24 &mdash; Hospital Crisis Begins</div><div class="chain-desc">Refrigerated food spoiling. Generator fuel depleting. Water pressure failing. Insulin and vaccines at risk. Dialysis centers in immediate crisis.</div></div></div>
-        <div class="chain-step chain-danger"><div class="chain-num"><span class="material-icons">dangerous</span></div><div class="chain-body"><div class="chain-label">Hour 72 &mdash; The Cliff</div><div class="chain-desc">Hospital generators run dry. Emergency food exhausted. Insulin, vaccines, blood products fail. Law enforcement capacity unsustainable. No tested national plan exists for what happens next.</div></div></div>
-        <div class="chain-step chain-warning"><div class="chain-num"><span class="material-icons">update</span></div><div class="chain-body"><div class="chain-label">Recovery &mdash; Weeks to Years</div><div class="chain-desc">Grid: weeks to months. Supply chain: months. Social stability: years. Puerto Rico after Hurricane Maria 2017 &mdash; grid failure lasted 11 months in some areas, with no adversary actively preventing repair.</div></div></div>
+        <div class="chain-step chain-danger"><div class="chain-num">1</div><div class="chain-body"><div class="chain-label">Hour 0 &mdash; Grid Goes Dark</div><div class="chain-desc">Lights out. Traffic systems fail. Gas pumps stop. ATMs dark. Door access systems fail. Cellular towers running on battery backup &mdash; clock starts immediately.</div></div></div>
+        <div class="chain-step chain-warning"><div class="chain-num">2</div><div class="chain-body"><div class="chain-label">Hours 1&ndash;4 &mdash; Communications Begin Failing</div><div class="chain-desc">Cellular towers exhaust battery backup. Internet goes dark. 911 goes silent. No emergency broadcasts. The information vacuum is complete.</div></div></div>
+        <div class="chain-step chain-warning"><div class="chain-num">3</div><div class="chain-body"><div class="chain-label">Hour 24 &mdash; Hospital Crisis Begins</div><div class="chain-desc">Refrigerated food spoiling. Generator fuel depleting. Water pressure failing. Insulin and vaccines at risk. Dialysis centers in immediate crisis.</div></div></div>
+        <div class="chain-step chain-danger"><div class="chain-num">4</div><div class="chain-body"><div class="chain-label">Hour 72 &mdash; The Cliff</div><div class="chain-desc">Hospital generators run dry. Emergency food exhausted. Insulin, vaccines, blood products fail. Law enforcement capacity unsustainable. No tested national plan exists for what happens next.</div></div></div>
+        <div class="chain-step chain-warning"><div class="chain-num">5</div><div class="chain-body"><div class="chain-label">Recovery &mdash; Weeks to Years</div><div class="chain-desc">Grid: weeks to months. Supply chain: months. Social stability: years. Puerto Rico after Hurricane Maria 2017 &mdash; grid failure lasted 11 months in some areas, with no adversary actively preventing repair.</div></div></div>
       </div>
     </div>
     <div class="figure-caption">Puerto Rico after Hurricane Maria 2017: grid failure lasted 11 months in some areas &mdash; with no adversary actively preventing repair</div>
@@ -336,16 +348,6 @@ footer span{color:#94a3b8}
   <div class="callout callout-red"><p><strong>The Question That Should Drive Policy:</strong> If cellular goes down tonight, how does a parent in Connecticut reach their mother in New York? How does a family know where to go, whether the roads are safe, whether help is coming, and how long they need to sustain themselves independently? The answer today is: they cannot, they do not know, and they have no plan. That gap is not a technology problem. It is a policy decision. It can be fixed. It should have been fixed before this analysis needed to be written.</p></div>
   <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">This analysis is a hypothetical strategic assessment based entirely on publicly documented infrastructure vulnerabilities, confirmed nation-state capabilities, and published emergency preparedness research. All threat actor capabilities referenced are confirmed in public reporting from CISA, NSA, FBI, Dragos, Microsoft, the Congressional Research Service, and the National Counterterrorism Center. No classified information is referenced or implied. This represents the author's independent analysis for educational and professional purposes and does not reflect the views of any employer, client, or government agency.</p>
 </div></div>
-
-<div class="bio">
-  <div class="bio-avatar">YI</div>
-  <div>
-    <div class="bio-name">Yana Ivanov</div>
-    <div class="bio-title">Security Researcher &nbsp;·&nbsp; Threat Intelligence &amp; Detection &nbsp;·&nbsp; SiteWave Studio</div>
-    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on “unknown.” When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
-    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
-  </div>
-</div>
 
 <footer>
   <span>The Cascade &mdash; Coordinated Infrastructure Attack Analysis · Yana Ivanov · March 15, 2026</span>

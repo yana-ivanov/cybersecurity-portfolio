@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Weakest Link — CMMC Supply Chain Gap Analysis | Yana Ivanov</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
@@ -13,15 +12,15 @@
   --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
   --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
   --green:#145a32;--green-dim:rgba(20,90,50,0.08);
-  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
-  --mono:'JetBrains Mono',monospace;
-  --serif:'Source Serif 4','Georgia',serif;
-  --display:'Playfair Display','Georgia',serif;
-  --display-clean:'IBM Plex Serif','Georgia',serif;
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --serif:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --display:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --display-clean:'Manrope','Helvetica Neue',Arial,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;font-size:20px}
-body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+html{scroll-behavior:smooth;font-size:18px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.7;font-size:18px}
 a{color:var(--blue);text-decoration:none}
 a:hover{text-decoration:underline}
 .back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
@@ -155,6 +154,19 @@ footer span{color:#94a3b8}
   h1.title{font-size:1.3rem}
   footer{padding:1rem .9rem}
 }
+
+/* ── modern treatment: Manrope, no icons, clean tables (do not edit) ── */
+h1.title{font-weight:800;letter-spacing:-.02em}
+h2{font-weight:800;letter-spacing:-.015em}
+h3{font-weight:700}
+.section-num{font-weight:700}
+.figure,.tool-embed{border-radius:12px}
+.callout{border-radius:8px}
+.finding,.split-panel{border-radius:10px}
+.stat-num-grid,.fig-stat-row{border-radius:12px;overflow:hidden}
+th{white-space:nowrap}
+h1.title,h2,h3,.section-head h2{text-wrap:balance}
+p,li,.callout p,.finding-desc,.chain-desc,.tl-desc,.step-content-desc{text-wrap:pretty}
 </style>
     <!-- Privacy-friendly analytics by Plausible -->
     <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
@@ -165,7 +177,7 @@ footer span{color:#94a3b8}
 </head>
 <body>
 <div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
-<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+<div class="back-nav"><a href="../cyber.html">Portfolio</a></div>
 
 <header class="masthead">
   <div class="mast-inner">
@@ -193,13 +205,13 @@ footer span{color:#94a3b8}
   <p>This was not an isolated incident of fraud. It was the first confirmed enforcement action in what the Department of Justice has signaled will be an expanding campaign against cybersecurity non-compliance throughout the defense supply chain. Seven cybersecurity fraud cases were settled by the DOJ in 2025 alone. The False Claims Act — a Civil War-era statute designed to combat government contract fraud — now applies to any defense contractor or subcontractor whose senior executive signs a compliance affirmation they cannot verify.</p>
   <div class="callout callout-red"><p><strong>The Central Finding:</strong> Only 1% of defense contractors are fully audit-ready for CMMC — down from 8% in 2023. There are 600 certified assessors available for 350,000+ contractors requiring certification, with wait times already exceeding 18 months. Phase 2 mandatory third-party certification begins November 2026. The compliance gap is not an administrative inconvenience — it is an open door into the defense programs that protect American national security. The DOJ has now settled nine cybersecurity False Claims Act cases, including the March 2025 MORSECORP settlement for $4.6 million.</p></div>
   <div class="figure">
-    <div class="figure-title"><span class="material-icons">warning</span> Figure 1 — The CMMC Crisis in Numbers</div>
+    <div class="figure-title">Figure 1 — The CMMC Crisis in Numbers</div>
     <div class="figure-body">
       <div class="fig-stat-row cols-4">
-        <div class="fig-stat red"><span class="material-icons">trending_down</span><div class="fig-stat-num">1%</div><div class="fig-stat-label">Audit-Ready</div><div class="fig-stat-sub">Down from 8% in 2023 · Declining as enforcement rises</div></div>
-        <div class="fig-stat red"><span class="material-icons">groups</span><div class="fig-stat-num">350K</div><div class="fig-stat-label">Contractors Need Cert.</div><div class="fig-stat-sub">Only 600 certified assessors — 18-month wait by Q3 2026</div></div>
-        <div class="fig-stat amber"><span class="material-icons">event</span><div class="fig-stat-num">Nov '26</div><div class="fig-stat-label">Phase 2 Deadline</div><div class="fig-stat-sub">Mandatory C3PAO certification — no cert = no contracts</div></div>
-        <div class="fig-stat red"><span class="material-icons">gavel</span><div class="fig-stat-num">$421K</div><div class="fig-stat-label">First FCA Settlement</div><div class="fig-stat-sub">Illinois machining shop · Dec 2025 · Qui tam — floor employee</div></div>
+        <div class="fig-stat red"><div class="fig-stat-num">1%</div><div class="fig-stat-label">Audit-Ready</div><div class="fig-stat-sub">Down from 8% in 2023 · Declining as enforcement rises</div></div>
+        <div class="fig-stat red"><div class="fig-stat-num">350K</div><div class="fig-stat-label">Contractors Need Cert.</div><div class="fig-stat-sub">Only 600 certified assessors — 18-month wait by Q3 2026</div></div>
+        <div class="fig-stat amber"><div class="fig-stat-num">Nov '26</div><div class="fig-stat-label">Phase 2 Deadline</div><div class="fig-stat-sub">Mandatory C3PAO certification — no cert = no contracts</div></div>
+        <div class="fig-stat red"><div class="fig-stat-num">$421K</div><div class="fig-stat-label">First FCA Settlement</div><div class="fig-stat-sub">Illinois machining shop · Dec 2025 · Qui tam — floor employee</div></div>
       </div>
     </div>
     <div class="figure-caption">Source: ISACA · DoD · DOJ — readiness declining while enforcement accelerates</div>
@@ -236,32 +248,32 @@ footer span{color:#94a3b8}
   <p>The compliance gap has three compounding causes: cost, years of voluntary non-enforcement creating a culture of justified negligence, and a failure of communication design. A control requiring "protection of audit logs" does not convey that unprotected audit logs allowed Volt Typhoon to operate inside US infrastructure for five years undetected. A control requiring "multi-factor authentication for privileged accounts" does not explain that its absence allowed a single compromised admin account to wipe 200,000 devices at Stryker Corporation in March 2026. The compliance framework is technically correct. As a communication to machinists and shop floor managers, it is nearly incomprehensible.</p>
   <div class="callout callout-amber"><p><strong>The Assessor Math That Does Not Work:</strong> 600 certified C3PAO assessors. 350,000 contractors requiring certification. Even at one assessment per week per assessor, total capacity is approximately 31,200 per year. Certifying the full contractor base at that rate would take more than 11 years. Wait times are already exceeding 18 months. The system cannot certify its own requirements at the pace the requirements demand.</p></div>
   <div class="figure">
-    <div class="figure-title"><span class="material-icons">linear_scale</span> Figure 2 — CMMC Phase Implementation Timeline</div>
+    <div class="figure-title">Figure 2 — CMMC Phase Implementation Timeline</div>
     <div class="figure-body">
       <div class="attack-chain">
         <div class="chain-step chain-green">
-          <div class="chain-num"><span class="material-icons">task_alt</span></div>
+          <div class="chain-num">1</div>
           <div class="chain-body">
             <div class="chain-label">Nov 2025 — Phase 1 Active Now</div>
             <div class="chain-desc">Self-assessment required for Level 1 and 2. Annual SPRS affirmation signed by senior executive. False Claims Act personal liability begins. Seven FCA settlements reached in 2025 alone.</div>
           </div>
         </div>
         <div class="chain-step chain-danger">
-          <div class="chain-num"><span class="material-icons">verified_user</span></div>
+          <div class="chain-num">2</div>
           <div class="chain-body">
             <div class="chain-label">Nov 2026 — Phase 2 · C3PAO Mandatory</div>
             <div class="chain-desc">Third-party audit required for all Level 2 contracts. No certification = no contract award. C3PAO pipeline already at 18-month wait. Organizations not yet in process are running out of time.</div>
           </div>
         </div>
         <div class="chain-step chain-warning">
-          <div class="chain-num"><span class="material-icons">expand_more</span></div>
+          <div class="chain-num">3</div>
           <div class="chain-body">
             <div class="chain-label">Nov 2027 — Phase 3 · Level 3 Expands</div>
             <div class="chain-desc">Level 2 C3PAO required in active contract options. NIST 800-172 enhanced controls begin phasing in for highest-sensitivity programs.</div>
           </div>
         </div>
         <div class="chain-step chain-green">
-          <div class="chain-num"><span class="material-icons">shield</span></div>
+          <div class="chain-num">4</div>
           <div class="chain-body">
             <div class="chain-label">Nov 2028 — Full Enforcement</div>
             <div class="chain-desc">CMMC mandatory in all applicable DoD contracts — no exceptions, no waivers. Full implementation across the defense industrial base.</div>
@@ -400,16 +412,6 @@ footer span{color:#94a3b8}
   <div class="callout callout-red"><p><strong>The Local Consequence:</strong> A precision machining shop in Groton that loses its Electric Boat subcontract because it cannot achieve CMMC compliance before Phase 2 is not just a business failure. It is a supply chain gap in the nuclear submarine program. The specialized machining capability that took decades to qualify, the institutional knowledge held by the shop's engineers and machinists, the relationship between that shop and the submarine program — none of that can be quickly replaced. The question every prime contractor in Connecticut should be asking right now is not which suppliers will be excluded. It is which suppliers cannot afford to comply and what the prime is going to do about it.</p></div>
   <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">All findings in this report are based on publicly available information including reports from the Department of Justice, CISA, NSA, FBI, Department of Defense, Lockheed Martin program documentation, Holland &amp; Knight legal analysis, DefenseScoop, GovConWire, Accorian, and CompassMSP. CMMC requirements and deadlines are sourced directly from 32 CFR Part 170 and DFARS 252.204-7021. This represents the author's independent analysis and does not reflect the views of any employer, client, or government agency.</p>
 </div></div>
-
-<div class="bio">
-  <div class="bio-avatar">YI</div>
-  <div>
-    <div class="bio-name">Yana Ivanov</div>
-    <div class="bio-title">Security Researcher &nbsp;·&nbsp; Threat Intelligence &amp; Detection &nbsp;·&nbsp; SiteWave Studio</div>
-    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on “unknown.” When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
-    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
-  </div>
-</div>
 
 <footer>
   <span>The Weakest Link · Yana Ivanov · March 15, 2026</span>

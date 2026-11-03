@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Encryption Illusion — Russia's Signal & WhatsApp Campaign | Yana Ivanov</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#0a0f1a;--ink2:#0a0f1a;--ink3:#374151;
@@ -13,15 +12,15 @@
   --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
   --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
   --green:#145a32;--green-dim:rgba(20,90,50,0.08);
-  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
-  --mono:'JetBrains Mono',monospace;
-  --serif:'Source Serif 4','Georgia',serif;
-  --display:'Playfair Display','Georgia',serif;
-  --display-clean:'IBM Plex Serif','Georgia',serif;
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --serif:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --display:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --display-clean:'Manrope','Helvetica Neue',Arial,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;font-size:20px}
-body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+html{scroll-behavior:smooth;font-size:18px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.7;font-size:18px}
 a{color:var(--blue);text-decoration:none}
 a:hover{text-decoration:underline}
 .back-nav{background:#0a0f1a;padding:.65rem 3rem;display:flex;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:999}
@@ -200,6 +199,19 @@ footer span{color:#94a3b8}
   footer{padding:1rem .9rem;font-size:.62rem}
 }
 @media(min-width:768px) and (orientation:landscape){.mobile-notice{display:none}}
+
+/* ── modern treatment: Manrope, no icons, clean tables (do not edit) ── */
+h1.title{font-weight:800;letter-spacing:-.02em}
+h2{font-weight:800;letter-spacing:-.015em}
+h3{font-weight:700}
+.section-num{font-weight:700}
+.figure,.tool-embed{border-radius:12px}
+.callout{border-radius:8px}
+.finding,.split-panel{border-radius:10px}
+.stat-num-grid,.fig-stat-row{border-radius:12px;overflow:hidden}
+th{white-space:nowrap}
+h1.title,h2,h3,.section-head h2{text-wrap:balance}
+p,li,.callout p,.finding-desc,.chain-desc,.tl-desc,.step-content-desc{text-wrap:pretty}
 </style>
     <!-- Privacy-friendly analytics by Plausible -->
     <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
@@ -211,7 +223,7 @@ footer span{color:#94a3b8}
 <body>
 
 <div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
-<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+<div class="back-nav"><a href="../cyber.html">Portfolio</a></div>
 
 <header class="masthead">
   <div class="mast-inner">
@@ -248,22 +260,22 @@ footer span{color:#94a3b8}
 
   <div class="stat-num-grid">
     <div class="stat-num-item stat-red">
-      <div class="stat-num"><span class="material-icons" style="font-size:1.6rem;display:block;margin-bottom:.3rem">public</span></div>
+      <div class="stat-num"></div>
       <div class="stat-num-label">Campaign Scope</div>
       <div class="stat-num-sub">Confirmed victims across multiple NATO countries</div>
     </div>
     <div class="stat-num-item stat-red">
-      <div class="stat-num"><span class="material-icons" style="font-size:1.6rem;display:block;margin-bottom:.3rem">schedule</span></div>
+      <div class="stat-num"></div>
       <div class="stat-num-label">Active Since 2024</div>
       <div class="stat-num-sub">Ukraine-focused first, now NATO-wide</div>
     </div>
     <div class="stat-num-item stat-amber">
-      <div class="stat-num"><span class="material-icons" style="font-size:1.6rem;display:block;margin-bottom:.3rem">alt_route</span></div>
+      <div class="stat-num"></div>
       <div class="stat-num-label">2 Attack Variants</div>
       <div class="stat-num-sub">Fake support chatbot · Malicious QR code</div>
     </div>
     <div class="stat-num-item stat-blue">
-      <div class="stat-num"><span class="material-icons" style="font-size:1.6rem;display:block;margin-bottom:.3rem">lock</span></div>
+      <div class="stat-num"></div>
       <div class="stat-num-label">Zero Crypto Broken</div>
       <div class="stat-num-sub">Signal Protocol held — humans were the vulnerability</div>
     </div>
@@ -288,35 +300,35 @@ footer span{color:#94a3b8}
     <div class="figure-body">
       <div class="attack-chain">
         <div class="chain-step chain-normal">
-          <div class="chain-num"><span class="material-icons">theater_comedy</span></div>
+          <div class="chain-num">1</div>
           <div class="chain-body">
             <div class="chain-label">Fake Account Created</div>
             <div class="chain-desc">"Signal Security Support" — official-looking name, created inside the app. No technical access required. Cost: zero.</div>
           </div>
         </div>
         <div class="chain-step chain-warning">
-          <div class="chain-num"><span class="material-icons">mark_email_unread</span></div>
+          <div class="chain-num">2</div>
           <div class="chain-body">
             <div class="chain-label">Urgent Message Sent</div>
             <div class="chain-desc">"Suspicious activity detected on your account — share your verification code to protect your messages." Creates urgency. Targets the instinct to act quickly to protect a secure channel.</div>
           </div>
         </div>
         <div class="chain-step chain-warning">
-          <div class="chain-num"><span class="material-icons">smartphone</span></div>
+          <div class="chain-num">3</div>
           <div class="chain-body">
             <div class="chain-label">Re-Registration Triggered</div>
             <div class="chain-desc">Attacker simultaneously requests re-registration of the target's account on a new device. Signal sends a real SMS verification code to the target's phone — exactly as designed.</div>
           </div>
         </div>
         <div class="chain-step chain-danger">
-          <div class="chain-num"><span class="material-icons">vpn_key</span></div>
+          <div class="chain-num">4</div>
           <div class="chain-body">
             <div class="chain-label">Target Hands Over the Key</div>
             <div class="chain-desc">Target shares the verification code and PIN, believing they are talking to official support. The encryption worked perfectly. The human handed the key to the wrong person.</div>
           </div>
         </div>
         <div class="chain-step chain-danger">
-          <div class="chain-num"><span class="material-icons">visibility</span></div>
+          <div class="chain-num">5</div>
           <div class="chain-body">
             <div class="chain-label">Account Fully Compromised</div>
             <div class="chain-desc">Attacker registers their device. Full access to message history, group chats, and all ongoing conversations — past and future. No malware. No exploit. No patch available.</div>
@@ -374,13 +386,13 @@ footer span{color:#94a3b8}
     <div class="figure-body">
       <div class="split-visual">
         <div class="split-panel left">
-          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">check_circle</span> What Encryption Protected</div>
+          <div class="split-panel-title">What Encryption Protected</div>
           <p><strong>The transit channel.</strong> Every message sent between the two devices was mathematically scrambled using the Signal Protocol. No one on the network — not ISPs, not government intercept, not even Signal itself — could read the content in transit.</p>
           <p>The encryption worked. <strong>Russia never attacked it.</strong> Attempting to break Signal Protocol encryption with current technology would take longer than the age of the universe.</p>
           <p>The math was perfect. The lock was unbreakable. The door it was protecting was left open by a human who did not know better.</p>
         </div>
         <div class="split-panel right">
-          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">cancel</span> What Encryption Cannot Protect</div>
+          <div class="split-panel-title">What Encryption Cannot Protect</div>
           <p><strong>The human endpoint.</strong> Once Russia convinced the target to hand over their verification code, they became a legitimate linked device. The encryption now protected Russia's access just as faithfully as the original user's.</p>
           <p>The app worked exactly as designed — encrypting and delivering messages to all linked devices including the attacker's. <strong>Security features became the attack vector.</strong></p>
           <p>No patch fixes this. No algorithm prevents a person from handing over their key when they believe they are talking to official support.</p>
@@ -485,28 +497,28 @@ footer span{color:#94a3b8}
     <div class="figure-body">
       <div class="attack-chain">
         <div class="chain-step chain-danger">
-          <div class="chain-num"><span class="material-icons">gps_not_fixed</span></div>
+          <div class="chain-num">1</div>
           <div class="chain-body">
             <div class="chain-label">No Awareness</div>
             <div class="chain-desc">Clicks the link. Shares the code. No frame of reference for the attack. Believes they are protecting their account by cooperating with "support."</div>
           </div>
         </div>
         <div class="chain-step chain-danger">
-          <div class="chain-num"><span class="material-icons">bolt</span></div>
+          <div class="chain-num">2</div>
           <div class="chain-body">
             <div class="chain-label">Incident</div>
             <div class="chain-desc">Account compromised. Message history exposed. For a defense contractor, this is the breach — CUI in conversations is now readable by a Russian intelligence analyst. Consequences are real and immediate.</div>
           </div>
         </div>
         <div class="chain-step chain-warning">
-          <div class="chain-num"><span class="material-icons">school</span></div>
+          <div class="chain-num">3</div>
           <div class="chain-body">
             <div class="chain-label">Education</div>
             <div class="chain-desc">Training delivered after the incident. Attack patterns explained. Recognition begins — but the breach already happened. Reactive training is too late for CUI exposure.</div>
           </div>
         </div>
         <div class="chain-step chain-normal">
-          <div class="chain-num"><span class="material-icons">security</span></div>
+          <div class="chain-num">4</div>
           <div class="chain-body">
             <div class="chain-label">Active Defense</div>
             <div class="chain-desc">Trained employees catch phishing, smishing, and impersonation attempts instinctively — before sharing any code. This is the only state that matters for CMMC compliance. It must be the starting point, not the destination after an incident.</div>
@@ -664,16 +676,6 @@ footer span{color:#94a3b8}
   <p style="font-style:italic;color:var(--ink3);border-top:1px solid var(--rule);padding-top:1.5rem;margin-top:2rem;font-size:.92rem">All findings in this report are based on publicly available information including the joint advisory from the Netherlands MIVD and AIVD (March 9, 2026), Google Threat Intelligence reporting, TechCrunch, NBC News, Malwarebytes, SecurityAffairs, Recorded Future News, and Infosecurity Magazine. This represents the author's independent analysis and does not reflect the views of any employer or client organization.</p>
 
 </div></div>
-
-<div class="bio">
-  <div class="bio-avatar">YI</div>
-  <div>
-    <div class="bio-name">Yana Ivanov</div>
-    <div class="bio-title">Security Researcher &nbsp;·&nbsp; Threat Intelligence &amp; Detection &nbsp;·&nbsp; SiteWave Studio</div>
-    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on “unknown.” When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
-    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
-  </div>
-</div>
 
 <footer>
   <span>The Encryption Illusion · Yana Ivanov · March 16, 2026</span>

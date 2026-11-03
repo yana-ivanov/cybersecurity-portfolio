@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>38 Breaches, One Email Address | Yana Ivanov</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ── DESIGN TOKENS ── */
 :root{
@@ -14,15 +13,15 @@
   --amber:#b45309;--amber-dim:rgba(180,83,9,0.08);
   --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
   --green:#145a32;--green-dim:rgba(20,90,50,0.08);
-  --rule:#d1d9e6;--bg:#f7f5f0;--paper:#ffffff;
-  --mono:'JetBrains Mono',monospace;
-  --serif:'Source Serif 4','Georgia',serif;
-  --display:'Playfair Display','Georgia',serif;
-  --display-clean:'IBM Plex Serif','Georgia',serif;
+  --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
+  --mono:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --serif:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --display:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --display-clean:'Manrope','Helvetica Neue',Arial,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;font-size:20px}
-body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+html{scroll-behavior:smooth;font-size:18px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.7;font-size:18px}
 a{color:var(--blue);text-decoration:none}
 a:hover{text-decoration:underline}
 
@@ -260,6 +259,19 @@ footer span{color:#94a3b8}
   h2{font-size:1.9rem}
   h3{font-size:1.25rem}
 }
+
+/* ── modern treatment: Manrope, no icons, clean tables (do not edit) ── */
+h1.title{font-weight:800;letter-spacing:-.02em}
+h2{font-weight:800;letter-spacing:-.015em}
+h3{font-weight:700}
+.section-num{font-weight:700}
+.figure,.tool-embed{border-radius:12px}
+.callout{border-radius:8px}
+.finding,.split-panel{border-radius:10px}
+.stat-num-grid,.fig-stat-row{border-radius:12px;overflow:hidden}
+th{white-space:nowrap}
+h1.title,h2,h3,.section-head h2{text-wrap:balance}
+p,li,.callout p,.finding-desc,.chain-desc,.tl-desc,.step-content-desc{text-wrap:pretty}
 </style>
     <!-- Privacy-friendly analytics by Plausible -->
     <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
@@ -271,7 +283,7 @@ footer span{color:#94a3b8}
 <body>
 
 <!-- ══ NAV ══ -->
-<div class="back-nav"><a href="../index.html">Portfolio</a></div>
+<div class="back-nav"><a href="../cyber.html">Portfolio</a></div>
 
 <!-- ══ MASTHEAD ══ -->
 <div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
@@ -391,31 +403,31 @@ footer span{color:#94a3b8}
       <div class="attack-flow">
         <div class="flow-step">
           <div class="flow-step-num">Step 01</div>
-          <div class="flow-step-icon"><span class="material-icons">storage</span></div>
+          <div class="flow-step-icon"></div>
           <div class="flow-step-label">DB Breach</div>
           <div class="flow-step-desc">Attacker exfiltrates password database from target platform</div>
         </div>
         <div class="flow-step warning">
           <div class="flow-step-num">Step 02</div>
-          <div class="flow-step-icon"><span class="material-icons">build</span></div>
+          <div class="flow-step-icon"></div>
           <div class="flow-step-label">Hash Cracking</div>
           <div class="flow-step-desc">Unsalted or weak hashes cracked using rainbow tables or GPU rigs</div>
         </div>
         <div class="flow-step warning">
           <div class="flow-step-num">Step 03</div>
-          <div class="flow-step-icon"><span class="material-icons">merge_type</span></div>
+          <div class="flow-step-icon"></div>
           <div class="flow-step-label">Aggregation</div>
           <div class="flow-step-desc">Plaintext credentials compiled into email:password combo lists, traded on dark web</div>
         </div>
         <div class="flow-step danger">
           <div class="flow-step-num">Step 04</div>
-          <div class="flow-step-icon"><span class="material-icons">smart_toy</span></div>
+          <div class="flow-step-icon"></div>
           <div class="flow-step-label">Automated Testing</div>
           <div class="flow-step-desc">Tools (OpenBullet, Sentry MBA) test millions of pairs/day against banking, email, cloud portals</div>
         </div>
         <div class="flow-step danger">
           <div class="flow-step-num">Step 05</div>
-          <div class="flow-step-icon"><span class="material-icons">lock_open</span></div>
+          <div class="flow-step-icon"></div>
           <div class="flow-step-label">Account Takeover</div>
           <div class="flow-step-desc">Successful logins monetized: accounts drained, reset chains exploited for lateral movement</div>
         </div>
@@ -432,14 +444,14 @@ footer span{color:#94a3b8}
     <div class="figure-body">
       <div class="split-visual">
         <div class="split-panel left">
-          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">history</span> Breach Aggregation Lists</div>
+          <div class="split-panel-title">Breach Aggregation Lists</div>
           <p><strong>Source:</strong> Compiled from historical breach databases, traded on dark web forums.</p>
           <p><strong>Credential age:</strong> Reflects passwords at time of breach — may be years old.</p>
           <p><strong>Defense:</strong> Changing passwords after a breach notification removes the risk. Regular rotation limits exposure window.</p>
           <p><strong>Examples in this profile:</strong> Collection #1, Cit0day, Pemiblanc, Exploit.In</p>
         </div>
         <div class="split-panel right">
-          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">bug_report</span> Infostealer-Sourced Credentials</div>
+          <div class="split-panel-title">Infostealer-Sourced Credentials</div>
           <p><strong>Source:</strong> Malware (Lumma, RedLine, Raccoon) deployed via malvertising, trojanized downloads, phishing attachments.</p>
           <p><strong>Credential age:</strong> Current — harvested from active browser sessions. Session cookies captured alongside passwords.</p>
           <p><strong>Defense:</strong> Password changes alone are insufficient if session cookie was captured. Requires full session invalidation + malware remediation.</p>
@@ -581,13 +593,13 @@ footer span{color:#94a3b8}
     <div class="figure-body">
       <div class="split-visual">
         <div class="split-panel left">
-          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">check_circle</span> What the User Believes</div>
+          <div class="split-panel-title">What the User Believes</div>
           <p>User creates account in 2008 with email + password. Later switches to "Sign in with Google" and assumes this replaced or secured the original account.</p>
           <p>User believes there is one account, protected by Google SSO and Google's 2FA.</p>
           <p>User stops maintaining the original password — stops rotating it, forgets what it was, loses the ability to recover it if needed.</p>
         </div>
         <div class="split-panel right">
-          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">cancel</span> What Actually Exists</div>
+          <div class="split-panel-title">What Actually Exists</div>
           <p>Two accounts exist: the original native account (email + old password, possibly from a breached era) and the new SSO account. Platform may not have merged them.</p>
           <p>The original account sits dormant — with whatever password was set at creation, potentially one that appears in breach lists, with no active monitoring or rotation.</p>
           <p>Password reset emails for the dormant account may not arrive due to spam filtering, delivery failures, or platform changes — creating an unrecoverable account that still holds personal data and represents an active credential-stuffing target.</p>
@@ -614,14 +626,14 @@ footer span{color:#94a3b8}
     <div class="figure-body">
       <div class="split-visual">
         <div class="split-panel left">
-          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">person</span> Consumer — Google SSO (where confirmed)</div>
+          <div class="split-panel-title">Consumer — Google SSO (where confirmed)</div>
           <p><strong>Root of trust:</strong> Google account controls OAuth authentication for linked platforms.</p>
           <p><strong>Blast radius:</strong> One stolen session token = simultaneous access to all SSO-linked platforms.</p>
           <p><strong>Email-as-master-key:</strong> Gmail also functions as the password reset address for every email-linked account — SSO or not. Compromising Gmail gives reset authority over all downstream accounts.</p>
           <p><strong>Detection gap:</strong> No centralized audit log across platforms for consumer SSO sessions.</p>
         </div>
         <div class="split-panel right">
-          <div class="split-panel-title"><span class="material-icons" style="font-size:1rem">business</span> Enterprise — Azure Entra ID</div>
+          <div class="split-panel-title">Enterprise — Azure Entra ID</div>
           <p><strong>Root of trust:</strong> Entra ID controls authentication for all integrated SaaS applications — SharePoint, Teams, Salesforce, ServiceNow, and more.</p>
           <p><strong>Blast radius:</strong> One compromised Entra ID account cascades through every integrated application via OAuth token delegation — functionally identical risk profile at enterprise scale.</p>
           <p><strong>Detection advantage:</strong> Entra ID Sign-in Logs + Microsoft Defender for Identity provide centralized visibility. Anomalous sign-ins trigger automated risk scoring and conditional access policies.</p>
@@ -831,16 +843,6 @@ footer span{color:#94a3b8}
 <!-- ══ BIO ══ -->
 <div class="wrap">
 </div></div>
-
-<div class="bio">
-  <div class="bio-avatar">YI</div>
-  <div>
-    <div class="bio-name">Yana Ivanov</div>
-    <div class="bio-title">Security Researcher &nbsp;·&nbsp; Threat Intelligence &amp; Detection &nbsp;·&nbsp; SiteWave Studio</div>
-    <p class="bio-text">I'm a security researcher in Connecticut. Analysis is the part I love: tracing threat actor behavior, pulling apart supply chain attacks, and following evidence even when it lands on “unknown.” When a question needs a tool that doesn't exist, I build it; most of the tools on this site started that way. Before security I spent 15 years designing enterprise software, which is why my tools assume a human will actually have to use them. Security+ in progress. Everything here is independent work, shared as a contribution to the security community.</p>
-    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
-  </div>
-</div>
 
 <footer>
   <span>38 Breaches, One Email Address · Yana Ivanov · March 2026</span>

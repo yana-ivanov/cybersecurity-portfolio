@@ -5,8 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- EDIT: page title -->
 <title>The Platform Is the Weapon — How Attackers Use GitHub, Jira, and Slack Against You | Yana Ivanov</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ════════════════════════════════════════════════════════════
    DESIGN TOKENS — do not edit
@@ -18,14 +17,14 @@
   --blue:#1a4fa0;--blue-dim:rgba(26,79,160,0.08);
   --green:#145a32;--green-dim:rgba(20,90,50,0.08);
   --rule:#e2e8f0;--bg:#f8fafc;--paper:#ffffff;
-  --mono:'JetBrains Mono',monospace;
-  --serif:'Source Serif 4','Georgia',serif;
-  --display:'Playfair Display','Georgia',serif;
-  --display-clean:'IBM Plex Serif','Georgia',serif;
+  --mono:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --serif:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --display:'Manrope','Helvetica Neue',Arial,sans-serif;
+  --display-clean:'Manrope','Helvetica Neue',Arial,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;font-size:20px}
-body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.8;font-size:20px}
+html{scroll-behavior:smooth;font-size:18px}
+body{font-family:var(--serif);background:var(--bg);color:var(--ink);line-height:1.7;font-size:18px}
 a{color:var(--blue);text-decoration:none}
 a:hover{text-decoration:underline}
 
@@ -54,7 +53,7 @@ h1.title span{color:#60a5fa}
 .meta-item .value{font-size:.9rem;color:#e2e8f0;font-weight:600;font-family:var(--mono);word-break:break-word}
 
 /* Blue bar — wraps naturally */
-.mast-bar{background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
+.mast-bar{text-transform:lowercase;background:#1a4fa0;margin-top:0;padding:.8rem 3rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:#fff;display:flex;align-items:center;gap:.75rem}
 .mast-bar-dot{width:7px;height:7px;min-width:7px;border-radius:50%;background:#4a9eff;flex-shrink:0;animation:blink 1.5s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
 
@@ -296,6 +295,19 @@ footer span{color:#94a3b8}
 @media(min-width:768px) and (orientation:landscape){
   .mobile-notice{display:none}
 }
+
+/* ── modern treatment: Manrope, no icons, clean tables (do not edit) ── */
+h1.title{font-weight:800;letter-spacing:-.02em}
+h2{font-weight:800;letter-spacing:-.015em}
+h3{font-weight:700}
+.section-num{font-weight:700}
+.figure,.tool-embed{border-radius:12px}
+.callout{border-radius:8px}
+.finding,.split-panel{border-radius:10px}
+.stat-num-grid,.fig-stat-row{border-radius:12px;overflow:hidden}
+th{white-space:nowrap}
+h1.title,h2,h3,.section-head h2{text-wrap:balance}
+p,li,.callout p,.finding-desc,.chain-desc,.tl-desc,.step-content-desc{text-wrap:pretty}
 </style>
     <!-- Privacy-friendly analytics by Plausible -->
     <script async src="https://plausible.io/js/pa-NXVpsfumVAR2LJELxP_So.js"></script>
@@ -310,7 +322,7 @@ footer span{color:#94a3b8}
 <div class="mobile-notice"><strong>Intentionally desktop-first</strong> — best experienced on a workstation</div>
 
 <!-- ══ NAV ══ -->
-<div class="back-nav"><a href="/">Portfolio</a></div>
+<div class="back-nav"><a href="/cyber.html">Portfolio</a></div>
 
 <!-- ══ MASTHEAD ══ -->
 <div class="masthead">
@@ -498,19 +510,6 @@ footer span{color:#94a3b8}
 <!-- ════════════════════════════════════════════════════════════
      BIO + FOOTER — do not move, must stay outside .wrap
      ════════════════════════════════════════════════════════════ -->
-<div class="bio">
-  <div class="bio-avatar">YI</div>
-  <div>
-    <div class="bio-name">Yana Ivanov</div>
-    <div class="bio-title">Security Analyst &nbsp;·&nbsp; CMMC Compliance Analyst &nbsp;·&nbsp; SiteWave Studio</div>
-    <p class="bio-text">Yana Ivanov is a security analyst and CMMC compliance consultant based in Connecticut, specializing in cybersecurity risk assessment for defense contractors in the Connecticut defense industrial base. With 15 years of enterprise technology experience and an MS in Web Design & Development, she brings a practitioner perspective to threat intelligence analysis. She is currently pursuing CompTIA Security+ and CMMC Registered Practitioner certification, with a focus on helping defense supply chain companies achieve genuine — not checkbox — security compliance. This analysis was produced independently as a contribution to the security community's understanding of active threats against US defense infrastructure.</p>
-    <p class="bio-text" style="margin-top:.75rem"><a href="../index.html" class="back-nav-link">Portfolio</a></p>
-  </div>
-</div>
-
-<!-- EDIT: footer spans — for WRITING: left=title/date, right=classification note -->
-<!-- For LAB LOGS: left=title/date/environment, right=← Portfolio link -->
-<!-- Writing footer example: -->
 <footer>
   <span>The Platform Is the Weapon &nbsp;·&nbsp; Yana Ivanov &nbsp;·&nbsp; August 2026</span>
   <span>Based on public reporting &nbsp;·&nbsp; For educational use &nbsp;·&nbsp; Independent analysis</span>
