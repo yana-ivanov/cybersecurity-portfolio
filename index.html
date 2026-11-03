@@ -1,5 +1,6 @@
 <title>Yana Ivanov</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -57,7 +58,17 @@
   .cards.cols-2{grid-template-columns:repeat(2,1fr)}
   .cards.cols-3{grid-template-columns:repeat(3,1fr)}
   @media(max-width:900px){.cards.cols-3{grid-template-columns:repeat(2,1fr)}}
-  @media(max-width:640px){.cards.cols-2,.cards.cols-3{grid-template-columns:1fr}}
+  @media(max-width:640px){
+    .cards.cols-2,.cards.cols-3{
+      display:flex;grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory;
+      gap:16px;padding-bottom:14px;margin-top:30px;
+      -webkit-overflow-scrolling:touch;scrollbar-width:none;
+    }
+    .cards.cols-2::-webkit-scrollbar,.cards.cols-3::-webkit-scrollbar{display:none}
+    .cards.cols-2 .card,.cards.cols-3 .card{flex:0 0 87%;scroll-snap-align:center}
+    .swipe-hint{display:block}
+  }
+  .swipe-hint{display:none;margin-top:14px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
   .card{display:flex;flex-direction:column;background:#ffffff;border:1px solid var(--line);border-radius:14px;padding:26px 24px 22px;transition:border-color .18s}
   .card:hover{border-color:var(--accent)}
   .card-img{margin:-26px -24px 18px;border-radius:14px 14px 0 0;overflow:hidden;aspect-ratio:16/10;background:#0f172a}
@@ -120,7 +131,7 @@
 .ctx .sep{opacity:.45}
 .ctx .current{color:var(--text);font-weight:700}
 .ctx .role{color:var(--muted);font-weight:600}
-@media(max-width:700px){.ctx .crumbs{display:none}}
+@media(max-width:700px){.ctx{display:none}}
 </style>
 
 <header class="sitehead">
@@ -186,6 +197,7 @@
       </a>
 
     </div>
+    <div class="swipe-hint">Swipe for more &rarr;</div>
   </section>
 
   <section class="wrap">

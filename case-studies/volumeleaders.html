@@ -37,7 +37,7 @@
   .crumbbar .role{ color:var(--muted); font-weight:600; }
   @media(max-width:560px){.topbar .mid{display:none}}
   .hero{padding:96px 0}
-  .hero-title{font-size:clamp(52px,10vw,120px);line-height:.92;font-weight:800;letter-spacing:-.02em;text-transform:uppercase;font-family:'Space Grotesk','Inter',sans-serif}
+  .hero-title{font-size:clamp(44px,9vw,120px);line-height:.92;font-weight:800;letter-spacing:-.02em;text-transform:uppercase;font-family:'Space Grotesk','Inter',sans-serif;overflow-wrap:break-word}
   .hero-title .dot{color:var(--accent)}
   .hero-tag{font-family:'JetBrains Mono','Courier New',monospace;color:var(--muted);font-size:17px;letter-spacing:.14em;margin-top:20px;text-transform:uppercase}
   .hero-intro{max-width:660px;margin-top:40px;color:#d0d0d0;font-size:20px;line-height:1.75}
@@ -90,7 +90,7 @@
 .ctx .sep{opacity:.45}
 .ctx .current{color:var(--text);font-weight:700}
 .ctx .role{color:var(--muted);font-weight:600}
-@media(max-width:700px){.ctx .crumbs{display:none}}
+@media(max-width:700px){.ctx{display:none}}
 </style>
 </head>
 <body>
@@ -115,7 +115,7 @@
   </header>
 
 <div class="wrap"><div class="hero">
-  <h1 class="hero-title">Volume<span class="dot">Leaders</span></h1>
+  <h1 class="hero-title">Volume<wbr><span class="dot">Leaders</span></h1>
   <div class="hero-tag">Volume with context. Insight with edge.</div>
   <p class="hero-intro">VolumeLeaders is a market-analytics platform that shows where the real money is moving: dark-pool blocks, sweeps, and unusual volume, with the context a trader needs to act. I led the product's UX and UI design and built its design system, turning dense, real-time market data into a clear, scannable interface.</p>
 </div></div>
