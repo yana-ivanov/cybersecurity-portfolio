@@ -59,6 +59,8 @@
   @media(max-width:640px){.cards.cols-2,.cards.cols-3{grid-template-columns:1fr}}
   .card{display:flex;flex-direction:column;background:#ffffff;border:1px solid var(--line);border-radius:14px;padding:26px 24px 22px;transition:border-color .18s}
   .card:hover{border-color:var(--accent)}
+  .card-img{margin:-26px -24px 18px;border-radius:14px 14px 0 0;overflow:hidden;aspect-ratio:16/10;background:#0f172a}
+  .card-img img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
   .badges{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
   .brow{display:flex;flex-wrap:wrap;gap:7px}
   .badge{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--accent-text);background:rgba(56,189,248,.13);border-radius:5px;padding:4px 9px}
@@ -131,6 +133,7 @@
     <div class="cards" id="cards">
 
       <a class="card" href="https://yanaivanov.com/case-studies/volumeleaders.html" target="_blank" rel="noopener">
+        <div class="card-img"><img src="images/volumeleaders/lifestyle-left-casual.jpg" alt="VolumeLeaders trading dashboard on a laptop" loading="lazy"></div>
         <div class="badges"><div class="brow"><span class="badge">Fintech</span><span class="badge">Design system</span></div><div class="brow"><span class="badge plat">Desktop</span></div></div>
         <h3>VolumeLeaders</h3>
         <div class="cat">Data-dense dashboard &middot; Data visualization</div>
@@ -139,6 +142,7 @@
       </a>
 
       <a class="card" href="https://yanaivanov.com/case-studies/steadyrides.html" target="_blank" rel="noopener">
+        <div class="card-img"><img src="images/steadyrides/lifestyle-driver.jpg" alt="SteadyRides driver app mounted in a car" loading="lazy"></div>
         <div class="badges"><div class="brow"><span class="badge">Product + Build</span><span class="badge">Workflows</span></div><div class="brow"><span class="badge plat">Mobile + Desktop</span></div></div>
         <h3>SteadyRides</h3>
         <div class="cat">Multi-role workflows &middot; AI-assisted build</div>
@@ -147,6 +151,7 @@
       </a>
 
       <a class="card" href="https://yanaivanov.com/argusx.html" target="_blank" rel="noopener">
+        <div class="card-img"><img src="images/main_feed.png" alt="ArgusX threat-intelligence dashboard" loading="lazy"></div>
         <div class="badges"><div class="brow"><span class="badge">Cybersecurity</span><span class="badge">Explainable AI</span></div><div class="brow"><span class="badge plat">Desktop</span></div></div>
         <h3>ArgusX</h3>
         <div class="cat">Threat intelligence &middot; AI decision UX</div>
