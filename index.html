@@ -334,7 +334,7 @@
 <script>
   (function(){
     var cards=document.getElementById('cards');
-    if(cards){var n=cards.querySelectorAll('.card').length;cards.classList.add(n%2===0?'cols-2':'cols-3');}
+    if(cards){var n=cards.querySelectorAll('.card').length;cards.classList.add(n<=2?'cols-2':'cols-3');}
     var tabs=[document.getElementById('tab-design'),document.getElementById('tab-cyber')];
     var panels={ 'tab-design':document.getElementById('panel-design'), 'tab-cyber':document.getElementById('panel-cyber') };
     function select(id){
